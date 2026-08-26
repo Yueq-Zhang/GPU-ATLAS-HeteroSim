@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hetero-accel-sim-qualification/v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "status",
+    "backend_id",
+    "trace_id",
+    "trace_key",
+    "simulation_key",
+    "comparison",
+    "exact_match_required",
+    "timing_ownership"
+  ],
+  "properties": {
+    "schema_version": {"const": "hetero-accel-sim-qualification/v1"},
+    "status": {"enum": ["passed", "failed"]},
+    "exact_match_required": {"const": true},
+    "comparison": {"type": "object"},
+    "timing_ownership": {"type": "object"}
+  }
+}

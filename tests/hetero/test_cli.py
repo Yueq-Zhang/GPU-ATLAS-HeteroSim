@@ -1,4 +1,5 @@
 from frontend.hetero.cli import main
+from frontend.hetero.trace_manifest import TraceManifest
 import json
 
 
@@ -44,3 +45,6 @@ def test_run_command_creates_required_artifacts(tmp_path, capsys) -> None:
     metrics = json.loads((run_dirs[0] / "metrics.json").read_text())
     assert metrics["run_status"] == "scheduler_validation"
     assert metrics["performance_claim_allowed"] is False
+    trace_manifest = TraceManifest.load(run_dirs[0] / "trace_manifest.json")
+    assert trace_manifest.trace_semantics == "none"
+    assert trace_manifest.kernels_list is None

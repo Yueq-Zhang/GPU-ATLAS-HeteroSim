@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hetero-accel-sim-backend/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "backend_id",
+    "executable",
+    "gpgpu_config",
+    "trace_config",
+    "target_gpu",
+    "target_sm",
+    "core_frequency_hz",
+    "timeout_seconds",
+    "dependency_commits",
+    "environment"
+  ],
+  "properties": {
+    "schema_version": {"const": "hetero-accel-sim-backend/v1"},
+    "backend_id": {"type": "string", "minLength": 1},
+    "executable": {"type": "string", "minLength": 1},
+    "gpgpu_config": {"type": "string", "minLength": 1},
+    "trace_config": {"type": "string", "minLength": 1},
+    "target_gpu": {"type": "string", "minLength": 1},
+    "target_sm": {"type": "integer", "minimum": 1},
+    "core_frequency_hz": {"type": "integer", "minimum": 1},
+    "timeout_seconds": {"type": "integer", "minimum": 1},
+    "dependency_commits": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "minLength": 7}
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    }
+  }
+}

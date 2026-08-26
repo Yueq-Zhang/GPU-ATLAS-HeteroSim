@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hetero-trace-manifest/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "trace_id",
+    "trace_semantics",
+    "replay_safe",
+    "qualification_record",
+    "kernels_list",
+    "capture",
+    "compilation",
+    "address_ranges"
+  ],
+  "properties": {
+    "schema_version": {"const": "hetero-trace-manifest/v1"},
+    "trace_id": {"type": "string", "minLength": 1},
+    "trace_semantics": {"enum": ["none", "functional", "timing_feedback"]},
+    "replay_safe": {"type": "boolean"},
+    "qualification_record": {"type": ["string", "null"]},
+    "kernels_list": {"type": ["string", "null"], "minLength": 1},
+    "capture": {"type": "object"},
+    "compilation": {"type": "object"},
+    "address_ranges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "capture_allocation_id",
+          "trace_base",
+          "size_bytes",
+          "tensor_id",
+          "tensor_offset_bytes",
+          "capture_epoch",
+          "backing_allocation_id",
+          "view_offset_bytes",
+          "alignment_bytes",
+          "shape",
+          "layout"
+        ],
+        "properties": {
+          "capture_allocation_id": {"type": "string", "minLength": 1},
+          "tensor_id": {"type": "string", "minLength": 1},
+          "trace_base": {"type": ["integer", "string"]},
+          "size_bytes": {"type": ["integer", "string"]},
+          "tensor_offset_bytes": {"type": ["integer", "string"]},
+          "capture_epoch": {"type": ["integer", "string"]},
+          "backing_allocation_id": {"type": "string", "minLength": 1},
+          "view_offset_bytes": {"type": ["integer", "string"]},
+          "alignment_bytes": {"type": ["integer", "string"]},
+          "shape": {"type": "array", "minItems": 1, "items": {"type": "integer", "minimum": 1}},
+          "layout": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"trace_semantics": {"const": "none"}}},
+      "then": {
+        "properties": {
+          "kernels_list": {"type": "null"},
+          "replay_safe": {"const": false},
+          "address_ranges": {"maxItems": 0}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"replay_safe": {"const": true}}},
+      "then": {"properties": {"qualification_record": {"type": "string", "minLength": 1}}}
+    }
+  ]
+}

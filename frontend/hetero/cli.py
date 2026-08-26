@@ -7,9 +7,11 @@ from pathlib import Path
 from typing import Sequence
 
 from . import __version__
+from .backends import AccelSimBackend, AccelSimBackendConfig, AccelSimBackendError
 from .runner import execute_run, simulation_input_key
 from .runtime_bridge import RuntimeUnavailableError
 from .schema import ConfigError, load_and_validate_config
+from .trace_manifest import TraceManifest, TraceManifestError
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -24,11 +26,29 @@ def _build_parser() -> argparse.ArgumentParser:
     run.add_argument("--config", required=True, type=Path)
     run.add_argument("--dry-run", action="store_true")
     run.add_argument("--runs-root", type=Path)
+
+    qualify_gpu = subparsers.add_parser(
+        "qualify-gpu", help="compare the Accel-Sim adapter with its native baseline"
+    )
+    qualify_gpu.add_argument("--backend-config", required=True, type=Path)
+    qualify_gpu.add_argument("--trace-manifest", required=True, type=Path)
+    qualify_gpu.add_argument("--output", required=True, type=Path)
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
+    if args.command == "qualify-gpu":
+        try:
+            backend_config = AccelSimBackendConfig.load(args.backend_config)
+            manifest = TraceManifest.load(args.trace_manifest)
+            record = AccelSimBackend(backend_config).qualify(manifest, args.output)
+        except (AccelSimBackendError, TraceManifestError) as error:
+            print(f"GPU qualification error: {error}")
+            return 5
+        print(f"GPU qualification passed; record={record}")
+        return 0
+
     try:
         config = load_and_validate_config(args.config)
     except ConfigError as error:

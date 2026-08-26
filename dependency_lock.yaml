@@ -12,12 +12,31 @@ environment:
   cmake: 3.22.1
   gcc: 11.4.0
 dependencies:
-  accel_sim: not_integrated
-  gpgpu_sim: not_integrated
+  accel_sim:
+    version: v1.3.0
+    commit: c5296df152c99a28dd64e5d9560bd58a8fd2e774
+    source_archive_sha256: 2652061806585d27fe62d6ba2b8dc0226401c2680d7474c56768bde3c5a079d7
+  gpgpu_sim:
+    version: v4.2.1
+    commit: 68e1cd30efaecbd71b496822f9d88a5803b33841
+    source_archive_sha256: f288ddfcc06a873c77c9f8ac8a6d513d628c2713dd6130372a36cabfd3c7e92d
+  nvbit:
+    version: 1.7.3
+    archive_sha256: 1eff502430936aeed570d73a62886d9057adffda519ada041f43486a36d4356b
+    capture_status: blocked_on_local_driver_591_86
+    supported_driver_upper_bound: 575
+  cuda_toolkit:
+    build_and_capture_version: 11.8
+    explicit_root: /usr/local/cuda-11.8
   ramulator2: inherited_from_atlas_until_m6
   booksim2: inherited_from_atlas_until_m6
-  pybind11: 2.9.1-2_ubuntu_jammy
+  pybind11:
+    simulator_runtime_package: 2.9.1-2_ubuntu_jammy
+    accel_sim_bundled_version: 2.9.1
+    source_archive_sha256: c6160321dc98e6e1184cc791fbeadd2907bb4a0ce0e447f2ea4ff8ab56550913
   tilelang: inherited_from_atlas_until_m5
 notes:
-  - Trace capture host and target GPU configuration must be added before M5 qualification.
-  - Exact submodule commits must replace inherited placeholders before coupled simulation results are reported.
+  - Local GPU is NVIDIA GeForce RTX 3070 (SM86); pinned SM86_RTX3070 configs are used.
+  - Native CUDA workload execution passes, but NVBit 1.7.3 returns CUDA_ERROR_NOT_SUPPORTED with driver 591.86; use a driver at or below 575 for local capture or import an official pre-captured trace.
+  - M5 Step 1 is an independent total-duration backend; Accel-Sim exclusively owns GPU core, cache, NoC and local DRAM timing.
+  - Exact ATLAS, Ramulator2, BookSim2 and TileLang dependency revisions must replace inherited placeholders before coupled simulation results are reported.

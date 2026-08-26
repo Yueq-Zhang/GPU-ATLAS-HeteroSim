@@ -2,7 +2,7 @@
 
 GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端到端 LLM 联合仿真工程。工程把完整 Prefill/Decode 请求图、算子放置、跨设备数据移动、Paged KV Cache 和全局事件调度连接到同一条可复现运行路径。
 
-> 当前版本处于 M2 开发阶段。`scheduler_validation` 用固定 Epoch 验证请求、Batch、KV、放置和拓扑语义；`analytical_preview` 使用未校准 Roofline 与链路参数验证全局任务 DAG。两者都不是周期精确性能结果，产物均明确写入 `performance_claim_allowed=false`。
+> 当前版本已完成 M5 第一步：独立 Accel-Sim Trace 后端的固定版本构建、Trace/地址契约和适配器资格验证路径。`scheduler_validation` 与 `analytical_preview` 仍是语义/分析模型；只有单独通过 `qualify-gpu` 的 GPU Trace 结果属于 Accel-Sim 周期模型，尚未与 ATLAS 共享内存时序。
 
 完整架构约束以 [GPU + ATLAS 异构端到端仿真实现规范](docs/gpu_atlas_heterogeneous_simulation_design_zh.md) 为准，阶段进度见 [实现状态](docs/IMPLEMENTATION_STATUS.md)。
 
@@ -28,8 +28,10 @@ GPU-ATLAS-HeteroSim/
 ├── configs/hetero/              # 模型、工作负载、放置、地址和实验配置
 ├── docs/                         # 冻结设计规范、构建记录和实现状态
 ├── frontend/hetero/              # Python 配置、ModelGraph、Placement、Runner
+├── scripts/                      # Accel-Sim 安装、构建、CUDA 工作负载和 Trace 采集
 ├── simulator/                    # C++ 运行时、内存服务、pybind11 与单元测试
 ├── tests/hetero/                 # Python 端到端及配置回归测试
+├── workloads/cuda/               # 最小可验证 CUDA 工作负载
 ├── dependency_lock.yaml          # 外部依赖版本记录
 └── runs/                         # 本地运行产物，默认不提交 Git
 ```
@@ -110,7 +112,7 @@ ctest --test-dir simulator/build --output-on-failure
 .venv/bin/python -m pytest tests/hetero -q
 ```
 
-当前基线应通过 7 个 C++ 测试和 30 个 Python 测试。测试数量会随实现推进增加；判断成功应以“0 failed”为准，而不是永久依赖固定数量。
+当前基线应通过 7 个 C++ 测试和 38 个 Python 测试。测试数量会随实现推进增加；判断成功应以“0 failed”为准，而不是永久依赖固定数量。
 
 强制重新编译已有目标：
 
@@ -356,3 +358,116 @@ Runner 按完整配置哈希选择目录。核对 CLI 输出的新 `simulation_i
 ## 12. 开发纪律
 
 后续修改必须先定位设计规范中的 M0-M9 阶段和强制不变量。任何拓扑、地址、Token、KV 状态或时序所有权变更，都应同步更新规范、测试和实现状态。共享 3D-DRAM 模式必须只有一个时序所有者；Trace 地址必须先稳定映射为 Global PA，再进行候选 DRAM 地址译码。
+
+## 13. M5 第一步：独立 Accel-Sim 后端
+
+这一阶段只验证 GPU 周期仿真器本身，尚不把 GPU L2 Miss 送入 ATLAS/Ramulator2。时序所有权固定为：
+
+```text
+CUDA/TileLang -> GPU Binary -> NVBit Trace -> Accel-Sim
+                                             ├─ SM/Core
+                                             ├─ L1/L2
+                                             ├─ NoC
+                                             └─ GPU Local DRAM
+```
+
+Accel-Sim 返回完整 Kernel/Trace 的总 Cycle，适配器按配置的 GPU Core 频率换算为整数飞秒。外部 Ramulator2 在本模式下必须关闭；共享 3D-DRAM Bridge 属于后续第三步。
+
+### 13.1 安装并构建固定版本
+
+要求 WSL 中存在 `/usr/local/cuda-11.8/bin/nvcc`。脚本固定到 Accel-Sim v1.3.0、GPGPU-Sim v4.2.1、NVBit 1.7.3，并对每个下载包校验 SHA-256：
+
+```bash
+cd /opt/gpu-atlas/GPU-ATLAS-HeteroSim
+bash scripts/install_accel_sim.sh
+bash scripts/build_accel_sim.sh
+```
+
+默认依赖目录是 `/opt/gpu-atlas/dependencies`。需要改变位置时，在安装、构建和运行阶段统一设置 `ACCEL_SIM_DEPS_ROOT`。
+
+### 13.2 编译并验证最小 CUDA 工作负载
+
+```bash
+bash scripts/build_cuda_workload.sh
+```
+
+成功标志为：
+
+```text
+vector_add verified: 4096 elements
+CUDA workload built and verified: .../build/workloads/vector_add
+```
+
+### 13.3 采集 Trace
+
+```bash
+bash scripts/capture_accel_sim_trace.sh \
+  build/workloads/vector_add \
+  /opt/gpu-atlas/traces/vector_add_sm86
+```
+
+本机已验证的 NVIDIA 驱动为 591.86，高于 NVBit 1.7.3 支持上限 575。采集脚本会在启动插桩前退出，并提示换用兼容驱动的采集主机。无需在仿真主机重新采集：可把兼容机器生成的 `kernelslist.g` 与 `*.traceg` 整体复制回来。`ALLOW_UNSUPPORTED_NVBIT_DRIVER=1` 只用于诊断，不表示结果有效。
+
+### 13.4 编写 Trace Manifest
+
+每份 Trace 都必须有独立 JSON Manifest。最小结构如下，其中 `replay_safe` 初始必须是 `false`：
+
+```json
+{
+  "schema_version": "hetero-trace-manifest/v1",
+  "trace_id": "vector_add.cuda11_8.sm86",
+  "trace_semantics": "functional",
+  "replay_safe": false,
+  "qualification_record": null,
+  "kernels_list": "/opt/gpu-atlas/traces/vector_add_sm86/kernelslist.g",
+  "capture": {"tool": "NVBit", "version": "1.7.3", "gpu": "RTX 3070"},
+  "compilation": {"cuda": "11.8", "target_sm": 86},
+  "address_ranges": [
+    {
+      "capture_allocation_id": "cuda.alloc.1",
+      "trace_base": "0x7f2000000000",
+      "size_bytes": 16384,
+      "tensor_id": "input_a",
+      "tensor_offset_bytes": 0,
+      "capture_epoch": 0,
+      "backing_allocation_id": "input_a.storage",
+      "view_offset_bytes": 0,
+      "alignment_bytes": 256,
+      "shape": [4096],
+      "layout": "contiguous_fp32"
+    }
+  ]
+}
+```
+
+地址层次严格分开：`TraceAddr -> TensorID + Offset -> PhysicalAddress(memory_space_id, offset) -> DRAM Tuple`。Manifest 只保存第一段采集绑定；每个仿真候选通过独立 `SimulationBufferBinding` 决定当前 PhysicalAddress，Channel/Bank/Row/Column 再由具体内存配置在 LLC Miss 后译码。候选分配和 DRAM 译码都不进入 `trace_key`。同一 Trace 只有在资格记录通过且没有执行时序反馈时，才允许跨 DRAM 候选复用。
+
+### 13.5 独立资格验证
+
+```bash
+.venv/bin/python -m frontend.hetero.cli qualify-gpu \
+  --backend-config configs/hetero/backends/gpu_accelsim_rtx3070.json \
+  --trace-manifest /opt/gpu-atlas/traces/vector_add_sm86/trace_manifest.json \
+  --output /opt/gpu-atlas/qualification/vector_add_sm86
+```
+
+命令连续执行一遍原生基线和一遍适配器路径，并要求 `gpu_tot_sim_cycle`、`gpu_tot_sim_insn` 完全一致。输出包括：
+
+- `native_baseline/command.json`、日志和 `stats.json`；
+- `adapter/command.json`、日志和 `stats.json`；
+- `qualification_record.json`；
+- `qualified_trace_manifest.json`，仅在精确比较通过后生成并写入 `replay_safe=true`。
+
+资格验证只证明适配器没有改变固定版本 Accel-Sim 的独立执行结果，不证明 RTX 3070 配置已经完成实机微架构校准，也不证明 GPU+ATLAS 联合仿真已经完成。
+
+仓库同时提供 `gpu_accelsim_qv100.json`，专门用于 Accel-Sim 官方 V100 预采集 Trace 的适配器回归。Trace 与硬件配置必须匹配：官方 SM70 Trace 不应套用 RTX 3070/SM86 配置；它能验证软件适配器，但不能替代后续 RTX 3070 Trace 的目标平台校准。
+
+官方回归 Trace 的完整复现命令为：
+
+```bash
+bash scripts/download_official_accel_sim_trace.sh
+.venv/bin/python -m frontend.hetero.cli qualify-gpu \
+  --backend-config configs/hetero/backends/gpu_accelsim_qv100.json \
+  --trace-manifest configs/hetero/traces/official_qv100_backprop_4096.json \
+  --output /opt/gpu-atlas/qualification/qv100_backprop_4096
+```

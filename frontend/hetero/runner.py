@@ -408,10 +408,14 @@ def execute_run(
         run_dir / "trace_manifest.json",
         {
             "schema_version": "hetero-trace-manifest/v1",
-            "trace_semantics": "functional",
+            "trace_id": f"unavailable.{key}",
+            "trace_semantics": "none",
             "replay_safe": False,
             "qualification_record": None,
-            "captures": [],
+            "kernels_list": None,
+            "capture": {"status": "no_cycle_trace", "execution_mode": execution_mode},
+            "compilation": {"status": "not_materialized"},
+            "address_ranges": [],
         },
     )
     _write_json(run_dir / "metrics.json", metrics)

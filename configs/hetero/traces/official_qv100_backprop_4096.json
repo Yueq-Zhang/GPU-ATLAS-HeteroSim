@@ -1,0 +1,22 @@
+{
+  "schema_version": "hetero-trace-manifest/v1",
+  "trace_id": "official.accel_sim.qv100.rodinia_backprop_4096.cuda9_1",
+  "trace_semantics": "functional",
+  "replay_safe": false,
+  "qualification_record": null,
+  "kernels_list": "/opt/gpu-atlas/qualification/official-traces/extracted/rodinia_2.0-ft/9.1/backprop-rodinia-2.0-ft/4096___data_result_4096_txt/traces/kernelslist.g",
+  "capture": {
+    "source": "Accel-Sim official Tesla V100 trace bundle",
+    "bundle": "rodinia_2.0-ft.tgz",
+    "bundle_sha256": "aeb7de478785856e4ac834d12be0e71ab0df297f43fc02650e2ca90dea66d8b1",
+    "cuda": "9.1",
+    "gpu": "Tesla V100",
+    "workload": "backprop-rodinia-2.0-ft",
+    "arguments": "4096"
+  },
+  "compilation": {
+    "origin": "official_pre_captured_trace",
+    "target_sm": 70
+  },
+  "address_ranges": []
+}
