@@ -18,7 +18,10 @@
       "properties": {
         "kind": {"type": "string"},
         "ref": {"type": "string", "minLength": 1},
-        "requested_timing_mode": {"type": "string"}
+        "requested_timing_mode": {"type": "string"},
+        "effective_compute_flops_per_s": {"type": "integer", "minimum": 1},
+        "effective_memory_bandwidth_Bps": {"type": "integer", "minimum": 1},
+        "parameter_source": {"type": "string", "minLength": 1}
       }
     },
     "model": {
@@ -113,7 +116,7 @@
       "type": "object", "additionalProperties": false, "required": ["coupling"],
       "properties": {
         "coupling": {"enum": ["analytical", "operator_event", "request_cycle"]},
-        "execution_mode": {"enum": ["scheduler_validation", "full_runtime"]}
+        "execution_mode": {"enum": ["scheduler_validation", "analytical_preview", "full_runtime"]}
       }
     },
     "system": {
@@ -121,7 +124,21 @@
       "properties": {
         "profile": {"enum": ["model1_atlas_native", "model2_host_memory_pcie", "model3_gpu_native_3ddram", "model4_cxl_memory_tier"]},
         "topology_ref": {"type": "string"},
-        "access_policy": {"enum": ["remote", "copy", "migrate"]}
+        "access_policy": {"enum": ["remote", "copy", "migrate"]},
+        "links": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object", "additionalProperties": false,
+            "required": ["wire_bandwidth_Bps", "latency_fs", "header_bytes", "resource_id", "parameter_source"],
+            "properties": {
+              "wire_bandwidth_Bps": {"type": "integer", "minimum": 1},
+              "latency_fs": {"type": "integer", "minimum": 0},
+              "header_bytes": {"type": "integer", "minimum": 0},
+              "resource_id": {"type": "string", "minLength": 1},
+              "parameter_source": {"type": "string", "minLength": 1}
+            }
+          }
+        }
       }
     },
     "backends": {

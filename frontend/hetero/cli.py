@@ -51,8 +51,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     except (ValueError, RuntimeError) as error:
         print(f"simulation error: {error}")
         return 4
+    execution_mode = config["simulation"].get("execution_mode", "scheduler_validation")
     print(
-        "scheduler-validation run completed; "
+        f"{str(execution_mode).replace('_', '-')} run completed; "
         f"simulation_input_key={key}; run_dir={run_dir}"
     )
     return 0

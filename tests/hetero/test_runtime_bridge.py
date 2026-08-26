@@ -1,6 +1,7 @@
 from frontend.hetero.runtime_bridge import (
     allocate_paged_kv,
     ideal_link_completion_fs,
+    run_task_dag,
     simulate_token_barrier,
 )
 
@@ -55,3 +56,31 @@ def test_cpp_paged_kv_matches_tiny_golden_values() -> None:
 
 def test_cpp_ideal_link_formula_uses_wire_bytes() -> None:
     assert ideal_link_completion_fs(7, 11, 64, 16, 10**12) == 80018
+
+
+def test_global_task_dag_runtime_serializes_resources() -> None:
+    result = run_task_dag(
+        [
+            {
+                "task_id": "gpu.a",
+                "resource_id": "gpu0.compute",
+                "dependencies": [],
+                "duration_fs": 10,
+            },
+            {
+                "task_id": "gpu.b",
+                "resource_id": "gpu0.compute",
+                "dependencies": [],
+                "duration_fs": 5,
+            },
+            {
+                "task_id": "atlas.c",
+                "resource_id": "atlas0.compute",
+                "dependencies": ["gpu.a"],
+                "duration_fs": 7,
+            },
+        ]
+    )
+    assert result["makespan_fs"] == 17
+    assert result["tasks"][1]["start_time_fs"] == 10
+    assert result["tasks"][2]["start_time_fs"] == 10

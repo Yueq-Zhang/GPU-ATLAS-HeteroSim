@@ -7,6 +7,7 @@
 #include <pybind11/stl.h>
 
 #include "hetero/memory/paged_kv.h"
+#include "hetero/runtime/global_event_runtime.h"
 #include "hetero/runtime/scheduler.h"
 #include "hetero/services/fixed_latency_memory.h"
 
@@ -119,12 +120,43 @@ py::dict allocate_kv(
         "allocations"_a = allocations);
 }
 
+py::dict run_task_dag(const py::list& task_objects) {
+    std::vector<heterosim::runtime::RuntimeTask> tasks;
+    tasks.reserve(py::len(task_objects));
+    for (const auto& item : task_objects) {
+        const auto task = py::cast<py::dict>(item);
+        tasks.push_back(heterosim::runtime::RuntimeTask{
+            py::cast<std::string>(task["task_id"]),
+            py::cast<std::string>(task["resource_id"]),
+            task.contains("dependencies")
+                ? py::cast<std::vector<std::string>>(task["dependencies"])
+                : std::vector<std::string>{},
+            get_u64(task, "release_time_fs"),
+            get_u64(task, "duration_fs")});
+    }
+    const auto result = heterosim::runtime::GlobalEventRuntime{}.run(tasks);
+    py::list timings;
+    for (const auto& timing : result.tasks) {
+        timings.append(py::dict(
+            "task_id"_a = timing.task_id,
+            "resource_id"_a = timing.resource_id,
+            "ready_time_fs"_a = timing.ready_time_fs,
+            "start_time_fs"_a = timing.start_time_fs,
+            "completion_time_fs"_a = timing.completion_time_fs));
+    }
+    return py::dict(
+        "schema_version"_a = "hetero-runtime-dag-result/v1",
+        "makespan_fs"_a = result.makespan_fs,
+        "tasks"_a = timings);
+}
+
 }  // namespace
 
 PYBIND11_MODULE(_heterosim_runtime, module) {
     module.doc() = "C++ dynamic runtime boundary for GPU-ATLAS-HeteroSim";
     module.def("simulate_token_barrier", &simulate);
     module.def("allocate_paged_kv", &allocate_kv);
+    module.def("run_task_dag", &run_task_dag);
     module.def(
         "ideal_link_completion_fs",
         &heterosim::services::ideal_link_completion_fs,

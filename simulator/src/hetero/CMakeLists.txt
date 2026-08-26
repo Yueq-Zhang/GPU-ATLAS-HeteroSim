@@ -1,5 +1,6 @@
 add_library(heterosim_runtime STATIC
     runtime/event_queue.cpp
+    runtime/global_event_runtime.cpp
     runtime/scheduler.cpp
     runtime/timing_ownership.cpp
     memory/paged_kv.cpp

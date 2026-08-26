@@ -36,6 +36,10 @@ def allocate_paged_kv(
     )
 
 
+def run_task_dag(tasks: list[dict[str, object]]) -> dict[str, object]:
+    return _runtime_module().run_task_dag(tasks)
+
+
 def ideal_link_completion_fs(
     issue_time_fs: int,
     latency_fs: int,

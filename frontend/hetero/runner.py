@@ -9,6 +9,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Mapping
 
+from .analytical import estimate_link_duration_fs, estimate_node_cost
 from .model_graph import (
     build_request_graph,
     graph_counters,
@@ -16,7 +17,7 @@ from .model_graph import (
     request_specs_from_config,
 )
 from .placement import place_nodes
-from .runtime_bridge import allocate_paged_kv, simulate_token_barrier
+from .runtime_bridge import allocate_paged_kv, run_task_dag, simulate_token_barrier
 from .topology import lower_cross_device_dependency, primary_3ddram
 
 
@@ -44,27 +45,41 @@ def _write_json(path: Path, payload: object) -> None:
 
 def _git_revision(project_root: Path) -> str:
     try:
-        return subprocess.run(
+        revision = subprocess.run(
             ["git", "rev-parse", "HEAD"],
             cwd=project_root,
             check=True,
             capture_output=True,
             text=True,
         ).stdout.strip()
+        dirty = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=project_root,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        return f"{revision}-dirty" if dirty else revision
     except (OSError, subprocess.CalledProcessError):
         return "unavailable"
 
 
 def _execution_graph(
-    graphs: list[tuple[object, list[object]]],
+    graphs: list[tuple[object, list[object], object]],
     profile: str,
     access_policy: str,
-) -> dict[str, object]:
+    model: object,
+    backends: Mapping[str, object],
+    links: Mapping[str, object],
+    analytical_preview: bool,
+) -> tuple[dict[str, object], list[dict[str, object]]]:
     tasks: list[dict[str, object]] = []
     routes: list[dict[str, object]] = []
-    for graph_object, decisions_object in graphs:
+    runtime_tasks: list[dict[str, object]] = []
+    for graph_object, decisions_object, request_object in graphs:
         graph = graph_object
         decisions = decisions_object
+        request = request_object
         by_node = {decision.node_id: decision for decision in decisions}
         previous_device: str | None = None
         previous_task: str | None = None
@@ -78,49 +93,113 @@ def _execution_graph(
                     profile, previous_device, decision.target_device, access_policy
                 )
                 route_task = f"route.{len(routes)}"
-                routes.append(
-                    {
-                        "task_id": route_task,
-                        "dependencies": [previous_task],
-                        "producer_device": previous_device,
-                        "consumer_device": decision.target_device,
-                        **asdict(lowering),
-                    }
-                )
+                route_record = {
+                    "task_id": route_task,
+                    "request_id": request.request_id,
+                    "dependencies": [previous_task],
+                    "producer_device": previous_device,
+                    "consumer_device": decision.target_device,
+                    **asdict(lowering),
+                }
+                if analytical_preview:
+                    if lowering.route_id not in links:
+                        raise ValueError(
+                            f"missing analytical parameters for route {lowering.route_id}"
+                        )
+                    link = links[lowering.route_id]
+                    if not isinstance(link, Mapping):
+                        raise ValueError(f"route {lowering.route_id} must be an object")
+                    q_len = int(node.attributes.get("q_len", 1))
+                    payload_bytes = q_len * model.hidden_size * model.bytes_per_element
+                    duration_fs = estimate_link_duration_fs(payload_bytes, link)
+                    route_record.update(
+                        {
+                            "resource_id": str(link["resource_id"]),
+                            "payload_bytes": payload_bytes,
+                            "duration_fs": duration_fs,
+                            "analytical_parameters": dict(link),
+                        }
+                    )
+                    runtime_tasks.append(
+                        {
+                            "task_id": route_task,
+                            "resource_id": str(link["resource_id"]),
+                            "dependencies": [previous_task],
+                            "release_time_fs": 0,
+                            "duration_fs": duration_fs,
+                        }
+                    )
+                routes.append(route_record)
                 dependencies = [route_task]
             task_id = f"task.{node.node_id}"
-            tasks.append(
-                {
-                    "task_id": task_id,
-                    "template_node_id": node.node_id,
-                    "task_kind": "device",
-                    "phase": node.phase,
-                    "layer_id": node.layer_id,
-                    "step_id": node.step_id,
-                    "device_id": decision.target_device,
-                    "backend_id": "gpu.roofline"
-                    if decision.target_device == "gpu0"
-                    else "atlas.analytical",
-                    "dependencies": dependencies,
-                    "fidelity": {
-                        "compute_fidelity": "unavailable",
-                        "memory_fidelity": "unavailable",
-                        "link_fidelity": "event_modeled"
-                        if dependencies and routes
-                        else "unavailable",
-                        "scheduler_fidelity": "event_modeled",
-                        "extrapolated_fraction": 0.0,
-                        "trace_coverage": 0.0,
-                    },
-                }
+            backend_key = (
+                "gpu"
+                if decision.target_device == "gpu0"
+                else "atlas"
+                if decision.target_device == "atlas0.compute"
+                else "host"
             )
+            backend = backends[backend_key]
+            if not isinstance(backend, Mapping):
+                raise ValueError(f"backend {backend_key} must be an object")
+            task_record = {
+                "task_id": task_id,
+                "request_id": request.request_id,
+                "template_node_id": node.node_id,
+                "task_kind": "device",
+                "phase": node.phase,
+                "layer_id": node.layer_id,
+                "step_id": node.step_id,
+                "device_id": decision.target_device,
+                "backend_id": f"{backend_key}.{backend['kind']}",
+                "dependencies": dependencies,
+                "fidelity": {
+                    "compute_fidelity": "analytical"
+                    if analytical_preview
+                    else "unavailable",
+                    "memory_fidelity": "analytical"
+                    if analytical_preview
+                    else "unavailable",
+                    "link_fidelity": "analytical"
+                    if analytical_preview and dependencies and routes
+                    else "unavailable",
+                    "scheduler_fidelity": "event_modeled",
+                    "extrapolated_fraction": 1.0 if analytical_preview else 0.0,
+                    "trace_coverage": 0.0,
+                },
+            }
+            if analytical_preview:
+                cost = estimate_node_cost(node, model, backend)
+                task_record.update(
+                    {
+                        "resource_id": decision.target_device,
+                        "duration_fs": cost.duration_fs,
+                        "analytical_cost": cost.to_dict(),
+                        "analytical_parameters": dict(backend),
+                    }
+                )
+                runtime_tasks.append(
+                    {
+                        "task_id": task_id,
+                        "resource_id": decision.target_device,
+                        "dependencies": dependencies,
+                        "release_time_fs": request.arrival_time_fs
+                        if previous_task is None
+                        else 0,
+                        "duration_fs": cost.duration_fs,
+                    }
+                )
+            tasks.append(task_record)
             previous_device = decision.target_device
             previous_task = task_id
-    return {
-        "schema_version": "hetero-execution-graph/v1",
-        "tasks": tasks,
-        "routes": routes,
-    }
+    return (
+        {
+            "schema_version": "hetero-execution-graph/v1",
+            "tasks": tasks,
+            "routes": routes,
+        },
+        runtime_tasks,
+    )
 
 
 def _metrics(
@@ -162,6 +241,74 @@ def _metrics(
     }
 
 
+def _analytical_metrics(
+    runtime_result: Mapping[str, object],
+    execution_graph: Mapping[str, object],
+    requests: list[dict[str, object]],
+) -> dict[str, object]:
+    timings = {
+        str(item["task_id"]): item
+        for item in runtime_result["tasks"]  # type: ignore[index]
+    }
+    device_tasks = list(execution_graph["tasks"])  # type: ignore[arg-type]
+    request_metrics: list[dict[str, object]] = []
+    for request in requests:
+        request_id = str(request["request_id"])
+        sampling = sorted(
+            (
+                task
+                for task in device_tasks
+                if task["request_id"] == request_id
+                and str(task["template_node_id"]).endswith(".sampling")
+            ),
+            key=lambda task: int(task["step_id"]),
+        )
+        ready = [
+            int(timings[str(task["task_id"])]["completion_time_fs"])
+            for task in sampling
+        ]
+        intervals = [right - left for left, right in zip(ready, ready[1:])]
+        retire_task = next(
+            task
+            for task in device_tasks
+            if task["request_id"] == request_id
+            and str(task["template_node_id"]).endswith(".kv_release")
+        )
+        arrival = int(request.get("arrival_time_fs", 0))
+        request_metrics.append(
+            {
+                "request_id": request_id,
+                "ttft_fs": ready[0] - arrival,
+                "tpot_fs": sum(intervals) / len(intervals) if intervals else None,
+                "itl_fs": intervals,
+                "e2e_user_fs": ready[-1] - arrival,
+                "retire_latency_fs": int(
+                    timings[str(retire_task["task_id"])]["completion_time_fs"]
+                )
+                - arrival,
+                "generated_length": len(ready),
+                "final_committed_kv_len": int(request["prompt_length"])
+                + int(request["output_length"])
+                - 1,
+            }
+        )
+    return {
+        "schema_version": "hetero-metrics/v1",
+        "run_status": "analytical_preview",
+        "performance_claim_allowed": False,
+        "makespan_fs": runtime_result["makespan_fs"],
+        "requests": request_metrics,
+        "fidelity": {
+            "compute_fidelity": "analytical",
+            "memory_fidelity": "analytical",
+            "link_fidelity": "analytical",
+            "scheduler_fidelity": "event_modeled",
+            "extrapolated_fraction": 1.0,
+            "trace_coverage": 0.0,
+        },
+    }
+
+
 def execute_run(
     config: dict[str, object],
     project_root: Path,
@@ -180,11 +327,11 @@ def execute_run(
     model = model_spec_from_config(model_config)
     requests = request_specs_from_config(request_configs)
     graph_payloads: list[dict[str, object]] = []
-    placed_graphs: list[tuple[object, list[object]]] = []
+    placed_graphs: list[tuple[object, list[object], object]] = []
     for request in requests:
         graph = build_request_graph(model, request)
         decisions = place_nodes(graph.nodes, placement_config, active_batch=len(requests))
-        placed_graphs.append((graph, decisions))
+        placed_graphs.append((graph, decisions, request))
         graph_payloads.append(
             {
                 "request_id": request.request_id,
@@ -198,9 +345,35 @@ def execute_run(
     bindings = allocate_paged_kv(
         request_configs, model_config, address, memory_space_id
     )
-    runtime_result = simulate_token_barrier(request_configs, scheduling)
-    execution_graph = _execution_graph(placed_graphs, profile, access_policy)
-    metrics = _metrics(runtime_result, request_configs)
+    simulation = dict(config["simulation"])  # type: ignore[arg-type]
+    execution_mode = str(simulation.get("execution_mode", "scheduler_validation"))
+    if execution_mode == "full_runtime":
+        raise ValueError("full_runtime is reserved but not implemented")
+    backends = dict(config["backends"])  # type: ignore[arg-type]
+    links = system.get("links", {})
+    if not isinstance(links, Mapping):
+        raise ValueError("system.links must be an object")
+    execution_graph, runtime_tasks = _execution_graph(
+        placed_graphs,
+        profile,
+        access_policy,
+        model,
+        backends,
+        links,
+        execution_mode == "analytical_preview",
+    )
+    if execution_mode == "analytical_preview":
+        runtime_result = run_task_dag(runtime_tasks)
+        metrics = _analytical_metrics(runtime_result, execution_graph, request_configs)
+        timing_by_id = {
+            str(item["task_id"]): item
+            for item in runtime_result["tasks"]  # type: ignore[index]
+        }
+        for record in [*execution_graph["tasks"], *execution_graph["routes"]]:  # type: ignore[index]
+            record["timing"] = timing_by_id[str(record["task_id"])]
+    else:
+        runtime_result = simulate_token_barrier(request_configs, scheduling)
+        metrics = _metrics(runtime_result, request_configs)
 
     key = simulation_input_key(config)
     experiment = dict(config["experiment"])  # type: ignore[arg-type]
@@ -219,7 +392,9 @@ def execute_run(
             "schema_version": "hetero-provenance/v1",
             "simulator_revision": _git_revision(project_root),
             "simulation_input_key": key,
-            "runtime_owner": "cpp.TokenBarrierScheduler",
+            "runtime_owner": "cpp.GlobalEventRuntime"
+            if execution_mode == "analytical_preview"
+            else "cpp.TokenBarrierScheduler",
             "address_owner": "cpp.PagedKvAllocator",
         },
     )
@@ -241,6 +416,11 @@ def execute_run(
     )
     _write_json(run_dir / "metrics.json", metrics)
     with (run_dir / "event_log.jsonl").open("w", encoding="utf-8") as stream:
-        for epoch in runtime_result["epochs"]:  # type: ignore[index]
-            stream.write(json.dumps(epoch, sort_keys=True) + "\n")
+        event_records = (
+            runtime_result["tasks"]
+            if execution_mode == "analytical_preview"
+            else runtime_result["epochs"]
+        )  # type: ignore[index]
+        for event in event_records:
+            stream.write(json.dumps(event, sort_keys=True) + "\n")
     return run_dir

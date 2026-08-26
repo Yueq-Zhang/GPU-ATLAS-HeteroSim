@@ -6,6 +6,10 @@ add_executable(test_event_queue test_event_queue.cpp)
 target_link_libraries(test_event_queue PRIVATE heterosim_runtime)
 add_test(NAME hetero_event_queue COMMAND test_event_queue)
 
+add_executable(test_global_event_runtime test_global_event_runtime.cpp)
+target_link_libraries(test_global_event_runtime PRIVATE heterosim_runtime)
+add_test(NAME hetero_global_event_runtime COMMAND test_global_event_runtime)
+
 add_executable(test_interfaces test_interfaces.cpp)
 target_link_libraries(test_interfaces PRIVATE heterosim_runtime)
 add_test(NAME hetero_interfaces COMMAND test_interfaces)

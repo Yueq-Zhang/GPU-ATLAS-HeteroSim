@@ -77,6 +77,12 @@ def _positive_int(value: Any, path: str) -> int:
     return value
 
 
+def _unsigned_int(value: Any, path: str) -> int:
+    if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+        raise ConfigError(f"{path} must be an unsigned integer")
+    return value
+
+
 def validate_config(config: Mapping[str, Any]) -> None:
     if not isinstance(config, Mapping):
         raise ConfigError("configuration root must be an object")
@@ -108,7 +114,7 @@ def validate_config(config: Mapping[str, Any]) -> None:
 
     system = _mapping(config, "system")
     _reject_unknown(
-        system, {"profile", "topology_ref", "access_policy"}, "system"
+        system, {"profile", "topology_ref", "access_policy", "links"}, "system"
     )
     profile = system.get("profile")
     if profile not in _PROFILES:
@@ -122,7 +128,14 @@ def validate_config(config: Mapping[str, Any]) -> None:
     for backend_name, backend in (("gpu", gpu), ("atlas", atlas), ("host", host)):
         _reject_unknown(
             backend,
-            {"kind", "ref", "requested_timing_mode"},
+            {
+                "kind",
+                "ref",
+                "requested_timing_mode",
+                "effective_compute_flops_per_s",
+                "effective_memory_bandwidth_Bps",
+                "parameter_source",
+            },
             f"backends.{backend_name}",
         )
     if gpu.get("kind") not in _GPU_BACKENDS:
@@ -131,6 +144,50 @@ def validate_config(config: Mapping[str, Any]) -> None:
         raise ConfigError("invalid backends.atlas.kind")
     if host.get("kind", "none") not in _HOST_BACKENDS:
         raise ConfigError("invalid backends.host.kind")
+
+    execution_mode = simulation.get("execution_mode", "scheduler_validation")
+    if execution_mode not in {"scheduler_validation", "analytical_preview", "full_runtime"}:
+        raise ConfigError("invalid simulation.execution_mode")
+    if execution_mode == "analytical_preview":
+        for backend_name, backend in (("gpu", gpu), ("atlas", atlas)):
+            _positive_int(
+                backend.get("effective_compute_flops_per_s"),
+                f"backends.{backend_name}.effective_compute_flops_per_s",
+            )
+            _positive_int(
+                backend.get("effective_memory_bandwidth_Bps"),
+                f"backends.{backend_name}.effective_memory_bandwidth_Bps",
+            )
+            source = backend.get("parameter_source")
+            if not isinstance(source, str) or not source:
+                raise ConfigError(f"backends.{backend_name}.parameter_source is required")
+
+        links = system.get("links")
+        if not isinstance(links, Mapping) or not links:
+            raise ConfigError("system.links must be a non-empty object")
+        for link_id, link in links.items():
+            if not isinstance(link_id, str) or not link_id or not isinstance(link, Mapping):
+                raise ConfigError("system.links entries must be named objects")
+            _reject_unknown(
+                link,
+                {
+                    "wire_bandwidth_Bps",
+                    "latency_fs",
+                    "header_bytes",
+                    "resource_id",
+                    "parameter_source",
+                },
+                f"system.links.{link_id}",
+            )
+            _positive_int(
+                link.get("wire_bandwidth_Bps"),
+                f"system.links.{link_id}.wire_bandwidth_Bps",
+            )
+            _unsigned_int(link.get("latency_fs", 0), f"system.links.{link_id}.latency_fs")
+            _unsigned_int(link.get("header_bytes", 0), f"system.links.{link_id}.header_bytes")
+            for field in ("resource_id", "parameter_source"):
+                if not isinstance(link.get(field), str) or not link[field]:
+                    raise ConfigError(f"system.links.{link_id}.{field} is required")
 
     model = _mapping(config, "model")
     _reject_unknown(model, _MODEL_REQUIRED, "model")
