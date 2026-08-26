@@ -6,6 +6,8 @@ GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端�
 
 完整架构约束以 [GPU + ATLAS 异构端到端仿真实现规范](docs/gpu_atlas_heterogeneous_simulation_design_zh.md) 为准，阶段进度见 [实现状态](docs/IMPLEMENTATION_STATUS.md)。
 
+计划与当前实现的逐项差距见 [当前完成情况与计划差距](README_PROGRESS_GAP_zh.md)。
+
 ## 1. 当前已实现的能力
 
 - 完整请求级 decoder-only LLM 图：Prefill、逐 Token Decode、KV Append、LM Head 与 Sampling；
