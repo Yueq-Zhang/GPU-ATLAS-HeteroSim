@@ -1,0 +1,104 @@
+{
+  "schema_version": "hetero-sim/v1",
+  "experiment": {
+    "name": "step2_model1_operator_event_probe",
+    "seed": 1,
+    "generation_mode": "trace_locked"
+  },
+  "simulation": {
+    "coupling": "operator_event",
+    "execution_mode": "operator_event"
+  },
+  "system": {
+    "profile": "model1_atlas_native",
+    "links": {
+      "atlas_external_analytical": {
+        "wire_bandwidth_Bps": 12800000000,
+        "latency_fs": 100000000,
+        "header_bytes": 16,
+        "resource_id": "atlas_external_link",
+        "parameter_source": "illustrative_synthetic_not_calibrated"
+      }
+    }
+  },
+  "backends": {
+    "gpu": {
+      "kind": "accel_sim",
+      "requested_timing_mode": "total",
+      "config_ref": "configs/hetero/backends/gpu_accelsim_qv100.json",
+      "resource_bindings": {
+        "gpu_core": "gpu0.core",
+        "gpu_l1": "gpu0.l1",
+        "gpu_l2": "gpu0.l2",
+        "gpu_noc": "gpu0.noc",
+        "gpu_local_dram": "gpu0.hbm"
+      },
+      "trace_bindings": [
+        {
+          "selector": {
+            "phase": "prefill",
+            "op": "qkv_projection",
+            "layer_id": 0,
+            "step_id": 0
+          },
+          "trace_manifest": "configs/hetero/traces/official_qv100_backprop_4096.json",
+          "compatibility": "surrogate_plumbing_probe"
+        }
+      ],
+      "fallback_kind": "analytical",
+      "effective_compute_flops_per_s": 100000000000000,
+      "effective_memory_bandwidth_Bps": 1000000000000,
+      "parameter_source": "illustrative_synthetic_fallback_not_calibrated"
+    },
+    "atlas": {
+      "kind": "atlasim",
+      "requested_timing_mode": "total",
+      "config_ref": "configs/hetero/backends/atlas_test_chip_16ch.json",
+      "resource_bindings": {
+        "atlas_core": "atlas0.core_array",
+        "atlas_sram": "atlas0.sram",
+        "atlas_noc": "atlas0.noc",
+        "atlas_3d_dram": "atlas0.3d_dram"
+      },
+      "artifact_bindings": [
+        {
+          "selector": {
+            "phase": "decode",
+            "op": "qkv_projection",
+            "layer_id": 0,
+            "step_id": 1
+          },
+          "chip_config": "/opt/atlas/ATLAS-MICRO-2026/configs/architecture/chip/test_chip_16ch.yaml",
+          "operator_list": "/opt/atlas/ATLAS-MICRO-2026/configs/operator_yaml/gemm_comp/gemm.yaml",
+          "placement_map": "/opt/atlas/ATLAS-MICRO-2026/configs/operator_yaml/gemm_comp/gemm_data.yaml",
+          "compatibility": "surrogate_plumbing_probe"
+        }
+      ],
+      "fallback_kind": "analytical",
+      "effective_compute_flops_per_s": 10000000000000,
+      "effective_memory_bandwidth_Bps": 409600000000,
+      "parameter_source": "illustrative_synthetic_not_calibrated"
+    },
+    "host": {
+      "kind": "none"
+    }
+  },
+  "model": {
+    "ref": "configs/hetero/models/tiny_llama_2layer.json"
+  },
+  "workload": {
+    "ref": "configs/hetero/workloads/tiny_e2e_single.json"
+  },
+  "scheduling": {
+    "ref": "configs/hetero/schedulers/token_barrier_smoke.json"
+  },
+  "placement": {
+    "ref": "configs/hetero/placements/gpu_prefill_atlas_decode.json"
+  },
+  "address": {
+    "ref": "configs/hetero/addresses/paged_kv_tiny.json"
+  },
+  "metrics": {
+    "ref": "configs/hetero/metrics/e2e_validation.json"
+  }
+}

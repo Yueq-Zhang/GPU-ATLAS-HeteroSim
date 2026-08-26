@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Mapping
 
 from ..trace_manifest import TraceManifest
+from .contracts import BackendDescriptor
 
 
 class AccelSimBackendError(RuntimeError):
@@ -142,6 +143,23 @@ class AccelSimBackend:
 
     def __init__(self, config: AccelSimBackendConfig):
         self.config = config
+
+    def descriptor(self) -> BackendDescriptor:
+        return BackendDescriptor(
+            backend_id=self.config.backend_id,
+            supported_duration_semantics=("total",),
+            ownable_resource_kinds=(
+                "gpu_core",
+                "gpu_l1",
+                "gpu_l2",
+                "gpu_noc",
+                "gpu_local_dram",
+            ),
+            supported_exports=(),
+            supports_stall_resume=False,
+            supported_trace_semantics=("functional",),
+            qualification_records=("adapter_equivalence",),
+        )
 
     def command(self, manifest: TraceManifest) -> tuple[str, ...]:
         if manifest.kernels_list is None:

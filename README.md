@@ -2,7 +2,7 @@
 
 GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端到端 LLM 联合仿真工程。工程把完整 Prefill/Decode 请求图、算子放置、跨设备数据移动、Paged KV Cache 和全局事件调度连接到同一条可复现运行路径。
 
-> 当前版本已完成 M5 第一步：独立 Accel-Sim Trace 后端的固定版本构建、Trace/地址契约和适配器资格验证路径。`scheduler_validation` 与 `analytical_preview` 仍是语义/分析模型；只有单独通过 `qualify-gpu` 的 GPU Trace 结果属于 Accel-Sim 周期模型，尚未与 ATLAS 共享内存时序。
+> 当前版本已形成第二步的最小算子事件级闭环：同一次 `run` 可调度 Accel-Sim GPU Trace 与真实 `atlasim.Chip` 算子包，并由 C++ `GlobalEventRuntime` 协调依赖、资源和显式传输。现有示例使用代理工作负载验证接线，仍禁止作为 LLM 性能结论；GPU 与 ATLAS 争用唯一共享 3D-DRAM 的请求级耦合属于第三步。
 
 完整架构约束以 [GPU + ATLAS 异构端到端仿真实现规范](docs/gpu_atlas_heterogeneous_simulation_design_zh.md) 为准，阶段进度见 [实现状态](docs/IMPLEMENTATION_STATUS.md)。
 
@@ -21,6 +21,8 @@ GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端�
 - C++ Token-Step Barrier Scheduler 与多请求连续调度语义验证；
 - C++ Paged KV 分配器、固定延迟内存服务和时序所有权冲突检查；
 - Python 配置/图控制面与 pybind11 C++ 动态运行时边界；
+- `BackendDescriptor`、`ResolvedTimingContract` 与唯一时序所有者检查；
+- Accel-Sim 和 ATLAS `total` 时长适配器、算子/Artifact 选择、显式分析回退与内容缓存；
 - 规范化 Run 目录、输入哈希、Git revision、依赖锁和 Fidelity 标签。
 
 ## 2. 目录结构
@@ -114,7 +116,7 @@ ctest --test-dir simulator/build --output-on-failure
 .venv/bin/python -m pytest tests/hetero -q
 ```
 
-当前基线应通过 7 个 C++ 测试和 38 个 Python 测试。测试数量会随实现推进增加；判断成功应以“0 failed”为准，而不是永久依赖固定数量。
+当前基线应通过 7 个 C++ 测试和 43 个 Python 测试。测试数量会随实现推进增加；判断成功应以“0 failed”为准，而不是永久依赖固定数量。
 
 强制重新编译已有目标：
 
@@ -181,7 +183,43 @@ cmake --build simulator/build --clean-first --parallel
 
 示例参数来源均写为 `illustrative_synthetic_not_calibrated`，只用于验证实现闭环，不能引用为 ATLAS、GPU 或链路真实性能。
 
-### 7.3 指定输出目录
+### 7.3 第二步：Accel-Sim + ATLAS 算子事件级接线验证
+
+先按第 13 节安装 Accel-Sim，并保证 ATLAS 位于 `/opt/atlas/ATLAS-MICRO-2026`、ATLAS Python 环境位于 `/opt/conda/envs/atlas`。然后运行：
+
+```bash
+.venv/bin/python -m frontend.hetero.cli validate \
+  --config configs/hetero/experiments/step2_model1_operator_event_probe.json
+
+.venv/bin/python -m frontend.hetero.cli run \
+  --config configs/hetero/experiments/step2_model1_operator_event_probe.json \
+  --runs-root /opt/gpu-atlas/step2-runs
+```
+
+该用例在一个完整 Prefill/Decode 图中执行：
+
+- 一个 GPU 算子绑定官方 QV100 Backprop Trace，由 Accel-Sim 返回总周期；
+- 一个 ATLAS Decode 算子绑定 ATLAS 自带 GEMM Operator/Placement，由 `atlasim.Chip` 返回总周期和能耗；
+- 其他未绑定算子通过 `fallback_kind=analytical` 明确回退；
+- 两个周期后端均为 `total` Contract，内部显存或 3D-DRAM 已计时，`exports=[]`，不会重复送入外部 Ramulator2；
+- 两个绑定都是 `surrogate_plumbing_probe`，所以 `performance_claim_allowed=false`。
+
+首次运行会生成 `backend_runs/gpu/` 与 `backend_runs/atlas/`；相同输入再次运行时，任务的 `backend_statistics.cache_hit` 应为 `true`。这只验证异构调度和适配器闭环，不代表真实 LLM Operator 已编译或校准。
+
+单独复核 ATLAS 适配器的确定性：
+
+```bash
+.venv/bin/python -m frontend.hetero.cli qualify-atlas \
+  --backend-config configs/hetero/backends/atlas_test_chip_16ch.json \
+  --chip-config /opt/atlas/ATLAS-MICRO-2026/configs/architecture/chip/test_chip_16ch.yaml \
+  --operator-list /opt/atlas/ATLAS-MICRO-2026/configs/operator_yaml/gemm_comp/gemm.yaml \
+  --placement-map /opt/atlas/ATLAS-MICRO-2026/configs/operator_yaml/gemm_comp/gemm_data.yaml \
+  --output /opt/gpu-atlas/qualification/atlas_test_chip_16ch
+```
+
+命令连续运行两次相同 ATLAS 输入，要求周期、能耗和全部原生统计完全一致，并生成 `qualification_record.json`。
+
+### 7.4 指定输出目录
 
 ```bash
 .venv/bin/python -m frontend.hetero.cli run \
@@ -205,7 +243,7 @@ runs/<experiment.name>/<simulation_input_key>/
 | `model_graph.json` | 每个请求的完整 Prefill/Decode 图、计数器和放置结果 |
 | `execution_graph.json` | 设备任务、传输任务、依赖、参数、持续时间和调度时间 |
 | `buffer_bindings.json` | Paged KV 的内存空间、偏移、逻辑/分配字节数 |
-| `trace_manifest.json` | Trace 语义和 replay-safe 状态；当前没有周期 Trace |
+| `trace_manifest.json` | 本次使用的 GPU Trace 与 ATLAS Artifact、兼容性、任务绑定和 replay-safe 状态 |
 | `event_log.jsonl` | Scheduler Epoch 或全局 DAG 任务完成记录 |
 | `metrics.json` | TTFT、TPOT、ITL、E2E、Fidelity 和结果使用限制 |
 

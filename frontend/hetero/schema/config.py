@@ -135,6 +135,11 @@ def validate_config(config: Mapping[str, Any]) -> None:
                 "effective_compute_flops_per_s",
                 "effective_memory_bandwidth_Bps",
                 "parameter_source",
+                "config_ref",
+                "trace_bindings",
+                "artifact_bindings",
+                "resource_bindings",
+                "fallback_kind",
             },
             f"backends.{backend_name}",
         )
@@ -146,10 +151,20 @@ def validate_config(config: Mapping[str, Any]) -> None:
         raise ConfigError("invalid backends.host.kind")
 
     execution_mode = simulation.get("execution_mode", "scheduler_validation")
-    if execution_mode not in {"scheduler_validation", "analytical_preview", "full_runtime"}:
+    if execution_mode not in {
+        "scheduler_validation",
+        "analytical_preview",
+        "operator_event",
+        "full_runtime",
+    }:
         raise ConfigError("invalid simulation.execution_mode")
-    if execution_mode == "analytical_preview":
+    if execution_mode in {"analytical_preview", "operator_event"}:
         for backend_name, backend in (("gpu", gpu), ("atlas", atlas)):
+            needs_analytical = backend.get("kind") in {"roofline", "analytical"} or (
+                backend.get("fallback_kind") == "analytical"
+            )
+            if not needs_analytical:
+                continue
             _positive_int(
                 backend.get("effective_compute_flops_per_s"),
                 f"backends.{backend_name}.effective_compute_flops_per_s",
@@ -161,6 +176,36 @@ def validate_config(config: Mapping[str, Any]) -> None:
             source = backend.get("parameter_source")
             if not isinstance(source, str) or not source:
                 raise ConfigError(f"backends.{backend_name}.parameter_source is required")
+
+        if execution_mode == "operator_event":
+            if coupling != "operator_event":
+                raise ConfigError(
+                    "operator_event execution_mode requires operator_event coupling"
+                )
+            if gpu.get("kind") == "accel_sim":
+                for field in ("config_ref", "requested_timing_mode"):
+                    if not isinstance(gpu.get(field), str) or not gpu[field]:
+                        raise ConfigError(f"backends.gpu.{field} is required")
+                bindings = gpu.get("trace_bindings")
+                if not isinstance(bindings, list) or not bindings:
+                    raise ConfigError("backends.gpu.trace_bindings is required")
+                resources = gpu.get("resource_bindings")
+                if not isinstance(resources, Mapping) or not resources:
+                    raise ConfigError("backends.gpu.resource_bindings is required")
+                if gpu.get("fallback_kind", "none") not in {"none", "analytical"}:
+                    raise ConfigError("invalid backends.gpu.fallback_kind")
+            if atlas.get("kind") == "atlasim":
+                for field in ("config_ref", "requested_timing_mode"):
+                    if not isinstance(atlas.get(field), str) or not atlas[field]:
+                        raise ConfigError(f"backends.atlas.{field} is required")
+                bindings = atlas.get("artifact_bindings")
+                if not isinstance(bindings, list) or not bindings:
+                    raise ConfigError("backends.atlas.artifact_bindings is required")
+                resources = atlas.get("resource_bindings")
+                if not isinstance(resources, Mapping) or not resources:
+                    raise ConfigError("backends.atlas.resource_bindings is required")
+                if atlas.get("fallback_kind", "none") not in {"none", "analytical"}:
+                    raise ConfigError("invalid backends.atlas.fallback_kind")
 
         links = system.get("links")
         if not isinstance(links, Mapping) or not links:

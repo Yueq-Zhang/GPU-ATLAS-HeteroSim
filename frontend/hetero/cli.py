@@ -7,7 +7,15 @@ from pathlib import Path
 from typing import Sequence
 
 from . import __version__
-from .backends import AccelSimBackend, AccelSimBackendConfig, AccelSimBackendError
+from .backends import (
+    AccelSimBackend,
+    AccelSimBackendConfig,
+    AccelSimBackendError,
+    AtlasArtifact,
+    AtlasBackend,
+    AtlasBackendConfig,
+    AtlasBackendError,
+)
 from .runner import execute_run, simulation_input_key
 from .runtime_bridge import RuntimeUnavailableError
 from .schema import ConfigError, load_and_validate_config
@@ -33,6 +41,14 @@ def _build_parser() -> argparse.ArgumentParser:
     qualify_gpu.add_argument("--backend-config", required=True, type=Path)
     qualify_gpu.add_argument("--trace-manifest", required=True, type=Path)
     qualify_gpu.add_argument("--output", required=True, type=Path)
+    qualify_atlas = subparsers.add_parser(
+        "qualify-atlas", help="check deterministic ATLAS adapter equivalence"
+    )
+    qualify_atlas.add_argument("--backend-config", required=True, type=Path)
+    qualify_atlas.add_argument("--chip-config", required=True, type=Path)
+    qualify_atlas.add_argument("--operator-list", required=True, type=Path)
+    qualify_atlas.add_argument("--placement-map", required=True, type=Path)
+    qualify_atlas.add_argument("--output", required=True, type=Path)
     return parser
 
 
@@ -47,6 +63,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"GPU qualification error: {error}")
             return 5
         print(f"GPU qualification passed; record={record}")
+        return 0
+    if args.command == "qualify-atlas":
+        try:
+            backend_config = AtlasBackendConfig.load(args.backend_config)
+            artifact = AtlasArtifact(args.operator_list, args.placement_map)
+            record = AtlasBackend(backend_config).qualify(
+                args.chip_config, artifact, args.output
+            )
+        except AtlasBackendError as error:
+            print(f"ATLAS qualification error: {error}")
+            return 6
+        print(f"ATLAS qualification passed; record={record}")
         return 0
 
     try:

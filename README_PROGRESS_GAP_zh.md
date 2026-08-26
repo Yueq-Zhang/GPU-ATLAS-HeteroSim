@@ -4,9 +4,9 @@
 
 评估日期：2026-08-26
 
-代码评估基线：`06150ed`
+代码评估基线：`d240667` 之后的第二步实现工作树
 
-当前版本：`0.4.0`
+当前版本：`0.5.0`
 
 状态定义：
 
@@ -17,7 +17,7 @@
 
 ## 1. 一句话结论
 
-工程已经具备异构 LLM 仿真的控制面、请求图、算子放置、基础全局事件运行时、四种拓扑语义、Paged KV、分析预览和独立 Accel-Sim Adapter；但仍不是 GPU+ATLAS 联合周期仿真器。
+工程已经具备异构 LLM 仿真的控制面、请求图、算子放置、全局事件运行时、四种拓扑语义、Paged KV，以及 Accel-Sim 与真实 ATLAS 同时参与一次 `operator_event` 运行的最小闭环；但仍不是请求级共享 3D-DRAM 联合周期仿真器。
 
 当前可以可靠报告：
 
@@ -26,6 +26,8 @@
 - 四种 Profile 的拓扑 Lowering 语义；
 - 未校准 Roofline/Link 分析预览；
 - 指定官方 Trace 与固定 QV100 配置下的独立 Accel-Sim 周期结果。
+- 指定 ATLAS Operator/Placement/Chip 配置下的独立 ATLAS 周期与能耗结果；
+- GPU 和 ATLAS `total` 时长任务在同一全局事件运行时中的依赖、资源和传输编排结果。
 
 当前不能报告：
 
@@ -41,11 +43,11 @@
 
 | 步骤 | 冻结目标 | 当前状态 | 已有证据 | 主要差距 |
 |---|---|---|---|---|
-| 第一步：独立 Accel-Sim 后端资格 | 固定依赖；编译/采集入口；Trace Manifest；地址正规化；Trace Cache；原生基线与 Adapter 一致 | ✅ 已完成 | QV100 Backprop 两条路径均为 `15,329 cycles`、`10,473,824 instructions`；38/38 Python、7/7 C++ 测试通过 | 本机 RTX 3070 Trace 因 NVBit/Driver 不兼容未采集；该结果只证明 Adapter 等价，`replay_safe=false` |
-| 第二步：算子事件级 GPU+ATLAS 集成 | Accel-Sim 总时长进入 ExecutionGraph；实现 ATLAS Adapter；GPU/ATLAS 算子按 Placement 执行；传输和多请求由全局运行时协调 | ⬜ 尚未开始主体实现 | 已有 ExecutionGraph、Placement、GlobalEventRuntime 和分析 Backend，可作为承载框架 | Accel-Sim 目前只由独立 `qualify-gpu` CLI 调用；没有 Backend Dispatcher、ATLAS Adapter、真实算子结果回填、Trace 覆盖选择和事件级端到端验收 |
+| 第一步：独立 Accel-Sim 后端资格 | 固定依赖；编译/采集入口；Trace Manifest；地址正规化；Trace Cache；原生基线与 Adapter 一致 | ✅ 已完成 | QV100 Backprop 两条路径均为 `15,329 cycles`、`10,473,824 instructions`；43/43 Python、7/7 C++ 测试通过 | 本机 RTX 3070 Trace 因 NVBit/Driver 不兼容未采集；该结果只证明 Adapter 等价，`replay_safe=false` |
+| 第二步：算子事件级 GPU+ATLAS 集成 | Accel-Sim 总时长进入 ExecutionGraph；实现 ATLAS Adapter；GPU/ATLAS 算子按 Placement 执行；传输和多请求由全局运行时协调 | 🟡 最小闭环完成 | 主 `run` 同时执行 Accel-Sim `15,329 cycles` 与 ATLAS `48,446 cycles`；时序 Contract、缓存、结果回填、显式回退和 C++ 全局事件编排均已运行 | 当前绑定是 `surrogate_plumbing_probe`；仍需生成与 LLM 算子形状/布局完全对应的 GPU Trace 和 ATLAS Artifact，并补多请求真实 Backend 黄金用例 |
 | 第三步：请求级共享 3D-DRAM 周期耦合 | GPU L2 Miss 和 ATLAS 请求进入同一 Shared Fabric/唯一 Ramulator2；实现跨时钟、仲裁、背压、响应和守恒 | ⬜ 未开始 | 已有 Timing Ownership 冲突检查和固定延迟内存服务单元测试 | 没有 GPU Memory Bridge、ATLAS Memory Port、Shared Fabric、外部内存请求接口、唯一 Ramulator2 实例、跨时钟事件桥及死锁/带宽验收 |
 
-因此，“第一步完成”的准确含义是：独立 GPU 仿真器适配层已经通过软件等价性资格验证；它不表示 GPU 仿真器已经参与当前端到端 `run` 命令，更不表示共享 3D-DRAM 已经周期耦合。
+因此，当前准确含义是：GPU 和 ATLAS 已经参与同一个端到端 `run`，但两者各自返回包含内部内存的总时长，全局只在算子/传输事件粒度协同；共享 3D-DRAM 尚未在请求粒度周期耦合。
 
 ## 3. 当前已经完成的模块
 
@@ -54,7 +56,7 @@
 - ✅ 严格实验配置解析、组件 `ref` 展开和输入哈希；
 - ✅ 规范化 Run 目录、Resolved Config、Git revision、Dependency Lock、事件日志和 Fidelity 字段；
 - ✅ Python 控制面与 C++ 运行时边界；
-- 🟡 依赖锁已精确覆盖 Accel-Sim、GPGPU-Sim、NVBit 和 CUDA 11.8，但 ATLAS、Ramulator2、BookSim2、TileLang 仍有 inherited placeholder。
+- 🟡 依赖锁已精确覆盖 ATLAS、Accel-Sim、GPGPU-Sim、NVBit 和 CUDA 11.8，但 Ramulator2、BookSim2、TileLang 仍有 inherited placeholder。
 
 ### 3.2 LLM 图、请求和放置
 
@@ -62,7 +64,7 @@
 - ✅ `G` 个输出 Token 对应 `G-1` 次 Decode Forward；
 - ✅ 手工/规则化 GPU 与 ATLAS 算子放置；
 - ✅ 可按 Phase、Layer、Operator Group、KV 长度和活动 Batch 匹配规则；
-- 🟡 当前 Placement 生成设备决策，但真实 Accel-Sim/ATLAS Backend 尚未按这些决策执行算子。
+- 🟡 Placement 已能驱动 Accel-Sim/ATLAS Artifact 选择；当前只有各一个代理绑定，其余算子显式分析回退。
 
 ### 3.3 Batch、KV 与运行时
 
@@ -100,9 +102,9 @@
 
 | 里程碑 | 计划内容 | 状态 | 当前完成情况 | 尚缺验收 |
 |---|---|---|---|---|
-| M0 契约和基线 | 四拓扑、时序所有权、单位、依赖锁、黄金工作负载、独立基线 | 🟡 | 规范、四拓扑、单位、黄金用例、Accel-Sim 独立基线已存在 | ATLAS 独立基线尚未通过本工程 Adapter 固化；ATLAS/Ramulator2/BookSim2/TileLang 版本仍需精确锁定 |
+| M0 契约和基线 | 四拓扑、时序所有权、单位、依赖锁、黄金工作负载、独立基线 | 🟡 | 规范、四拓扑、单位、黄金用例、Accel-Sim 与 ATLAS Adapter 基线已存在 | Ramulator2/BookSim2/TileLang 的完整版本和资格记录仍需精确锁定 |
 | M1 统一模型和两级 IR | Canonical Model、ModelGraph、ExecutionGraph、Prefill/Decode、KV/Request State | ✅ | Tiny 模型、完整请求图、ExecutionGraph、固定生成轨迹和 KV 状态已实现并测试 | 扩展到真实模型只需新增配置/编译路径；不阻塞下一步 |
-| M2 基础运行时和 Model 1 | Global Runtime、GPU Roofline、ATLAS Adapter、Link、单请求端到端 | 🟡 | GlobalEventRuntime、未校准 Roofline/Link、单请求分析预览和指标输出已完成 | ATLAS Adapter 缺失；Roofline 未校准；没有真实 Backend 前后确定性对比 |
+| M2 基础运行时和 Model 1 | Global Runtime、GPU Roofline、ATLAS Adapter、Link、单请求端到端 | 🟡 | GlobalEventRuntime、Roofline/Link、ATLAS Adapter、Accel-Sim/ATLAS 混合单请求和确定性对比已完成 | Roofline 未校准；真实 LLM 算子 Trace/Artifact 和完整多请求 Backend 验收缺失 |
 | M3 地址和四 Profile 事件模式 | MemorySpace、PhysicalAddress、Allocator、Router、传输/迁移/同步、四 Profile | 🟡 | 拓扑 Router、Profile 配置、Paged KV 地址空间和部分配置校验已完成 | 通用 Global Allocator、完整 Residency/Owner、四 Profile operator-event 执行和 Model 3 共享分析内存服务缺失 |
 | M4 Multi-Batch | Ragged Batch、Paged KV、Continuous Batch、Chunked Prefill、Mixed、Sub-Batch | 🟡 | Paged KV、Barrier Scheduler、多 Arrival/Chunk 语义和规则放置已完成 | 真实 Batched Kernel、动态 KV 释放复用、Mixed Backend 执行、Device Sub-Batch 恢复与完整 B1–B5 验收缺失 |
 | M5 Accel-Sim 资格 | 编译、NVBit Trace、Manifest、地址绑定、Cache、Adapter | 🟡 | 独立 Adapter、官方 Trace 回归和地址分层已完成 | TileLang GPU 编译路径、本机/目标 RTX Trace、真实 Tensor Range 捕获、Replay Safety 资格和 Trace 覆盖策略缺失 |
@@ -123,24 +125,22 @@
 | 4 | Model 3 请求级共享 3D-DRAM 周期耦合 | ⬜ | M6 未开始 |
 | 5 | Model 2/4 有界队列、带宽、延迟和背压 | ⬜ | M7 未开始 |
 | 6 | Static Ragged、Paged KV、Continuous Batch | 🟡 | Paged KV 和调度语义完成，真实 Ragged/Continuous Backend 执行未完成 |
-| 7 | 手工和规则化 GPU/ATLAS 放置 | ✅ | Placement 决策已实现；真实 Backend 执行将在第二步接入 |
+| 7 | 手工和规则化 GPU/ATLAS 放置 | ✅ | Placement 决策和 Backend Artifact 选择已接入主 `run` |
 | 8 | 逻辑工作量、地址、传输和请求守恒 | 🟡 | 已覆盖部分黄金计数与内存服务，尚未覆盖真实 Bridge/PCIe/CXL |
 | 9 | Resolved Config、版本、Trace、地址、Seed 可复现 | 🟡 | 框架已存在，部分 ATLAS 系依赖仍是 placeholder，真实 Trace 地址清单不完整 |
 | 10 | 明确区分 analytical/event/cycle/extrapolated | ✅ | 当前 Run 产物已有 Fidelity 和禁止性能声明字段 |
 
 ## 6. 当前最关键的实现缺口
 
-### P0：完成第二步的最小闭环
+### P0：把第二步从代理闭环升级为真实 LLM 算子闭环
 
-1. 实现统一 Backend Descriptor 和 Resolved Timing Contract；
-2. 让 `run` 命令能为 GPU 任务选择 Accel-Sim，而不是只由 `qualify-gpu` 独立调用；
-3. 实现 ATLAS Adapter，并先完成 ATLAS 原生结果与 Adapter 的确定性对比；
-4. 将 GPU/ATLAS Backend 的总时长和 Counter 回填 ExecutionGraph；
-5. 用 GlobalEventRuntime 协调设备任务、跨设备传输和多请求资源争用；
-6. 每个任务记录 Trace Coverage、Compute/Memory/Link Fidelity 和 Fallback 原因；
-7. 建立最小端到端黄金用例：GPU Prefill + ATLAS Decode Attention + GPU LM Head/Sampling。
+1. 为 Tiny LLM 的 GPU 算子生成形状和布局一致的 CUDA/TileLang Kernel 与 Trace；
+2. 为对应 ATLAS 算子从编译计划生成匹配的 Operator/Placement YAML；
+3. 用精确 Artifact 替换两个 `surrogate_plumbing_probe` 绑定；
+4. 增加至少两个请求的 GPU/ATLAS 混合执行、资源排队和传输黄金用例；
+5. 完成 Trace/Artifact 覆盖率门槛，只有全部关键算子为 `exact_operator` 时才允许进入性能资格评估。
 
-第二步完成标准：同一个端到端请求中，至少一个 GPU 算子来自真实 Accel-Sim Trace，至少一个 ATLAS 算子来自 ATLAS Adapter；全局运行时生成确定性的 TTFT/TPOT/E2E，且没有重复计算设备与传输时间。
+第二步的接线标准已经满足；完成标准仍要求同一个端到端请求中的绑定与真实 LLM 算子完全兼容，全局运行时生成确定性的 TTFT/TPOT/E2E，且没有重复计算设备与传输时间。
 
 ### P1：完成第三步的最小 Load/Store 耦合
 
@@ -163,22 +163,24 @@
 
 ## 7. 下一次开始实现时的建议入口
 
-下一次应从第二步开始，不应直接跳到 Ramulator2 共享内存桥。推荐第一个可提交切片是：
+下一次应先完成第二步的真实 LLM Artifact，不应直接跳到 Ramulator2 共享内存桥。推荐切片是：
 
 ```text
-BackendDescriptor + TimingContract
-        -> GPU Accel-Sim Task Adapter
-        -> ExecutionGraph 结果回填
-        -> 单 GPU 算子 operator_event 黄金测试
+Tiny LLM GPU Kernel/Trace
+        + 匹配的 ATLAS Operator/Placement
+        -> exact_operator 绑定
+        -> 多请求 operator_event 黄金测试
 ```
 
-完成后再加入 ATLAS Adapter，形成第二步最小异构闭环。这样可以在修改 Accel-Sim 内存系统之前，先验证 Backend 选择、时长所有权、任务依赖、结果缓存和全局事件调度均正确。
+上述完成后，再进入第三步的 GPU L2 Miss/ATLAS Memory Port/唯一 Ramulator2 请求级耦合。
 
 ## 8. 当前验证证据
 
 - 最新功能提交：`6ba9111`；资格语义修正：`06150ed`；
 - Accel-Sim Adapter：官方 QV100 Backprop 原生/适配器均为 `15,329 cycles`、`10,473,824 instructions`；
-- Python：38/38 passed；
+- ATLAS Adapter：测试 GEMM 两次独立运行均为 `48,446 cycles`、`0.00581352 J`，完整统计精确一致；
+- 联合接线：同一次主 `run` 同时产生 Accel-Sim 与 ATLAS 周期任务，两个 Contract 均为 `total` 且 `exports=[]`；
+- Python：43/43 passed；
 - C++：7/7 passed；
 - CUDA：RTX 3070 Vector Add 原生执行与结果验证通过；
 - GitHub：`main` 已同步；

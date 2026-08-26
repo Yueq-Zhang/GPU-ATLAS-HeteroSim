@@ -17,6 +17,7 @@ from .model_graph import (
     request_specs_from_config,
 )
 from .placement import place_nodes
+from .operator_event import OperatorEventDispatcher
 from .runtime_bridge import allocate_paged_kv, run_task_dag, simulate_token_barrier
 from .topology import lower_cross_device_dependency, primary_3ddram
 
@@ -71,8 +72,10 @@ def _execution_graph(
     model: object,
     backends: Mapping[str, object],
     links: Mapping[str, object],
-    analytical_preview: bool,
+    execution_mode: str,
+    dispatcher: OperatorEventDispatcher | None = None,
 ) -> tuple[dict[str, object], list[dict[str, object]]]:
+    timed_execution = execution_mode in {"analytical_preview", "operator_event"}
     tasks: list[dict[str, object]] = []
     routes: list[dict[str, object]] = []
     runtime_tasks: list[dict[str, object]] = []
@@ -101,7 +104,7 @@ def _execution_graph(
                     "consumer_device": decision.target_device,
                     **asdict(lowering),
                 }
-                if analytical_preview:
+                if timed_execution:
                     if lowering.route_id not in links:
                         raise ValueError(
                             f"missing analytical parameters for route {lowering.route_id}"
@@ -148,27 +151,23 @@ def _execution_graph(
                 "template_node_id": node.node_id,
                 "task_kind": "device",
                 "phase": node.phase,
+                "op": node.op,
+                "operator_group": node.attributes.get("operator_group"),
                 "layer_id": node.layer_id,
                 "step_id": node.step_id,
                 "device_id": decision.target_device,
                 "backend_id": f"{backend_key}.{backend['kind']}",
                 "dependencies": dependencies,
                 "fidelity": {
-                    "compute_fidelity": "analytical"
-                    if analytical_preview
-                    else "unavailable",
-                    "memory_fidelity": "analytical"
-                    if analytical_preview
-                    else "unavailable",
-                    "link_fidelity": "analytical"
-                    if analytical_preview and dependencies and routes
-                    else "unavailable",
+                    "compute_fidelity": "unavailable",
+                    "memory_fidelity": "unavailable",
+                    "link_fidelity": "unavailable",
                     "scheduler_fidelity": "event_modeled",
-                    "extrapolated_fraction": 1.0 if analytical_preview else 0.0,
+                    "extrapolated_fraction": 0.0,
                     "trace_coverage": 0.0,
                 },
             }
-            if analytical_preview:
+            if execution_mode == "analytical_preview":
                 cost = estimate_node_cost(node, model, backend)
                 task_record.update(
                     {
@@ -176,6 +175,14 @@ def _execution_graph(
                         "duration_fs": cost.duration_fs,
                         "analytical_cost": cost.to_dict(),
                         "analytical_parameters": dict(backend),
+                        "fidelity": {
+                            "compute_fidelity": "analytical",
+                            "memory_fidelity": "analytical",
+                            "link_fidelity": "not_applicable",
+                            "scheduler_fidelity": "event_modeled",
+                            "extrapolated_fraction": 1.0,
+                            "trace_coverage": 0.0,
+                        },
                     }
                 )
                 runtime_tasks.append(
@@ -187,6 +194,34 @@ def _execution_graph(
                         if previous_task is None
                         else 0,
                         "duration_fs": cost.duration_fs,
+                    }
+                )
+            elif execution_mode == "operator_event":
+                if dispatcher is None:
+                    raise ValueError("operator_event execution requires a Backend dispatcher")
+                result = dispatcher.dispatch(
+                    backend_key, node, model, decision.target_device
+                )
+                task_record.update(
+                    {
+                        "backend_id": result.backend_id,
+                        "resource_id": result.resource_id,
+                        "duration_fs": result.duration_fs,
+                        "timing_contract": dict(result.timing_contract),
+                        "backend_statistics": dict(result.statistics),
+                        "compiled_artifact": dict(result.artifact),
+                        "fidelity": dict(result.fidelity),
+                    }
+                )
+                runtime_tasks.append(
+                    {
+                        "task_id": task_id,
+                        "resource_id": result.resource_id,
+                        "dependencies": dependencies,
+                        "release_time_fs": request.arrival_time_fs
+                        if previous_task is None
+                        else 0,
+                        "duration_fs": result.duration_fs,
                     }
                 )
             tasks.append(task_record)
@@ -241,10 +276,11 @@ def _metrics(
     }
 
 
-def _analytical_metrics(
+def _timed_metrics(
     runtime_result: Mapping[str, object],
     execution_graph: Mapping[str, object],
     requests: list[dict[str, object]],
+    run_status: str,
 ) -> dict[str, object]:
     timings = {
         str(item["task_id"]): item
@@ -292,20 +328,36 @@ def _analytical_metrics(
                 - 1,
             }
         )
+    fidelities = [dict(task["fidelity"]) for task in device_tasks]
+
+    def aggregate(field: str) -> str:
+        values = {str(item[field]) for item in fidelities}
+        return next(iter(values)) if len(values) == 1 else "mixed"
+
+    count = len(fidelities)
+    fidelity = {
+        "compute_fidelity": aggregate("compute_fidelity"),
+        "memory_fidelity": aggregate("memory_fidelity"),
+        "link_fidelity": "analytical" if execution_graph["routes"] else "not_applicable",
+        "scheduler_fidelity": "event_modeled",
+        "extrapolated_fraction": sum(
+            float(item["extrapolated_fraction"]) for item in fidelities
+        )
+        / count,
+        "trace_coverage": sum(float(item["trace_coverage"]) for item in fidelities)
+        / count,
+        "artifact_coverage": sum(
+            float(item.get("artifact_coverage", 0.0)) for item in fidelities
+        )
+        / count,
+    }
     return {
         "schema_version": "hetero-metrics/v1",
-        "run_status": "analytical_preview",
+        "run_status": run_status,
         "performance_claim_allowed": False,
         "makespan_fs": runtime_result["makespan_fs"],
         "requests": request_metrics,
-        "fidelity": {
-            "compute_fidelity": "analytical",
-            "memory_fidelity": "analytical",
-            "link_fidelity": "analytical",
-            "scheduler_fidelity": "event_modeled",
-            "extrapolated_fraction": 1.0,
-            "trace_coverage": 0.0,
-        },
+        "fidelity": fidelity,
     }
 
 
@@ -314,6 +366,12 @@ def execute_run(
     project_root: Path,
     runs_root: Path | None = None,
 ) -> Path:
+    key = simulation_input_key(config)
+    experiment = dict(config["experiment"])  # type: ignore[arg-type]
+    root = runs_root or project_root / "runs"
+    run_dir = root / str(experiment["name"]) / key
+    run_dir.mkdir(parents=True, exist_ok=True)
+
     model_config = dict(config["model"])  # type: ignore[arg-type]
     workload = dict(config["workload"])  # type: ignore[arg-type]
     request_configs = [dict(item) for item in workload["requests"]]
@@ -350,6 +408,11 @@ def execute_run(
     if execution_mode == "full_runtime":
         raise ValueError("full_runtime is reserved but not implemented")
     backends = dict(config["backends"])  # type: ignore[arg-type]
+    dispatcher = (
+        OperatorEventDispatcher(project_root, run_dir / "backend_runs", backends)
+        if execution_mode == "operator_event"
+        else None
+    )
     links = system.get("links", {})
     if not isinstance(links, Mapping):
         raise ValueError("system.links must be an object")
@@ -360,11 +423,14 @@ def execute_run(
         model,
         backends,
         links,
-        execution_mode == "analytical_preview",
+        execution_mode,
+        dispatcher,
     )
-    if execution_mode == "analytical_preview":
+    if execution_mode in {"analytical_preview", "operator_event"}:
         runtime_result = run_task_dag(runtime_tasks)
-        metrics = _analytical_metrics(runtime_result, execution_graph, request_configs)
+        metrics = _timed_metrics(
+            runtime_result, execution_graph, request_configs, execution_mode
+        )
         timing_by_id = {
             str(item["task_id"]): item
             for item in runtime_result["tasks"]  # type: ignore[index]
@@ -374,12 +440,6 @@ def execute_run(
     else:
         runtime_result = simulate_token_barrier(request_configs, scheduling)
         metrics = _metrics(runtime_result, request_configs)
-
-    key = simulation_input_key(config)
-    experiment = dict(config["experiment"])  # type: ignore[arg-type]
-    root = runs_root or project_root / "runs"
-    run_dir = root / str(experiment["name"]) / key
-    run_dir.mkdir(parents=True, exist_ok=True)
 
     _write_json(run_dir / "resolved_config.yaml", config)
     dependency_lock = project_root / "dependency_lock.yaml"
@@ -393,9 +453,10 @@ def execute_run(
             "simulator_revision": _git_revision(project_root),
             "simulation_input_key": key,
             "runtime_owner": "cpp.GlobalEventRuntime"
-            if execution_mode == "analytical_preview"
+            if execution_mode in {"analytical_preview", "operator_event"}
             else "cpp.TokenBarrierScheduler",
             "address_owner": "cpp.PagedKvAllocator",
+            "backend_dispatch": dispatcher.provenance() if dispatcher else None,
         },
     )
     _write_json(
@@ -404,9 +465,10 @@ def execute_run(
     )
     _write_json(run_dir / "execution_graph.json", execution_graph)
     _write_json(run_dir / "buffer_bindings.json", bindings)
-    _write_json(
-        run_dir / "trace_manifest.json",
-        {
+    trace_payload = (
+        dispatcher.trace_bundle()
+        if dispatcher
+        else {
             "schema_version": "hetero-trace-manifest/v1",
             "trace_id": f"unavailable.{key}",
             "trace_semantics": "none",
@@ -416,13 +478,14 @@ def execute_run(
             "capture": {"status": "no_cycle_trace", "execution_mode": execution_mode},
             "compilation": {"status": "not_materialized"},
             "address_ranges": [],
-        },
+        }
     )
+    _write_json(run_dir / "trace_manifest.json", trace_payload)
     _write_json(run_dir / "metrics.json", metrics)
     with (run_dir / "event_log.jsonl").open("w", encoding="utf-8") as stream:
         event_records = (
             runtime_result["tasks"]
-            if execution_mode == "analytical_preview"
+            if execution_mode in {"analytical_preview", "operator_event"}
             else runtime_result["epochs"]
         )  # type: ignore[index]
         for event in event_records:

@@ -1,0 +1,12 @@
+{
+  "schema_version": "hetero-atlas-backend/v1",
+  "backend_id": "atlas.atlasim.micro26.test_chip_16ch",
+  "python_executable": "/opt/conda/envs/atlas/bin/python",
+  "atlas_root": "/opt/atlas/ATLAS-MICRO-2026",
+  "adapter_script": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/scripts/run_atlas_operator.py",
+  "core_frequency_hz": 1000000000,
+  "timeout_seconds": 3600,
+  "dependency_commits": {
+    "atlas_micro_2026": "b2787399408e32d327c820daee96d4e6610f551a"
+  }
+}
