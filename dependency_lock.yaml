@@ -1,0 +1,23 @@
+schema_version: hetero-sim/dependency-lock/v1
+captured_at: 2026-08-26
+source_baseline:
+  atlas_repository: pku-gsun/ATLAS-MICRO-2026
+  atlas_commit: b2787399408e32d327c820daee96d4e6610f551a
+  design_spec_sha256: F61942846490F8AF1116646835412265EEA4DD1100CA88EA100833775A121FAB
+environment:
+  os: Ubuntu-22.04-WSL2
+  wsl_kernel: 6.6.87.2-microsoft-standard-WSL2
+  python: 3.10.12
+  pytest: 9.1.1
+  cmake: 3.22.1
+  gcc: 11.4.0
+dependencies:
+  accel_sim: not_integrated
+  gpgpu_sim: not_integrated
+  ramulator2: inherited_from_atlas_until_m6
+  booksim2: inherited_from_atlas_until_m6
+  pybind11: integration_pending
+  tilelang: inherited_from_atlas_until_m5
+notes:
+  - Trace capture host and target GPU configuration must be added before M5 qualification.
+  - Exact submodule commits must replace inherited placeholders before coupled simulation results are reported.

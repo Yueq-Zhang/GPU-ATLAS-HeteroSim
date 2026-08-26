@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gpu-atlas-heterosim"
+version = "0.1.0"
+description = "Heterogeneous GPU and ATLAS 3D-DRAM simulation infrastructure"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+gpu-atlas-heterosim = "frontend.hetero.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["frontend*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/hetero"]
+pythonpath = ["."]
+

@@ -1,0 +1,47 @@
+{
+  "schema_version": "hetero-sim/v1",
+  "experiment": {
+    "name": "m0_smoke",
+    "seed": 1,
+    "generation_mode": "trace_locked"
+  },
+  "simulation": {
+    "coupling": "analytical"
+  },
+  "system": {
+    "profile": "model1_atlas_native"
+  },
+  "backends": {
+    "gpu": {"kind": "roofline"},
+    "atlas": {"kind": "analytical"},
+    "host": {"kind": "none"}
+  },
+  "model": {
+    "name": "tiny_llama_2layer",
+    "hidden_size": 128,
+    "num_layers": 2
+  },
+  "workload": {
+    "requests": [
+      {"request_id": "R0", "prompt_length": 16, "output_length": 3}
+    ]
+  },
+  "scheduling": {
+    "mode": "static_ragged",
+    "max_num_sequences": 1,
+    "max_batched_tokens": 16,
+    "prefill_chunk_tokens": 16
+  },
+  "placement": {
+    "mode": "manual",
+    "default_target": "gpu0"
+  },
+  "address": {
+    "allocator": "first_fit",
+    "page_tokens": 16
+  },
+  "metrics": {
+    "request": ["ttft", "e2e_user"]
+  }
+}
+

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hetero-sim/v1",
+  "title": "GPU-ATLAS Heterogeneous Simulation Experiment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "experiment", "simulation", "system", "backends",
+    "model", "workload", "scheduling", "placement", "address", "metrics"
+  ],
+  "properties": {
+    "schema_version": {"const": "hetero-sim/v1"},
+    "experiment": {"type": "object"},
+    "simulation": {
+      "type": "object",
+      "required": ["coupling"],
+      "properties": {
+        "coupling": {
+          "enum": ["analytical", "operator_event", "request_cycle"]
+        }
+      }
+    },
+    "system": {
+      "type": "object",
+      "required": ["profile"],
+      "properties": {
+        "profile": {
+          "enum": [
+            "model1_atlas_native",
+            "model2_host_memory_pcie",
+            "model3_gpu_native_3ddram",
+            "model4_cxl_memory_tier"
+          ]
+        }
+      }
+    },
+    "backends": {"type": "object"},
+    "model": {"type": "object"},
+    "workload": {"type": "object"},
+    "scheduling": {"type": "object"},
+    "placement": {"type": "object"},
+    "address": {"type": "object"},
+    "metrics": {"type": "object"}
+  }
+}
+
