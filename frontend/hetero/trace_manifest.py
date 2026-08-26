@@ -299,6 +299,10 @@ class TraceManifest:
             raise TraceManifestError("qualification_record has the wrong schema_version")
         if record.get("status") != "passed":
             raise TraceManifestError("qualification_record status is not passed")
+        if record.get("replay_safety_qualified") is not True:
+            raise TraceManifestError(
+                "qualification_record does not qualify cross-configuration replay safety"
+            )
         if record.get("trace_key") != self.trace_key():
             raise TraceManifestError("qualification_record trace_key does not match")
 

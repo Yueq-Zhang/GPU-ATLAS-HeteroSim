@@ -100,6 +100,7 @@ def test_trace_key_excludes_qualification_and_replay_decision(tmp_path) -> None:
             {
                 "schema_version": "hetero-accel-sim-qualification/v1",
                 "status": "passed",
+                "replay_safety_qualified": True,
                 "trace_key": first.trace_key(),
             }
         ),

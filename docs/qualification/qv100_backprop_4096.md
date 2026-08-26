@@ -23,4 +23,4 @@ The native baseline and adapter executions matched exactly:
 
 At the configured 1.132 GHz GPU core frequency, the adapter reported a total duration of 13,541,519,435 fs. Accel-Sim owns GPU core, cache, NoC and local DRAM timing in this qualification. External Ramulator2 is disabled.
 
-This result qualifies the total-duration software adapter for the exact pinned QV100 trace/config pair. It is not RTX 3070 calibration and is not a coupled GPU+ATLAS result. Reproduce it with the commands in README section 13.
+This result qualifies the total-duration software adapter for the exact pinned QV100 trace/config pair. It does not qualify cross-configuration replay safety, so `replay_safe` remains false. It is not RTX 3070 calibration and is not a coupled GPU+ATLAS result. Reproduce it with the commands in README section 13.

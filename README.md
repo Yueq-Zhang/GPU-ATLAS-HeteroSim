@@ -456,9 +456,9 @@ bash scripts/capture_accel_sim_trace.sh \
 - `native_baseline/command.json`、日志和 `stats.json`；
 - `adapter/command.json`、日志和 `stats.json`；
 - `qualification_record.json`；
-- `qualified_trace_manifest.json`，仅在精确比较通过后生成并写入 `replay_safe=true`。
+- `adapter_qualified_trace_manifest.json`，记录适配器资格结果，但仍保持 `replay_safe=false`。
 
-资格验证只证明适配器没有改变固定版本 Accel-Sim 的独立执行结果，不证明 RTX 3070 配置已经完成实机微架构校准，也不证明 GPU+ATLAS 联合仿真已经完成。
+资格验证只证明适配器没有改变固定版本 Accel-Sim 的独立执行结果，不证明跨 DRAM 配置 Replay 安全，不证明 RTX 3070 配置已经完成实机微架构校准，也不证明 GPU+ATLAS 联合仿真已经完成。只有后续显式覆盖时序反馈、同步、Atomics、动态控制流和地址行为的 Replay 资格记录，才能把 `replay_safe` 提升为 `true`。
 
 仓库同时提供 `gpu_accelsim_qv100.json`，专门用于 Accel-Sim 官方 V100 预采集 Trace 的适配器回归。Trace 与硬件配置必须匹配：官方 SM70 Trace 不应套用 RTX 3070/SM86 配置；它能验证软件适配器，但不能替代后续 RTX 3070 Trace 的目标平台校准。
 

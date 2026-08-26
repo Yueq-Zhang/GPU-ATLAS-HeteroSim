@@ -11,12 +11,19 @@
     "simulation_key",
     "comparison",
     "exact_match_required",
+    "qualified_scopes",
+    "replay_safety_qualified",
     "timing_ownership"
   ],
   "properties": {
     "schema_version": {"const": "hetero-accel-sim-qualification/v1"},
     "status": {"enum": ["passed", "failed"]},
     "exact_match_required": {"const": true},
+    "qualified_scopes": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "replay_safety_qualified": {"type": "boolean"},
     "comparison": {"type": "object"},
     "timing_ownership": {"type": "object"}
   }

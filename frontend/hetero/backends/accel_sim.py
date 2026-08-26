@@ -273,6 +273,8 @@ class AccelSimBackend:
                 },
                 "comparison": compared,
                 "exact_match_required": True,
+                "qualified_scopes": ["adapter_equivalence"],
+                "replay_safety_qualified": False,
                 "timing_ownership": {
                     "gpu_core_cache_noc_local_dram": "accel_sim",
                     "external_ramulator2": False,
@@ -286,11 +288,11 @@ class AccelSimBackend:
             qualified_payload = json.loads(
                 manifest.source_path.read_text(encoding="utf-8")
             )
-            qualified_payload["replay_safe"] = True
+            qualified_payload["replay_safe"] = False
             qualified_payload["qualification_record"] = str(record.resolve())
             qualified_payload["kernels_list"] = str(manifest.kernels_list)
             _write_json(
-                output_directory / "qualified_trace_manifest.json",
+                output_directory / "adapter_qualified_trace_manifest.json",
                 qualified_payload,
             )
         return record

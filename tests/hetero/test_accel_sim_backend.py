@@ -97,9 +97,11 @@ def test_qualification_requires_exact_native_adapter_match(tmp_path) -> None:
     assert record["comparison"]["gpu_tot_sim_cycle"] == [1132, 1132]
     assert record["timing_ownership"]["external_ramulator2"] is False
     qualified = TraceManifest.load(
-        tmp_path / "qualification" / "qualified_trace_manifest.json"
+        tmp_path / "qualification" / "adapter_qualified_trace_manifest.json"
     )
-    assert qualified.replay_safe is True
+    assert qualified.replay_safe is False
+    assert record["qualified_scopes"] == ["adapter_equivalence"]
+    assert record["replay_safety_qualified"] is False
     stats = json.loads(
         (tmp_path / "qualification" / "adapter" / "stats.json").read_text()
     )
