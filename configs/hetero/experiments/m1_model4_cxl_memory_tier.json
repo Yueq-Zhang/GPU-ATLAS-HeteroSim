@@ -1,0 +1,17 @@
+{
+  "schema_version": "hetero-sim/v1",
+  "experiment": {"name": "m1_model4_cxl_memory_tier", "seed": 1, "generation_mode": "trace_locked"},
+  "simulation": {"coupling": "operator_event", "execution_mode": "scheduler_validation"},
+  "system": {"profile": "model4_cxl_memory_tier", "access_policy": "copy"},
+  "backends": {
+    "gpu": {"kind": "roofline"},
+    "atlas": {"kind": "analytical"},
+    "host": {"kind": "none"}
+  },
+  "model": {"ref": "configs/hetero/models/tiny_llama_2layer.json"},
+  "workload": {"ref": "configs/hetero/workloads/tiny_e2e_single.json"},
+  "scheduling": {"ref": "configs/hetero/schedulers/token_barrier_smoke.json"},
+  "placement": {"ref": "configs/hetero/placements/gpu_prefill_atlas_decode.json"},
+  "address": {"ref": "configs/hetero/addresses/paged_kv_tiny.json"},
+  "metrics": {"ref": "configs/hetero/metrics/e2e_validation.json"}
+}

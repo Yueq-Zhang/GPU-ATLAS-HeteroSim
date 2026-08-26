@@ -10,3 +10,14 @@ add_executable(test_interfaces test_interfaces.cpp)
 target_link_libraries(test_interfaces PRIVATE heterosim_runtime)
 add_test(NAME hetero_interfaces COMMAND test_interfaces)
 
+add_executable(test_scheduler test_scheduler.cpp)
+target_link_libraries(test_scheduler PRIVATE heterosim_runtime)
+add_test(NAME hetero_scheduler COMMAND test_scheduler)
+
+add_executable(test_memory_services test_memory_services.cpp)
+target_link_libraries(test_memory_services PRIVATE heterosim_runtime)
+add_test(NAME hetero_memory_services COMMAND test_memory_services)
+
+add_executable(test_paged_kv test_paged_kv.cpp)
+target_link_libraries(test_paged_kv PRIVATE heterosim_runtime)
+add_test(NAME hetero_paged_kv COMMAND test_paged_kv)

@@ -1,0 +1,12 @@
+{
+  "name": "tiny_llama_2layer",
+  "hidden_size": 128,
+  "intermediate_size": 256,
+  "num_layers": 2,
+  "num_attention_heads": 4,
+  "num_kv_heads": 2,
+  "head_dim": 32,
+  "vocab_size": 256,
+  "dtype": "fp16",
+  "bytes_per_element": 2
+}

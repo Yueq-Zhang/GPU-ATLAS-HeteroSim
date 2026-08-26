@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -43,6 +44,25 @@ _GENERATION_MODES = {
     "replayed_eos",
 }
 
+_MODEL_REQUIRED = {
+    "name",
+    "hidden_size",
+    "intermediate_size",
+    "num_layers",
+    "num_attention_heads",
+    "num_kv_heads",
+    "head_dim",
+    "vocab_size",
+    "dtype",
+    "bytes_per_element",
+}
+
+
+def _reject_unknown(mapping: Mapping[str, Any], allowed: set[str], path: str) -> None:
+    unknown = set(mapping) - allowed
+    if unknown:
+        raise ConfigError(f"unknown {path} fields: {sorted(unknown)}")
+
 
 def _mapping(config: Mapping[str, Any], key: str) -> Mapping[str, Any]:
     value = config.get(key)
@@ -81,19 +101,30 @@ def validate_config(config: Mapping[str, Any]) -> None:
         raise ConfigError("invalid experiment.generation_mode")
 
     simulation = _mapping(config, "simulation")
+    _reject_unknown(simulation, {"coupling", "execution_mode"}, "simulation")
     coupling = simulation.get("coupling")
     if coupling not in _COUPLINGS:
         raise ConfigError("invalid simulation.coupling")
 
     system = _mapping(config, "system")
+    _reject_unknown(
+        system, {"profile", "topology_ref", "access_policy"}, "system"
+    )
     profile = system.get("profile")
     if profile not in _PROFILES:
         raise ConfigError("invalid system.profile")
 
     backends = _mapping(config, "backends")
+    _reject_unknown(backends, {"gpu", "atlas", "host"}, "backends")
     gpu = _mapping(backends, "gpu")
     atlas = _mapping(backends, "atlas")
     host = _mapping(backends, "host")
+    for backend_name, backend in (("gpu", gpu), ("atlas", atlas), ("host", host)):
+        _reject_unknown(
+            backend,
+            {"kind", "ref", "requested_timing_mode"},
+            f"backends.{backend_name}",
+        )
     if gpu.get("kind") not in _GPU_BACKENDS:
         raise ConfigError("invalid backends.gpu.kind")
     if atlas.get("kind") not in _ATLAS_BACKENDS:
@@ -101,7 +132,38 @@ def validate_config(config: Mapping[str, Any]) -> None:
     if host.get("kind", "none") not in _HOST_BACKENDS:
         raise ConfigError("invalid backends.host.kind")
 
+    model = _mapping(config, "model")
+    _reject_unknown(model, _MODEL_REQUIRED, "model")
+    missing_model = _MODEL_REQUIRED - set(model)
+    if missing_model:
+        raise ConfigError(f"missing model fields: {sorted(missing_model)}")
+    for key in _MODEL_REQUIRED - {"name", "dtype"}:
+        _positive_int(model.get(key), f"model.{key}")
+    if not isinstance(model.get("name"), str) or not model["name"]:
+        raise ConfigError("model.name must be a non-empty string")
+    if model["num_attention_heads"] * model["head_dim"] != model["hidden_size"]:
+        raise ConfigError(
+            "model.num_attention_heads * model.head_dim must equal hidden_size"
+        )
+
     scheduling = _mapping(config, "scheduling")
+    _reject_unknown(
+        scheduling,
+        {
+            "mode",
+            "epoch_mode",
+            "admission",
+            "decode_priority",
+            "prefill_aging",
+            "max_num_sequences",
+            "max_batched_tokens",
+            "prefill_chunk_tokens",
+            "max_prefill_wait_epochs",
+            "kv_reservation_mode",
+            "epoch_duration_fs",
+        },
+        "scheduling",
+    )
     max_tokens = _positive_int(
         scheduling.get("max_batched_tokens"), "scheduling.max_batched_tokens"
     )
@@ -116,21 +178,62 @@ def validate_config(config: Mapping[str, Any]) -> None:
         raise ConfigError(
             "scheduling.prefill_chunk_tokens must not exceed max_batched_tokens"
         )
+    _positive_int(scheduling.get("epoch_duration_fs"), "scheduling.epoch_duration_fs")
 
     workload = _mapping(config, "workload")
+    _reject_unknown(workload, {"requests"}, "workload")
     requests = workload.get("requests")
     if not isinstance(requests, list) or not requests:
         raise ConfigError("workload.requests must be a non-empty array")
+    request_ids: set[str] = set()
     for index, request in enumerate(requests):
         if not isinstance(request, Mapping):
             raise ConfigError(f"workload.requests[{index}] must be an object")
+        _reject_unknown(
+            request,
+            {
+                "request_id",
+                "arrival_time_fs",
+                "prompt_length",
+                "output_length",
+                "priority",
+            },
+            f"workload.requests[{index}]",
+        )
+        request_id = request.get("request_id")
+        if not isinstance(request_id, str) or not request_id:
+            raise ConfigError(f"requests[{index}].request_id must be non-empty")
+        if request_id in request_ids:
+            raise ConfigError(f"duplicate request_id: {request_id}")
+        request_ids.add(request_id)
         _positive_int(request.get("prompt_length"), f"requests[{index}].prompt_length")
         _positive_int(request.get("output_length"), f"requests[{index}].output_length")
+        arrival = request.get("arrival_time_fs", 0)
+        if not isinstance(arrival, int) or isinstance(arrival, bool) or arrival < 0:
+            raise ConfigError(f"requests[{index}].arrival_time_fs must be unsigned")
+
+    placement = _mapping(config, "placement")
+    _reject_unknown(
+        placement, {"mode", "unit", "default_target", "rules", "data"}, "placement"
+    )
+    if placement.get("mode") not in {"manual", "rule_based", "auto_dse"}:
+        raise ConfigError("invalid placement.mode")
+
+    address = _mapping(config, "address")
+    _reject_unknown(
+        address, {"allocator", "page_tokens", "kv_capacity_bytes"}, "address"
+    )
+    _positive_int(address.get("page_tokens"), "address.page_tokens")
+    _positive_int(address.get("kv_capacity_bytes"), "address.kv_capacity_bytes")
 
     if profile == "model4_cxl_memory_tier":
         access_policy = system.get("access_policy", "copy")
+        if access_policy not in {"remote", "copy", "migrate"}:
+            raise ConfigError("invalid Model 4 access_policy")
         if access_policy == "remote" and coupling != "request_cycle":
             raise ConfigError("Model 4 remote access requires request_cycle coupling")
+        if access_policy == "remote" and gpu.get("kind") != "accel_sim":
+            raise ConfigError("Model 4 remote access requires accel_sim GPU backend")
 
 
 def load_and_validate_config(path: str | Path) -> dict[str, Any]:
@@ -139,6 +242,39 @@ def load_and_validate_config(path: str | Path) -> dict[str, Any]:
         config = json.loads(config_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         raise ConfigError(f"failed to load {config_path}: {error}") from error
-    validate_config(config)
-    return config
+    if not isinstance(config, dict):
+        raise ConfigError("configuration root must be an object")
+    resolved = deepcopy(config)
+    project_root = next(
+        (
+            parent
+            for parent in (config_path.resolve().parent, *config_path.resolve().parents)
+            if (parent / "pyproject.toml").is_file()
+        ),
+        Path.cwd(),
+    )
 
+    def expand(section: str) -> None:
+        value = resolved.get(section)
+        if not isinstance(value, Mapping) or "ref" not in value:
+            return
+        if set(value) != {"ref"}:
+            raise ConfigError(f"{section}.ref cannot be combined with inline fields")
+        ref = value["ref"]
+        if not isinstance(ref, str) or not ref:
+            raise ConfigError(f"{section}.ref must be a non-empty path")
+        ref_path = Path(ref)
+        if not ref_path.is_absolute():
+            ref_path = project_root / ref_path
+        try:
+            loaded = json.loads(ref_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            raise ConfigError(f"failed to expand {section}.ref {ref_path}: {error}") from error
+        if not isinstance(loaded, dict):
+            raise ConfigError(f"{section}.ref must resolve to an object")
+        resolved[section] = loaded
+
+    for section in ("model", "workload", "scheduling", "placement", "address", "metrics"):
+        expand(section)
+    validate_config(resolved)
+    return resolved

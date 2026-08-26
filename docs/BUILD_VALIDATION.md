@@ -22,5 +22,12 @@ PYTHONPATH=. python3 -m frontend.hetero.cli validate \
   --config configs/hetero/experiments/m0_smoke.yaml
 ```
 
-The scaffold does not yet execute ATLAS or Accel-Sim and makes no performance claim.
+Validation after the first implementation slice:
 
+- CTest: 6/6 passed.
+- Pytest: 24/24 passed.
+- Model 1/2/3/4 scheduler-validation runs completed and emitted all nine required run artifacts.
+- Tiny golden Paged KV: 18 committed tokens, 8 blocks, 9216 logical bytes, 16384 allocated bytes.
+- Continuous-batching dummy workload matched the five frozen Epoch selections exactly.
+
+The system still does not execute ATLAS or Accel-Sim. Fixed Epoch timing is only for semantic validation and makes no performance claim.

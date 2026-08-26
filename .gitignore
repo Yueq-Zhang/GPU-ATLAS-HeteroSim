@@ -8,3 +8,5 @@ build/
 simulator/build/
 runs/
 *.log
+*.so
+*.pyd

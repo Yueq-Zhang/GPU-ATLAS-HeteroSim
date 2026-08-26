@@ -16,7 +16,7 @@ dependencies:
   gpgpu_sim: not_integrated
   ramulator2: inherited_from_atlas_until_m6
   booksim2: inherited_from_atlas_until_m6
-  pybind11: integration_pending
+  pybind11: 2.9.1-2_ubuntu_jammy
   tilelang: inherited_from_atlas_until_m5
 notes:
   - Trace capture host and target GPU configuration must be added before M5 qualification.

@@ -8,39 +8,135 @@
     "schema_version", "experiment", "simulation", "system", "backends",
     "model", "workload", "scheduling", "placement", "address", "metrics"
   ],
+  "$defs": {
+    "ref": {
+      "type": "object", "additionalProperties": false, "required": ["ref"],
+      "properties": {"ref": {"type": "string", "minLength": 1}}
+    },
+    "backend": {
+      "type": "object", "additionalProperties": false, "required": ["kind"],
+      "properties": {
+        "kind": {"type": "string"},
+        "ref": {"type": "string", "minLength": 1},
+        "requested_timing_mode": {"type": "string"}
+      }
+    },
+    "model": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "name", "hidden_size", "intermediate_size", "num_layers",
+        "num_attention_heads", "num_kv_heads", "head_dim", "vocab_size",
+        "dtype", "bytes_per_element"
+      ],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "hidden_size": {"type": "integer", "minimum": 1},
+        "intermediate_size": {"type": "integer", "minimum": 1},
+        "num_layers": {"type": "integer", "minimum": 1},
+        "num_attention_heads": {"type": "integer", "minimum": 1},
+        "num_kv_heads": {"type": "integer", "minimum": 1},
+        "head_dim": {"type": "integer", "minimum": 1},
+        "vocab_size": {"type": "integer", "minimum": 1},
+        "dtype": {"type": "string", "minLength": 1},
+        "bytes_per_element": {"type": "integer", "minimum": 1}
+      }
+    },
+    "request": {
+      "type": "object", "additionalProperties": false,
+      "required": ["request_id", "prompt_length", "output_length"],
+      "properties": {
+        "request_id": {"type": "string", "minLength": 1},
+        "arrival_time_fs": {"type": "integer", "minimum": 0},
+        "prompt_length": {"type": "integer", "minimum": 1},
+        "output_length": {"type": "integer", "minimum": 1},
+        "priority": {"type": "integer"}
+      }
+    },
+    "workload": {
+      "type": "object", "additionalProperties": false, "required": ["requests"],
+      "properties": {"requests": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/request"}}}
+    },
+    "scheduler": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "max_num_sequences", "max_batched_tokens", "prefill_chunk_tokens", "epoch_duration_fs"],
+      "properties": {
+        "mode": {"enum": ["static_ragged", "continuous_batching"]},
+        "epoch_mode": {"enum": ["token_step_barrier"]},
+        "admission": {"enum": ["fcfs"]},
+        "decode_priority": {"type": "boolean"},
+        "prefill_aging": {"type": "boolean"},
+        "max_num_sequences": {"type": "integer", "minimum": 1},
+        "max_batched_tokens": {"type": "integer", "minimum": 1},
+        "prefill_chunk_tokens": {"type": "integer", "minimum": 1},
+        "max_prefill_wait_epochs": {"type": "integer", "minimum": 0},
+        "kv_reservation_mode": {"enum": ["full_request"]},
+        "epoch_duration_fs": {"type": "integer", "minimum": 1}
+      }
+    },
+    "placement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "default_target"],
+      "properties": {
+        "mode": {"enum": ["manual", "rule_based", "auto_dse"]},
+        "unit": {"type": "string"},
+        "default_target": {"type": "string", "minLength": 1},
+        "rules": {"type": "array", "items": {"type": "object"}},
+        "data": {"type": "object"}
+      }
+    },
+    "address": {
+      "type": "object", "additionalProperties": false,
+      "required": ["allocator", "page_tokens", "kv_capacity_bytes"],
+      "properties": {
+        "allocator": {"enum": ["first_fit"]},
+        "page_tokens": {"type": "integer", "minimum": 1},
+        "kv_capacity_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "metrics": {
+      "type": "object", "additionalProperties": false, "required": ["request"],
+      "properties": {"request": {"type": "array", "items": {"type": "string"}}}
+    }
+  },
   "properties": {
     "schema_version": {"const": "hetero-sim/v1"},
-    "experiment": {"type": "object"},
-    "simulation": {
-      "type": "object",
-      "required": ["coupling"],
+    "experiment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "seed", "generation_mode"],
       "properties": {
-        "coupling": {
-          "enum": ["analytical", "operator_event", "request_cycle"]
-        }
+        "name": {"type": "string", "minLength": 1},
+        "seed": {"type": "integer", "minimum": 0},
+        "generation_mode": {"enum": ["trace_locked", "fixed_tokens", "functional_generation", "replayed_eos"]}
+      }
+    },
+    "simulation": {
+      "type": "object", "additionalProperties": false, "required": ["coupling"],
+      "properties": {
+        "coupling": {"enum": ["analytical", "operator_event", "request_cycle"]},
+        "execution_mode": {"enum": ["scheduler_validation", "full_runtime"]}
       }
     },
     "system": {
-      "type": "object",
-      "required": ["profile"],
+      "type": "object", "additionalProperties": false, "required": ["profile"],
       "properties": {
-        "profile": {
-          "enum": [
-            "model1_atlas_native",
-            "model2_host_memory_pcie",
-            "model3_gpu_native_3ddram",
-            "model4_cxl_memory_tier"
-          ]
-        }
+        "profile": {"enum": ["model1_atlas_native", "model2_host_memory_pcie", "model3_gpu_native_3ddram", "model4_cxl_memory_tier"]},
+        "topology_ref": {"type": "string"},
+        "access_policy": {"enum": ["remote", "copy", "migrate"]}
       }
     },
-    "backends": {"type": "object"},
-    "model": {"type": "object"},
-    "workload": {"type": "object"},
-    "scheduling": {"type": "object"},
-    "placement": {"type": "object"},
-    "address": {"type": "object"},
-    "metrics": {"type": "object"}
+    "backends": {
+      "type": "object", "additionalProperties": false, "required": ["gpu", "atlas", "host"],
+      "properties": {
+        "gpu": {"$ref": "#/$defs/backend"},
+        "atlas": {"$ref": "#/$defs/backend"},
+        "host": {"$ref": "#/$defs/backend"}
+      }
+    },
+    "model": {"oneOf": [{"$ref": "#/$defs/ref"}, {"$ref": "#/$defs/model"}]},
+    "workload": {"oneOf": [{"$ref": "#/$defs/ref"}, {"$ref": "#/$defs/workload"}]},
+    "scheduling": {"oneOf": [{"$ref": "#/$defs/ref"}, {"$ref": "#/$defs/scheduler"}]},
+    "placement": {"oneOf": [{"$ref": "#/$defs/ref"}, {"$ref": "#/$defs/placement"}]},
+    "address": {"oneOf": [{"$ref": "#/$defs/ref"}, {"$ref": "#/$defs/address"}]},
+    "metrics": {"oneOf": [{"$ref": "#/$defs/ref"}, {"$ref": "#/$defs/metrics"}]}
   }
 }
-

@@ -1,0 +1,21 @@
+{
+  "mode": "rule_based",
+  "unit": "device_subbatch_operator",
+  "default_target": "gpu0",
+  "rules": [
+    {
+      "match": {
+        "phase": "decode",
+        "operator_group": "attention"
+      },
+      "target": "atlas0.compute"
+    }
+  ],
+  "data": {
+    "kv_cache": {
+      "home": "primary_3ddram",
+      "layout": "paged",
+      "page_tokens": 16
+    }
+  }
+}

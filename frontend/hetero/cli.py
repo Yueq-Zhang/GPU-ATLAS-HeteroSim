@@ -3,18 +3,13 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
 from pathlib import Path
 from typing import Sequence
 
 from . import __version__
+from .runner import execute_run, simulation_input_key
+from .runtime_bridge import RuntimeUnavailableError
 from .schema import ConfigError, load_and_validate_config
-
-
-def _input_key(config: dict[str, object]) -> str:
-    canonical = json.dumps(config, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -28,6 +23,7 @@ def _build_parser() -> argparse.ArgumentParser:
     run = subparsers.add_parser("run", help="validate a run request")
     run.add_argument("--config", required=True, type=Path)
     run.add_argument("--dry-run", action="store_true")
+    run.add_argument("--runs-root", type=Path)
     return parser
 
 
@@ -39,17 +35,28 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"configuration error: {error}")
         return 2
 
-    key = _input_key(config)
+    key = simulation_input_key(config)
     if args.command == "validate":
         print(f"valid hetero-sim/v1 configuration; simulation_input_key={key}")
         return 0
     if args.dry_run:
         print(f"dry-run validated; simulation_input_key={key}")
         return 0
-    print("runtime execution is not implemented in the M0/M1 scaffold; use --dry-run")
-    return 3
+    project_root = Path(__file__).resolve().parents[2]
+    try:
+        run_dir = execute_run(config, project_root, args.runs_root)
+    except RuntimeUnavailableError as error:
+        print(f"runtime error: {error}")
+        return 3
+    except (ValueError, RuntimeError) as error:
+        print(f"simulation error: {error}")
+        return 4
+    print(
+        "scheduler-validation run completed; "
+        f"simulation_input_key={key}; run_dir={run_dir}"
+    )
+    return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

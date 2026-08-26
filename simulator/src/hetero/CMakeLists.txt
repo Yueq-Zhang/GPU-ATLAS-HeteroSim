@@ -1,6 +1,12 @@
 add_library(heterosim_runtime STATIC
     runtime/event_queue.cpp
+    runtime/scheduler.cpp
+    runtime/timing_ownership.cpp
+    memory/paged_kv.cpp
+    services/fixed_latency_memory.cpp
 )
+
+set_target_properties(heterosim_runtime PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(heterosim_runtime
     PUBLIC
@@ -13,4 +19,3 @@ target_compile_options(heterosim_runtime
         -Wextra
         -Werror
 )
-
