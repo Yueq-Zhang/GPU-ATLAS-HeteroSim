@@ -1,6 +1,7 @@
 import json
 import math
 import os
+from pathlib import Path
 
 import pytest
 
@@ -8,8 +9,32 @@ from frontend.hetero.backends.accel_sim import (
     AccelSimBackend,
     AccelSimBackendConfig,
     parse_accel_sim_stats,
+    parse_ramulator2_stats,
 )
 from frontend.hetero.trace_manifest import TraceManifest
+
+
+def test_checked_in_backend_configs_pin_accel_sim_v2() -> None:
+    repository = Path(__file__).resolve().parents[2]
+    expected_accel = "64653015f85fb5664c84a10f48527e8897d289d0"
+    expected_gpgpu = "e10018b67a4b668e7b43f89280cf67624f1df4ff"
+    for filename in (
+        "gpu_accelsim_qv100.json",
+        "gpu_accelsim_rtx3070.json",
+        "gpu_accelsim_qv100_ramulator2_hbm3.json",
+    ):
+        payload = json.loads(
+            (repository / "configs" / "hetero" / "backends" / filename).read_text(
+                encoding="utf-8"
+            )
+        )
+        assert payload["dependency_commits"]["accel_sim_framework"] == expected_accel
+        assert payload["dependency_commits"]["gpgpu_sim_distribution"] == expected_gpgpu
+        assert payload["backend_id"].endswith(".v2_0_0")
+        expected_build = "build-ramulator2" if "external_memory" in payload else "build"
+        assert payload["executable"].endswith(
+            f"/gpu-simulator/{expected_build}/accel-sim.out"
+        )
 
 
 def _files(tmp_path):
@@ -77,6 +102,47 @@ def test_stat_parser_accepts_integer_float_and_scientific_values() -> None:
         "gpu_ipc": 3.618,
         "L2_BW": 125.0,
     }
+
+
+def test_ramulator2_parser_uses_final_summary() -> None:
+    stats = parse_ramulator2_stats(
+        "heterosim_ramulator2 cycles=100 reads=2 writes=0 completed=2 "
+        "rejected=1 outstanding=0 instances=1\n"
+        "heterosim_ramulator2_summary cycles=120 reads=3 writes=1 completed=4 "
+        "rejected=1 outstanding=0 instances=1 partitions=8\n"
+    )
+    assert stats == {
+        "cycles": 120,
+        "reads": 3,
+        "writes": 1,
+        "completed": 4,
+        "rejected": 1,
+        "outstanding": 0,
+        "instances": 1,
+        "partitions": 8,
+    }
+
+
+def test_external_memory_descriptor_is_cycle_coupled(tmp_path) -> None:
+    config_path, _ = _files(tmp_path)
+    payload = json.loads(config_path.read_text(encoding="utf-8"))
+    for filename in ("hbm3.yaml", "bridge.so"):
+        (tmp_path / filename).write_text("test\n", encoding="utf-8")
+    payload["external_memory"] = {
+        "kind": "ramulator2_in_process",
+        "config_file": "hbm3.yaml",
+        "bridge_library": "bridge.so",
+        "timing_owner": "shared3d.ramulator2",
+        "expected_instances": 1,
+        "require_nonzero_requests": True,
+    }
+    config_path.write_text(json.dumps(payload), encoding="utf-8")
+    backend = AccelSimBackend(AccelSimBackendConfig.load(config_path))
+    descriptor = backend.descriptor()
+    assert descriptor.supported_duration_semantics == ("coupled",)
+    assert descriptor.supports_stall_resume is True
+    assert "shared_3d_dram" in descriptor.ownable_resource_kinds
+    assert "gpu_local_dram" not in descriptor.ownable_resource_kinds
 
 
 def test_command_preserves_native_accel_sim_contract(tmp_path) -> None:

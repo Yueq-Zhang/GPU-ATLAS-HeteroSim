@@ -40,6 +40,30 @@ def run_task_dag(tasks: list[dict[str, object]]) -> dict[str, object]:
     return _runtime_module().run_task_dag(tasks)
 
 
+def plan_memory_lifecycle(
+    spaces: list[dict[str, object]], events: list[dict[str, object]]
+) -> dict[str, object]:
+    """Allocate and release physical ranges with deterministic first-fit reuse."""
+
+    return _runtime_module().plan_memory_lifecycle(spaces, events)
+
+
+def simulate_bounded_link(
+    config: dict[str, object], transactions: list[dict[str, object]]
+) -> dict[str, object]:
+    """Run the transaction/credit model used by PCIe and CXL paths."""
+
+    return _runtime_module().simulate_bounded_link(config, transactions)
+
+
+def simulate_shared_3d_memory(
+    config: dict[str, object], requests: list[dict[str, object]]
+) -> dict[str, object]:
+    """Run the single-owner shared 3D-DRAM reference request service."""
+
+    return _runtime_module().simulate_shared_3d_memory(config, requests)
+
+
 def ideal_link_completion_fs(
     issue_time_fs: int,
     latency_fs: int,

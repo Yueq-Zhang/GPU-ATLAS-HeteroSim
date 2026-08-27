@@ -6,6 +6,36 @@ from frontend.hetero.model_graph import (
 )
 
 
+def test_decode_step_scope_builds_one_decode_without_prefill() -> None:
+    model = ModelSpec(
+        name="tiny",
+        hidden_size=128,
+        intermediate_size=256,
+        num_layers=2,
+        num_attention_heads=4,
+        num_kv_heads=2,
+        head_dim=32,
+        vocab_size=256,
+    )
+    request = RequestSpec(
+        "decode-only",
+        prompt_length=1024,
+        output_length=1,
+        execution_scope="decode_step",
+        initial_kv_length=1024,
+    )
+    graph = build_request_graph(model, request)
+    counters = graph_counters(model, request)
+    phases = {node.phase.value for node in graph.nodes}
+    assert "prefill" not in phases
+    assert "decode" in phases
+    assert counters.prefill_forwards == 0
+    assert counters.decode_forwards == 1
+    assert counters.final_committed_kv_len == 1025
+    attention = next(node for node in graph.nodes if node.op == "causal_attention")
+    assert attention.attributes["attention_kv_len"] == 1025
+
+
 TINY_MODEL = ModelSpec(
     name="tiny_llama_2layer",
     hidden_size=128,

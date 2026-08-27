@@ -1,0 +1,13 @@
+{
+  "mode": "continuous",
+  "epoch_mode": "token_step_barrier",
+  "admission": "kv_capacity_aware",
+  "decode_priority": true,
+  "prefill_aging": true,
+  "max_num_sequences": 2,
+  "max_batched_tokens": 16,
+  "prefill_chunk_tokens": 8,
+  "max_prefill_wait_epochs": 4,
+  "kv_reservation_mode": "max_request",
+  "epoch_duration_fs": 1000000
+}

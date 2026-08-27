@@ -38,6 +38,9 @@ void validate(const std::vector<RequestInput>& requests, const SchedulerConfig& 
             request.output_length == 0) {
             throw std::invalid_argument("invalid request input");
         }
+        if (request.decode_step && request.initial_kv_length == 0) {
+            throw std::invalid_argument("decode-step request requires initial KV length");
+        }
         ids.push_back(request.request_id);
     }
     std::sort(ids.begin(), ids.end());
@@ -56,7 +59,9 @@ SchedulerResult simulate_token_barrier(
     state.reserve(requests.size());
     for (const auto& request : requests) {
         state.push_back(MutableRequest{
-            request, State::kWaiting, 0, 0, 0, 0, {}, 0});
+            request, State::kWaiting, 0, 0,
+            request.decode_step ? request.initial_kv_length : 0,
+            0, {}, 0});
     }
 
     SchedulerResult result;
@@ -96,7 +101,9 @@ SchedulerResult simulate_token_barrier(
             if (active >= config.max_num_sequences) {
                 break;
             }
-            state[index].state = State::kPrefillReady;
+            state[index].state = state[index].input.decode_step
+                                     ? State::kDecodeReady
+                                     : State::kPrefillReady;
             ++active;
         }
 

@@ -1,0 +1,13 @@
+{
+  "mode": "manual",
+  "unit": "device_subbatch_operator",
+  "default_target": "atlas0.compute",
+  "rules": [],
+  "data": {
+    "kv_cache": {
+      "home": "primary_3ddram",
+      "layout": "paged",
+      "page_tokens": 16
+    }
+  }
+}

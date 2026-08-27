@@ -41,8 +41,8 @@ def place_nodes(
     active_batch: int = 1,
 ) -> list[PlacementDecision]:
     mode = placement.get("mode", "manual")
-    if mode not in {"manual", "rule_based"}:
-        raise ValueError(f"placement mode {mode!r} is not executable in M1-M3")
+    if mode not in {"manual", "rule_based", "auto_dse"}:
+        raise ValueError(f"unsupported placement mode {mode!r}")
     default = str(placement.get("default_target", "gpu0"))
     rules = placement.get("rules", [])
     if not isinstance(rules, list):
@@ -51,7 +51,7 @@ def place_nodes(
     for node in nodes:
         target = default
         matched: int | None = None
-        if mode == "rule_based":
+        if mode in {"rule_based", "auto_dse"}:
             for index, rule in enumerate(rules):
                 if not isinstance(rule, Mapping):
                     raise ValueError("each placement rule must be an object")
@@ -67,7 +67,15 @@ def place_nodes(
                 node_id=node.node_id,
                 target_device=target,
                 matched_rule=matched,
-                reason="first_match" if matched is not None else "default_target",
+                reason=(
+                    "auto_dse_candidate_first_match"
+                    if mode == "auto_dse" and matched is not None
+                    else "auto_dse_candidate_default"
+                    if mode == "auto_dse"
+                    else "first_match"
+                    if matched is not None
+                    else "default_target"
+                ),
             )
         )
     return decisions

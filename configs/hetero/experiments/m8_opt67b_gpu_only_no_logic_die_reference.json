@@ -1,0 +1,73 @@
+{
+  "schema_version": "hetero-sim/v1",
+  "experiment": {
+    "name": "m8_opt67b_gpu_only_no_logic_die_reference",
+    "seed": 1,
+    "generation_mode": "trace_locked"
+  },
+  "simulation": {
+    "coupling": "request_cycle",
+    "execution_mode": "full_runtime",
+    "validation_policy": "deferred"
+  },
+  "system": {
+    "profile": "model3_gpu_native_3ddram",
+    "links": {
+      "shared3d.explicit_noncoherent": {
+        "wire_bandwidth_Bps": 448000000000,
+        "latency_fs": 0,
+        "header_bytes": 0,
+        "resource_id": "unused_gpu_only_route",
+        "parameter_source": "reference_unqualified",
+        "queue_depth_transactions": 64,
+        "credits": 64,
+        "full_duplex": true,
+        "protocol": "unused_gpu_only"
+      }
+    },
+    "memory_services": {
+      "shared0.dram3d": {
+        "kind": "shared_3d_reference",
+        "access_mode": "gpu_only",
+        "timing_owner": "shared3d.memory_service",
+        "channel_count": 16,
+        "banks_per_channel": 16,
+        "transaction_bytes": 1048576,
+        "queue_depth_per_initiator": 64,
+        "fixed_latency_fs": 100000000,
+        "channel_injection_interval_fs": 37449142857,
+        "bank_busy_time_fs": 37449142857,
+        "initiator_order": ["gpu0"],
+        "parameter_source": "coarse_grain_functional_reference_unqualified"
+      }
+    }
+  },
+  "backends": {
+    "gpu": {
+      "kind": "roofline",
+      "effective_compute_flops_per_s": 81300000000000,
+      "effective_memory_bandwidth_Bps": 448000000000,
+      "parameter_source": "NVIDIA_RTX3070_theoretical_dense_fp16_and_memory_bandwidth"
+    },
+    "atlas": {"kind": "none"},
+    "host": {"kind": "none"}
+  },
+  "model": {"ref": "configs/hetero/models/opt_6_7b_fp16.json"},
+  "workload": {"ref": "configs/hetero/workloads/opt67b_bs1_ctx1024_single_decode.json"},
+  "scheduling": {
+    "mode": "static_ragged",
+    "max_num_sequences": 1,
+    "max_batched_tokens": 1024,
+    "prefill_chunk_tokens": 1024,
+    "max_prefill_wait_epochs": 8,
+    "epoch_duration_fs": 1000
+  },
+  "placement": {"ref": "configs/hetero/placements/gpu_only_shared_3ddram.json"},
+  "address": {
+    "allocator": "first_fit",
+    "page_tokens": 16,
+    "kv_capacity_bytes": 25769803776,
+    "allocation_alignment_bytes": 256
+  },
+  "metrics": {"ref": "configs/hetero/metrics/e2e_validation.json"}
+}

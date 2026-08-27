@@ -1,0 +1,239 @@
+diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/CMakeLists.txt b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/CMakeLists.txt
+--- a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/CMakeLists.txt
++++ b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/CMakeLists.txt
+@@ -34,3 +34,15 @@
+ target_include_directories(gpgpusim PRIVATE ${GPGPUSIM_POWER_MODEL})
+ endif()
+ 
++
++option(HETEROSIM_ENABLE_RAMULATOR2 "Use the GPU-ATLAS external Ramulator2 bridge" OFF)
++set(HETEROSIM_RAMULATOR2_BRIDGE_DIR "" CACHE PATH "Ramulator2 bridge directory")
++if(HETEROSIM_ENABLE_RAMULATOR2)
++  if(NOT EXISTS "${HETEROSIM_RAMULATOR2_BRIDGE_DIR}/libramulator_gpgpusim_bridge.so")
++    message(FATAL_ERROR "Missing GPU-ATLAS Ramulator2 bridge library")
++  endif()
++  target_compile_definitions(gpgpusim PRIVATE HETEROSIM_RAMULATOR2_BRIDGE=1)
++  target_include_directories(gpgpusim PRIVATE ${HETEROSIM_RAMULATOR2_BRIDGE_DIR})
++  target_link_libraries(gpgpusim PUBLIC
++    "${HETEROSIM_RAMULATOR2_BRIDGE_DIR}/libramulator_gpgpusim_bridge.so")
++endif()
+diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.h b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.h
+--- a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.h
++++ b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.h
+@@ -37,6 +37,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <zlib.h>
++#include <deque>
+ #include <bitset>
+ #include <fstream>
+ #include <iomanip>
+@@ -107,6 +108,7 @@ class dram_t {
+   dram_t(unsigned int parition_id, const memory_config *config,
+          class memory_stats_t *stats, class memory_partition_unit *mp,
+          class gpgpu_sim *gpu);
++  ~dram_t();
+ 
+   bool full(bool is_write) const;
+   void print(FILE *simFile) const;
+@@ -181,6 +183,12 @@ class dram_t {
+   // buffer to hold packets when DRAM processing is over
+   // should be filled with dram clock and popped with l2or icnt clock
+   fifo_pipeline<mem_fetch> *returnq;
++
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  void *m_ramulator;
++  std::deque<mem_fetch *> m_ramulator_issueq;
++  static const unsigned m_ramulator_queue_limit = 64;
++#endif
+ 
+   unsigned int dram_util_bins[10];
+   unsigned int dram_eff_bins[10];
+diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc
+--- a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc
++++ b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc
+@@ -31,6 +31,9 @@
+ // POSSIBILITY OF SUCH DAMAGE.
+ 
+ #include "dram.h"
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++#include "ramulator_bridge.h"
++#endif
+ #include "dram_sched.h"
+ #include "gpu-misc.h"
+ #include "gpu-sim.h"
+@@ -55,6 +58,24 @@ dram_t::dram_t(unsigned int partition_id, const memory_config *config,
+   m_config = config;
+   m_gpu = gpu;
+ 
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  m_ramulator = NULL;
++  const char *ramulator_config = getenv("GPGPUSIM_RAMULATOR_CONFIG");
++  if (ramulator_config && ramulator_config[0]) {
++    m_ramulator = heterosim_ramulator_create(
++        ramulator_config, partition_id, m_config->m_n_mem);
++    if (!m_ramulator) {
++      fprintf(stderr,
++              "Failed to create shared Ramulator2 bridge for partition %u\n",
++              partition_id);
++      abort();
++    }
++    fprintf(stdout,
++            "Accel-Sim partition %u connected to shared Ramulator2\n",
++            partition_id);
++  }
++#endif
++
+   // rowblp
+   access_num = 0;
+   hits_num = 0;
+@@ -161,7 +182,20 @@ dram_t::dram_t(unsigned int partition_id, const memory_config *config,
+     mrqq_Dist = StatCreate("mrqq_length", 1, 64);  // track up to 64 entries
+ }
+ 
++dram_t::~dram_t() {
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  if (m_ramulator) {
++    heterosim_ramulator_destroy(m_ramulator);
++    m_ramulator = NULL;
++  }
++#endif
++}
++
+ bool dram_t::full(bool is_write) const {
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  if (m_ramulator)
++    return m_ramulator_issueq.size() >= m_ramulator_queue_limit;
++#endif
+   if (m_config->scheduler_type == DRAM_FRFCFS) {
+     if (m_config->gpgpu_frfcfs_dram_sched_queue_size == 0) return false;
+     if (m_config->seperate_write_queue_enabled) {
+@@ -180,6 +211,10 @@ bool dram_t::full(bool is_write) const {
+ 
+ unsigned dram_t::que_length() const {
+   unsigned nreqs = 0;
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  if (m_ramulator) return m_ramulator_issueq.size();
++#endif
++
+   if (m_config->scheduler_type == DRAM_FRFCFS) {
+     nreqs = m_frfcfs_scheduler->num_pending();
+   } else {
+@@ -245,6 +283,23 @@ dram_req_t::dram_req_t(class mem_fetch *mf, unsigned banks,
+ }
+ 
+ void dram_t::push(class mem_fetch *data) {
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  if (m_ramulator) {
++    assert(id == data->get_tlx_addr().chip);
++    data->set_status(IN_PARTITION_MC_INTERFACE_QUEUE,
++                     m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle);
++    m_ramulator_issueq.push_back(data);
++    n_req += 1;
++    n_req_partial += 1;
++    if (m_ramulator_issueq.size() > max_mrqs_temp)
++      max_mrqs_temp = m_ramulator_issueq.size();
++    if (m_ramulator_issueq.size() > max_mrqs)
++      max_mrqs = m_ramulator_issueq.size();
++    m_stats->memlatstat_dram_access(data);
++    return;
++  }
++#endif
++
+   assert(id == data->get_tlx_addr()
+                    .chip);  // Ensure request is in correct memory partition
+ 
+@@ -288,6 +343,53 @@ void dram_t::scheduler_fifo() {
+   a ^= b;
+ 
+ void dram_t::cycle() {
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  if (m_ramulator) {
++    ++n_cmd;
++    ++n_cmd_partial;
++
++    if (!returnq->full()) {
++      mem_fetch *data = static_cast<mem_fetch *>(
++          heterosim_ramulator_pop_completed(m_ramulator));
++      if (data) {
++        data->set_status(IN_PARTITION_MC_RETURNQ,
++                         m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle);
++        if (data->get_access_type() != L1_WRBK_ACC &&
++            data->get_access_type() != L2_WRBK_ACC) {
++          data->set_reply();
++          returnq->push(data);
++        } else {
++          m_memory_partition_unit->set_done(data);
++          delete data;
++        }
++      }
++    }
++
++    if (!m_ramulator_issueq.empty()) {
++      mem_fetch *data = m_ramulator_issueq.front();
++      if (heterosim_ramulator_send(m_ramulator, data->get_addr(),
++                                    data->get_is_write(), data)) {
++        m_ramulator_issueq.pop_front();
++        if (data->get_is_write())
++          ++n_wr;
++        else
++          ++n_rd;
++        ++n_activity;
++        ++bwutil;
++      }
++    }
++
++    // dram_t::cycle is invoked once per partition. Only the last partition
++    // advances the one shared Ramulator2 instance, exactly once per DRAM tick.
++    if (id + 1 == m_config->m_n_mem) {
++      heterosim_ramulator_tick(m_ramulator);
++    }
++    ave_mrqs += m_ramulator_issueq.size();
++    ave_mrqs_partial += m_ramulator_issueq.size();
++    return;
++  }
++#endif
++
+   if (!returnq->full()) {
+     dram_req_t *cmd = rwq->pop();
+     if (cmd) {
+@@ -701,6 +809,19 @@ void dram_t::print(FILE *simFile) const {
+       "n_rd=%llu n_rd_L2_A=%llu n_write=%llu n_wr_bk=%llu bw_util=%.4g\n",
+       n_cmd, n_nop, n_act, n_pre, n_ref, n_req, n_rd, n_rd_L2_A, n_wr, n_wr_WB,
+       (float)bwutil / n_cmd);
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  if (m_ramulator && id == 0) {
++    fprintf(simFile,
++            "heterosim_ramulator2 cycles=%llu reads=%llu writes=%llu "
++            "completed=%llu rejected=%llu outstanding=%llu instances=1\n",
++            (unsigned long long)heterosim_ramulator_clock(m_ramulator),
++            (unsigned long long)heterosim_ramulator_reads(m_ramulator),
++            (unsigned long long)heterosim_ramulator_writes(m_ramulator),
++            (unsigned long long)heterosim_ramulator_completed(m_ramulator),
++            (unsigned long long)heterosim_ramulator_rejected(m_ramulator),
++            (unsigned long long)heterosim_ramulator_outstanding(m_ramulator));
++  }
++#endif
+   fprintf(simFile, "n_activity=%llu dram_eff=%.4g\n", n_activity,
+           (float)bwutil / n_activity);
+   for (i = 0; i < m_config->nbk; i++) {
+@@ -801,6 +922,19 @@ void dram_t::print_stat(FILE *simFile) {
+           (float)bwutil / n_cmd);
+   fprintf(simFile, "mrqq: %d %.4g mrqsmax=%llu ", max_mrqs,
+           (float)ave_mrqs / n_cmd, max_mrqs_temp);
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  if (m_ramulator && id == 0) {
++    fprintf(simFile,
++            "heterosim_ramulator2 cycles=%llu reads=%llu writes=%llu "
++            "completed=%llu rejected=%llu outstanding=%llu instances=1 ",
++            (unsigned long long)heterosim_ramulator_clock(m_ramulator),
++            (unsigned long long)heterosim_ramulator_reads(m_ramulator),
++            (unsigned long long)heterosim_ramulator_writes(m_ramulator),
++            (unsigned long long)heterosim_ramulator_completed(m_ramulator),
++            (unsigned long long)heterosim_ramulator_rejected(m_ramulator),
++            (unsigned long long)heterosim_ramulator_outstanding(m_ramulator));
++  }
++#endif
+   fprintf(simFile, "\n");
+   fprintf(simFile, "dram_util_bins:");
+   for (unsigned i = 0; i < 10; i++) fprintf(simFile, " %d", dram_util_bins[i]);

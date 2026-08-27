@@ -1,0 +1,16 @@
+{
+  "name": "OPT-6.7B",
+  "hidden_size": 4096,
+  "intermediate_size": 16384,
+  "num_layers": 32,
+  "num_attention_heads": 32,
+  "num_kv_heads": 32,
+  "head_dim": 128,
+  "vocab_size": 50272,
+  "dtype": "fp16",
+  "bytes_per_element": 2,
+  "architecture": "opt",
+  "mlp_type": "dense_gelu",
+  "position_encoding": "learned_absolute",
+  "tied_embeddings": true
+}

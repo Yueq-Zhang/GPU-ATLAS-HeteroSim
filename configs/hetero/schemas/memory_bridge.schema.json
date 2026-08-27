@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hetero-memory-bridge/v1",
+  "title": "One JSONL external memory request record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type", "request_id", "parent_task_id", "initiator_id",
+    "trace_address", "size_bytes", "operation", "issue_time_fs"
+  ],
+  "properties": {
+    "type": {"const": "memory_request"},
+    "request_id": {"type": "integer", "minimum": 0},
+    "parent_task_id": {"type": "integer", "minimum": 0},
+    "initiator_id": {"enum": ["gpu0", "atlas0.compute"]},
+    "trace_address": {
+      "oneOf": [
+        {"type": "integer", "minimum": 0},
+        {"type": "string", "pattern": "^0[xX][0-9a-fA-F]+$"}
+      ]
+    },
+    "size_bytes": {"type": "integer", "minimum": 1},
+    "operation": {"enum": ["read", "write"]},
+    "issue_time_fs": {"type": "integer", "minimum": 0},
+    "sequence_number": {"type": "integer", "minimum": 0}
+  }
+}

@@ -5,8 +5,8 @@
 | 字段 | 内容 |
 | --- | --- |
 | 状态 | 已冻结的实现基线 |
-| 版本 | 1.1 |
-| 日期 | 2026-08-26 |
+| 版本 | 1.4 |
+| 日期 | 2026-08-27 |
 | 适用工程 | ATLAS-MICRO-2026 |
 | 当前基线提交 | b2787399408e32d327c820daee96d4e6610f551a |
 | 主要目标 | GPU 与 3D-DRAM Compute Die/ATLAS 的端到端 LLM 联合仿真 |
@@ -181,6 +181,28 @@ GPU 和 ATLAS Compute Die 是计算发起方。
 
 任何层都不能静默包含其他层已经拥有的时间。
 
+Model 3/4的`request_cycle`数据通路进一步冻结为分层父子事务模型：
+
+    GPU LLC Miss / DMA / CXL.mem Parent Request
+                    |
+       Bidirectional External Link Service
+       Request Packetization / Credit / Serialization
+                    |
+          Singleton LogicDieMemoryGateway
+       Address Normalize / Split / Order / Parent Table
+                    |
+          N x Internal DRAM Child Request
+                    |
+              One Ramulator2 Owner
+                    |
+          N x Child Completion / Join
+                    |
+       Response Packetization / External Link
+                    |
+          Original GPU Request Completion
+
+外部GPU接口带宽与Logic Die到3D-DRAM阵列的内部带宽是两个独立资源，通常允许`B_external < B_internal`。二者拥有独立队列、时钟、统计和时序所有权，禁止把它们合并成一个平均带宽或让一个Ramulator2请求同时代表两段传输。
+
 ### 4.1 唯一主控与 Python/C++ 边界
 
 第一版冻结为“Python 离线控制面 + C++ 动态执行面”：
@@ -318,17 +340,20 @@ PhysicalAddress分配只有一个所有者：Python的`StaticAllocationPlan`只�
 
 物理结构：
 
-    GPU SM/L1/L2 ---- gpu_memory_port -----\
-                                           > Shared Memory Fabric
-    ATLAS Core ----- internal_hb_port -----/          |
-                                                   3D-DRAM
-                                                   Ramulator2
+    GPU SM/L1/L2 -- external_gpu_link --\
+                                          > LogicDieMemoryGateway
+    ATLAS Core ---- internal_hb_port -----/          |
+                                             Shared Memory Fabric
+                                                    |
+                                                 3D-DRAM
+                                                 Ramulator2
 
 语义：
 
 - 3D-DRAM 是 GPU 唯一的全局设备内存；
 - GPU 保留 Register、Shared Memory、L1、L2 和 NoC；
 - GPU LLC Miss 导出到共享 MemoryService；
+- GPU LLC Miss先作为外部Parent Request经过请求方向链路进入Logic Die；Ramulator2内部Child全部完成后，再经过响应方向链路返回GPU；
 - ATLAS 本地请求通过内部 Hybrid-Bond Port 进入同一 MemoryService；
 - GPU 与 ATLAS 竞争相同 Controller、Channel 和 Bank；
 - 同一物理 3D-DRAM 只能有一个时序所有者；
@@ -337,19 +362,26 @@ PhysicalAddress分配只有一个所有者：Python的`StaticAllocationPlan`只�
 - 共享地址不等于自动一致，第一版使用 explicit_noncoherent；
 - 设备切换时显式执行 Writeback、Invalidate 和 Fence。
 
-GPU 端口和 ATLAS 内部端口分别配置带宽、固定延迟、队列深度、请求粒度和仲裁策略。只有明确选择直接混合键合的 GPU Logic 结构，才允许 GPU 使用对应内部端口能力。
+GPU外部请求/响应链路和ATLAS内部端口分别配置带宽、固定延迟、队列深度、请求粒度和仲裁策略。只有明确选择直接混合键合的GPU Logic结构，才允许GPU绕过外部链路并使用内部端口能力；默认Model 3不允许这种绕过。
 
-Model 3 的两个端口是不同的资源，禁止合并成一个平均带宽：
+Model 3 的外部GPU链路、ATLAS内部端口和DRAM内部Fabric是不同资源，禁止合并成一个平均带宽：
 
     memory_ports:
       - id: gpu_memory_port
         initiator: gpu0
-        target_memory: shared0.dram3d
+        route: gpu0.external_link -> shared0.logic_die_gateway
       - id: atlas_internal_hb_port
         initiator: atlas0.compute
-        target_memory: shared0.dram3d
+        route: atlas0.internal_hb -> shared0.logic_die_gateway
 
 两者最终争用同一个 `Shared3DMemoryService` 和同一组 DRAM Controller/Bank。
+
+Model 3的共享内存服务冻结为两个可切换访问模式：
+
+- `access_mode=gpu_only`：无竞争基线。全部ModelGraph节点必须放置到`gpu0`，`backends.atlas.kind=none`，`initiator_order`必须严格等于`["gpu0"]`；派生执行图不得包含非GPU任务或跨设备路由。结果必须显式记录`logic_die_tasks=0`和`logic_die_memory_requests=0`。
+- `access_mode=shared_gpu_atlas`：后续竞争实验。允许`gpu0`和`atlas0.compute`通过各自端口提交请求，并由唯一MemoryService仲裁同一组Controller/Channel/Bank。
+
+这两个模式共用Model 3地址空间、MemoryService和时序所有者。GPU-only基线不是另一套GPU DRAM模型，也不得同时启用Accel-Sim内部DRAM计时；因此从无竞争到有竞争时只改变算子放置、允许发起方和端口流量，不改变Global PA语义。
 
 ### 6.4 Model 4：GPU HBM + CXL 3D-DRAM
 
@@ -429,6 +461,45 @@ ATLAS Edge 参考配置中存在两类不同带宽：
     16 Core：409.6 GB/s / 3D-Accelerator
 
 本地快速测试配置可能使用不同的内部组织，例如 32 GB/s/Core。实验必须记录实际使用的配置文件，不能混用论文值和测试值。
+
+### 7.1 外部/内部带宽层次与完成语义
+
+外部带宽描述GPU或Host到Logic Die边界的协议和PHY；内部带宽描述Logic Die经Hybrid Bond/TSV访问3D-DRAM Channel/Pseudo-Channel/Bank的能力。必须分别配置：
+
+    external_link:
+      protocol: direct_memory_phy | pcie_dma | cxl_mem
+      request_payload_bandwidth_Bps
+      response_payload_bandwidth_Bps
+      request_header_bytes
+      response_header_bytes
+      flit_bytes
+      propagation_latency_fs
+      queue_depth_transactions
+      credits
+      duplex_mode
+      clock_hz
+
+    logic_die_gateway:
+      clock_hz
+      ingress_queue_depth
+      parent_table_entries
+      split_width_per_cycle
+      issue_width_per_cycle
+      completion_width_per_cycle
+      ordering_policy
+      write_ack_policy: durable | posted
+
+    internal_dram:
+      ramulator2_config
+      transaction_bytes: derived_and_validated
+
+`transaction_bytes`必须从Ramulator2实际`channel_width`、prefetch和Burst组织推导并校验，不能只依据配置文件名猜测。`DQ`、`channel_width`、`rate`、`nBL`、`tCK`和事务大小必须导出一致的峰值带宽；不一致时配置加载失败，不允许带着歧义运行性能实验。
+
+一个外部Parent Request可以被拆成多个对齐的内部Child Request。Runtime必须记录Parent ID、Global PA、Logical Bytes、Byte/Sector Mask、Ordering Domain、Child总数和完成数。Ramulator2接收Global PA并负责最终DRAM Tuple译码；Logic Die不得提前编码两套Channel/Bank映射。
+
+读请求的唯一完成点冻结为：全部Child完成且响应方向Link Transaction完成。写请求默认`durable`，同样等待全部Child和写确认链路；`posted`只允许作为显式实验选项，必须分别记录GPU-visible completion与后台durable completion，Run结束前仍需排空。
+
+Model 3的GPU LLC Miss使用`direct_memory_phy` Parent语义；Model 4 Remote使用`cxl_mem`；Model 2通过PCIe DMA/Page Migration生成Bulk Parent，禁止把每个GPU Load/Store直接伪装成PCIe事务。
 
 ---
 
@@ -686,6 +757,24 @@ Chunked Prefill 第 c 个 Chunk：
 - 随机种子；
 - MoE 路由；
 - Batch/Scheduler 配置。
+
+### 9.6 已有KV上的独立Decode Step
+
+完整请求语义保持第9.1–9.4节不变。为了进行GPU、ATLAS或内存系统的单步微基准，Workload另外允许显式声明：
+
+    execution_scope: decode_step
+    initial_kv_length: K
+    output_length: 1
+
+该模式表示KV中已经提交了K个历史Token，当前只执行一次`q_len=1`的Decode Forward、LM Head和Sampling。当前Token的K/V先Append，因此：
+
+    past_kv_len = K
+    attention_kv_len = K + 1
+    Decode Forward = 1
+    Prefill Forward = 0
+    final_committed_kv_len = K + 1
+
+它是明确标注的微基准执行范围，不能与`full_request`的TTFT或“`G=1`不执行额外Decode”规则混写。跨系统比较必须保持相同的`execution_scope`和`initial_kv_length`。
 
 ---
 
@@ -1385,11 +1474,13 @@ Memory Request 冻结为：
         value_id
         value_version
         size_bytes
+        byte_mask_or_sector_mask
         operation: read | write
         issue_time_fs
         ordering_domain
         sequence_number
         qos_class
+        source_partition_id
     }
 
     MemoryResponse {
@@ -1403,7 +1494,7 @@ Memory Request 冻结为：
         completed_bytes
     }
 
-第一版只支持 Read/Write；Atomic、RMW 和隐式一致性操作必须在 Capability/Config 校验时拒绝，不能降级成普通读写。Runtime在提交和响应时都必须验证PhysicalAddress的Allocation Epoch以及Value Version仍与ReplicaRecord一致。MemoryService 按目标端口的 `transaction_bytes` 和对齐边界把父请求确定性拆成子事务；首尾部分事务仍计入完整线上事务字节。全部子事务完成后才产生一次父 `MemoryResponse`，同时分别统计 logical bytes、transaction bytes 和 in-flight children。
+第一版只支持 Read/Write；Atomic、RMW 和隐式一致性操作必须在 Capability/Config 校验时拒绝，不能降级成普通读写。Runtime在提交和响应时都必须验证PhysicalAddress的Allocation Epoch以及Value Version仍与ReplicaRecord一致。LogicDieMemoryGateway按目标端口的`transaction_bytes`、对齐边界和Byte/Sector Mask把父请求确定性拆成子事务；首尾部分事务仍计入完整线上事务字节。全部子事务完成后只表示内部内存服务完成，仍需经过响应方向Link Transaction，之后才产生一次GPU可见的父`MemoryResponse`。统计必须区分logical bytes、external request/response payload和wire bytes、internal transaction bytes及in-flight children。
 
 Link Transaction 冻结为：
 
@@ -1499,6 +1590,10 @@ Model 3 在 M3 阶段仅允许 `compute_only + Shared3DAnalyticalMemoryService`�
 - 联合运行自然产生总任务时间；
 - Model 3 最终必须使用；
 - Model 4 的直接 CXL Remote Load/Store 必须使用。
+- 外部Link、LogicDieMemoryGateway和Ramulator2必须在各自时钟域推进；
+- GPU请求必须经历`external request link -> parent/child split -> Ramulator2 -> child join -> external response link`，不能由Ramulator2回调直接越过返回链路完成；
+- GPU、Link、Logic Die和DRAM周期统一转换为整数fs或由无漂移相位累加器推进，禁止依赖“最后一个GPU Partition每次替全系统Tick一次”的临时调用顺序；
+- 运行时内部生成的Child Request可以持久化为审计Trace，但不得预先离线回放替代动态Queue/Credit/Backpressure。
 
 禁止：
 
@@ -2131,15 +2226,23 @@ fixed Trace 只有在 replay_safe=true 时允许复用。
 交付：
 
 - GPU Memory Bridge；
+- Bridge ABI v2：Parent ID、Global PA、Size、Byte/Sector Mask、Partition、Ordering和QoS；
+- 双向外部Link Service；
+- Singleton LogicDieMemoryGateway、Parent Table和确定性Child Split/Join；
 - ATLAS Memory Port；
 - Shared Memory Fabric；
 - 唯一Shared3DMemoryService；
 - 跨时钟事件桥；
 - 仲裁和背压。
+- durable/posted写完成策略和多时钟域推进。
 
 验收：
 
 - 同一3D-DRAM只有一个时序所有者；
+- 外部Link带宽、ATLAS内部端口带宽和Ramulator2内部带宽可以不同，且分别满足独立的Byte/Rate守恒；
+- `DQ/channel_width/rate/nBL/tCK/transaction_bytes`必须通过一致性校验；
+- 一个Parent拆出的全部Child未完成前不得发起Response Link，Response Link未完成前GPU不得解除阻塞；
+- 任意32/64/128B及非对齐请求的Child覆盖范围必须与Byte/Sector Mask完全一致，无丢失、重复或越界；
 - GPU-only/ATLAS-only分别与“相同Bridge、Port和MemoryService配置，仅禁用另一发起方”的基线比较，请求PhysicalAddress、Operation、Logical Bytes、Transaction Bytes和完成数完全一致；
 - 固定延迟服务的双发起方并发严格通过第22.5节完成顺序；
 - 请求注入数等于完成数加在途数，父/子请求均分别守恒；
@@ -2157,6 +2260,7 @@ fixed Trace 只有在 replay_safe=true 时允许复用。
 - Remote Access；
 - Page Migration；
 - Residency/Owner状态机。
+- 复用M6的双向Cycle Link接口，但按PCIe DMA和CXL.mem分别约束请求生成语义。
 
 验收：
 
@@ -2164,6 +2268,7 @@ fixed Trace 只有在 replay_safe=true 时允许复用。
 - 延迟不低于传播与序列化下界；
 - Model 2禁止绕过PCIe；
 - Model 4本地、远端和迁移路径分别通过测试。
+- Model 2仅允许DMA/Page Migration生成PCIe Parent；Model 4 Remote才允许细粒度CXL.mem Parent。
 
 ### M8：全组合验证与DSE
 
@@ -2382,6 +2487,11 @@ TPOT 平均值和 ITL 百分位必须分开报告；`G=1` 请求的 TPOT 为 `nu
 ### 23.4 数据与内存
 
     PCIe/CXL/内部端口字节数
+    External Request/Response Payload Bytes与Wire Bytes
+    External Link有效带宽、利用率、Credit Stall和Queue Stall
+    Parent请求数、Child事务数与Internal Traffic Amplification
+    Logic Die Ingress/Split/Issue/Completion Queue占用
+    Parent从GPU发出、Logic Die到达、内部完成、响应返回的分段延迟
     bytes per generated token
     DMA/Migration/Fence次数
     KV远端访问和迁移字节
@@ -2453,6 +2563,9 @@ TPOT 平均值和 ITL 百分位必须分开报告；`G=1` 请求的 TPOT 为 `nu
 - Address Mapping；
 - 内部Hybrid-Bond Port；
 - GPU Memory Port；
+- GPU↔Logic Die请求/响应方向的独立Payload/Wire带宽；
+- Logic Die Parent Table、Split/Issue/Completion Width和Clock；
+- Ramulator2 Transaction Bytes与内部流量放大率；
 - PCIe/CXL带宽和延迟；
 - Queue/Credit；
 - Scheduler/Arbitration；
@@ -2518,6 +2631,12 @@ TPOT 平均值和 ITL 百分位必须分开报告；`G=1` 请求的 TPOT 为 `nu
 32. Resolved Config中`system.profile`、`backends.*.kind`和`simulation.coupling`各只有一个真源。
 33. Atomic/RMW在第一版必须显式拒绝。
 34. `replay_safe`默认false，没有Qualification Record不得跨配置复用。
+35. 外部GPU链路和内部Hybrid-Bond/DRAM带宽必须是不同资源、不同配置键和不同统计项。
+36. 一个GPU Parent Request可以对应多个内部Child，但Child地址覆盖、Logical Bytes、Transaction Bytes和完成数必须分别守恒。
+37. 全部内部Child完成前禁止生成读响应；响应方向Link未完成前禁止向GPU返回原`mem_fetch`。
+38. `write_ack_policy=durable`必须等待全部内部写完成；`posted`必须同时记录GPU-visible和durable完成并在退出前排空。
+39. Ramulator2的`DQ/channel_width/rate/nBL/tCK/transaction_bytes`不能导出互相矛盾的峰值带宽。
+40. Model 2的PCIe只承载DMA/Page Migration Parent；Model 3 LLC Miss和Model 4 CXL.mem Remote使用各自明确的细粒度Parent语义。
 
 ---
 
@@ -2536,6 +2655,9 @@ TPOT 平均值和 ITL 百分位必须分开报告；`G=1` 请求的 TPOT 为 `nu
 | Trace错误复用 | 中高 | 分层Cache Key和replay_safe |
 | 算子频繁切换导致KV抖动 | 中高 | KV Affinity、最小驻留、Hysteresis |
 | GB/s、GiB/s、Gbps混用 | 中 | 配置解析统一为B/s |
+| 外部/内部带宽被合并或HBM3组织参数不自洽 | 极高 | 分层Schema；启动时交叉计算峰值带宽和事务粒度，不一致直接失败 |
+| Parent在部分Child完成后提前返回GPU | 极高 | Parent Table完成屏障；Response Link只接受fully-joined Parent；守恒与非对齐黄金用例 |
+| 每个GPU Partition独立注入导致绕过外部带宽 | 高 | 所有Partition连接Singleton LogicDieMemoryGateway并共享Ingress Credit/仲裁 |
 | Roofline与周期结果不同 | 中 | 不要求延迟相同；验证逻辑工作量和数据量 |
 
 ---
@@ -2547,7 +2669,7 @@ TPOT 平均值和 ITL 百分位必须分开报告；`G=1` 请求的 TPOT 为 `nu
 1. 四种Profile运行同一端到端Prefill/Decode工作负载；
 2. Roofline覆盖全部Profile；
 3. Accel-Sim完成GPU独立路径；
-4. Model 3达到共享3D-DRAM请求级周期耦合；
+4. Model 3达到具有独立外部Link、Logic Die Gateway、内部Child事务、单Ramulator2和响应Link的共享3D-DRAM请求级周期耦合；
 5. Model 2/4具有有界队列、带宽、延迟和背压模型；
 6. 支持Static Ragged Batch、Paged KV和Continuous Batching；
 7. 支持手工和规则化GPU/ATLAS算子放置；
@@ -2590,3 +2712,6 @@ TPOT 平均值和 ITL 百分位必须分开报告；`G=1` 请求的 TPOT 为 `nu
 | --- | --- | --- |
 | 1.0 | 2026-08-26 | 固化四种拓扑、两级IR、端到端Prefill/Decode、算子放置、多Batch、地址体系、Backend契约、实现阶段和验收标准 |
 | 1.1 | 2026-08-26 | 冻结Python/C++边界、执行接口、唯一配置Schema、Trace/Simulation地址分离、非一致性状态机、确定性Batch调度、Cache DAG和精确黄金用例 |
+| 1.2 | 2026-08-26 | 增加已有KV的显式decode_step微基准语义；固化参考full_runtime、动态地址复用、有界PCIe/CXL、共享3D内存参考服务和外部Memory Bridge与目标Backend资格验证的边界 |
+| 1.3 | 2026-08-27 | 固化Model 3 GPU-only无竞争基线：全部算子位于GPU、Logic Die Backend关闭、共享3D-DRAM仅允许GPU请求，并强制派生任务、路由、请求和守恒验收；双发起方竞争作为后续独立模式开启 |
+| 1.4 | 2026-08-27 | 固化GPU外部带宽与Logic Die/3D-DRAM内部带宽分离；新增双向外部Link、LogicDieMemoryGateway、Parent/Child拆分汇聚、durable完成、多时钟域、带宽一致性校验和拓扑特定请求语义；明确当前单请求Bridge仅是最小资格原型 |

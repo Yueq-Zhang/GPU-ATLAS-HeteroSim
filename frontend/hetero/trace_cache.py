@@ -37,8 +37,12 @@ class TraceCache:
         destination.mkdir(parents=True)
         kernels_destination = destination / manifest.kernels_list.name
         shutil.copy2(manifest.kernels_list, kernels_destination)
-        for trace in manifest.kernels_list.parent.glob("*.traceg"):
-            shutil.copy2(trace, destination / trace.name)
+        # Accel-Sim <=1.3 uses text .traceg files; 2.0 defaults to zstd
+        # compressed .tracez files. Preserve either representation so a cache
+        # entry remains self-contained across the version migration.
+        for pattern in ("*.traceg", "*.tracez"):
+            for trace in manifest.kernels_list.parent.glob(pattern):
+                shutil.copy2(trace, destination / trace.name)
         payload = json.loads(manifest_path.read_text(encoding="utf-8"))
         payload["kernels_list"] = kernels_destination.name
         (destination / "trace_manifest.json").write_text(

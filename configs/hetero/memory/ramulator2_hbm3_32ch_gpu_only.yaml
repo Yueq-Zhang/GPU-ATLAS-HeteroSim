@@ -1,0 +1,25 @@
+Frontend:
+  impl: HBFrontend
+  clock_ratio: 1
+
+MemorySystem:
+  impl: GenericDRAM
+  clock_ratio: 1
+  DRAM:
+    impl: HBM3
+    org:
+      preset: HBM3_4Gb
+      channel: 32
+    timing:
+      preset: HBM3_2Gbps
+  Controller:
+    impl: Generic
+    Scheduler:
+      impl: FRFCFS
+    RefreshManager:
+      impl: AllBank
+    RowPolicy:
+      impl: OpenRowPolicy
+    plugins:
+  AddrMapper:
+    impl: RoBaRaCoCh

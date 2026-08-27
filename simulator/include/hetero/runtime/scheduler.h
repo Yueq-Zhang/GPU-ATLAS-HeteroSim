@@ -16,6 +16,8 @@ struct RequestInput {
     std::uint64_t prompt_length{};
     std::uint64_t output_length{};
     std::int64_t priority{};
+    bool decode_step{};
+    std::uint64_t initial_kv_length{};
 };
 
 struct SchedulerConfig {

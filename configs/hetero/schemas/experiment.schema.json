@@ -24,6 +24,9 @@
         "parameter_source": {"type": "string", "minLength": 1},
         "config_ref": {"type": "string", "minLength": 1},
         "fallback_kind": {"enum": ["none", "analytical"]},
+        "external_memory_bridge": {"type": "string"},
+        "exports_memory_requests": {"type": "boolean"},
+        "supports_stall_resume": {"type": "boolean"},
         "resource_bindings": {
           "type": "object",
           "additionalProperties": {"type": "string", "minLength": 1}
@@ -82,7 +85,11 @@
         "head_dim": {"type": "integer", "minimum": 1},
         "vocab_size": {"type": "integer", "minimum": 1},
         "dtype": {"type": "string", "minLength": 1},
-        "bytes_per_element": {"type": "integer", "minimum": 1}
+        "bytes_per_element": {"type": "integer", "minimum": 1},
+        "architecture": {"type": "string", "minLength": 1},
+        "mlp_type": {"enum": ["swiglu", "dense_gelu"]},
+        "position_encoding": {"enum": ["rope", "learned_absolute"]},
+        "tied_embeddings": {"type": "boolean"}
       }
     },
     "request": {
@@ -93,7 +100,9 @@
         "arrival_time_fs": {"type": "integer", "minimum": 0},
         "prompt_length": {"type": "integer", "minimum": 1},
         "output_length": {"type": "integer", "minimum": 1},
-        "priority": {"type": "integer"}
+        "priority": {"type": "integer"},
+        "execution_scope": {"enum": ["full_request", "decode_step"]},
+        "initial_kv_length": {"type": "integer", "minimum": 0}
       }
     },
     "workload": {
@@ -104,16 +113,16 @@
       "type": "object", "additionalProperties": false,
       "required": ["mode", "max_num_sequences", "max_batched_tokens", "prefill_chunk_tokens", "epoch_duration_fs"],
       "properties": {
-        "mode": {"enum": ["static_ragged", "continuous_batching"]},
+        "mode": {"enum": ["static_ragged", "continuous", "continuous_batching"]},
         "epoch_mode": {"enum": ["token_step_barrier"]},
-        "admission": {"enum": ["fcfs"]},
+        "admission": {"enum": ["fcfs", "kv_capacity_aware"]},
         "decode_priority": {"type": "boolean"},
         "prefill_aging": {"type": "boolean"},
         "max_num_sequences": {"type": "integer", "minimum": 1},
         "max_batched_tokens": {"type": "integer", "minimum": 1},
         "prefill_chunk_tokens": {"type": "integer", "minimum": 1},
         "max_prefill_wait_epochs": {"type": "integer", "minimum": 0},
-        "kv_reservation_mode": {"enum": ["full_request"]},
+        "kv_reservation_mode": {"enum": ["full_request", "max_request"]},
         "epoch_duration_fs": {"type": "integer", "minimum": 1}
       }
     },
@@ -134,7 +143,10 @@
       "properties": {
         "allocator": {"enum": ["first_fit"]},
         "page_tokens": {"type": "integer", "minimum": 1},
-        "kv_capacity_bytes": {"type": "integer", "minimum": 1}
+        "kv_capacity_bytes": {"type": "integer", "minimum": 1},
+        "allocation_alignment_bytes": {"type": "integer", "minimum": 1},
+        "memory_spaces": {"type": "array"},
+        "address_mapping": {"type": "object"}
       }
     },
     "metrics": {
@@ -157,7 +169,8 @@
       "type": "object", "additionalProperties": false, "required": ["coupling"],
       "properties": {
         "coupling": {"enum": ["analytical", "operator_event", "request_cycle"]},
-        "execution_mode": {"enum": ["scheduler_validation", "analytical_preview", "operator_event", "full_runtime"]}
+        "execution_mode": {"enum": ["scheduler_validation", "analytical_preview", "operator_event", "full_runtime"]},
+        "validation_policy": {"enum": ["required", "deferred"]}
       }
     },
     "system": {
@@ -176,10 +189,55 @@
               "latency_fs": {"type": "integer", "minimum": 0},
               "header_bytes": {"type": "integer", "minimum": 0},
               "resource_id": {"type": "string", "minLength": 1},
-              "parameter_source": {"type": "string", "minLength": 1}
+              "parameter_source": {"type": "string", "minLength": 1},
+              "queue_depth_transactions": {"type": "integer", "minimum": 1},
+              "credits": {"type": "integer", "minimum": 1},
+              "full_duplex": {"type": "boolean"},
+              "max_payload_bytes": {"type": "integer", "minimum": 1},
+              "protocol": {"type": "string", "minLength": 1}
             }
           }
-        }
+        },
+        "memory_services": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "timing_owner", "parameter_source"],
+            "properties": {
+              "kind": {"enum": ["shared_3d_reference", "ramulator2"]},
+              "access_mode": {"enum": ["gpu_only", "shared_gpu_atlas"]},
+              "timing_owner": {"type": "string", "minLength": 1},
+              "channel_count": {"type": "integer", "minimum": 1},
+              "banks_per_channel": {"type": "integer", "minimum": 1},
+              "transaction_bytes": {"type": "integer", "minimum": 1},
+              "queue_depth_per_initiator": {"type": "integer", "minimum": 1},
+              "fixed_latency_fs": {"type": "integer", "minimum": 1},
+              "channel_injection_interval_fs": {"type": "integer", "minimum": 0},
+              "bank_busy_time_fs": {"type": "integer", "minimum": 0},
+              "initiator_order": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+              "config_ref": {"type": "string"},
+              "parameter_source": {"type": "string", "minLength": 1}
+            },
+            "allOf": [
+              {
+                "if": {"properties": {"kind": {"const": "shared_3d_reference"}}},
+                "then": {
+                  "required": [
+                    "channel_count", "banks_per_channel", "transaction_bytes",
+                    "queue_depth_per_initiator", "fixed_latency_fs", "initiator_order"
+                  ]
+                }
+              },
+              {
+                "if": {"properties": {"kind": {"const": "ramulator2"}}},
+                "then": {"required": ["config_ref"]}
+              }
+            ]
+          }
+        },
+        "memory_ports": {"type": "object"},
+        "cxl": {"type": "object"}
       }
     },
     "backends": {

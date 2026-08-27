@@ -1,0 +1,32 @@
+{
+  "schema_version": "hetero-sim/v1",
+  "experiment": {"name": "m8_model1_full_runtime_reference", "seed": 1, "generation_mode": "trace_locked"},
+  "simulation": {"coupling": "request_cycle", "execution_mode": "full_runtime", "validation_policy": "deferred"},
+  "system": {
+    "profile": "model1_atlas_native",
+    "links": {
+      "atlas_external_analytical": {
+        "wire_bandwidth_Bps": 12800000000,
+        "latency_fs": 100000000,
+        "header_bytes": 16,
+        "resource_id": "atlas_external_link",
+        "parameter_source": "reference_unqualified",
+        "queue_depth_transactions": 16,
+        "credits": 16,
+        "full_duplex": true,
+        "protocol": "analytical_external"
+      }
+    }
+  },
+  "backends": {
+    "gpu": {"kind": "roofline", "effective_compute_flops_per_s": 100000000000000, "effective_memory_bandwidth_Bps": 1000000000000, "parameter_source": "reference_unqualified"},
+    "atlas": {"kind": "analytical", "effective_compute_flops_per_s": 10000000000000, "effective_memory_bandwidth_Bps": 409600000000, "parameter_source": "reference_unqualified"},
+    "host": {"kind": "none"}
+  },
+  "model": {"ref": "configs/hetero/models/tiny_llama_2layer.json"},
+  "workload": {"ref": "configs/hetero/workloads/ragged_continuous.json"},
+  "scheduling": {"ref": "configs/hetero/schedulers/continuous_mixed.json"},
+  "placement": {"ref": "configs/hetero/placements/gpu_prefill_atlas_decode.json"},
+  "address": {"ref": "configs/hetero/addresses/paged_kv_tiny.json"},
+  "metrics": {"ref": "configs/hetero/metrics/e2e_validation.json"}
+}

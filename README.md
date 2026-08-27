@@ -2,7 +2,7 @@
 
 GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端到端 LLM 联合仿真工程。工程把完整 Prefill/Decode 请求图、算子放置、跨设备数据移动、Paged KV Cache 和全局事件调度连接到同一条可复现运行路径。
 
-> 当前版本已形成第二步的最小算子事件级闭环：同一次 `run` 可调度 Accel-Sim GPU Trace 与真实 `atlasim.Chip` 算子包，并由 C++ `GlobalEventRuntime` 协调依赖、资源和显式传输。现有示例使用代理工作负载验证接线，仍禁止作为 LLM 性能结论；GPU 与 ATLAS 争用唯一共享 3D-DRAM 的请求级耦合属于第三步。
+> 当前版本为 `0.6.1`。四种Profile已经拥有统一的 `full_runtime` 参考执行入口；Accel-Sim 已迁移到 v2.0.0，并在本机 RTX 3070/驱动 591.86 上完成 NVBit 1.8 `.tracez` 采集与适配器等价验证。参考运行和未校准配置始终输出 `performance_claim_allowed=false`；外部Ramulator2、RTX 4090 Trace和真实LLM Artifact的资格验证留待后续完成。
 
 完整架构约束以 [GPU + ATLAS 异构端到端仿真实现规范](docs/gpu_atlas_heterogeneous_simulation_design_zh.md) 为准，阶段进度见 [实现状态](docs/IMPLEMENTATION_STATUS.md)。
 
@@ -20,6 +20,13 @@ GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端�
 - C++ `GlobalEventRuntime`：按 DAG 依赖、任务到达时间和互斥资源推进确定性事件；
 - C++ Token-Step Barrier Scheduler 与多请求连续调度语义验证；
 - C++ Paged KV 分配器、固定延迟内存服务和时序所有权冲突检查；
+- C++ Runtime Memory Planner：多Memory Space、对齐、First-Fit、释放、合并与地址复用；
+- C++ Shared3DMemoryModel：GPU/ATLAS双发起方、Channel/Bank译码、父子事务拆分、轮询仲裁、背压与字节守恒；
+- C++ BoundedLinkModel：PCIe/CXL队列深度、Credit、全双工序列化、传播延迟与背压；
+- Static Ragged、Continuous/Chunked Prefill与按设备拆分的Device Sub-Batch计划；
+- TraceAddr → TensorID+offset → Global PA 的JSONL外部内存桥协议；
+- 自动DSE笛卡尔搜索、候选缓存运行和带Fidelity的排序报告；
+- `full_request` 与已有KV上的独立 `decode_step` 两种工作负载语义；
 - Python 配置/图控制面与 pybind11 C++ 动态运行时边界；
 - `BackendDescriptor`、`ResolvedTimingContract` 与唯一时序所有者检查；
 - Accel-Sim 和 ATLAS `total` 时长适配器、算子/Artifact 选择、显式分析回退与内容缓存；
@@ -58,7 +65,7 @@ GPU-ATLAS-HeteroSim/
 
 ```bash
 sudo apt update
-sudo apt install -y build-essential cmake python3-venv pybind11-dev rsync
+sudo apt install -y build-essential cmake python3-venv pybind11-dev rsync libzstd-dev
 ```
 
 ### 4.2 准备工程副本
@@ -116,7 +123,7 @@ ctest --test-dir simulator/build --output-on-failure
 .venv/bin/python -m pytest tests/hetero -q
 ```
 
-当前基线应通过 7 个 C++ 测试和 43 个 Python 测试。测试数量会随实现推进增加；判断成功应以“0 failed”为准，而不是永久依赖固定数量。
+当前基线通过 9 个 C++ 测试和 63 个 Python 测试。测试数量会随实现推进增加；判断成功应以“0 failed”为准，而不是永久依赖固定数量。
 
 强制重新编译已有目标：
 
@@ -227,6 +234,116 @@ cmake --build simulator/build --clean-first --parallel
   --runs-root /tmp/gpu-atlas-runs
 ```
 
+### 7.5 四种Profile的完整参考运行
+
+以下四个配置使用同一Tiny模型、三请求Continuous Batch和相同放置规则，只改变物理拓扑：
+
+```bash
+for profile in model1 model2 model3 model4; do
+  .venv/bin/python -m frontend.hetero.cli run \
+    --config "configs/hetero/experiments/m8_${profile}_full_runtime_reference.json"
+done
+```
+
+`full_runtime` 会额外生成：
+
+- `batch_plan.json`：Ragged序列、Epoch和Device Sub-Batch；
+- `memory_lifecycle.json`：KV分配、释放、Allocation Epoch、峰值占用和复用；
+- `link_statistics.json`：PCIe/CXL/同步路径事务、Credit、背压与字节守恒；
+- `memory_statistics.json`：共享3D内存父子请求、地址译码、Channel分布和完成时间；
+- `residency.json`：Copy、Migration、Remote或显式同步后的Owner/Version状态。
+
+这些配置使用 `reference_unqualified` 参数。链路和共享内存响应会反向延长父任务并重新推进全局DAG，直到任务/链路/内存时间表确定性收敛；因此队列与背压会进入端到端延迟，但Fidelity仍是`event_modeled`，参数也不代表目标硬件精度已经验证。
+
+### 7.6 GPU独占3D-DRAM、Logic Die关闭的无竞争基线
+
+该基线表示Model 3中3D-DRAM直接作为GPU显存，但Compute/Logic Die不执行算子，也不能向共享内存服务提交请求。小模型配置适合快速功能回归：
+
+```bash
+.venv/bin/python -m frontend.hetero.cli run \
+  --config configs/hetero/experiments/m8_model3_gpu_only_no_logic_die_reference.json
+```
+
+OPT-6.7B、BS=1、已有1024 Token KV、单步Decode配置用于验证完整391算子图：
+
+```bash
+.venv/bin/python -m frontend.hetero.cli run \
+  --config configs/hetero/experiments/m8_opt67b_gpu_only_no_logic_die_reference.json \
+  --runs-root runs/gpu-only-no-logic-die
+```
+
+运行前和运行后均有强制约束：`access_mode=gpu_only`、`backends.atlas.kind=none`、放置规则只允许`gpu0`、`initiator_order=["gpu0"]`；派生执行图中出现非GPU任务或跨设备路由时立即失败。成功结果应满足：
+
+- `execution_graph.json`中全部任务的`device_id`为`gpu0`，且`routes=[]`；
+- `memory_statistics.json`中只有`gpu0`发起方；
+- `metrics.json`中`logic_die_tasks=0`且`logic_die_memory_requests=0`；
+- 父请求、子事务和字节提交/完成数严格守恒。
+
+OPT配置为控制参考模型事件数量，使用1 MiB粗粒度事务；它验证控制流、请求流、时序所有权和守恒，不是命令级DRAM模型，也不是Accel-Sim/Ramulator2周期结果，始终保持`performance_claim_allowed=false`。
+
+### 7.7 OPT-6.7B单步Decode的RTX 4090 Roofline
+
+该配置明确表示“已有1024 Token KV、执行一次Decode Forward”，不会把它误建模为1024 Token Prefill：
+
+```bash
+.venv/bin/python -m frontend.hetero.cli run \
+  --config configs/hetero/experiments/m8_opt67b_rtx4090_roofline.json
+```
+
+当前实现基线输出约 `13.733 ms`。这是使用RTX 4090理论FP16 Tensor吞吐与1008 GB/s带宽得到的未校准Roofline结果，不是Accel-Sim周期结果或4090实测结果。
+
+相同 OPT-6.7B 单步 Decode 图在当前 ATLAS 参考参数（10 TFLOP/s、409.6 GB/s）下为约 `33.796 ms`，而 RTX 3070/4090 Roofline 分别为约 `30.899 ms` 和 `13.733 ms`。因此当前配置下 3D-DRAM 相对两款 GPU 的加速比分别为 `0.914x` 和 `0.406x`，并未获得加速。完整口径、瓶颈与复现命令见 [GPU 与 3D-DRAM 单步 Decode 分析对比](docs/qualification/opt67b_single_decode_gpu_vs_3ddram_analytical.md)。
+
+### 7.8 OPT-6.7B Prefill的RTX 3070 Roofline
+
+以下配置表示FP16、BS=1、Context=1024的一次完整Prefill，不包含Decode：
+
+```bash
+.venv/bin/python -m frontend.hetero.cli run \
+  --config configs/hetero/experiments/m8_opt67b_rtx3070_prefill_roofline.json
+```
+
+RTX 3070参考板参数采用约81.3 TFLOP/s Dense FP16 Tensor吞吐和448 GB/s显存带宽。当前Roofline输出TTFT约`179.558 ms`，计算图为1次Prefill、0次Decode、最终KV长度1024。该结果是未校准理论下界，并非3070实测或Accel-Sim周期结果。OPT-6.7B FP16权重约13.4 GB，超过本机8 GB显存，因此无法作为纯GPU完整FP16模型直接加载；真实运行需量化、CPU Offload或改用更小模型。
+
+本机 CUDA 程序和 Accel-Sim 2.0/NVBit 1.8 Trace 采集均已在 RTX 3070、驱动 591.86 上通过。最小 `vector_add` 产生压缩 `.tracez`，并在 SM86 配置下得到原生与 Adapter 完全一致的 5,657 cycles、61,440 instructions。该结果验证工具链与适配器，不等于 OPT-6.7B 性能或 RTX 3070 微架构校准。
+
+### 7.9 自动DSE
+
+```bash
+.venv/bin/python -m frontend.hetero.cli dse \
+  --config configs/hetero/experiments/m8_model1_full_runtime_reference.json \
+  --search configs/hetero/dse/tiny_roofline_search.json \
+  --output-root runs/dse/tiny_roofline
+```
+
+搜索轴使用配置点路径，例如 `backends.gpu.effective_memory_bandwidth_Bps`。候选数受 `max_candidates` 限制，结果写入 `dse_report.json`；未经目标Backend资格验证的候选不会自动获得性能声明资格。
+
+### 7.10 外部内存请求桥
+
+`bridge-memory` 接收捕获Trace Manifest、候选Simulation Buffer Bindings和GPU/ATLAS请求JSONL，先完成地址正规化，再交给唯一共享内存服务：
+
+```bash
+.venv/bin/python -m frontend.hetero.cli bridge-memory \
+  --trace-manifest trace_manifest.json \
+  --buffer-bindings simulation_buffer_bindings.json \
+  --memory-config shared_memory.json \
+  --requests memory_requests.jsonl \
+  --responses memory_responses.jsonl
+```
+
+当前已实现确定性的离线文件协议。把同一协议接到Accel-Sim L2 Miss的实时暂停/恢复回调，以及把内部参考服务替换为版本锁定的Ramulator2，属于后续资格验证工作。
+
+Ramulator2独立重放适配器可先做两次确定性资格运行；后端配置格式见`configs/hetero/schemas/ramulator2_backend.schema.json`，请求数组中的地址必须已经是Global PA偏移：
+
+```bash
+.venv/bin/python -m frontend.hetero.cli qualify-memory \
+  --backend-config ramulator2_backend.json \
+  --requests physical_memory_requests.json \
+  --output qualification/ramulator2
+```
+
+`full_runtime`若配置`kind=ramulator2`但在线回调尚未完成资格验证，会明确拒绝运行，不会静默改用内部参考模型。
+
 ## 8. 运行产物及人工核验
 
 默认目录格式：
@@ -246,6 +363,11 @@ runs/<experiment.name>/<simulation_input_key>/
 | `trace_manifest.json` | 本次使用的 GPU Trace 与 ATLAS Artifact、兼容性、任务绑定和 replay-safe 状态 |
 | `event_log.jsonl` | Scheduler Epoch 或全局 DAG 任务完成记录 |
 | `metrics.json` | TTFT、TPOT、ITL、E2E、Fidelity 和结果使用限制 |
+| `batch_plan.json` | `full_runtime`的Ragged Epoch和Device Sub-Batch |
+| `memory_lifecycle.json` | 动态KV分配、释放、峰值占用和地址复用 |
+| `link_statistics.json` | 有界链路事务、Credit、背压和字节计数 |
+| `memory_statistics.json` | 共享内存请求、DRAM译码和守恒计数 |
+| `residency.json` | Copy/Migration/Remote/Sync后的Residency状态 |
 
 从 CLI 输出复制完整 `run_dir` 后查看结果：
 
@@ -415,7 +537,7 @@ Accel-Sim 返回完整 Kernel/Trace 的总 Cycle，适配器按配置的 GPU Cor
 
 ### 13.1 安装并构建固定版本
 
-要求 WSL 中存在 `/usr/local/cuda-11.8/bin/nvcc`。脚本固定到 Accel-Sim v1.3.0、GPGPU-Sim v4.2.1、NVBit 1.7.3，并对每个下载包校验 SHA-256：
+要求 WSL 中存在 `/usr/local/cuda-11.8/bin/nvcc`，并已安装 `libzstd-dev`。脚本固定到 Accel-Sim v2.0.0（commit `64653015...`）、配套 GPGPU-Sim dev（commit `e10018b...`）和 NVBit 1.8，并对每个下载包校验 SHA-256：
 
 ```bash
 cd /opt/gpu-atlas/GPU-ATLAS-HeteroSim
@@ -446,7 +568,7 @@ bash scripts/capture_accel_sim_trace.sh \
   /opt/gpu-atlas/traces/vector_add_sm86
 ```
 
-本机已验证的 NVIDIA 驱动为 591.86，高于 NVBit 1.7.3 支持上限 575。采集脚本会在启动插桩前退出，并提示换用兼容驱动的采集主机。无需在仿真主机重新采集：可把兼容机器生成的 `kernelslist.g` 与 `*.traceg` 整体复制回来。`ALLOW_UNSUPPORTED_NVBIT_DRIVER=1` 只用于诊断，不表示结果有效。
+本机 RTX 3070、NVIDIA 驱动 591.86 已通过 NVBit 1.8 采集验证。Tracer 先写入原始 `*.trace.xz`，后处理器默认生成 Accel-Sim 2.0 的 `*.tracez` 和 `kernelslist.g`；项目的 Trace Cache 同时兼容旧 `*.traceg` 与新 `*.tracez`。默认输出清单位于 `<trace output>/traces/kernelslist.g`。
 
 ### 13.4 编写 Trace Manifest
 
@@ -459,8 +581,8 @@ bash scripts/capture_accel_sim_trace.sh \
   "trace_semantics": "functional",
   "replay_safe": false,
   "qualification_record": null,
-  "kernels_list": "/opt/gpu-atlas/traces/vector_add_sm86/kernelslist.g",
-  "capture": {"tool": "NVBit", "version": "1.7.3", "gpu": "RTX 3070"},
+  "kernels_list": "/opt/gpu-atlas/traces/vector_add_sm86/traces/kernelslist.g",
+  "capture": {"tool": "NVBit", "version": "1.8", "gpu": "RTX 3070"},
   "compilation": {"cuda": "11.8", "target_sm": 86},
   "address_ranges": [
     {
@@ -487,8 +609,8 @@ bash scripts/capture_accel_sim_trace.sh \
 ```bash
 .venv/bin/python -m frontend.hetero.cli qualify-gpu \
   --backend-config configs/hetero/backends/gpu_accelsim_rtx3070.json \
-  --trace-manifest /opt/gpu-atlas/traces/vector_add_sm86/trace_manifest.json \
-  --output /opt/gpu-atlas/qualification/vector_add_sm86
+  --trace-manifest configs/hetero/traces/local_rtx3070_vector_add_v2.json \
+  --output /opt/gpu-atlas/qualification/accel-sim-v2/rtx3070-vector-add-v2/qualification
 ```
 
 命令连续执行一遍原生基线和一遍适配器路径，并要求 `gpu_tot_sim_cycle`、`gpu_tot_sim_insn` 完全一致。输出包括：
@@ -509,5 +631,75 @@ bash scripts/download_official_accel_sim_trace.sh
 .venv/bin/python -m frontend.hetero.cli qualify-gpu \
   --backend-config configs/hetero/backends/gpu_accelsim_qv100.json \
   --trace-manifest configs/hetero/traces/official_qv100_backprop_4096.json \
-  --output /opt/gpu-atlas/qualification/qv100_backprop_4096
+  --output /opt/gpu-atlas/qualification/accel-sim-v2/qv100-backprop-4096
 ```
+
+在 v2.0.0 下，QV100 旧格式 Trace 的原生与 Adapter 结果均为 14,731 cycles、10,473,824 instructions；这与 v1.3.0 的 15,329 cycles 不同，因此升级后必须重新生成仿真基线，不能沿用旧版本周期数。
+
+## 14. GPU + 3D-DRAM Cycle-Accurate 请求/响应模式
+
+本模式不使用 Roofline，也不把 `compute_time` 与一次性汇总的访存字节数相加。执行闭环为：
+
+```text
+GPU Warp/Instruction
+        ↓
+Accel-Sim SM → L1 → L2 → NoC
+                         ↓ L2/MC request（地址 + mem_fetch）
+                 唯一 Ramulator2 实例
+                 Channel/Bank/Row 时序推进
+                         ↓ completion callback
+              原 memory partition 返回响应
+                         ↓
+                Cache/Warp 解除等待并继续
+```
+
+当前首个资格模式固定为 GPU-only：ATLAS Logic Die 不发请求，因此不含 GPU/PIM 竞争；Accel-Sim 负责 GPU Core/L1/L2/NoC，Ramulator2 是唯一 DRAM 时序所有者。全部 GPU memory partition 连接同一个 Ramulator2，而不是每个 partition 各建一个内存系统。读请求必须等待回调；写回采用 posted-write 语义，但进程退出前会排空 Ramulator2 写队列。
+
+### 14.1 构建
+
+先按 4.2 节把 Windows 工程同步到 WSL，然后运行：
+
+```bash
+cd /opt/gpu-atlas/GPU-ATLAS-HeteroSim
+bash scripts/build_accel_sim_ramulator2.sh
+```
+
+输出包括：
+
+- `build-ramulator2/accel-sim.out`：带外部 DRAM 回调的 Accel-Sim v2；
+- `libramulator_gpgpusim_bridge.so`：单实例 Ramulator2 桥；
+- `ramulator_bridge_smoke`：4 个 GPU partition 共享一个实例的最小测试。
+
+### 14.2 资格运行
+
+```bash
+.venv/bin/python -m frontend.hetero.cli qualify-gpu \
+  --backend-config configs/hetero/backends/gpu_accelsim_qv100_ramulator2_hbm3.json \
+  --trace-manifest configs/hetero/traces/official_qv100_backprop_4096.json \
+  --output /opt/gpu-atlas/qualification/accel-sim-v2/qv100-backprop-4096-ramulator2-hbm3-32ch-no-fixed-dram-latency
+```
+
+资格检查要求两次运行的 GPU 周期、指令数和全部桥统计完全一致，并强制检查：`instances=1`、请求数非零、`completed=reads+writes`、`outstanding=0`。任何一项不满足都会失败，不能静默退回 Accel-Sim 内部 DRAM。
+
+当前通过结果为 14,700 GPU cycles、10,473,824 instructions；Ramulator2 为 11,038 cycles、63 reads、63 completed、0 outstanding。相同 Trace 的原生内部 DRAM结果为 14,731 GPU cycles，说明外部 DRAM完成时刻已经反馈到 GPU 周期推进。耦合专用 Trace 配置显式设置 `-dram_latency 0`，避免在 Ramulator2 时序之前再次叠加 Accel-Sim 的固定 DRAM 延迟；GPU ROP/L2/NoC 延迟仍然保留。完整证据见 [Cycle-Accurate 资格记录](docs/qualification/qv100_backprop_ramulator2_hbm3_cycle_coupled.md)。
+
+`ramulator2_hbm3_32ch_gpu_only.yaml` 目前是 HBM3 32 通道功能配置，并非已经按 ATLAS 论文中的 Stack/Logic Die 参数完成校准。RTX 3070 的 4096 元素 `vector_add` Trace 中，全局读被预加载数据命中 L2，未产生外部读请求，因而不用于这项请求闭环资格验证。后续 LLM 评估必须采集能覆盖目标 GEMM/Attention/KV 算子的精确 Trace，不能由该 Backprop 微基准外推。
+
+### 14.3 下一阶段：外部链路与Logic Die内部事务分层
+
+当前Bridge是最小资格原型：一个GPU `mem_fetch`直接对应一个Ramulator2请求。正式Model 3/4周期路径将升级为：
+
+```text
+GPU Parent Request
+  -> 外部请求Link（带宽/协议/队列/Credit）
+  -> Singleton LogicDieMemoryGateway
+  -> 按Global PA、Size和Byte/Sector Mask拆分N个内部Child
+  -> 唯一Ramulator2完成全部Child
+  -> Parent Join
+  -> 外部响应Link
+  -> GPU完成
+```
+
+外部GPU↔Logic Die带宽与Logic Die↔3D-DRAM内部带宽是不同资源，允许且通常满足`B_external < B_internal`。读请求只有在全部Child和响应Link完成后才能解除GPU阻塞；写请求默认采用durable确认，posted write必须显式配置并在退出前排空。
+
+当前HBM3候选配置还没有使`DQ`、默认`channel_width`、Burst、`tCK`和事务大小导出一致的峰值带宽，因此现有Backprop结果只验证请求/回调闭环，不验证有效带宽。实施顺序和验收条件以[设计规范v1.4](docs/gpu_atlas_heterogeneous_simulation_design_zh.md)和[进度/差距表](README_PROGRESS_GAP_zh.md)为准。

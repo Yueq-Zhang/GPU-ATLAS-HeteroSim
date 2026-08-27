@@ -20,6 +20,10 @@ class ModelSpec:
     vocab_size: int
     dtype: str = "fp16"
     bytes_per_element: int = 2
+    architecture: str = "llama"
+    mlp_type: str = "swiglu"
+    position_encoding: str = "rope"
+    tied_embeddings: bool = True
 
     def __post_init__(self) -> None:
         integer_fields = (
@@ -36,6 +40,10 @@ class ModelSpec:
             raise ValueError("model fields must be non-empty positive values")
         if self.num_attention_heads * self.head_dim != self.hidden_size:
             raise ValueError("num_attention_heads * head_dim must equal hidden_size")
+        if self.mlp_type not in {"swiglu", "dense_gelu"}:
+            raise ValueError("mlp_type must be swiglu or dense_gelu")
+        if self.position_encoding not in {"rope", "learned_absolute"}:
+            raise ValueError("unsupported position_encoding")
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,6 +53,8 @@ class RequestSpec:
     output_length: int
     arrival_time_fs: int = 0
     priority: int = 0
+    execution_scope: str = "full_request"
+    initial_kv_length: int = 0
 
     def __post_init__(self) -> None:
         if not self.request_id:
@@ -53,6 +63,12 @@ class RequestSpec:
             raise ValueError("prompt_length and output_length must be positive")
         if self.arrival_time_fs < 0:
             raise ValueError("arrival_time_fs must be unsigned")
+        if self.execution_scope not in {"full_request", "decode_step"}:
+            raise ValueError("execution_scope must be full_request or decode_step")
+        if self.initial_kv_length < 0:
+            raise ValueError("initial_kv_length must be unsigned")
+        if self.execution_scope == "decode_step" and self.initial_kv_length <= 0:
+            raise ValueError("decode_step requires positive initial_kv_length")
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,21 +82,32 @@ class GraphCounters:
     final_committed_kv_len: int
 
 
-def _layer_ops() -> Iterable[tuple[str, str]]:
-    return (
+def _layer_ops(model: ModelSpec) -> Iterable[tuple[str, str]]:
+    attention = (
         ("norm.attention", "attention_norm"),
         ("attention.projection", "qkv_projection"),
-        ("attention.rope", "rope"),
+        (
+            "attention.rope" if model.position_encoding == "rope" else "attention.position",
+            "rope" if model.position_encoding == "rope" else "position_add",
+        ),
         ("attention.kv_append", "kv_append"),
         ("attention.core", "causal_attention"),
         ("attention.output", "output_projection"),
         ("attention.residual", "residual_add"),
         ("mlp.norm", "mlp_norm"),
-        ("mlp.gate_up", "gate_up_projection"),
-        ("mlp.activation", "silu_multiply"),
-        ("mlp.down", "down_projection"),
-        ("mlp.residual", "residual_add"),
     )
+    mlp = (
+        (
+            ("mlp.gate_up", "gate_up_projection"),
+            ("mlp.activation", "silu_multiply"),
+        )
+        if model.mlp_type == "swiglu"
+        else (
+            ("mlp.fc1", "fc1_projection"),
+            ("mlp.activation", "gelu"),
+        )
+    )
+    return (*attention, *mlp, ("mlp.down", "down_projection"), ("mlp.residual", "residual_add"))
 
 
 def build_request_graph(model: ModelSpec, request: RequestSpec) -> ModelGraph:
@@ -142,7 +169,15 @@ def build_request_graph(model: ModelSpec, request: RequestSpec) -> ModelGraph:
 
     prefix = request.request_id
     prompt_value = f"{prefix}.prompt"
-    add_value(prompt_value, StorageClass.ACTIVATION, (request.prompt_length, model.hidden_size))
+    if request.execution_scope == "full_request":
+        add_value(
+            prompt_value,
+            StorageClass.ACTIVATION,
+            (request.prompt_length, model.hidden_size),
+        )
+    else:
+        prompt_value = f"{prefix}.decode_input"
+        add_value(prompt_value, StorageClass.ACTIVATION, (1, model.hidden_size))
     for layer_id in range(model.num_layers):
         for kind in ("k", "v"):
             add_value(
@@ -154,19 +189,28 @@ def build_request_graph(model: ModelSpec, request: RequestSpec) -> ModelGraph:
     add_node(f"{prefix}.request_start", NodeKind.CONTROL, "request_start", Phase.CONTROL, 0)
     add_node(f"{prefix}.kv_allocate", NodeKind.STATE, "kv_allocate", Phase.CONTROL, 0)
 
-    for phase, step_id, q_len, past_len in [
-        (Phase.PREFILL, 0, request.prompt_length, 0),
-        *[
-            (Phase.DECODE, step, 1, request.prompt_length + step - 1)
-            for step in range(1, request.output_length)
-        ],
-    ]:
+    forward_steps = (
+        [
+            (Phase.PREFILL, 0, request.prompt_length, 0),
+            *[
+                (Phase.DECODE, step, 1, request.prompt_length + step - 1)
+                for step in range(1, request.output_length)
+            ],
+        ]
+        if request.execution_scope == "full_request"
+        else [(Phase.DECODE, 0, 1, request.initial_kv_length)]
+    )
+    for phase, step_id, q_len, past_len in forward_steps:
         phase_key = f"{phase.value}.s{step_id}"
-        hidden = prompt_value if phase is Phase.PREFILL else f"{prefix}.token.{step_id - 1}"
-        if phase is Phase.DECODE:
+        hidden = (
+            prompt_value
+            if phase is Phase.PREFILL or request.execution_scope == "decode_step"
+            else f"{prefix}.token.{step_id - 1}"
+        )
+        if phase is Phase.DECODE and request.execution_scope == "full_request":
             add_value(hidden, StorageClass.ACTIVATION, (1, model.hidden_size))
         for layer_id in range(model.num_layers):
-            for group, op in _layer_ops():
+            for group, op in _layer_ops(model):
                 output = f"{prefix}.{phase_key}.l{layer_id}.{group}.out"
                 add_value(output, StorageClass.ACTIVATION, (q_len, model.hidden_size))
                 reads = [hidden]
@@ -223,6 +267,16 @@ def build_request_graph(model: ModelSpec, request: RequestSpec) -> ModelGraph:
 
 
 def graph_counters(model: ModelSpec, request: RequestSpec) -> GraphCounters:
+    if request.execution_scope == "decode_step":
+        return GraphCounters(
+            prefill_forwards=0,
+            decode_forwards=1,
+            lm_head=1,
+            sampling=1,
+            kv_append_pairs=model.num_layers,
+            kv_range_writes=model.num_layers * 2,
+            final_committed_kv_len=request.initial_kv_length + 1,
+        )
     decode = request.output_length - 1
     written_tokens = request.prompt_length + decode
     return GraphCounters(

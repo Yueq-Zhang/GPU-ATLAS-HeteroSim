@@ -1,0 +1,9 @@
+{
+  "axes": {
+    "backends.gpu.effective_memory_bandwidth_Bps": [500000000000, 1000000000000],
+    "scheduling.max_batched_tokens": [16, 32],
+    "placement.rules.0.target": ["gpu0", "atlas0.compute"]
+  },
+  "max_candidates": 16,
+  "objective": "makespan_fs"
+}

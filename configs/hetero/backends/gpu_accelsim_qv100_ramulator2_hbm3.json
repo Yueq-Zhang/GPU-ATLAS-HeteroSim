@@ -1,0 +1,25 @@
+{
+  "schema_version": "hetero-accel-sim-backend/v1",
+  "backend_id": "gpu.accel_sim.sm70_qv100.ramulator2_hbm3_32ch.v2_0_0",
+  "executable": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-ramulator2/gpu-simulator/build-ramulator2/accel-sim.out",
+  "gpgpu_config": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-ramulator2/gpu-simulator/gpgpu-sim/configs/tested-cfgs/SM7_QV100/gpgpusim.config",
+  "trace_config": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/backends/qv100_ramulator2.trace.config",
+  "target_gpu": "NVIDIA Tesla V100 (QV100 tested configuration)",
+  "target_sm": 70,
+  "core_frequency_hz": 1132000000,
+  "timeout_seconds": 3600,
+  "dependency_commits": {
+    "accel_sim_framework": "64653015f85fb5664c84a10f48527e8897d289d0",
+    "gpgpu_sim_distribution": "e10018b67a4b668e7b43f89280cf67624f1df4ff",
+    "ramulator2": "3996362187d7f8314936e5ad7560d93b66b6a215"
+  },
+  "environment": {},
+  "external_memory": {
+    "kind": "ramulator2_in_process",
+    "config_file": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/memory/ramulator2_hbm3_32ch_gpu_only.yaml",
+    "bridge_library": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-ramulator2/ramulator2_bridge/libramulator_gpgpusim_bridge.so",
+    "timing_owner": "shared3d.ramulator2",
+    "expected_instances": 1,
+    "require_nonzero_requests": true
+  }
+}

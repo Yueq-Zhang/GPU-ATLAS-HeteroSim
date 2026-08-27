@@ -68,6 +68,10 @@ def estimate_node_cost(
         flops = 4 * m * h * i
         read_bytes += 2 * h * i * b
         write_bytes = 2 * m * i * b
+    elif node.op == "fc1_projection":
+        flops = 2 * m * h * i
+        read_bytes += h * i * b
+        write_bytes = m * i * b
     elif node.op == "down_projection":
         flops = 2 * m * i * h
         read_bytes = m * i * b + i * h * b
@@ -88,6 +92,8 @@ def estimate_node_cost(
         "residual_add",
         "mlp_norm",
         "silu_multiply",
+        "gelu",
+        "position_add",
         "final_norm",
     }:
         flops = 5 * m * h

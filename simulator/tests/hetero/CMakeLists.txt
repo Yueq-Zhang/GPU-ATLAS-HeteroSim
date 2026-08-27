@@ -25,3 +25,11 @@ add_test(NAME hetero_memory_services COMMAND test_memory_services)
 add_executable(test_paged_kv test_paged_kv.cpp)
 target_link_libraries(test_paged_kv PRIVATE heterosim_runtime)
 add_test(NAME hetero_paged_kv COMMAND test_paged_kv)
+
+add_executable(test_runtime_memory_planner test_runtime_memory_planner.cpp)
+target_link_libraries(test_runtime_memory_planner PRIVATE heterosim_runtime)
+add_test(NAME hetero_runtime_memory_planner COMMAND test_runtime_memory_planner)
+
+add_executable(test_shared_services test_shared_services.cpp)
+target_link_libraries(test_shared_services PRIVATE heterosim_runtime)
+add_test(NAME hetero_shared_services COMMAND test_shared_services)

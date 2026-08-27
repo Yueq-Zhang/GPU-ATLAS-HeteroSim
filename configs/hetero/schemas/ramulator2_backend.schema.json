@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hetero-ramulator2-backend/v1",
+  "title": "Standalone Ramulator2 replay adapter configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "executable", "config_template", "frequency_hz",
+    "transaction_bytes", "timeout_seconds", "expected_commit"
+  ],
+  "properties": {
+    "schema_version": {"const": "hetero-ramulator2-backend/v1"},
+    "executable": {"type": "string", "minLength": 1},
+    "config_template": {"type": "string", "minLength": 1},
+    "frequency_hz": {"type": "integer", "minimum": 1},
+    "transaction_bytes": {"type": "integer", "minimum": 1},
+    "timeout_seconds": {"type": "integer", "minimum": 1},
+    "expected_commit": {"type": "string", "minLength": 1}
+  }
+}

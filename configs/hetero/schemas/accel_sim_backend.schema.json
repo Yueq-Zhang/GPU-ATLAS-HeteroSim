@@ -34,6 +34,26 @@
     "environment": {
       "type": "object",
       "additionalProperties": {"type": "string"}
+    },
+    "external_memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "config_file",
+        "bridge_library",
+        "timing_owner",
+        "expected_instances",
+        "require_nonzero_requests"
+      ],
+      "properties": {
+        "kind": {"const": "ramulator2_in_process"},
+        "config_file": {"type": "string", "minLength": 1},
+        "bridge_library": {"type": "string", "minLength": 1},
+        "timing_owner": {"type": "string", "minLength": 1},
+        "expected_instances": {"const": 1},
+        "require_nonzero_requests": {"type": "boolean"}
+      }
     }
   }
 }

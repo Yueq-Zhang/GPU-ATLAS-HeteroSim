@@ -1,0 +1,23 @@
+{
+  "schema_version": "hetero-trace-manifest/v1",
+  "trace_id": "local.rtx3070.vector_add_4096.cuda11_8.accel_sim_v2",
+  "trace_semantics": "functional",
+  "replay_safe": false,
+  "qualification_record": null,
+  "kernels_list": "/opt/gpu-atlas/qualification/accel-sim-v2/rtx3070-vector-add-v2/traces/kernelslist.g",
+  "capture": {
+    "source": "local GPU qualification",
+    "tool": "NVBit",
+    "version": "1.8",
+    "accel_sim": "v2.0.0",
+    "gpu": "NVIDIA GeForce RTX 3070",
+    "driver": "591.86",
+    "workload": "vector_add",
+    "elements": 4096
+  },
+  "compilation": {
+    "cuda": "11.8",
+    "target_sm": 86
+  },
+  "address_ranges": []
+}

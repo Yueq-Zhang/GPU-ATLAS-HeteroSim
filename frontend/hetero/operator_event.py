@@ -336,11 +336,13 @@ class OperatorEventDispatcher:
             cycles = int(stats["cycles"])
             instructions = int(stats["instructions"])
             duration_fs = int(stats["duration_fs"])
+            external_memory_stats = stats.get("external_memory_stats")
         else:
             result = self._accel_sim.run(binding.manifest, output)
             cycles = result.cycles
             instructions = result.instructions
             duration_fs = result.duration_fs
+            external_memory_stats = result.external_memory_stats
         trace_key = binding.manifest.trace_key()
         trace_record = self._used_traces.setdefault(
             trace_key,
@@ -368,7 +370,9 @@ class OperatorEventDispatcher:
                 "compute_fidelity": "cycle_simulated"
                 if exact
                 else "cycle_simulated_surrogate",
-                "memory_fidelity": "cycle_simulated_local_dram",
+                "memory_fidelity": "cycle_simulated_external_ramulator2"
+                if self._accel_sim.config.external_memory is not None
+                else "cycle_simulated_local_dram",
                 "link_fidelity": "not_applicable",
                 "scheduler_fidelity": "event_modeled",
                 "extrapolated_fraction": 0.0 if exact else 1.0,
@@ -380,6 +384,7 @@ class OperatorEventDispatcher:
                 "instructions": instructions,
                 "duration_fs": duration_fs,
                 "cache_hit": cache_hit,
+                "external_memory_stats": external_memory_stats,
             },
             artifact={
                 "kind": "accel_sim_trace",

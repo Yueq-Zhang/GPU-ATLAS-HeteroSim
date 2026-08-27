@@ -1,18 +1,16 @@
 {
   "schema_version": "hetero-accel-sim-backend/v1",
-  "backend_id": "gpu.accel_sim.sm70_qv100.v1_3_0",
-  "executable": "/opt/gpu-atlas/dependencies/accel-sim-framework-c5296df152c99a28dd64e5d9560bd58a8fd2e774/gpu-simulator/bin/release/accel-sim.out",
-  "gpgpu_config": "/opt/gpu-atlas/dependencies/accel-sim-framework-c5296df152c99a28dd64e5d9560bd58a8fd2e774/gpu-simulator/gpgpu-sim/configs/tested-cfgs/SM7_QV100/gpgpusim.config",
-  "trace_config": "/opt/gpu-atlas/dependencies/accel-sim-framework-c5296df152c99a28dd64e5d9560bd58a8fd2e774/gpu-simulator/configs/tested-cfgs/SM7_QV100/trace.config",
+  "backend_id": "gpu.accel_sim.sm70_qv100.v2_0_0",
+  "executable": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0/gpu-simulator/build/accel-sim.out",
+  "gpgpu_config": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0/gpu-simulator/gpgpu-sim/configs/tested-cfgs/SM7_QV100/gpgpusim.config",
+  "trace_config": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0/gpu-simulator/configs/tested-cfgs/SM7_QV100/trace.config",
   "target_gpu": "NVIDIA Tesla V100 (QV100 tested configuration)",
   "target_sm": 70,
   "core_frequency_hz": 1132000000,
   "timeout_seconds": 3600,
   "dependency_commits": {
-    "accel_sim_framework": "c5296df152c99a28dd64e5d9560bd58a8fd2e774",
-    "gpgpu_sim_distribution": "68e1cd30efaecbd71b496822f9d88a5803b33841"
+    "accel_sim_framework": "64653015f85fb5664c84a10f48527e8897d289d0",
+    "gpgpu_sim_distribution": "e10018b67a4b668e7b43f89280cf67624f1df4ff"
   },
-  "environment": {
-    "LD_LIBRARY_PATH": "/opt/gpu-atlas/dependencies/accel-sim-framework-c5296df152c99a28dd64e5d9560bd58a8fd2e774/gpu-simulator/gpgpu-sim/lib/gcc-11.4.0/cuda-11080/release"
-  }
+  "environment": {}
 }

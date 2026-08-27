@@ -1,190 +1,83 @@
-# GPU-ATLAS-HeteroSim 当前完成情况与计划差距
+# GPU-ATLAS-HeteroSim 当前完成情况与验证差距
 
-本文用于回答三个问题：当前工程真正完成了什么、与冻结计划还差什么、下一步应从哪里继续。运行方法见主 [README](README.md)，规范性目标见 [GPU + ATLAS 异构端到端仿真实现规范](docs/gpu_atlas_heterogeneous_simulation_design_zh.md)。
+评估日期：2026-08-27
+当前版本：`0.6.2`
+规范基线：`hetero-sim/v1`、设计合同v1.4
 
-评估日期：2026-08-26
+本文区分“功能已经实现”和“目标硬件已经完成资格验证”。前者表示接口、运行入口、状态机和参考模型可执行；后者要求真实Trace、真实Artifact、版本锁定的外部Backend和误差/守恒验收全部通过。
 
-代码评估基线：`d240667` 之后的第二步实现工作树
+## 1. 当前结论
 
-当前版本：`0.5.0`
+计划中的软件功能已经形成完整参考闭环：四种系统Profile可运行相同端到端工作负载，支持GPU/ATLAS算子放置、Prefill/Decode、独立Decode Step、多请求Continuous/Ragged Batch、Device Sub-Batch、Paged KV动态释放复用、统一地址与Residency、PCIe/CXL有界链路、共享3D内存请求模型、外部内存桥协议和DSE。
 
-状态定义：
+GPU-only 的实时 Accel-Sim 请求/响应路径已经接入唯一 Ramulator2，并完成一个固定 QV100 Backprop Trace/配置的最小闭环资格验证。该闭环目前仍是“一个GPU `mem_fetch`对应一个Ramulator2请求”，尚未建模GPU到Logic Die的外部请求/响应链路、按真实事务大小拆分的内部子事务、Parent/Child完成汇聚和独立Link/Logic/DRAM时钟域。当前HBM3候选配置的`DQ`、`channel_width`、Burst和事务粒度也没有形成自洽的单一带宽口径，因此只证明实时回调可工作，不构成3D-DRAM带宽资格验证。全部新增参考配置继续标记`performance_claim_allowed=false`。
 
-- ✅ 已完成：代码、运行入口和对应验收证据均存在；
-- 🟡 部分完成：已有结构或语义验证，但缺少计划要求的真实 Backend、精确时序或完整验收；
-- ⬜ 未开始：当前仓库中没有可运行实现；
-- ⛔ 环境受限：代码路径存在，但当前机器条件不能完成目标实机步骤。
+## 2. 三步GPU集成计划对照
 
-## 1. 一句话结论
+| 步骤 | 实现状态 | 已具备功能 | 后续验证 |
+|---|---|---|---|
+| 第一步：独立Accel-Sim后端 | ✅ v2.0.0 已集成并完成 QV100 与 RTX 3070 Adapter 等价验证 | 固定依赖、CMake构建、NVBit 1.8 `.tracez`采集、Trace Manifest、兼容新旧格式的Trace Cache、周期结果解析 | 真实LLM Trace与RTX 3070/4090微架构校准 |
+| 第二步：算子事件级GPU+ATLAS | ✅ 软件闭环完成，真实LLM Artifact待验证 | 同一GlobalEventRuntime调度GPU、ATLAS、传输和分析回退；Artifact选择与缓存 | 用形状/布局完全匹配的LLM GPU Trace和ATLAS YAML替换代理绑定 |
+| 第三步：共享3D-DRAM请求级耦合 | 🟡 GPU-only最小实时闭环已通过 | Accel-Sim请求进入唯一Ramulator2并由完成回调解除GPU等待；内部DRAM固定延迟已关闭 | 先实现外部Link→LogicDieGateway→内部Child事务→Ramulator2→响应Link，再接入ATLAS Port和双发起方竞争 |
 
-工程已经具备异构 LLM 仿真的控制面、请求图、算子放置、全局事件运行时、四种拓扑语义、Paged KV，以及 Accel-Sim 与真实 ATLAS 同时参与一次 `operator_event` 运行的最小闭环；但仍不是请求级共享 3D-DRAM 联合周期仿真器。
+## 3. M0–M9实现矩阵
 
-当前可以可靠报告：
+| 里程碑 | 软件实现 | 当前证据 | 尚待资格验证 |
+|---|---:|---|---|
+| M0 契约和依赖 | ✅ | 四拓扑、单位、时序所有权；Ramulator2、BookSim2、TileLang Commit已锁定 | 外部组件逐项资格记录 |
+| M1 模型与两级IR | ✅ | Full Request与`decode_step`；Llama/SwiGLU和OPT/Dense-GELU；Prefill/Decode/KV计数 | 更多模型解析器和数值功能验证 |
+| M2 基础运行时 | ✅ | C++ DAG Runtime、Roofline、Accel-Sim/ATLAS Adapter、统一Run产物 | 目标硬件校准 |
+| M3 地址与四Profile | ✅ | RuntimeMemoryPlanner、Memory Space、PhysicalAddress、Residency、Copy/Migrate/Remote/Sync | 真实地址清单和大容量压力验证 |
+| M4 Multi-Batch | ✅ 参考执行 | Continuous/Chunked、Static Ragged、Device Sub-Batch、动态KV释放复用 | 真正融合Batched Kernel与真实Backend Shape覆盖 |
+| M5 Accel-Sim资格 | 🟡 | v2.0.0 QV100旧Trace回放通过；RTX 3070/驱动591.86的NVBit 1.8采集及Adapter等价通过 | 精确LLM Trace、RTX 3070微架构校准与RTX 4090合格配置仍未完成 |
+| M6 共享3D-DRAM | 🟡 | 单Owner参考模型与离线桥；GPU-only最小实时Accel-Sim + 单Ramulator2闭环已通过固定Backprop资格 | Bridge ABI v2、外部/内部带宽分离、Parent/Child拆分汇聚、durable write、独立时钟域、ATLAS实时端口与目标堆叠校准 |
+| M7 PCIe/CXL与外部链路 | 🟡 | 事件级有界事务、Credit、序列化、传播延迟、背压、Residency状态机 | 将有界链路升级为请求/响应双向周期服务，并按direct PHY、PCIe DMA和CXL.mem分别限定访问语义 |
+| M8 DSE和报告 | ✅ 参考执行 | 四Profile `full_runtime`配置、自动笛卡尔DSE、OPT-6.7B单步Decode配置 | 大规模矩阵、周期复验和论文级统计 |
+| M9高级扩展 | ⬜ 可选 | gem5/NPU接口仍按设计保留 | MMU、完整一致性、多GPU、动态MoE等不属于第一版必需项 |
 
-- Prefill/Decode 图和逻辑工作量；
-- GPU/ATLAS 算子放置决策；
-- 四种 Profile 的拓扑 Lowering 语义；
-- 未校准 Roofline/Link 分析预览；
-- 指定官方 Trace 与固定 QV100 配置下的独立 Accel-Sim 周期结果。
-- 指定 ATLAS Operator/Placement/Chip 配置下的独立 ATLAS 周期与能耗结果；
-- GPU 和 ATLAS `total` 时长任务在同一全局事件运行时中的依赖、资源和传输编排结果。
+## 4. 已实现的关键模块
 
-当前不能报告：
+- `RuntimeMemoryPlanner`：对齐、First-Fit、释放、空闲段合并、Allocation Epoch和峰值占用；
+- `Shared3DMemoryModel`：64B等可配置事务、GPU/ATLAS轮询、公用Channel/Bank资源、请求拆分和严格守恒；
+- Reference Coupling Loop：把Link/Memory响应反馈为父任务Stall，重新推进全局DAG直到确定性收敛；
+- `BoundedLinkModel`：PCIe/CXL队列深度、Credit、全双工方向、带宽、延迟和背压；
+- `ResidencyManager`：Copy、Migration、Remote、Write和显式非一致同步；
+- Batch Planner：Ragged打包、Mixed Prefill/Decode Epoch和按目标设备拆分；
+- `bridge-memory`：TraceAddr → TensorID+offset → Global PA → DRAM服务；
+- `dse`：点路径搜索轴、候选上限、确定性运行、Fidelity与结果排序；
+- OPT-6.7B FP16、BS=1、初始KV=1024、单步Decode的RTX 4090 Roofline配置。
+- Model 3 GPU-only无竞争基线：全部算子固定在GPU，Logic Die后端关闭，共享3D-DRAM只接受`gpu0`请求，并输出零Logic Die任务/请求验收计数。
+- 最小Cycle-Accurate桥：全部GPU Memory Partition共享一个Ramulator2实例，读请求等待完成回调；它还没有外部链路、Logic Die Parent Table、按Byte/Sector Mask拆分和响应链路，因此不能代表最终M6数据通路。
 
-- GPU 与 ATLAS 同时执行时的真实端到端性能；
-- GPU 和 Compute Die 争用同一 3D-DRAM 的周期级结果；
-- 真实 PCIe/CXL 队列、Credit、背压和迁移性能；
-- RTX 3070 目标平台的已校准周期结果；
-- 完整动态 Batch、KV 回收和端到端 LLM 周期精确性能。
+## 5. 当前运行证据
 
-## 2. 三步 GPU 集成计划对照
+- CMake Release构建：通过；
+- C++：9/9通过；
+- Python：65/65通过；
+- 四种`full_runtime`参考配置：均由自动测试覆盖；
+- Model 3：父请求、子事务和字节数守恒通过；
+- OPT-6.7B单步Decode：391个逻辑任务，1次Decode Forward、0次Prefill，最终KV长度1025；RTX 4090理论Roofline约`13.733 ms`；
+- 同图全ATLAS 3D-DRAM参考Roofline约`33.796 ms`，RTX 3070 Decode约`30.899 ms`；当前409.6 GB/s参考参数下3D-DRAM相对3070/4090的加速比分别为`0.914x`/`0.406x`，结果明确保持未校准状态；
+- OPT-6.7B Prefill：FP16、BS=1、Context=1024，1次Prefill、0次Decode；RTX 3070理论Roofline约`179.558 ms`；
+- OPT-6.7B GPU-only共享3D-DRAM功能运行：391个GPU任务、0条跨设备路由、774个GPU父内存请求、0个Logic Die请求，13,966个子事务与13,842,739,592 B流量均守恒；该配置为1 MiB粗粒度未校准参考模型，不用于性能结论；
+- Accel-Sim v2 QV100旧Trace：原生与Adapter均为14,731 cycles、10,473,824 instructions；
+- Accel-Sim v2 RTX 3070本机`vector_add` `.tracez`：原生与Adapter均为5,657 cycles、61,440 instructions；
+- Accel-Sim + 单实例Ramulator2 QV100 Backprop：两次均为14,700 GPU cycles、10,473,824 instructions；Ramulator2均为11,038 cycles、63 reads/63 completed、0 outstanding，原生内部DRAM基线为14,731 GPU cycles；耦合配置关闭原固定`dram_latency`以避免重复计时；
+- ATLAS测试GEMM：两次独立运行均为48,446 cycles、0.00581352 J。
 
-三步计划与 M0–M9 里程碑不是同一套顺序。三步计划描述 GPU 仿真器如何逐级接入；M0–M9 描述整个异构系统的功能成熟度。
+## 6. 后续实现计划
 
-| 步骤 | 冻结目标 | 当前状态 | 已有证据 | 主要差距 |
-|---|---|---|---|---|
-| 第一步：独立 Accel-Sim 后端资格 | 固定依赖；编译/采集入口；Trace Manifest；地址正规化；Trace Cache；原生基线与 Adapter 一致 | ✅ 已完成 | QV100 Backprop 两条路径均为 `15,329 cycles`、`10,473,824 instructions`；43/43 Python、7/7 C++ 测试通过 | 本机 RTX 3070 Trace 因 NVBit/Driver 不兼容未采集；该结果只证明 Adapter 等价，`replay_safe=false` |
-| 第二步：算子事件级 GPU+ATLAS 集成 | Accel-Sim 总时长进入 ExecutionGraph；实现 ATLAS Adapter；GPU/ATLAS 算子按 Placement 执行；传输和多请求由全局运行时协调 | 🟡 最小闭环完成 | 主 `run` 同时执行 Accel-Sim `15,329 cycles` 与 ATLAS `48,446 cycles`；时序 Contract、缓存、结果回填、显式回退和 C++ 全局事件编排均已运行 | 当前绑定是 `surrogate_plumbing_probe`；仍需生成与 LLM 算子形状/布局完全对应的 GPU Trace 和 ATLAS Artifact，并补多请求真实 Backend 黄金用例 |
-| 第三步：请求级共享 3D-DRAM 周期耦合 | GPU L2 Miss 和 ATLAS 请求进入同一 Shared Fabric/唯一 Ramulator2；实现跨时钟、仲裁、背压、响应和守恒 | ⬜ 未开始 | 已有 Timing Ownership 冲突检查和固定延迟内存服务单元测试 | 没有 GPU Memory Bridge、ATLAS Memory Port、Shared Fabric、外部内存请求接口、唯一 Ramulator2 实例、跨时钟事件桥及死锁/带宽验收 |
+| 顺序 | 计划项 | 完成条件 |
+|---:|---|---|
+| P1 | 固化外部与内部带宽配置 | `external_link`与Ramulator2组织分开；`DQ/channel_width/rate/nBL/tCK/transaction_bytes`自洽，带宽计算器和Schema拒绝矛盾配置 |
+| P2 | Bridge ABI v2 | GPU请求携带Parent ID、Global PA、Size、Byte/Sector Mask、Partition、Ordering和QoS；不再默认一个`mem_fetch`等于一个DRAM事务 |
+| P3 | Logic Die Memory Gateway | 统一Ingress Queue、Parent Table、确定性拆分、Child重试、全部Child完成汇聚；写请求默认`durable`，`posted`只作为显式可选语义 |
+| P4 | 双向Cycle Link | 请求和响应分别建模Payload/Wire Bytes、Header、Flit、Credit、Queue、Serialization、Propagation和Full/Half Duplex |
+| P5 | 多时钟推进 | GPU、外部Link、Logic Die和DRAM分别配置频率，以整数fs/相位累加器推进，移除“最后一个Partition代替全系统Tick”的临时约定 |
+| P6 | GPU-only分层资格验证 | 分别构造外部带宽瓶颈和内部DRAM瓶颈微基准；Parent/Child/Byte守恒、所有Child完成前GPU不恢复、退出时零在途 |
+| P7 | ATLAS实时端口与竞争 | ATLAS请求通过内部Hybrid-Bond Port进入同一Gateway/Ramulator2，完成GPU-only、ATLAS-only和双发起方黄金对照 |
+| P8 | 真实LLM Artifact | 获取精确OPT/目标LLM GPU Trace和匹配ATLAS YAML，再进行RTX 3070/4090与3D-DRAM校准和端到端评估 |
 
-因此，当前准确含义是：GPU 和 ATLAS 已经参与同一个端到端 `run`，但两者各自返回包含内部内存的总时长，全局只在算子/传输事件粒度协同；共享 3D-DRAM 尚未在请求粒度周期耦合。
+Model 3直接显存模式将每个GPU LLC Miss作为外部Parent请求；Model 4使用CXL.mem请求/响应；Model 2的PCIe路径保持DMA/Page Migration语义，不能把每个GPU Load/Store伪装成PCIe事务。完成P1–P7之前，最小Bridge结果不得用于GPU与3D-DRAM有效带宽或LLM加速比结论。
 
-## 3. 当前已经完成的模块
-
-### 3.1 控制面与可复现框架
-
-- ✅ 严格实验配置解析、组件 `ref` 展开和输入哈希；
-- ✅ 规范化 Run 目录、Resolved Config、Git revision、Dependency Lock、事件日志和 Fidelity 字段；
-- ✅ Python 控制面与 C++ 运行时边界；
-- 🟡 依赖锁已精确覆盖 ATLAS、Accel-Sim、GPGPU-Sim、NVBit 和 CUDA 11.8，但 Ramulator2、BookSim2、TileLang 仍有 inherited placeholder。
-
-### 3.2 LLM 图、请求和放置
-
-- ✅ Tiny Decoder-only 模型的完整 Prefill、首 Token、逐 Token Decode、KV Append、LM Head 和 Sampling 图；
-- ✅ `G` 个输出 Token 对应 `G-1` 次 Decode Forward；
-- ✅ 手工/规则化 GPU 与 ATLAS 算子放置；
-- ✅ 可按 Phase、Layer、Operator Group、KV 长度和活动 Batch 匹配规则；
-- 🟡 Placement 已能驱动 Accel-Sim/ATLAS Artifact 选择；当前只有各一个代理绑定，其余算子显式分析回退。
-
-### 3.3 Batch、KV 与运行时
-
-- ✅ C++ Token-Step Barrier Scheduler；
-- ✅ C++ Paged KV 分配和容量检查；
-- ✅ 多请求 Arrival、Prefill Chunk、Decode Priority 的确定性语义测试；
-- ✅ C++ DAG 依赖、资源互斥和到达时间感知 GlobalEventRuntime；
-- 🟡 当前分析执行没有把同一 Token Step 的请求聚合成真实 Batched Kernel；
-- 🟡 请求结束后的动态 KV 释放、Block 复用、Mixed Prefill/Decode 真实 Backend 执行尚未实现；
-- ⬜ Static Ragged Batch 的真实打包 Kernel 和 Device Sub-Batch 执行尚未实现。
-
-### 3.4 四种物理系统 Profile
-
-- ✅ Model 1：独立 ATLAS 的逻辑拓扑；
-- ✅ Model 2：Host 3D-DRAM + GPU HBM + PCIe 的路由语义；
-- ✅ Model 3：GPU 与 Compute Die 共享 3D-DRAM、禁止伪 DMA 的拓扑语义；
-- ✅ Model 4：GPU HBM + CXL 3D-DRAM 的 Remote/Copy/Migration 路由语义；
-- 🟡 四种 Profile 已通过逻辑工作量和 Lowering 测试，但只有 Model 1 有当前分析预览示例；
-- ⬜ Model 3 尚无 Shared3DAnalyticalMemoryService，也无请求级共享内存周期耦合；
-- ⬜ Model 2/4 尚无有界 PCIe/CXL 队列、Credit 和背压模型。
-
-### 3.5 GPU Accel-Sim 第一步
-
-- ✅ 固定 Accel-Sim v1.3.0、GPGPU-Sim v4.2.1、NVBit 1.7.3；
-- ✅ CUDA 11.8 下构建 Accel-Sim、NVBit Tracer 和 Postprocessor；
-- ✅ RTX 3070 最小 CUDA Vector Add 编译、原生执行与结果验证；
-- ✅ Trace Manifest Schema、Trace Cache 和 Accel-Sim Backend；
-- ✅ `TraceAddr -> TensorID+offset` 与候选 `SimulationBufferBinding -> PhysicalAddress` 分离；
-- ✅ 原生 Accel-Sim 与 Adapter 的 Cycle/Instruction 精确一致性验证；
-- ⛔ 本机 Driver 591.86 超出固定 NVBit 1.7.3 的兼容范围，RTX 3070 本地 Trace 采集被主动拒绝；
-- 🟡 官方 QV100 Trace 可用于 Adapter 回归，但不能替代 RTX 3070 目标平台校准；
-- 🟡 当前资格范围为 `adapter_equivalence`，不包含跨 DRAM 时序的 Replay Safety，因此 `replay_safe=false`。
-
-## 4. M0–M9 里程碑差距矩阵
-
-| 里程碑 | 计划内容 | 状态 | 当前完成情况 | 尚缺验收 |
-|---|---|---|---|---|
-| M0 契约和基线 | 四拓扑、时序所有权、单位、依赖锁、黄金工作负载、独立基线 | 🟡 | 规范、四拓扑、单位、黄金用例、Accel-Sim 与 ATLAS Adapter 基线已存在 | Ramulator2/BookSim2/TileLang 的完整版本和资格记录仍需精确锁定 |
-| M1 统一模型和两级 IR | Canonical Model、ModelGraph、ExecutionGraph、Prefill/Decode、KV/Request State | ✅ | Tiny 模型、完整请求图、ExecutionGraph、固定生成轨迹和 KV 状态已实现并测试 | 扩展到真实模型只需新增配置/编译路径；不阻塞下一步 |
-| M2 基础运行时和 Model 1 | Global Runtime、GPU Roofline、ATLAS Adapter、Link、单请求端到端 | 🟡 | GlobalEventRuntime、Roofline/Link、ATLAS Adapter、Accel-Sim/ATLAS 混合单请求和确定性对比已完成 | Roofline 未校准；真实 LLM 算子 Trace/Artifact 和完整多请求 Backend 验收缺失 |
-| M3 地址和四 Profile 事件模式 | MemorySpace、PhysicalAddress、Allocator、Router、传输/迁移/同步、四 Profile | 🟡 | 拓扑 Router、Profile 配置、Paged KV 地址空间和部分配置校验已完成 | 通用 Global Allocator、完整 Residency/Owner、四 Profile operator-event 执行和 Model 3 共享分析内存服务缺失 |
-| M4 Multi-Batch | Ragged Batch、Paged KV、Continuous Batch、Chunked Prefill、Mixed、Sub-Batch | 🟡 | Paged KV、Barrier Scheduler、多 Arrival/Chunk 语义和规则放置已完成 | 真实 Batched Kernel、动态 KV 释放复用、Mixed Backend 执行、Device Sub-Batch 恢复与完整 B1–B5 验收缺失 |
-| M5 Accel-Sim 资格 | 编译、NVBit Trace、Manifest、地址绑定、Cache、Adapter | 🟡 | 独立 Adapter、官方 Trace 回归和地址分层已完成 | TileLang GPU 编译路径、本机/目标 RTX Trace、真实 Tensor Range 捕获、Replay Safety 资格和 Trace 覆盖策略缺失 |
-| M6 Model 3 周期耦合 | GPU Bridge、ATLAS Port、Shared Fabric、唯一内存服务、跨时钟、背压 | ⬜ | 仅有接口原型、时序所有权检查和固定延迟 MemoryService 单测 | M6 全部主体组件与黄金请求守恒验收尚未实现 |
-| M7 PCIe/CXL 高精度 | DMA、队列、CXL Root/Switch、Credit、Remote、Migration、Residency | ⬜ | 只有拓扑路由决策和分析链路公式 | 协议状态、队列、Credit、背压、迁移和四路径测试全部缺失 |
-| M8 全组合与 DSE | 回归矩阵、缓存清单、真实模型、跨拓扑报告、周期复验 | ⬜ | 已有少量四 Profile 语义回归和输入哈希 | 没有真实模型矩阵、自动 DSE、跨拓扑周期报告和完整缓存复用清单 |
-| M9 高级扩展 | 动态 EOS/MoE、MMU、完整 CXL、一致性、多 GPU、gem5、NPU | ⬜ | 未实现 | 全部属于后续扩展，不应提前阻塞 M2–M8 主路径 |
-
-## 5. 与“研究可用”完成定义的差距
-
-冻结规范要求下列十项同时满足。当前不能宣称第一版研究可用。
-
-| # | 研究可用条件 | 当前判断 | 说明 |
-|---:|---|---|---|
-| 1 | 四 Profile 运行相同端到端 Prefill/Decode | 🟡 | 四 Profile 已运行相同逻辑图，但不是四 Profile 完整时序 Backend |
-| 2 | Roofline 覆盖全部 Profile | ⬜ | 当前只有 Model 1 分析预览示例，Model 3 缺共享分析内存服务 |
-| 3 | Accel-Sim 完成 GPU 独立路径 | ✅ | 固定 QV100 Trace/Config 的原生与 Adapter 结果精确一致 |
-| 4 | Model 3 请求级共享 3D-DRAM 周期耦合 | ⬜ | M6 未开始 |
-| 5 | Model 2/4 有界队列、带宽、延迟和背压 | ⬜ | M7 未开始 |
-| 6 | Static Ragged、Paged KV、Continuous Batch | 🟡 | Paged KV 和调度语义完成，真实 Ragged/Continuous Backend 执行未完成 |
-| 7 | 手工和规则化 GPU/ATLAS 放置 | ✅ | Placement 决策和 Backend Artifact 选择已接入主 `run` |
-| 8 | 逻辑工作量、地址、传输和请求守恒 | 🟡 | 已覆盖部分黄金计数与内存服务，尚未覆盖真实 Bridge/PCIe/CXL |
-| 9 | Resolved Config、版本、Trace、地址、Seed 可复现 | 🟡 | 框架已存在，部分 ATLAS 系依赖仍是 placeholder，真实 Trace 地址清单不完整 |
-| 10 | 明确区分 analytical/event/cycle/extrapolated | ✅ | 当前 Run 产物已有 Fidelity 和禁止性能声明字段 |
-
-## 6. 当前最关键的实现缺口
-
-### P0：把第二步从代理闭环升级为真实 LLM 算子闭环
-
-1. 为 Tiny LLM 的 GPU 算子生成形状和布局一致的 CUDA/TileLang Kernel 与 Trace；
-2. 为对应 ATLAS 算子从编译计划生成匹配的 Operator/Placement YAML；
-3. 用精确 Artifact 替换两个 `surrogate_plumbing_probe` 绑定；
-4. 增加至少两个请求的 GPU/ATLAS 混合执行、资源排队和传输黄金用例；
-5. 完成 Trace/Artifact 覆盖率门槛，只有全部关键算子为 `exact_operator` 时才允许进入性能资格评估。
-
-第二步的接线标准已经满足；完成标准仍要求同一个端到端请求中的绑定与真实 LLM 算子完全兼容，全局运行时生成确定性的 TTFT/TPOT/E2E，且没有重复计算设备与传输时间。
-
-### P1：完成第三步的最小 Load/Store 耦合
-
-1. 定义 Accel-Sim 外部内存请求/响应接口；
-2. 在 L2 Miss 后执行候选 DRAM Decode；
-3. 实现 ATLAS Memory Port、Shared Fabric 和唯一 Shared3DMemoryService；
-4. 连接唯一 Ramulator2，并关闭 Accel-Sim 内部 DRAM 时序；
-5. 实现跨时钟事件、队列、仲裁、背压和响应唤醒；
-6. 从固定延迟服务和最小 Load/Store Trace 开始验证，再切换真实 Ramulator2；
-7. 严格检查注入、完成、在途、父/子请求和字节守恒。
-
-第三步完成标准：Model 3 中 GPU 与 ATLAS 请求同时争用同一 3D-DRAM，系统只有一个 DRAM 时序所有者；GPU-only、ATLAS-only 和双发起方结果均通过版本锁定的黄金测试。
-
-### P2：补齐研究可用外围能力
-
-- M4：真实 Ragged/Continuous Batch、KV 释放复用和 Device Sub-Batch；
-- M7：PCIe/CXL 有界队列、Credit、Remote/Copy/Migration；
-- M8：真实 LLM Workload、自动回归矩阵、DSE 与跨拓扑报告；
-- 校准：RTX 3070 Trace Capture、GPU/ATLAS/Ramulator2 参数来源和误差记录。
-
-## 7. 下一次开始实现时的建议入口
-
-下一次应先完成第二步的真实 LLM Artifact，不应直接跳到 Ramulator2 共享内存桥。推荐切片是：
-
-```text
-Tiny LLM GPU Kernel/Trace
-        + 匹配的 ATLAS Operator/Placement
-        -> exact_operator 绑定
-        -> 多请求 operator_event 黄金测试
-```
-
-上述完成后，再进入第三步的 GPU L2 Miss/ATLAS Memory Port/唯一 Ramulator2 请求级耦合。
-
-## 8. 当前验证证据
-
-- 最新功能提交：`6ba9111`；资格语义修正：`06150ed`；
-- Accel-Sim Adapter：官方 QV100 Backprop 原生/适配器均为 `15,329 cycles`、`10,473,824 instructions`；
-- ATLAS Adapter：测试 GEMM 两次独立运行均为 `48,446 cycles`、`0.00581352 J`，完整统计精确一致；
-- 联合接线：同一次主 `run` 同时产生 Accel-Sim 与 ATLAS 周期任务，两个 Contract 均为 `total` 且 `exports=[]`；
-- Python：43/43 passed；
-- C++：7/7 passed；
-- CUDA：RTX 3070 Vector Add 原生执行与结果验证通过；
-- GitHub：`main` 已同步；
-- 资格记录：[docs/qualification/qv100_backprop_4096.md](docs/qualification/qv100_backprop_4096.md)；
-- 详细状态：[docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md)。
-
-后续每完成一个切片，应同步更新本文件中的状态、验收证据和剩余缺口；不能仅根据目录或类名将项目标记为完成。
+在这些资格记录完成前，目录或接口存在不能被表述为目标硬件已经验证。

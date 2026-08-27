@@ -48,5 +48,13 @@ int main() {
     assert(result.requests.at(0).committed_kv_length == 5);
     assert(result.requests.at(1).committed_kv_length == 2);
     assert(result.requests.at(2).committed_kv_length == 4);
+
+    const auto decode_only = simulate_token_barrier(
+        {RequestInput{"D0", 0, 1024, 1, 0, true, 1024}},
+        SchedulerConfig{1, 1, 1, 8, 1000});
+    assert(decode_only.epochs.size() == 1);
+    assert(decode_only.epochs.at(0).selections.at(0).phase == RequestPhase::kDecode);
+    assert(decode_only.requests.at(0).generated_length == 1);
+    assert(decode_only.requests.at(0).committed_kv_length == 1025);
     return 0;
 }

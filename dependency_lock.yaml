@@ -1,9 +1,9 @@
 schema_version: hetero-sim/dependency-lock/v1
-captured_at: 2026-08-26
+captured_at: 2026-08-27
 source_baseline:
   atlas_repository: pku-gsun/ATLAS-MICRO-2026
   atlas_commit: b2787399408e32d327c820daee96d4e6610f551a
-  design_spec_sha256: F61942846490F8AF1116646835412265EEA4DD1100CA88EA100833775A121FAB
+  design_spec_sha256: EB9AE19EF168F26B9B2B081BD116290C061B151EABA61F76BEF60A86B10A5333
 environment:
   os: Ubuntu-22.04-WSL2
   wsl_kernel: 6.6.87.2-microsoft-standard-WSL2
@@ -13,30 +13,46 @@ environment:
   gcc: 11.4.0
 dependencies:
   accel_sim:
-    version: v1.3.0
-    commit: c5296df152c99a28dd64e5d9560bd58a8fd2e774
-    source_archive_sha256: 2652061806585d27fe62d6ba2b8dc0226401c2680d7474c56768bde3c5a079d7
+    version: v2.0.0
+    commit: 64653015f85fb5664c84a10f48527e8897d289d0
+    source_archive_sha256: 1ab59739f00b006cefa9ce1dbe0a3196050bb82a8a820f77d71c45d8574ea711
   gpgpu_sim:
-    version: v4.2.1
-    commit: 68e1cd30efaecbd71b496822f9d88a5803b33841
-    source_archive_sha256: f288ddfcc06a873c77c9f8ac8a6d513d628c2713dd6130372a36cabfd3c7e92d
+    version: dev_for_accel_sim_v2.0.0
+    commit: e10018b67a4b668e7b43f89280cf67624f1df4ff
+    source_archive_sha256: a85c3c16b2636fca999fab3d2fb1d0475c7e54f7e204a75e5c0244377ddfbb98
   nvbit:
-    version: 1.7.3
-    archive_sha256: 1eff502430936aeed570d73a62886d9057adffda519ada041f43486a36d4356b
-    capture_status: blocked_on_local_driver_591_86
-    supported_driver_upper_bound: 575
+    version: 1.8
+    archive_sha256: 72a2b827f9531dcb86b6be13844f267640fb440929d92944177029da6da2b9e1
+    capture_status: passed_local_rtx3070_driver_591_86
   cuda_toolkit:
     build_and_capture_version: 11.8
     explicit_root: /usr/local/cuda-11.8
-  ramulator2: inherited_from_atlas_until_m6
-  booksim2: inherited_from_atlas_until_m6
+  ramulator2:
+    commit: 3996362187d7f8314936e5ad7560d93b66b6a215
+    source: ATLAS-MICRO-2026/simulator/src/dram/ramulator2
+    integration_status: minimal_in_process_gpu_callback_bridge_qualified_bandwidth_pending
+  booksim2:
+    commit: 1a8ec21ecc71f26be6907e373034e18c136ee459
+    source: ATLAS-MICRO-2026/simulator/src/noc/booksim2
+    integration_status: adapter_pending_qualification
   pybind11:
     simulator_runtime_package: 2.9.1-2_ubuntu_jammy
     accel_sim_bundled_version: 2.9.1
     source_archive_sha256: c6160321dc98e6e1184cc791fbeadd2907bb4a0ce0e447f2ea4ff8ab56550913
-  tilelang: inherited_from_atlas_until_m5
+  tilelang:
+    commit: 3772fd2f52ea95ae67cb884955c9a11ac718764a
+    version_describe: v0.1.7.post3-80-g3772fd2f
+    source: ATLAS-MICRO-2026/frontend/tilelang
+    integration_status: compiler_path_pending_qualification
+research_candidates:
+  rtx4090_sm89_community_config:
+    accel_sim_fork_commit: 59679f1afcdbec0de6361f75e3230848c1fa6255
+    gpgpu_sim_fork_commit: fdd4f16417b4325258a1c3b3701cd24410c732f2
+    status: downloaded_unqualified_deadlock_reported_upstream
 notes:
   - Local GPU is NVIDIA GeForce RTX 3070 (SM86); pinned SM86_RTX3070 configs are used.
-  - Native CUDA workload execution passes, but NVBit 1.7.3 returns CUDA_ERROR_NOT_SUPPORTED with driver 591.86; use a driver at or below 575 for local capture or import an official pre-captured trace.
+  - Accel-Sim 2.0 uses the rebuilt NVBit 1.8 tracer and compressed .tracez format; local RTX 3070 driver 591.86 capture and adapter-equivalence qualification passed on 2026-08-27.
+  - The Accel-Sim 2.0 source archive does not pin GPGPU-Sim; the exact inspected dev revision is pinned here for reproducibility.
   - M5 Step 1 is an independent total-duration backend; Accel-Sim exclusively owns GPU core, cache, NoC and local DRAM timing.
-  - Exact ATLAS, Ramulator2, BookSim2 and TileLang dependency revisions must replace inherited placeholders before coupled simulation results are reported.
+  - ATLAS, Ramulator2, BookSim2 and TileLang revisions are pinned; their coupled target-platform paths still require explicit qualification records before results are reported.
+  - The current QV100 + Ramulator2 result qualifies one-parent/one-request callbacks only. External-link timing, Logic-Die parent/child splitting, bandwidth consistency and dual-initiator contention remain planned under design contract v1.4.

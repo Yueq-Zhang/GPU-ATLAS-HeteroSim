@@ -26,6 +26,53 @@ def _resolve(path: object, base: Path) -> Path:
 
 
 @dataclass(frozen=True)
+class ExternalMemoryConfig:
+    kind: str
+    config_file: Path
+    bridge_library: Path
+    timing_owner: str
+    expected_instances: int
+    require_nonzero_requests: bool
+
+    @classmethod
+    def load(cls, payload: object, base: Path) -> "ExternalMemoryConfig":
+        if not isinstance(payload, dict):
+            raise AccelSimBackendError("external_memory must be an object")
+        required = {
+            "kind",
+            "config_file",
+            "bridge_library",
+            "timing_owner",
+            "expected_instances",
+            "require_nonzero_requests",
+        }
+        missing = required - payload.keys()
+        extra = payload.keys() - required
+        if missing or extra:
+            raise AccelSimBackendError(
+                "external_memory keys mismatch: "
+                f"missing={sorted(missing)}, extra={sorted(extra)}"
+            )
+        if payload["kind"] != "ramulator2_in_process":
+            raise AccelSimBackendError(
+                "external_memory.kind must be ramulator2_in_process"
+            )
+        result = cls(
+            kind=str(payload["kind"]),
+            config_file=_resolve(payload["config_file"], base),
+            bridge_library=_resolve(payload["bridge_library"], base),
+            timing_owner=str(payload["timing_owner"]),
+            expected_instances=int(payload["expected_instances"]),
+            require_nonzero_requests=bool(payload["require_nonzero_requests"]),
+        )
+        if not result.timing_owner or result.expected_instances != 1:
+            raise AccelSimBackendError(
+                "external memory requires one non-empty timing owner and exactly one instance"
+            )
+        return result
+
+
+@dataclass(frozen=True)
 class AccelSimBackendConfig:
     backend_id: str
     executable: Path
@@ -37,6 +84,7 @@ class AccelSimBackendConfig:
     timeout_seconds: int
     dependency_commits: Mapping[str, str]
     environment: Mapping[str, str]
+    external_memory: ExternalMemoryConfig | None
     source_path: Path
 
     @classmethod
@@ -61,7 +109,7 @@ class AccelSimBackendConfig:
             "environment",
         }
         missing = required - payload.keys()
-        extra = payload.keys() - required
+        extra = payload.keys() - (required | {"external_memory"})
         if missing or extra:
             raise AccelSimBackendError(
                 f"backend config keys mismatch: missing={sorted(missing)}, extra={sorted(extra)}"
@@ -88,6 +136,9 @@ class AccelSimBackendConfig:
             timeout_seconds=int(payload["timeout_seconds"]),
             dependency_commits={str(k): str(v) for k, v in commits.items()},
             environment={str(k): str(v) for k, v in environment.items()},
+            external_memory=ExternalMemoryConfig.load(payload["external_memory"], base)
+            if "external_memory" in payload
+            else None,
             source_path=path.resolve(),
         )
         if result.core_frequency_hz <= 0 or result.timeout_seconds <= 0:
@@ -104,6 +155,13 @@ class AccelSimBackendConfig:
         }.items():
             if not path.is_file():
                 raise AccelSimBackendError(f"{label} does not exist: {path}")
+        if self.external_memory is not None:
+            for label, path in {
+                "external memory config": self.external_memory.config_file,
+                "external memory bridge": self.external_memory.bridge_library,
+            }.items():
+                if not path.is_file():
+                    raise AccelSimBackendError(f"{label} does not exist: {path}")
 
 
 @dataclass(frozen=True)
@@ -114,11 +172,19 @@ class AccelSimRunResult:
     cycles: int
     instructions: int
     stats: Mapping[str, int | float]
+    external_memory_stats: Mapping[str, int] | None
     output_directory: Path
 
 
 _STATISTIC = re.compile(
     r"^\s*([^=]+?)\s*=\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*$"
+)
+
+_RAMULATOR2_STATISTIC = re.compile(
+    r"heterosim_ramulator2(?:_summary)?\s+"
+    r"cycles=(\d+)\s+reads=(\d+)\s+writes=(\d+)\s+"
+    r"completed=(\d+)\s+rejected=(\d+)\s+outstanding=(\d+)\s+"
+    r"instances=(\d+)(?:\s+partitions=(\d+))?"
 )
 
 
@@ -134,6 +200,28 @@ def parse_accel_sim_stats(text: str) -> dict[str, int | float]:
     return stats
 
 
+def parse_ramulator2_stats(text: str) -> dict[str, int] | None:
+    matches = list(_RAMULATOR2_STATISTIC.finditer(text))
+    if not matches:
+        return None
+    match = matches[-1]
+    names = (
+        "cycles",
+        "reads",
+        "writes",
+        "completed",
+        "rejected",
+        "outstanding",
+        "instances",
+        "partitions",
+    )
+    return {
+        name: int(value)
+        for name, value in zip(names, match.groups())
+        if value is not None
+    }
+
+
 def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
@@ -145,6 +233,22 @@ class AccelSimBackend:
         self.config = config
 
     def descriptor(self) -> BackendDescriptor:
+        if self.config.external_memory is not None:
+            return BackendDescriptor(
+                backend_id=self.config.backend_id,
+                supported_duration_semantics=("coupled",),
+                ownable_resource_kinds=(
+                    "gpu_core",
+                    "gpu_l1",
+                    "gpu_l2",
+                    "gpu_noc",
+                    "shared_3d_dram",
+                ),
+                supported_exports=(),
+                supports_stall_resume=True,
+                supported_trace_semantics=("functional",),
+                qualification_records=("cycle_coupled_request_response",),
+            )
         return BackendDescriptor(
             backend_id=self.config.backend_id,
             supported_duration_semantics=("total",),
@@ -179,6 +283,18 @@ class AccelSimBackend:
             "backend_id": self.config.backend_id,
             "dependency_commits": self.config.dependency_commits,
             "environment": self.config.environment,
+            "external_memory": {
+                "kind": self.config.external_memory.kind,
+                "timing_owner": self.config.external_memory.timing_owner,
+                "config_sha256": hashlib.sha256(
+                    self.config.external_memory.config_file.read_bytes()
+                ).hexdigest(),
+                "bridge_sha256": hashlib.sha256(
+                    self.config.external_memory.bridge_library.read_bytes()
+                ).hexdigest(),
+            }
+            if self.config.external_memory is not None
+            else None,
             "gpgpu_config_sha256": hashlib.sha256(
                 self.config.gpgpu_config.read_bytes()
             ).hexdigest(),
@@ -211,6 +327,10 @@ class AccelSimBackend:
         try:
             environment = os.environ.copy()
             environment.update(self.config.environment)
+            if self.config.external_memory is not None:
+                environment["GPGPUSIM_RAMULATOR_CONFIG"] = str(
+                    self.config.external_memory.config_file
+                )
             process = subprocess.run(
                 command,
                 cwd=output_directory,
@@ -228,7 +348,8 @@ class AccelSimBackend:
             raise AccelSimBackendError(
                 f"Accel-Sim returned {process.returncode}; see {output_directory}"
             )
-        stats = parse_accel_sim_stats(process.stdout + "\n" + process.stderr)
+        combined_output = process.stdout + "\n" + process.stderr
+        stats = parse_accel_sim_stats(combined_output)
         missing = {"gpu_tot_sim_cycle", "gpu_tot_sim_insn"} - stats.keys()
         if missing:
             raise AccelSimBackendError(
@@ -236,6 +357,29 @@ class AccelSimBackend:
             )
         cycles = int(stats["gpu_tot_sim_cycle"])
         instructions = int(stats["gpu_tot_sim_insn"])
+        external_memory_stats = parse_ramulator2_stats(combined_output)
+        if self.config.external_memory is not None:
+            if external_memory_stats is None:
+                raise AccelSimBackendError(
+                    "external Ramulator2 is configured but emitted no bridge statistics"
+                )
+            if external_memory_stats["instances"] != self.config.external_memory.expected_instances:
+                raise AccelSimBackendError(
+                    "external Ramulator2 instance count violates the single-owner contract"
+                )
+            if external_memory_stats["outstanding"] != 0:
+                raise AccelSimBackendError(
+                    "external Ramulator2 exited with outstanding GPU requests"
+                )
+            accepted = external_memory_stats["reads"] + external_memory_stats["writes"]
+            if self.config.external_memory.require_nonzero_requests and accepted == 0:
+                raise AccelSimBackendError(
+                    "external Ramulator2 accepted zero requests; the trace did not exercise the cycle bridge"
+                )
+            if external_memory_stats["completed"] != accepted:
+                raise AccelSimBackendError(
+                    "external Ramulator2 did not complete every accepted GPU request"
+                )
         duration_fs = math.ceil(cycles * 1_000_000_000_000_000 / self.config.core_frequency_hz)
         result = AccelSimRunResult(
             command=command,
@@ -244,6 +388,7 @@ class AccelSimBackend:
             cycles=cycles,
             instructions=instructions,
             stats=stats,
+            external_memory_stats=external_memory_stats,
             output_directory=output_directory,
         )
         _write_json(
@@ -256,6 +401,7 @@ class AccelSimBackend:
                 "duration_fs": duration_fs,
                 "core_frequency_hz": self.config.core_frequency_hz,
                 "raw_stats": stats,
+                "external_memory_stats": external_memory_stats,
             },
         )
         return result
@@ -268,6 +414,11 @@ class AccelSimBackend:
             "gpu_tot_sim_cycle": [baseline.cycles, adapter.cycles],
             "gpu_tot_sim_insn": [baseline.instructions, adapter.instructions],
         }
+        if self.config.external_memory is not None:
+            compared["external_memory_stats"] = [
+                baseline.external_memory_stats,
+                adapter.external_memory_stats,
+            ]
         passed = all(left == right for left, right in compared.values())
         record = output_directory / "qualification_record.json"
         _write_json(
@@ -291,12 +442,23 @@ class AccelSimBackend:
                 },
                 "comparison": compared,
                 "exact_match_required": True,
-                "qualified_scopes": ["adapter_equivalence"],
+                "qualified_scopes": [
+                    "cycle_coupled_request_response"
+                    if self.config.external_memory is not None
+                    else "adapter_equivalence"
+                ],
                 "replay_safety_qualified": False,
                 "timing_ownership": {
-                    "gpu_core_cache_noc_local_dram": "accel_sim",
-                    "external_ramulator2": False,
-                    "duration_mode": "total",
+                    "gpu_core_cache_noc": "accel_sim",
+                    "gpu_local_dram": "accel_sim"
+                    if self.config.external_memory is None
+                    else None,
+                    "external_ramulator2": self.config.external_memory.timing_owner
+                    if self.config.external_memory is not None
+                    else False,
+                    "duration_mode": "coupled"
+                    if self.config.external_memory is not None
+                    else "total",
                 },
             },
         )

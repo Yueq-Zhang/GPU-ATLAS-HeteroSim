@@ -58,3 +58,41 @@ def test_duplicate_request_id_is_rejected() -> None:
     )
     with pytest.raises(ConfigError, match="duplicate request_id"):
         validate_config(broken)
+
+
+def test_gpu_only_shared_memory_rejects_logic_die_initiator() -> None:
+    config = load_and_validate_config(
+        "configs/hetero/experiments/m8_model3_gpu_only_no_logic_die_reference.json"
+    )
+    broken = deepcopy(config)
+    broken["system"]["memory_services"]["shared0.dram3d"]["initiator_order"] = [
+        "gpu0",
+        "atlas0.compute",
+    ]
+    with pytest.raises(ConfigError, match="requires initiator_order"):
+        validate_config(broken)
+
+
+def test_gpu_only_shared_memory_requires_disabled_atlas_backend() -> None:
+    config = load_and_validate_config(
+        "configs/hetero/experiments/m8_model3_gpu_only_no_logic_die_reference.json"
+    )
+    broken = deepcopy(config)
+    broken["backends"]["atlas"] = {
+        "kind": "analytical",
+        "effective_compute_flops_per_s": 1,
+        "effective_memory_bandwidth_Bps": 1,
+        "parameter_source": "test",
+    }
+    with pytest.raises(ConfigError, match="backends.atlas.kind=none"):
+        validate_config(broken)
+
+
+def test_gpu_only_shared_memory_rejects_non_gpu_placement() -> None:
+    config = load_and_validate_config(
+        "configs/hetero/experiments/m8_model3_gpu_only_no_logic_die_reference.json"
+    )
+    broken = deepcopy(config)
+    broken["placement"]["default_target"] = "atlas0.compute"
+    with pytest.raises(ConfigError, match="placement.default_target=gpu0"):
+        validate_config(broken)

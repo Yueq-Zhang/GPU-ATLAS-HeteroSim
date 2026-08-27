@@ -13,6 +13,13 @@ from .contracts import (
     TimingOwnershipRegistry,
     resolve_timing_contract,
 )
+from .memory_bridge import MemoryBridgeError, run_jsonl_bridge
+from .ramulator2 import (
+    Ramulator2Backend,
+    Ramulator2BackendConfig,
+    Ramulator2BackendError,
+    Ramulator2RunResult,
+)
 from .atlas import (
     AtlasArtifact,
     AtlasBackend,
@@ -30,6 +37,12 @@ __all__ = [
     "ResolvedTimingContract",
     "TimingContractError",
     "TimingOwnershipRegistry",
+    "MemoryBridgeError",
+    "run_jsonl_bridge",
+    "Ramulator2Backend",
+    "Ramulator2BackendConfig",
+    "Ramulator2BackendError",
+    "Ramulator2RunResult",
     "resolve_timing_contract",
     "AtlasArtifact",
     "AtlasBackend",

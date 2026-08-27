@@ -1,0 +1,13 @@
+{
+  "mode": "manual",
+  "unit": "device_subbatch_operator",
+  "default_target": "gpu0",
+  "rules": [],
+  "data": {
+    "kv_cache": {
+      "home": "gpu_device_memory",
+      "layout": "paged",
+      "page_tokens": 16
+    }
+  }
+}

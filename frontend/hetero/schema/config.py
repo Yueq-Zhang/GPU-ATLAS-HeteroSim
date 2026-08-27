@@ -35,7 +35,7 @@ _PROFILES = {
 
 _COUPLINGS = {"analytical", "operator_event", "request_cycle"}
 _GPU_BACKENDS = {"roofline", "accel_sim"}
-_ATLAS_BACKENDS = {"atlasim", "analytical"}
+_ATLAS_BACKENDS = {"none", "atlasim", "analytical"}
 _HOST_BACKENDS = {"none", "analytical", "gem5"}
 _GENERATION_MODES = {
     "trace_locked",
@@ -55,6 +55,12 @@ _MODEL_REQUIRED = {
     "vocab_size",
     "dtype",
     "bytes_per_element",
+}
+_MODEL_OPTIONAL = {
+    "architecture",
+    "mlp_type",
+    "position_encoding",
+    "tied_embeddings",
 }
 
 
@@ -107,14 +113,28 @@ def validate_config(config: Mapping[str, Any]) -> None:
         raise ConfigError("invalid experiment.generation_mode")
 
     simulation = _mapping(config, "simulation")
-    _reject_unknown(simulation, {"coupling", "execution_mode"}, "simulation")
+    _reject_unknown(
+        simulation,
+        {"coupling", "execution_mode", "validation_policy"},
+        "simulation",
+    )
     coupling = simulation.get("coupling")
     if coupling not in _COUPLINGS:
         raise ConfigError("invalid simulation.coupling")
 
     system = _mapping(config, "system")
     _reject_unknown(
-        system, {"profile", "topology_ref", "access_policy", "links"}, "system"
+        system,
+        {
+            "profile",
+            "topology_ref",
+            "access_policy",
+            "links",
+            "memory_services",
+            "memory_ports",
+            "cxl",
+        },
+        "system",
     )
     profile = system.get("profile")
     if profile not in _PROFILES:
@@ -140,6 +160,9 @@ def validate_config(config: Mapping[str, Any]) -> None:
                 "artifact_bindings",
                 "resource_bindings",
                 "fallback_kind",
+                "external_memory_bridge",
+                "exports_memory_requests",
+                "supports_stall_resume",
             },
             f"backends.{backend_name}",
         )
@@ -158,7 +181,7 @@ def validate_config(config: Mapping[str, Any]) -> None:
         "full_runtime",
     }:
         raise ConfigError("invalid simulation.execution_mode")
-    if execution_mode in {"analytical_preview", "operator_event"}:
+    if execution_mode in {"analytical_preview", "operator_event", "full_runtime"}:
         for backend_name, backend in (("gpu", gpu), ("atlas", atlas)):
             needs_analytical = backend.get("kind") in {"roofline", "analytical"} or (
                 backend.get("fallback_kind") == "analytical"
@@ -221,6 +244,11 @@ def validate_config(config: Mapping[str, Any]) -> None:
                     "header_bytes",
                     "resource_id",
                     "parameter_source",
+                    "queue_depth_transactions",
+                    "credits",
+                    "full_duplex",
+                    "max_payload_bytes",
+                    "protocol",
                 },
                 f"system.links.{link_id}",
             )
@@ -234,8 +262,105 @@ def validate_config(config: Mapping[str, Any]) -> None:
                 if not isinstance(link.get(field), str) or not link[field]:
                     raise ConfigError(f"system.links.{link_id}.{field} is required")
 
+        memory_services = system.get("memory_services", {})
+        if not isinstance(memory_services, Mapping):
+            raise ConfigError("system.memory_services must be an object")
+        for memory_id, memory in memory_services.items():
+            if not isinstance(memory_id, str) or not memory_id or not isinstance(memory, Mapping):
+                raise ConfigError("system.memory_services entries must be named objects")
+            _reject_unknown(
+                memory,
+                {
+                    "kind",
+                    "access_mode",
+                    "timing_owner",
+                    "channel_count",
+                    "banks_per_channel",
+                    "transaction_bytes",
+                    "queue_depth_per_initiator",
+                    "fixed_latency_fs",
+                    "channel_injection_interval_fs",
+                    "bank_busy_time_fs",
+                    "initiator_order",
+                    "config_ref",
+                    "parameter_source",
+                },
+                f"system.memory_services.{memory_id}",
+            )
+            if memory.get("kind") not in {"shared_3d_reference", "ramulator2"}:
+                raise ConfigError(f"invalid memory service kind for {memory_id}")
+            access_mode = memory.get("access_mode", "shared_gpu_atlas")
+            if access_mode not in {"gpu_only", "shared_gpu_atlas"}:
+                raise ConfigError(
+                    f"invalid system.memory_services.{memory_id}.access_mode"
+                )
+            if memory.get("kind") == "shared_3d_reference":
+                for field in (
+                    "channel_count",
+                    "banks_per_channel",
+                    "transaction_bytes",
+                    "queue_depth_per_initiator",
+                    "fixed_latency_fs",
+                ):
+                    _positive_int(
+                        memory.get(field),
+                        f"system.memory_services.{memory_id}.{field}",
+                    )
+                _unsigned_int(
+                    memory.get("channel_injection_interval_fs", 0),
+                    f"system.memory_services.{memory_id}.channel_injection_interval_fs",
+                )
+                _unsigned_int(
+                    memory.get("bank_busy_time_fs", 0),
+                    f"system.memory_services.{memory_id}.bank_busy_time_fs",
+                )
+                initiators = memory.get("initiator_order")
+                if not isinstance(initiators, list) or not initiators or any(
+                    not isinstance(item, str) or not item for item in initiators
+                ):
+                    raise ConfigError(
+                        f"system.memory_services.{memory_id}.initiator_order is required"
+                    )
+                if len(set(initiators)) != len(initiators):
+                    raise ConfigError(
+                        f"system.memory_services.{memory_id}.initiator_order contains duplicates"
+                    )
+                if access_mode == "gpu_only" and initiators != ["gpu0"]:
+                    raise ConfigError(
+                        f"system.memory_services.{memory_id}.access_mode=gpu_only "
+                        "requires initiator_order=['gpu0']"
+                    )
+            elif not isinstance(memory.get("config_ref"), str) or not memory["config_ref"]:
+                raise ConfigError(
+                    f"system.memory_services.{memory_id}.config_ref is required"
+                )
+            for field in ("timing_owner", "parameter_source"):
+                if not isinstance(memory.get(field), str) or not memory[field]:
+                    raise ConfigError(
+                        f"system.memory_services.{memory_id}.{field} is required"
+                    )
+
+        if execution_mode == "full_runtime":
+            if coupling != "request_cycle":
+                raise ConfigError("full_runtime requires request_cycle coupling")
+            if profile == "model3_gpu_native_3ddram":
+                shared = memory_services.get("shared0.dram3d")
+                if not isinstance(shared, Mapping):
+                    raise ConfigError(
+                        "Model 3 full_runtime requires shared0.dram3d memory service"
+                    )
+                if shared.get("timing_owner") != "shared3d.memory_service":
+                    raise ConfigError(
+                        "Model 3 shared DRAM must have exactly one shared3d.memory_service owner"
+                    )
+                if shared.get("access_mode", "shared_gpu_atlas") == "gpu_only":
+                    if atlas.get("kind") != "none":
+                        raise ConfigError(
+                            "Model 3 gpu_only shared DRAM requires backends.atlas.kind=none"
+                        )
+
     model = _mapping(config, "model")
-    _reject_unknown(model, _MODEL_REQUIRED, "model")
+    _reject_unknown(model, _MODEL_REQUIRED | _MODEL_OPTIONAL, "model")
     missing_model = _MODEL_REQUIRED - set(model)
     if missing_model:
         raise ConfigError(f"missing model fields: {sorted(missing_model)}")
@@ -247,6 +372,12 @@ def validate_config(config: Mapping[str, Any]) -> None:
         raise ConfigError(
             "model.num_attention_heads * model.head_dim must equal hidden_size"
         )
+    if model.get("mlp_type", "swiglu") not in {"swiglu", "dense_gelu"}:
+        raise ConfigError("invalid model.mlp_type")
+    if model.get("position_encoding", "rope") not in {"rope", "learned_absolute"}:
+        raise ConfigError("invalid model.position_encoding")
+    if not isinstance(model.get("tied_embeddings", True), bool):
+        raise ConfigError("model.tied_embeddings must be a boolean")
 
     scheduling = _mapping(config, "scheduling")
     _reject_unknown(
@@ -299,6 +430,8 @@ def validate_config(config: Mapping[str, Any]) -> None:
                 "prompt_length",
                 "output_length",
                 "priority",
+                "execution_scope",
+                "initial_kv_length",
             },
             f"workload.requests[{index}]",
         )
@@ -310,6 +443,15 @@ def validate_config(config: Mapping[str, Any]) -> None:
         request_ids.add(request_id)
         _positive_int(request.get("prompt_length"), f"requests[{index}].prompt_length")
         _positive_int(request.get("output_length"), f"requests[{index}].output_length")
+        scope = request.get("execution_scope", "full_request")
+        if scope not in {"full_request", "decode_step"}:
+            raise ConfigError(f"requests[{index}].execution_scope is invalid")
+        initial_kv = request.get("initial_kv_length", 0)
+        _unsigned_int(initial_kv, f"requests[{index}].initial_kv_length")
+        if scope == "decode_step" and int(initial_kv) <= 0:
+            raise ConfigError(
+                f"requests[{index}].decode_step requires initial_kv_length"
+            )
         arrival = request.get("arrival_time_fs", 0)
         if not isinstance(arrival, int) or isinstance(arrival, bool) or arrival < 0:
             raise ConfigError(f"requests[{index}].arrival_time_fs must be unsigned")
@@ -320,13 +462,44 @@ def validate_config(config: Mapping[str, Any]) -> None:
     )
     if placement.get("mode") not in {"manual", "rule_based", "auto_dse"}:
         raise ConfigError("invalid placement.mode")
+    if execution_mode == "full_runtime" and profile == "model3_gpu_native_3ddram":
+        shared = system.get("memory_services", {}).get("shared0.dram3d", {})
+        if (
+            isinstance(shared, Mapping)
+            and shared.get("access_mode", "shared_gpu_atlas") == "gpu_only"
+        ):
+            if placement.get("default_target", "gpu0") != "gpu0":
+                raise ConfigError(
+                    "Model 3 gpu_only shared DRAM requires placement.default_target=gpu0"
+                )
+            rules = placement.get("rules", [])
+            if not isinstance(rules, list) or any(
+                not isinstance(rule, Mapping) or rule.get("target") != "gpu0"
+                for rule in rules
+            ):
+                raise ConfigError(
+                    "Model 3 gpu_only shared DRAM placement rules may only target gpu0"
+                )
 
     address = _mapping(config, "address")
     _reject_unknown(
-        address, {"allocator", "page_tokens", "kv_capacity_bytes"}, "address"
+        address,
+        {
+            "allocator",
+            "page_tokens",
+            "kv_capacity_bytes",
+            "allocation_alignment_bytes",
+            "memory_spaces",
+            "address_mapping",
+        },
+        "address",
     )
     _positive_int(address.get("page_tokens"), "address.page_tokens")
     _positive_int(address.get("kv_capacity_bytes"), "address.kv_capacity_bytes")
+    _positive_int(
+        address.get("allocation_alignment_bytes", 64),
+        "address.allocation_alignment_bytes",
+    )
 
     if profile == "model4_cxl_memory_tier":
         access_policy = system.get("access_policy", "copy")
