@@ -52,6 +52,7 @@ def test_capture_and_simulation_bindings_are_separate(tmp_path) -> None:
     path = tmp_path / "manifest.json"
     path.write_text(json.dumps(payload), encoding="utf-8")
     manifest = TraceManifest.load(path)
+    assert len(manifest.trace_key()) == 64
     normalized = manifest.normalize(0x7F2000000180)
     assert normalized.tensor_id == "A"
     assert normalized.tensor_offset == 1024 + 0x180

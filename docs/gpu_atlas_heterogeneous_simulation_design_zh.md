@@ -5,8 +5,8 @@
 | 字段 | 内容 |
 | --- | --- |
 | 状态 | 已冻结的实现基线 |
-| 版本 | 1.4 |
-| 日期 | 2026-08-27 |
+| 版本 | 1.5 |
+| 日期 | 2026-08-28 |
 | 适用工程 | ATLAS-MICRO-2026 |
 | 当前基线提交 | b2787399408e32d327c820daee96d4e6610f551a |
 | 主要目标 | GPU 与 3D-DRAM Compute Die/ATLAS 的端到端 LLM 联合仿真 |
@@ -2637,6 +2637,9 @@ TPOT 平均值和 ITL 百分位必须分开报告；`G=1` 请求的 TPOT 为 `nu
 38. `write_ack_policy=durable`必须等待全部内部写完成；`posted`必须同时记录GPU-visible和durable完成并在退出前排空。
 39. Ramulator2的`DQ/channel_width/rate/nBL/tCK/transaction_bytes`不能导出互相矛盾的峰值带宽。
 40. Model 2的PCIe只承载DMA/Page Migration Parent；Model 3 LLC Miss和Model 4 CXL.mem Remote使用各自明确的细粒度Parent语义。
+41. ATLAS原生`ComponentInput`端口通过不等于完整`atlasim.Chip`已经与Accel-Sim并发；资格记录必须分别标记`memory_port`和`full_chip_scheduler`覆盖范围。
+42. GPU Trace与ATLAS Artifact做性能比较前，模型Revision、算子、Phase、Batch、Context、Dtype和完整Shape必须逐字段相等；任一不匹配时比较生成器必须失败。
+43. 单算子资格结果不得外推为完整Layer、端到端模型或多Batch吞吐；报告必须携带明确的Artifact Coverage。
 
 ---
 
@@ -2715,3 +2718,4 @@ TPOT 平均值和 ITL 百分位必须分开报告；`G=1` 请求的 TPOT 为 `nu
 | 1.2 | 2026-08-26 | 增加已有KV的显式decode_step微基准语义；固化参考full_runtime、动态地址复用、有界PCIe/CXL、共享3D内存参考服务和外部Memory Bridge与目标Backend资格验证的边界 |
 | 1.3 | 2026-08-27 | 固化Model 3 GPU-only无竞争基线：全部算子位于GPU、Logic Die Backend关闭、共享3D-DRAM仅允许GPU请求，并强制派生任务、路由、请求和守恒验收；双发起方竞争作为后续独立模式开启 |
 | 1.4 | 2026-08-27 | 固化GPU外部带宽与Logic Die/3D-DRAM内部带宽分离；新增双向外部Link、LogicDieMemoryGateway、Parent/Child拆分汇聚、durable完成、多时钟域、带宽一致性校验和拓扑特定请求语义；明确当前单请求Bridge仅是最小资格原型 |
+| 1.5 | 2026-08-28 | 记录P1–P7分层内存路径与ATLAS内部端口已经实现；固化端口级与完整Chip级资格边界；新增真实LLM Trace/ATLAS Artifact逐字段形状匹配门槛和单算子外推限制 |

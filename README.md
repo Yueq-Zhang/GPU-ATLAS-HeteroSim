@@ -2,7 +2,7 @@
 
 GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端到端 LLM 联合仿真工程。工程把完整 Prefill/Decode 请求图、算子放置、跨设备数据移动、Paged KV Cache 和全局事件调度连接到同一条可复现运行路径。
 
-> 当前版本为 `0.6.1`。四种Profile已经拥有统一的 `full_runtime` 参考执行入口；Accel-Sim 已迁移到 v2.0.0，并在本机 RTX 3070/驱动 591.86 上完成 NVBit 1.8 `.tracez` 采集与适配器等价验证。参考运行和未校准配置始终输出 `performance_claim_allowed=false`；外部Ramulator2、RTX 4090 Trace和真实LLM Artifact的资格验证留待后续完成。
+> 当前版本为 `0.7.0`。P1–P7 分层内存路径已实现并通过微基准资格验证；本机 RTX 3070/驱动 591.86 已采集 TinyLlama‑1.1B 真实 Q 投影 Trace，并完成 Accel‑Sim 2.0 原生显存、GPU 经外部链路访问 ATLAS 风格 3D‑DRAM、以及匹配 ATLAS 算子 Artifact 的逐周期运行。当前证据严格限定为一个真实算子；完整层、端到端 LLM、多 Batch 周期执行和完整 ATLAS Chip 与 GPU 同时运行仍待后续实现。
 
 完整架构约束以 [GPU + ATLAS 异构端到端仿真实现规范](docs/gpu_atlas_heterogeneous_simulation_design_zh.md) 为准，阶段进度见 [实现状态](docs/IMPLEMENTATION_STATUS.md)。
 
@@ -22,6 +22,10 @@ GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端�
 - C++ Paged KV 分配器、固定延迟内存服务和时序所有权冲突检查；
 - C++ Runtime Memory Planner：多Memory Space、对齐、First-Fit、释放、合并与地址复用；
 - C++ Shared3DMemoryModel：GPU/ATLAS双发起方、Channel/Bank译码、父子事务拆分、轮询仲裁、背压与字节守恒；
+- Cycle-Accurate ABI v2：GPU Parent经双向外部Link进入Logic-Die Gateway，按Byte/Sector Mask拆分为64B Child，全部完成后才经响应Link返回；
+- GPU、外部Link、Logic Die和DRAM独立时钟域，默认durable写确认，退出时强制零在途；
+- ATLAS原生`ComponentInput`内部Hybrid-Bond端口，和GPU端口共享唯一Ramulator2；GPU-only、ATLAS-only和双发起方竞争黄金用例均已通过；
+- TinyLlama‑1.1B layer-0 Q投影的真实SM86 Trace、16核ATLAS列分块Artifact和形状锁定比较生成器；
 - C++ BoundedLinkModel：PCIe/CXL队列深度、Credit、全双工序列化、传播延迟与背压；
 - Static Ragged、Continuous/Chunked Prefill与按设备拆分的Device Sub-Batch计划；
 - TraceAddr → TensorID+offset → Global PA 的JSONL外部内存桥协议；
@@ -123,7 +127,7 @@ ctest --test-dir simulator/build --output-on-failure
 .venv/bin/python -m pytest tests/hetero -q
 ```
 
-当前基线通过 9 个 C++ 测试和 63 个 Python 测试。测试数量会随实现推进增加；判断成功应以“0 failed”为准，而不是永久依赖固定数量。
+当前基线通过 9 个 C++ 测试和 73 个 Python 测试。测试数量会随实现推进增加；判断成功应以“0 failed”为准，而不是永久依赖固定数量。
 
 强制重新编译已有目标：
 
@@ -645,15 +649,22 @@ GPU Warp/Instruction
         ↓
 Accel-Sim SM → L1 → L2 → NoC
                          ↓ L2/MC request（地址 + mem_fetch）
+               GPU Parent Request
+                         ↓
+            外部请求Link（带宽/协议/Credit）
+                         ↓
+              LogicDieMemoryGateway
+              Parent Table + 64B Child拆分
+                         ↓
                  唯一 Ramulator2 实例
                  Channel/Bank/Row 时序推进
-                         ↓ completion callback
-              原 memory partition 返回响应
+                         ↓ 全部Child完成
+              外部响应Link → Parent Join
                          ↓
                 Cache/Warp 解除等待并继续
 ```
 
-当前首个资格模式固定为 GPU-only：ATLAS Logic Die 不发请求，因此不含 GPU/PIM 竞争；Accel-Sim 负责 GPU Core/L1/L2/NoC，Ramulator2 是唯一 DRAM 时序所有者。全部 GPU memory partition 连接同一个 Ramulator2，而不是每个 partition 各建一个内存系统。读请求必须等待回调；写回采用 posted-write 语义，但进程退出前会排空 Ramulator2 写队列。
+Accel-Sim负责GPU Core/L1/L2/NoC，Ramulator2是唯一DRAM时序所有者。全部GPU Memory Partition连接同一个Gateway和Ramulator2，而不是每个Partition各建一个内存系统。GPU读请求必须等待全部Child和响应Link；写请求默认使用durable确认。ATLAS端口接收原生`atlasim::ComponentInput`，复用ATLAS `HBFrontend`的Tile遍历、地址对齐和读写生成规则，但从内部Hybrid-Bond端口进入Gateway，不经过GPU外部Link。
 
 ### 14.1 构建
 
@@ -668,7 +679,8 @@ bash scripts/build_accel_sim_ramulator2.sh
 
 - `build-ramulator2/accel-sim.out`：带外部 DRAM 回调的 Accel-Sim v2；
 - `libramulator_gpgpusim_bridge.so`：单实例 Ramulator2 桥；
-- `ramulator_bridge_smoke`：4 个 GPU partition 共享一个实例的最小测试。
+- `ramulator_bridge_smoke`：GPU分层请求/响应路径测试；
+- `dual_initiator_smoke`：GPU外部端口与ATLAS内部端口共享DRAM的三组黄金对照。
 
 ### 14.2 资格运行
 
@@ -685,9 +697,9 @@ bash scripts/build_accel_sim_ramulator2.sh
 
 `ramulator2_hbm3_32ch_gpu_only.yaml` 目前是 HBM3 32 通道功能配置，并非已经按 ATLAS 论文中的 Stack/Logic Die 参数完成校准。RTX 3070 的 4096 元素 `vector_add` Trace 中，全局读被预加载数据命中 L2，未产生外部读请求，因而不用于这项请求闭环资格验证。后续 LLM 评估必须采集能覆盖目标 GEMM/Attention/KV 算子的精确 Trace，不能由该 Backprop 微基准外推。
 
-### 14.3 下一阶段：外部链路与Logic Die内部事务分层
+### 14.3 已完成：外部链路与Logic Die内部事务分层
 
-当前Bridge是最小资格原型：一个GPU `mem_fetch`直接对应一个Ramulator2请求。正式Model 3/4周期路径将升级为：
+当前Bridge ABI v2的数据路径为：
 
 ```text
 GPU Parent Request
@@ -702,4 +714,61 @@ GPU Parent Request
 
 外部GPU↔Logic Die带宽与Logic Die↔3D-DRAM内部带宽是不同资源，允许且通常满足`B_external < B_internal`。读请求只有在全部Child和响应Link完成后才能解除GPU阻塞；写请求默认采用durable确认，posted write必须显式配置并在退出前排空。
 
-当前HBM3候选配置还没有使`DQ`、默认`channel_width`、Burst、`tCK`和事务大小导出一致的峰值带宽，因此现有Backprop结果只验证请求/回调闭环，不验证有效带宽。实施顺序和验收条件以[设计规范v1.4](docs/gpu_atlas_heterogeneous_simulation_design_zh.md)和[进度/差距表](README_PROGRESS_GAP_zh.md)为准。
+配置加载时会同时校验`DQ/channel_width/rate/nBL/tCK/prefetch/transaction_bytes`。当前ATLAS风格候选为16通道、每通道512-bit、400 MT/s、64B事务，对应内部峰值`409.6 GB/s`；GPU外部直连PHY默认`12.8 GB/s`。资格命令：
+
+```bash
+bash scripts/qualify_gpu_only_memory_path.sh \
+  /opt/gpu-atlas/qualification/gpu-only-layered-memory-path
+
+bash scripts/qualify_dual_initiator_memory_path.sh \
+  /opt/gpu-atlas/qualification/dual-initiator-memory-path
+```
+
+GPU分层用例分别构造外部Link瓶颈和内部DRAM瓶颈，并检查Parent/Child、Payload/Wire Byte、durable完成和独立时钟比。双发起方用例结果为：GPU-only `163` DRAM cycles，ATLAS-only `90`，并发`239`；并发时GPU与ATLAS完成时间都变长，且始终只有一个Ramulator2实例。该ATLAS端口资格验证的是原生`ComponentInput`访问合同和共享内存竞争，还不是完整`atlasim.Chip`调度器与Accel-Sim同时推进。
+
+### 14.4 TinyLlama真实Q投影的形状匹配资格运行
+
+当前第一个真实LLM Artifact固定为`TinyLlama/TinyLlama-1.1B-Chat-v1.0`、revision `fe8a4e...`、layer-0 `q_proj`、FP16、BS=1、已有KV长度1024、单步Decode，矩阵形状为`M=1, K=2048, N=2048`。GPU侧Trace包含一个CUTLASS WMMA GEMM Kernel和一个Split-K Reduction Kernel；ATLAS侧把N维按16核均分为每核128列，使用`1×512×16` Tile。
+
+重新生成ATLAS Artifact：
+
+```bash
+/opt/conda/envs/atlas/bin/python scripts/generate_atlas_qproj_artifact.py \
+  --output configs/hetero/atlas/tinyllama11b_qproj_decode_bs1_ctx1024
+```
+
+在已有本地Checkpoint上重新采集GPU Trace：
+
+```bash
+export ACTIVE_FROM_START=1
+export DYNAMIC_KERNEL_RANGE=4-5
+bash scripts/capture_accel_sim_trace.sh \
+  /opt/conda/envs/qserve-local/bin/python \
+  /opt/gpu-atlas/qualification/tinyllama-qproj-decode-sm86-kernels4-5 \
+  workloads/python/tinyllama_q_projection.py \
+  --model /opt/hf-cache/hub/models--TinyLlama--TinyLlama-1.1B-Chat-v1.0/snapshots/fe8a4ea1ffedaf415f4da2f062534de366a451e6 \
+  --phase decode --context 1024
+```
+
+三条资格路径：
+
+```bash
+.venv/bin/python -m frontend.hetero.cli qualify-gpu \
+  --backend-config configs/hetero/backends/gpu_accelsim_rtx3070.json \
+  --trace-manifest configs/hetero/traces/local_rtx3070_tinyllama11b_qproj_decode_v2.json \
+  --output /opt/gpu-atlas/qualification/accel-sim-v2/rtx3070-tinyllama11b-qproj-decode-ctx1024
+
+.venv/bin/python -m frontend.hetero.cli qualify-gpu \
+  --backend-config configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch.json \
+  --trace-manifest configs/hetero/traces/local_rtx3070_tinyllama11b_qproj_decode_v2.json \
+  --output /opt/gpu-atlas/qualification/accel-sim-v2/rtx3070-tinyllama11b-qproj-decode-ctx1024-shared-hbdram
+
+/opt/conda/envs/atlas/bin/python -m frontend.hetero.cli qualify-atlas \
+  --backend-config configs/hetero/backends/atlas_test_chip_16ch.json \
+  --chip-config configs/hetero/atlas/tinyllama_qproj_edge_16core_chip.yaml \
+  --operator-list configs/hetero/atlas/tinyllama11b_qproj_decode_bs1_ctx1024/operator_description.yaml \
+  --placement-map configs/hetero/atlas/tinyllama11b_qproj_decode_bs1_ctx1024/data_placement.yaml \
+  --output /opt/gpu-atlas/qualification/atlas/tinyllama11b-qproj-decode-bs1-ctx1024-edge16
+```
+
+已验证结果：RTX 3070原生显存为`36,324 cycles / 32.088 µs`；GPU经12.8 GB/s外部Link访问409.6 GB/s内部3D-DRAM为`1,498,113 cycles / 1,323.421 µs`；ATLAS内部3D-DRAM为`24,613 cycles / 24.613 µs`。这三项是同Checkpoint、同算子和同Shape，但计算微架构不同；只可作为当前配置研究结果，不能外推为整层、端到端模型或实测硬件加速比。详细证据见[TinyLlama Q投影资格对比](docs/qualification/tinyllama11b_qproj_gpu_vs_atlas.md)。

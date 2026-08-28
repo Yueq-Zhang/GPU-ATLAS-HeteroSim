@@ -1,0 +1,19 @@
+diff --git a/src/dram_controller/impl/generic_dram_controller.cpp b/src/dram_controller/impl/generic_dram_controller.cpp
+--- a/src/dram_controller/impl/generic_dram_controller.cpp
++++ b/src/dram_controller/impl/generic_dram_controller.cpp
+@@ -211,3 +211,4 @@
+           } else if (req_it->type_id == Request::Type::Write) {
+-            // TODO: Add code to update statistics
++            req_it->depart = m_clk + m_dram->m_timing_vals("nBL");
++            pending.push_back(*req_it);
+           }
+@@ -310,7 +311,8 @@
+         auto& req = pending[0];
+         if (req.depart <= m_clk) {
+           // Request received data from dram
+-          if (req.depart - req.arrive > 1) {
++          if (req.type_id == Request::Type::Read &&
++              req.depart - req.arrive > 1) {
+             // Check if this requests accesses the DRAM or is being forwarded.
+             // TODO add the stats back
+             s_read_latency += req.depart - req.arrive;

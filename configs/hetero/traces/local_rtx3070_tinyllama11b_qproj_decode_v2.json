@@ -1,0 +1,72 @@
+{
+  "schema_version": "hetero-trace-manifest/v1",
+  "trace_id": "local.rtx3070.tinyllama11b.layer0_qproj.decode.bs1_ctx1024.fp16.accel_sim_v2",
+  "trace_semantics": "functional",
+  "replay_safe": false,
+  "qualification_record": null,
+  "kernels_list": "/opt/gpu-atlas/qualification/tinyllama-qproj-decode-sm86-kernels4-5/traces/kernelslist.g",
+  "capture": {
+    "source": "local exact-checkpoint operator qualification",
+    "tool": "NVBit",
+    "version": "1.8",
+    "accel_sim": "v2.0.0",
+    "gpu": "NVIDIA GeForce RTX 3070",
+    "driver": "591.86",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "operator": "model.layers.0.self_attn.q_proj",
+    "shape": {"m": 1, "n": 2048, "k": 2048},
+    "dtype": "fp16",
+    "batch_size": 1,
+    "context_length": 1024,
+    "kernel_range": "4-5",
+    "scope": "one_exact_operator_not_end_to_end"
+  },
+  "compilation": {
+    "pytorch": "2.3.0+cu121",
+    "cuda_runtime": "12.1",
+    "target_sm": 86,
+    "kernel_library": "cuBLAS/CUTLASS WMMA"
+  },
+  "address_ranges": [
+    {
+      "capture_allocation_id": "tinyllama.qproj.input.capture0",
+      "trace_base": 47380091392,
+      "size_bytes": 4096,
+      "tensor_id": "tinyllama.layer0.qproj.input",
+      "tensor_offset_bytes": 0,
+      "capture_epoch": 0,
+      "backing_allocation_id": "tinyllama.qproj.input.capture0",
+      "view_offset_bytes": 0,
+      "alignment_bytes": 256,
+      "shape": [1, 2048],
+      "layout": "row_major"
+    },
+    {
+      "capture_allocation_id": "tinyllama.qproj.output.capture0",
+      "trace_base": 47380095488,
+      "size_bytes": 4096,
+      "tensor_id": "tinyllama.layer0.qproj.output",
+      "tensor_offset_bytes": 0,
+      "capture_epoch": 0,
+      "backing_allocation_id": "tinyllama.qproj.output.capture0",
+      "view_offset_bytes": 0,
+      "alignment_bytes": 256,
+      "shape": [1, 2048],
+      "layout": "row_major"
+    },
+    {
+      "capture_allocation_id": "tinyllama.layer0.qproj.weight.capture0",
+      "trace_base": 47286583296,
+      "size_bytes": 8388608,
+      "tensor_id": "tinyllama.layer0.qproj.weight",
+      "tensor_offset_bytes": 0,
+      "capture_epoch": 0,
+      "backing_allocation_id": "tinyllama.layer0.qproj.weight.capture0",
+      "view_offset_bytes": 0,
+      "alignment_bytes": 256,
+      "shape": [2048, 2048],
+      "layout": "row_major_backing_transposed_view"
+    }
+  ]
+}

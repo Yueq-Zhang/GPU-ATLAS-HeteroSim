@@ -1,0 +1,25 @@
+architecture:
+  frequency: 1000
+  core_num: 16
+  core:
+    controller:
+      power: 0.099
+      area: 0.387
+    matrix:
+      mac_num: 48
+      power: 0.0421
+      area: 1.2305
+    vector:
+      vec_num: 96
+      power: 0.1623
+      area: 2.907
+    buffer:
+      buffer_size: 38
+      read_bw: 256.0
+      write_bw: 256.0
+      power: 0.0617
+      area: 0.5485
+  dram:
+    config_path: /opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/memory/ramulator2_hbdram_edge_per_core_8ch.yaml
+    power: 0.191
+    area: 1.3317

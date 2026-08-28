@@ -174,6 +174,10 @@ class AtlasBackend:
         )
 
     def simulation_key(self, chip_path: Path, artifact: AtlasArtifact) -> str:
+        chip_path = chip_path.resolve()
+        artifact = AtlasArtifact(
+            artifact.operator_list.resolve(), artifact.placement_map.resolve()
+        )
         payload = {
             "backend_id": self.config.backend_id,
             "dependency_commits": self.config.dependency_commits,
@@ -194,6 +198,12 @@ class AtlasBackend:
         artifact: AtlasArtifact,
         output_directory: Path,
     ) -> AtlasRunResult:
+        # The subprocess runs from ATLAS's source root so every user-provided
+        # artifact path must be made absolute before constructing argv.
+        chip_path = chip_path.resolve()
+        artifact = AtlasArtifact(
+            artifact.operator_list.resolve(), artifact.placement_map.resolve()
+        )
         self.config.validate_files()
         artifact.validate_files()
         if not chip_path.is_file():
@@ -292,6 +302,10 @@ class AtlasBackend:
         output_directory: Path,
     ) -> Path:
         """Require exact deterministic statistics across two adapter invocations."""
+        chip_path = chip_path.resolve()
+        artifact = AtlasArtifact(
+            artifact.operator_list.resolve(), artifact.placement_map.resolve()
+        )
         baseline = self.run(chip_path, artifact, output_directory / "native_baseline")
         adapter = self.run(chip_path, artifact, output_directory / "adapter")
         compared = {

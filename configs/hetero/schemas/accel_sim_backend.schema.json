@@ -44,7 +44,8 @@
         "bridge_library",
         "timing_owner",
         "expected_instances",
-        "require_nonzero_requests"
+        "require_nonzero_requests",
+        "bandwidth_contract"
       ],
       "properties": {
         "kind": {"const": "ramulator2_in_process"},
@@ -52,7 +53,83 @@
         "bridge_library": {"type": "string", "minLength": 1},
         "timing_owner": {"type": "string", "minLength": 1},
         "expected_instances": {"const": 1},
-        "require_nonzero_requests": {"type": "boolean"}
+        "require_nonzero_requests": {"type": "boolean"},
+        "bandwidth_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema_version", "external_link", "logic_die_gateway", "internal_dram"],
+          "properties": {
+            "schema_version": {"const": "hetero-bandwidth-contract/v1"},
+            "external_link": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "protocol", "request_payload_bandwidth_Bps",
+                "response_payload_bandwidth_Bps", "request_header_bytes",
+                "response_header_bytes", "flit_bytes",
+                "propagation_latency_fs", "queue_depth_transactions",
+                "credits", "duplex_mode", "clock_hz"
+              ],
+              "properties": {
+                "protocol": {"enum": ["direct_memory_phy", "pcie_dma", "cxl_mem"]},
+                "request_payload_bandwidth_Bps": {"type": "integer", "minimum": 1},
+                "response_payload_bandwidth_Bps": {"type": "integer", "minimum": 1},
+                "request_header_bytes": {"type": "integer", "minimum": 0},
+                "response_header_bytes": {"type": "integer", "minimum": 0},
+                "flit_bytes": {"type": "integer", "minimum": 1},
+                "propagation_latency_fs": {"type": "integer", "minimum": 0},
+                "queue_depth_transactions": {"type": "integer", "minimum": 1},
+                "credits": {"type": "integer", "minimum": 1},
+                "duplex_mode": {"enum": ["full_duplex", "half_duplex"]},
+                "clock_hz": {"type": "integer", "minimum": 1}
+              }
+            },
+            "logic_die_gateway": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "clock_hz", "ingress_queue_depth", "parent_table_entries",
+                "split_width_per_cycle", "issue_width_per_cycle",
+                "completion_width_per_cycle", "ordering_policy",
+                "write_ack_policy"
+              ],
+              "properties": {
+                "clock_hz": {"type": "integer", "minimum": 1},
+                "ingress_queue_depth": {"type": "integer", "minimum": 1},
+                "parent_table_entries": {"type": "integer", "minimum": 1},
+                "split_width_per_cycle": {"type": "integer", "minimum": 1},
+                "issue_width_per_cycle": {"type": "integer", "minimum": 1},
+                "completion_width_per_cycle": {"type": "integer", "minimum": 1},
+                "ordering_policy": {"enum": ["fifo", "ordering_domain_fifo"]},
+                "write_ack_policy": {"enum": ["durable", "posted"]}
+              }
+            },
+            "internal_dram": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "implementation", "channel_count", "pseudochannels_per_channel",
+                "dq_bits_per_channel", "channel_width_bits", "transfers_per_clock",
+                "rate_MTps", "nBL_cycles", "tCK_ps", "internal_prefetch_size",
+                "transaction_bytes", "peak_payload_bandwidth_Bps"
+              ],
+              "properties": {
+                "implementation": {"type": "string", "minLength": 1},
+                "channel_count": {"type": "integer", "minimum": 1},
+                "pseudochannels_per_channel": {"type": "integer", "minimum": 1},
+                "dq_bits_per_channel": {"type": "integer", "minimum": 1},
+                "channel_width_bits": {"type": "integer", "minimum": 1},
+                "transfers_per_clock": {"type": "integer", "minimum": 1},
+                "rate_MTps": {"type": "integer", "minimum": 1},
+                "nBL_cycles": {"type": "integer", "minimum": 1},
+                "tCK_ps": {"type": "integer", "minimum": 1},
+                "internal_prefetch_size": {"type": "integer", "minimum": 1},
+                "transaction_bytes": {"type": "integer", "minimum": 1},
+                "peak_payload_bandwidth_Bps": {"type": "integer", "minimum": 1}
+              }
+            }
+          }
+        }
       }
     }
   }

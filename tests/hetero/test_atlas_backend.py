@@ -60,3 +60,26 @@ def test_atlas_total_duration_and_equivalence_record(tmp_path: Path) -> None:
     assert record["status"] == "passed"
     assert record["comparison"]["cycles"] == [48446, 48446]
     assert record["timing_ownership"]["external_ramulator2"] is False
+
+
+def test_atlas_relative_artifacts_survive_backend_cwd_change(
+    tmp_path: Path, monkeypatch
+) -> None:
+    project = tmp_path / "project"
+    project.mkdir()
+    backend, chip, artifact = _fake_backend(project)
+    monkeypatch.chdir(project)
+
+    relative_artifact = AtlasArtifact(
+        artifact.operator_list.relative_to(project),
+        artifact.placement_map.relative_to(project),
+    )
+    result = backend.run(
+        chip.relative_to(project), relative_artifact, project / "relative_run"
+    )
+
+    assert result.cycles == 48_446
+    command = json.loads((project / "relative_run" / "command.json").read_text())
+    assert Path(command["argv"][3]).is_absolute()
+    assert Path(command["argv"][5]).is_absolute()
+    assert Path(command["argv"][7]).is_absolute()

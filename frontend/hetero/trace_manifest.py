@@ -360,7 +360,7 @@ class TraceManifest:
             "trace_semantics": self.trace_semantics,
             "capture": self.capture,
             "compilation": self.compilation,
-            "address_ranges": [item.to_dict() for item in self.address_ranges],
+            "address_ranges": [item.to_dict for item in self.address_ranges],
         }
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()

@@ -4,7 +4,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/CMakeLists.txt b/gpu-simulato
 @@ -34,3 +34,15 @@
  target_include_directories(gpgpusim PRIVATE ${GPGPUSIM_POWER_MODEL})
  endif()
- 
+
 +
 +option(HETEROSIM_ENABLE_RAMULATOR2 "Use the GPU-ATLAS external Ramulator2 bridge" OFF)
 +set(HETEROSIM_RAMULATOR2_BRIDGE_DIR "" CACHE PATH "Ramulator2 bridge directory")
@@ -33,7 +33,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.h b/gpu-simulator/gpgpu-
           class memory_stats_t *stats, class memory_partition_unit *mp,
           class gpgpu_sim *gpu);
 +  ~dram_t();
- 
+
    bool full(bool is_write) const;
    void print(FILE *simFile) const;
 @@ -181,6 +183,12 @@ class dram_t {
@@ -46,7 +46,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.h b/gpu-simulator/gpgpu-
 +  std::deque<mem_fetch *> m_ramulator_issueq;
 +  static const unsigned m_ramulator_queue_limit = 64;
 +#endif
- 
+
    unsigned int dram_util_bins[10];
    unsigned int dram_eff_bins[10];
 diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc
@@ -54,7 +54,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
 +++ b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc
 @@ -31,6 +31,9 @@
  // POSSIBILITY OF SUCH DAMAGE.
- 
+
  #include "dram.h"
 +#ifdef HETEROSIM_RAMULATOR2_BRIDGE
 +#include "ramulator_bridge.h"
@@ -65,7 +65,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
 @@ -55,6 +58,24 @@ dram_t::dram_t(unsigned int partition_id, const memory_config *config,
    m_config = config;
    m_gpu = gpu;
- 
+
 +#ifdef HETEROSIM_RAMULATOR2_BRIDGE
 +  m_ramulator = NULL;
 +  const char *ramulator_config = getenv("GPGPUSIM_RAMULATOR_CONFIG");
@@ -90,7 +90,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
 @@ -161,7 +182,20 @@ dram_t::dram_t(unsigned int partition_id, const memory_config *config,
      mrqq_Dist = StatCreate("mrqq_length", 1, 64);  // track up to 64 entries
  }
- 
+
 +dram_t::~dram_t() {
 +#ifdef HETEROSIM_RAMULATOR2_BRIDGE
 +  if (m_ramulator) {
@@ -109,7 +109,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
      if (m_config->gpgpu_frfcfs_dram_sched_queue_size == 0) return false;
      if (m_config->seperate_write_queue_enabled) {
 @@ -180,6 +211,10 @@ bool dram_t::full(bool is_write) const {
- 
+
  unsigned dram_t::que_length() const {
    unsigned nreqs = 0;
 +#ifdef HETEROSIM_RAMULATOR2_BRIDGE
@@ -121,7 +121,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
    } else {
 @@ -245,6 +283,23 @@ dram_req_t::dram_req_t(class mem_fetch *mf, unsigned banks,
  }
- 
+
  void dram_t::push(class mem_fetch *data) {
 +#ifdef HETEROSIM_RAMULATOR2_BRIDGE
 +  if (m_ramulator) {
@@ -142,10 +142,10 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
 +
    assert(id == data->get_tlx_addr()
                     .chip);  // Ensure request is in correct memory partition
- 
-@@ -288,6 +343,53 @@ void dram_t::scheduler_fifo() {
+
+@@ -288,6 +343,101 @@ void dram_t::scheduler_fifo() {
    a ^= b;
- 
+
  void dram_t::cycle() {
 +#ifdef HETEROSIM_RAMULATOR2_BRIDGE
 +  if (m_ramulator) {
@@ -171,8 +171,61 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
 +
 +    if (!m_ramulator_issueq.empty()) {
 +      mem_fetch *data = m_ramulator_issueq.front();
-+      if (heterosim_ramulator_send(m_ramulator, data->get_addr(),
-+                                    data->get_is_write(), data)) {
++      heterosim_parent_request_v2 request = {};
++      request.abi_version = HETEROSIM_RAMULATOR_ABI_VERSION;
++      request.struct_size = sizeof(request);
++      request.parent_id = data->get_request_uid();
++      request.global_address = data->get_addr();
++      request.size_bytes = data->get_data_size();
++      request.partition_id = id;
++      request.operation = data->get_is_write() ? HETEROSIM_MEMORY_WRITE
++                                               : HETEROSIM_MEMORY_READ;
++      const mem_access_byte_mask_t byte_mask = data->get_access_byte_mask();
++      const mem_access_sector_mask_t sector_mask =
++          data->get_access_sector_mask();
++      unsigned byte_mask_source_offset = 0;
++      if (request.size_bytes == SECTOR_SIZE && sector_mask.count() == 1) {
++        unsigned sector = 0;
++        while (!sector_mask.test(sector)) ++sector;
++        request.global_address =
++            data->get_addr() - data->get_addr() % MAX_MEMORY_ACCESS_SIZE
++            + sector * SECTOR_SIZE;
++        byte_mask_source_offset = sector * SECTOR_SIZE;
++        request.sector_mask = 1;
++        request.flags |= HETEROSIM_REQUEST_SECTOR_MASK_VALID;
++      } else {
++        request.sector_mask = sector_mask.to_ulong();
++        if (request.sector_mask)
++          request.flags |= HETEROSIM_REQUEST_SECTOR_MASK_VALID;
++      }
++      for (unsigned bit = 0;
++           bit < request.size_bytes &&
++           byte_mask_source_offset + bit < MAX_MEMORY_ACCESS_SIZE;
++           ++bit) {
++        if (!byte_mask.test(byte_mask_source_offset + bit)) continue;
++        request.byte_mask[bit / 64] |= uint64_t(1) << (bit % 64);
++        request.flags |= HETEROSIM_REQUEST_BYTE_MASK_VALID;
++      }
++      request.byte_mask_word_count = HETEROSIM_MAX_BYTE_MASK_WORDS;
++      request.ordering_domain = data->get_streamID();
++      request.sequence_number = data->get_request_uid();
++      request.qos_class = 0;
++      request.payload = data;
++      const int send_result =
++          heterosim_ramulator_send_v2(m_ramulator, &request);
++      if (send_result == HETEROSIM_SEND_INVALID) {
++        fprintf(stderr,
++                "Invalid GPU parent request %u addr=0x%llx size=%u "
++                "byte_mask=%llx:%llx sector_mask=0x%x for Ramulator2 bridge\n",
++                data->get_request_uid(),
++                (unsigned long long)request.global_address,
++                request.size_bytes,
++                (unsigned long long)request.byte_mask[1],
++                (unsigned long long)request.byte_mask[0],
++                request.sector_mask);
++        abort();
++      }
++      if (send_result == HETEROSIM_SEND_ACCEPTED) {
 +        m_ramulator_issueq.pop_front();
 +        if (data->get_is_write())
 +          ++n_wr;
@@ -183,11 +236,6 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
 +      }
 +    }
 +
-+    // dram_t::cycle is invoked once per partition. Only the last partition
-+    // advances the one shared Ramulator2 instance, exactly once per DRAM tick.
-+    if (id + 1 == m_config->m_n_mem) {
-+      heterosim_ramulator_tick(m_ramulator);
-+    }
 +    ave_mrqs += m_ramulator_issueq.size();
 +    ave_mrqs_partial += m_ramulator_issueq.size();
 +    return;
@@ -197,7 +245,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
    if (!returnq->full()) {
      dram_req_t *cmd = rwq->pop();
      if (cmd) {
-@@ -701,6 +809,19 @@ void dram_t::print(FILE *simFile) const {
+@@ -701,6 +857,19 @@ void dram_t::print(FILE *simFile) const {
        "n_rd=%llu n_rd_L2_A=%llu n_write=%llu n_wr_bk=%llu bw_util=%.4g\n",
        n_cmd, n_nop, n_act, n_pre, n_ref, n_req, n_rd, n_rd_L2_A, n_wr, n_wr_WB,
        (float)bwutil / n_cmd);
@@ -217,7 +265,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
    fprintf(simFile, "n_activity=%llu dram_eff=%.4g\n", n_activity,
            (float)bwutil / n_activity);
    for (i = 0; i < m_config->nbk; i++) {
-@@ -801,6 +922,19 @@ void dram_t::print_stat(FILE *simFile) {
+@@ -801,6 +970,19 @@ void dram_t::print_stat(FILE *simFile) {
            (float)bwutil / n_cmd);
    fprintf(simFile, "mrqq: %d %.4g mrqsmax=%llu ", max_mrqs,
            (float)ave_mrqs / n_cmd, max_mrqs_temp);
@@ -237,3 +285,29 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
    fprintf(simFile, "\n");
    fprintf(simFile, "dram_util_bins:");
    for (unsigned i = 0; i < 10; i++) fprintf(simFile, " %d", dram_util_bins[i]);
+diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/gpu-sim.cc b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/gpu-sim.cc
+--- a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/gpu-sim.cc
++++ b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/gpu-sim.cc
+@@ -31,6 +31,9 @@
+ // POSSIBILITY OF SUCH DAMAGE.
+
+ #include "gpu-sim.h"
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++#include "ramulator_bridge.h"
++#endif
+
+ #include <execinfo.h>
+ #include <math.h>
+@@ -2232,6 +2235,11 @@ unsigned long long g_single_step =
+     0;  // set this in gdb to single step the pipeline
+
+ void gpgpu_sim::cycle() {
+   int clock_mask = next_clock_domain();
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  if (clock_mask & CORE) {
++    heterosim_ramulator_advance_gpu_cycle();
++  }
++#endif
+
+   if (clock_mask & ICNT) {
+     // shader core loading (pop from ICNT into core) follows CORE clock

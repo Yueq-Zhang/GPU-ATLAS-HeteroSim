@@ -8,10 +8,11 @@ import math
 import os
 import re
 import subprocess
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Mapping
 
+from ..bandwidth import BandwidthContract, BandwidthContractError
 from ..trace_manifest import TraceManifest
 from .contracts import BackendDescriptor
 
@@ -33,6 +34,7 @@ class ExternalMemoryConfig:
     timing_owner: str
     expected_instances: int
     require_nonzero_requests: bool
+    bandwidth_contract: BandwidthContract
 
     @classmethod
     def load(cls, payload: object, base: Path) -> "ExternalMemoryConfig":
@@ -45,6 +47,7 @@ class ExternalMemoryConfig:
             "timing_owner",
             "expected_instances",
             "require_nonzero_requests",
+            "bandwidth_contract",
         }
         missing = required - payload.keys()
         extra = payload.keys() - required
@@ -57,6 +60,12 @@ class ExternalMemoryConfig:
             raise AccelSimBackendError(
                 "external_memory.kind must be ramulator2_in_process"
             )
+        try:
+            bandwidth_contract = BandwidthContract.load(
+                payload["bandwidth_contract"]
+            )
+        except BandwidthContractError as error:
+            raise AccelSimBackendError(str(error)) from error
         result = cls(
             kind=str(payload["kind"]),
             config_file=_resolve(payload["config_file"], base),
@@ -64,6 +73,7 @@ class ExternalMemoryConfig:
             timing_owner=str(payload["timing_owner"]),
             expected_instances=int(payload["expected_instances"]),
             require_nonzero_requests=bool(payload["require_nonzero_requests"]),
+            bandwidth_contract=bandwidth_contract,
         )
         if not result.timing_owner or result.expected_instances != 1:
             raise AccelSimBackendError(
@@ -201,6 +211,29 @@ def parse_accel_sim_stats(text: str) -> dict[str, int | float]:
 
 
 def parse_ramulator2_stats(text: str) -> dict[str, int] | None:
+    # ABI v2 emits an extensible final summary.  Preserve every integer field
+    # so traffic-volume and per-initiator evidence reaches qualification
+    # records instead of being discarded by the legacy fixed-width parser.
+    for line in reversed(text.splitlines()):
+        marker = "heterosim_ramulator2_summary "
+        if marker not in line:
+            continue
+        fields = {
+            name: int(value)
+            for name, value in re.findall(r"([A-Za-z_][A-Za-z0-9_]*)=(\d+)", line)
+        }
+        required = {
+            "cycles",
+            "reads",
+            "writes",
+            "completed",
+            "rejected",
+            "outstanding",
+            "instances",
+        }
+        if required <= fields.keys():
+            return fields
+
     matches = list(_RAMULATOR2_STATISTIC.finditer(text))
     if not matches:
         return None
@@ -292,6 +325,9 @@ class AccelSimBackend:
                 "bridge_sha256": hashlib.sha256(
                     self.config.external_memory.bridge_library.read_bytes()
                 ).hexdigest(),
+                "bandwidth_contract": asdict(
+                    self.config.external_memory.bandwidth_contract
+                ),
             }
             if self.config.external_memory is not None
             else None,
@@ -331,6 +367,55 @@ class AccelSimBackend:
                 environment["GPGPUSIM_RAMULATOR_CONFIG"] = str(
                     self.config.external_memory.config_file
                 )
+                contract = self.config.external_memory.bandwidth_contract
+                gateway = contract.logic_die_gateway
+                environment["HETEROSIM_DRAM_TRANSACTION_BYTES"] = str(
+                    contract.internal_dram.transaction_bytes
+                )
+                environment["HETEROSIM_GPU_CLOCK_HZ"] = str(
+                    self.config.core_frequency_hz
+                )
+                environment["HETEROSIM_GATEWAY_CLOCK_HZ"] = str(
+                    gateway.clock_hz
+                )
+                environment["HETEROSIM_DRAM_CLOCK_HZ"] = str(
+                    int(contract.internal_dram.clock_hz)
+                )
+                environment["HETEROSIM_GATEWAY_INGRESS_QUEUE_DEPTH"] = str(
+                    gateway.ingress_queue_depth
+                )
+                environment["HETEROSIM_GATEWAY_PARENT_TABLE_ENTRIES"] = str(
+                    gateway.parent_table_entries
+                )
+                environment["HETEROSIM_GATEWAY_ISSUE_WIDTH"] = str(
+                    gateway.issue_width_per_cycle
+                )
+                environment["HETEROSIM_GATEWAY_WRITE_ACK_POLICY"] = (
+                    gateway.write_ack_policy
+                )
+                link = contract.external_link
+                environment["HETEROSIM_LINK_CLOCK_HZ"] = str(link.clock_hz)
+                environment["HETEROSIM_LINK_REQUEST_BANDWIDTH_BPS"] = str(
+                    link.request_payload_bandwidth_Bps
+                )
+                environment["HETEROSIM_LINK_RESPONSE_BANDWIDTH_BPS"] = str(
+                    link.response_payload_bandwidth_Bps
+                )
+                environment["HETEROSIM_LINK_REQUEST_HEADER_BYTES"] = str(
+                    link.request_header_bytes
+                )
+                environment["HETEROSIM_LINK_RESPONSE_HEADER_BYTES"] = str(
+                    link.response_header_bytes
+                )
+                environment["HETEROSIM_LINK_FLIT_BYTES"] = str(link.flit_bytes)
+                environment["HETEROSIM_LINK_PROPAGATION_LATENCY_FS"] = str(
+                    link.propagation_latency_fs
+                )
+                environment["HETEROSIM_LINK_QUEUE_DEPTH"] = str(
+                    link.queue_depth_transactions
+                )
+                environment["HETEROSIM_LINK_CREDITS"] = str(link.credits)
+                environment["HETEROSIM_LINK_DUPLEX_MODE"] = link.duplex_mode
             process = subprocess.run(
                 command,
                 cwd=output_directory,

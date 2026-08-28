@@ -14,6 +14,49 @@ from frontend.hetero.backends.accel_sim import (
 from frontend.hetero.trace_manifest import TraceManifest
 
 
+def _valid_bandwidth_contract() -> dict[str, object]:
+    return {
+        "schema_version": "hetero-bandwidth-contract/v1",
+        "external_link": {
+            "protocol": "direct_memory_phy",
+            "request_payload_bandwidth_Bps": 12_800_000_000,
+            "response_payload_bandwidth_Bps": 12_800_000_000,
+            "request_header_bytes": 16,
+            "response_header_bytes": 16,
+            "flit_bytes": 32,
+            "propagation_latency_fs": 10_000_000,
+            "queue_depth_transactions": 64,
+            "credits": 64,
+            "duplex_mode": "full_duplex",
+            "clock_hz": 400_000_000,
+        },
+        "logic_die_gateway": {
+            "clock_hz": 400_000_000,
+            "ingress_queue_depth": 128,
+            "parent_table_entries": 256,
+            "split_width_per_cycle": 4,
+            "issue_width_per_cycle": 4,
+            "completion_width_per_cycle": 4,
+            "ordering_policy": "ordering_domain_fifo",
+            "write_ack_policy": "durable",
+        },
+        "internal_dram": {
+            "implementation": "HBDRAM",
+            "channel_count": 16,
+            "pseudochannels_per_channel": 1,
+            "dq_bits_per_channel": 512,
+            "channel_width_bits": 512,
+            "transfers_per_clock": 1,
+            "rate_MTps": 400,
+            "nBL_cycles": 1,
+            "tCK_ps": 2500,
+            "internal_prefetch_size": 1,
+            "transaction_bytes": 64,
+            "peak_payload_bandwidth_Bps": 409_600_000_000,
+        },
+    }
+
+
 def test_checked_in_backend_configs_pin_accel_sim_v2() -> None:
     repository = Path(__file__).resolve().parents[2]
     expected_accel = "64653015f85fb5664c84a10f48527e8897d289d0"
@@ -109,7 +152,8 @@ def test_ramulator2_parser_uses_final_summary() -> None:
         "heterosim_ramulator2 cycles=100 reads=2 writes=0 completed=2 "
         "rejected=1 outstanding=0 instances=1\n"
         "heterosim_ramulator2_summary cycles=120 reads=3 writes=1 completed=4 "
-        "rejected=1 outstanding=0 instances=1 partitions=8\n"
+        "rejected=1 outstanding=0 instances=1 partitions=8 logical_bytes=256 "
+        "internal_bytes=512 gpu_parents=3 atlas_parents=1\n"
     )
     assert stats == {
         "cycles": 120,
@@ -120,6 +164,10 @@ def test_ramulator2_parser_uses_final_summary() -> None:
         "outstanding": 0,
         "instances": 1,
         "partitions": 8,
+        "logical_bytes": 256,
+        "internal_bytes": 512,
+        "gpu_parents": 3,
+        "atlas_parents": 1,
     }
 
 
@@ -135,6 +183,7 @@ def test_external_memory_descriptor_is_cycle_coupled(tmp_path) -> None:
         "timing_owner": "shared3d.ramulator2",
         "expected_instances": 1,
         "require_nonzero_requests": True,
+        "bandwidth_contract": _valid_bandwidth_contract(),
     }
     config_path.write_text(json.dumps(payload), encoding="utf-8")
     backend = AccelSimBackend(AccelSimBackendConfig.load(config_path))

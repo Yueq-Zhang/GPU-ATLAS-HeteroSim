@@ -1,0 +1,77 @@
+operator:
+- name: tinyllama_layer0_q_proj_decode
+  type: gemm
+  iteration: 32
+  execution:
+    matrix:
+    - name: gemm_tile
+      mac_count: 8192
+    vector:
+    - name: gemm_tile_accumulation
+      vec_count: 16
+    buffer_load:
+    - name: gemm_tile_load
+      byte_count: 17408
+      is_write: false
+    - name: gemm_tile_accumulation_load
+      byte_count: 32
+      is_write: false
+    buffer_store:
+    - name: gemm_tile_store
+      byte_count: 32
+      is_write: true
+    - name: gemm_tile_accumulation_store
+      byte_count: 32
+      is_write: true
+    dram:
+    - name: input_layer0_q_proj
+      is_write: false
+      access_base:
+      - 0
+      - 0
+      access_extent:
+      - 1
+      - 512
+      access_stride_add:
+      - 32
+      - 1
+      access_offset_add:
+      - 1
+      - 512
+      init_iter: 0
+      stride_iter: 1
+      total_iter: 32
+    - name: weight_layer0_q_proj_slice
+      is_write: false
+      access_base:
+      - 0
+      - 0
+      access_extent:
+      - 512
+      - 16
+      access_stride_add:
+      - 1
+      - 4
+      access_offset_add:
+      - 512
+      - 16
+      init_iter: 0
+      stride_iter: 1
+      total_iter: 32
+    - name: output_layer0_q_proj
+      is_write: true
+      access_base:
+      - 0
+      - 0
+      access_extent:
+      - 1
+      - 16
+      access_stride_add:
+      - 32
+      - 4
+      access_offset_add:
+      - 1
+      - 16
+      init_iter: 5
+      stride_iter: 4
+      total_iter: 8
