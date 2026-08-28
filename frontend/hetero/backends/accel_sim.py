@@ -83,6 +83,74 @@ class ExternalMemoryConfig:
 
 
 @dataclass(frozen=True)
+class CoResidentAtlasConfig:
+    kind: str
+    execution_semantics: str
+    chip_config: Path
+    operator_list: Path
+    placement_map: Path
+    expected_instances: int
+    require_nonzero_requests: bool
+    expected_transaction_bytes: int | None
+
+    @classmethod
+    def load(cls, payload: object, base: Path) -> "CoResidentAtlasConfig":
+        if not isinstance(payload, dict):
+            raise AccelSimBackendError("co_resident_atlas must be an object")
+        required = {
+            "kind",
+            "execution_semantics",
+            "chip_config",
+            "operator_list",
+            "placement_map",
+            "expected_instances",
+            "require_nonzero_requests",
+        }
+        optional = {"expected_transaction_bytes"}
+        missing = required - payload.keys()
+        extra = payload.keys() - (required | optional)
+        if missing or extra:
+            raise AccelSimBackendError(
+                "co_resident_atlas keys mismatch: "
+                f"missing={sorted(missing)}, extra={sorted(extra)}"
+            )
+        if payload["kind"] != "full_chip_external_dram":
+            raise AccelSimBackendError(
+                "co_resident_atlas.kind must be full_chip_external_dram"
+            )
+        if payload["execution_semantics"] != "contention_stress_duplicate_operator":
+            raise AccelSimBackendError(
+                "co_resident_atlas.execution_semantics must explicitly be "
+                "contention_stress_duplicate_operator"
+            )
+        expected_bytes = payload.get("expected_transaction_bytes")
+        result = cls(
+            kind=str(payload["kind"]),
+            execution_semantics=str(payload["execution_semantics"]),
+            chip_config=_resolve(payload["chip_config"], base),
+            operator_list=_resolve(payload["operator_list"], base),
+            placement_map=_resolve(payload["placement_map"], base),
+            expected_instances=int(payload["expected_instances"]),
+            require_nonzero_requests=bool(payload["require_nonzero_requests"]),
+            expected_transaction_bytes=int(expected_bytes)
+            if expected_bytes is not None
+            else None,
+        )
+        if result.expected_instances != 1:
+            raise AccelSimBackendError(
+                "co-resident ATLAS requires exactly one full-chip runtime"
+            )
+        if (
+            result.expected_transaction_bytes is not None
+            and result.expected_transaction_bytes <= 0
+        ):
+            raise AccelSimBackendError(
+                "expected_transaction_bytes must be positive when present"
+            )
+        return result
+
+
+@dataclass(frozen=True)
 class AccelSimBackendConfig:
     backend_id: str
     executable: Path
@@ -95,6 +163,7 @@ class AccelSimBackendConfig:
     dependency_commits: Mapping[str, str]
     environment: Mapping[str, str]
     external_memory: ExternalMemoryConfig | None
+    co_resident_atlas: CoResidentAtlasConfig | None
     source_path: Path
 
     @classmethod
@@ -119,7 +188,9 @@ class AccelSimBackendConfig:
             "environment",
         }
         missing = required - payload.keys()
-        extra = payload.keys() - (required | {"external_memory"})
+        extra = payload.keys() - (
+            required | {"external_memory", "co_resident_atlas"}
+        )
         if missing or extra:
             raise AccelSimBackendError(
                 f"backend config keys mismatch: missing={sorted(missing)}, extra={sorted(extra)}"
@@ -149,11 +220,21 @@ class AccelSimBackendConfig:
             external_memory=ExternalMemoryConfig.load(payload["external_memory"], base)
             if "external_memory" in payload
             else None,
+            co_resident_atlas=CoResidentAtlasConfig.load(
+                payload["co_resident_atlas"], base
+            )
+            if "co_resident_atlas" in payload
+            else None,
             source_path=path.resolve(),
         )
         if result.core_frequency_hz <= 0 or result.timeout_seconds <= 0:
             raise AccelSimBackendError(
                 "core_frequency_hz and timeout_seconds must be positive"
+            )
+        if result.co_resident_atlas is not None and result.external_memory is None:
+            raise AccelSimBackendError(
+                "co_resident_atlas requires external_memory so both initiators "
+                "share one Ramulator2"
             )
         return result
 
@@ -172,6 +253,14 @@ class AccelSimBackendConfig:
             }.items():
                 if not path.is_file():
                     raise AccelSimBackendError(f"{label} does not exist: {path}")
+        if self.co_resident_atlas is not None:
+            for label, path in {
+                "ATLAS chip config": self.co_resident_atlas.chip_config,
+                "ATLAS operator list": self.co_resident_atlas.operator_list,
+                "ATLAS placement map": self.co_resident_atlas.placement_map,
+            }.items():
+                if not path.is_file():
+                    raise AccelSimBackendError(f"{label} does not exist: {path}")
 
 
 @dataclass(frozen=True)
@@ -183,6 +272,7 @@ class AccelSimRunResult:
     instructions: int
     stats: Mapping[str, int | float]
     external_memory_stats: Mapping[str, int] | None
+    atlas_runtime_stats: Mapping[str, int | str] | None
     output_directory: Path
 
 
@@ -255,6 +345,36 @@ def parse_ramulator2_stats(text: str) -> dict[str, int] | None:
     }
 
 
+def parse_atlas_full_chip_runtime_stats(
+    text: str,
+) -> dict[str, int | str] | None:
+    marker = "heterosim_atlas_full_chip_runtime_summary "
+    for line in reversed(text.splitlines()):
+        if marker not in line:
+            continue
+        fields: dict[str, int | str] = {}
+        for name, value in re.findall(
+            r"([A-Za-z_][A-Za-z0-9_]*)=([^\s]+)", line
+        ):
+            fields[name] = int(value) if value.isdigit() else value
+        required = {
+            "status",
+            "atlas_cycles",
+            "atlas_e2e_cycles",
+            "finish_gpu_cycle",
+            "transaction_bytes",
+            "submitted_parents",
+            "completed_parents",
+            "bridge_atlas_parents",
+            "bridge_atlas_completed",
+            "runtime_active",
+            "instances",
+        }
+        if required <= fields.keys():
+            return fields
+    return None
+
+
 def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
@@ -267,16 +387,19 @@ class AccelSimBackend:
 
     def descriptor(self) -> BackendDescriptor:
         if self.config.external_memory is not None:
+            resource_kinds = [
+                "gpu_core",
+                "gpu_l1",
+                "gpu_l2",
+                "gpu_noc",
+                "shared_3d_dram",
+            ]
+            if self.config.co_resident_atlas is not None:
+                resource_kinds.extend(("atlas_core", "atlas_sram", "atlas_noc"))
             return BackendDescriptor(
                 backend_id=self.config.backend_id,
                 supported_duration_semantics=("coupled",),
-                ownable_resource_kinds=(
-                    "gpu_core",
-                    "gpu_l1",
-                    "gpu_l2",
-                    "gpu_noc",
-                    "shared_3d_dram",
-                ),
+                ownable_resource_kinds=tuple(resource_kinds),
                 supported_exports=(),
                 supports_stall_resume=True,
                 supported_trace_semantics=("functional",),
@@ -330,6 +453,28 @@ class AccelSimBackend:
                 ),
             }
             if self.config.external_memory is not None
+            else None,
+            "co_resident_atlas": {
+                "kind": self.config.co_resident_atlas.kind,
+                "execution_semantics": self.config.co_resident_atlas.execution_semantics,
+                "chip_config_sha256": hashlib.sha256(
+                    self.config.co_resident_atlas.chip_config.read_bytes()
+                ).hexdigest(),
+                "operator_list_sha256": hashlib.sha256(
+                    self.config.co_resident_atlas.operator_list.read_bytes()
+                ).hexdigest(),
+                "placement_map_sha256": hashlib.sha256(
+                    self.config.co_resident_atlas.placement_map.read_bytes()
+                ).hexdigest(),
+                "expected_instances": self.config.co_resident_atlas.expected_instances,
+                "require_nonzero_requests": (
+                    self.config.co_resident_atlas.require_nonzero_requests
+                ),
+                "expected_transaction_bytes": (
+                    self.config.co_resident_atlas.expected_transaction_bytes
+                ),
+            }
+            if self.config.co_resident_atlas is not None
             else None,
             "gpgpu_config_sha256": hashlib.sha256(
                 self.config.gpgpu_config.read_bytes()
@@ -416,6 +561,17 @@ class AccelSimBackend:
                 )
                 environment["HETEROSIM_LINK_CREDITS"] = str(link.credits)
                 environment["HETEROSIM_LINK_DUPLEX_MODE"] = link.duplex_mode
+            if self.config.co_resident_atlas is not None:
+                atlas = self.config.co_resident_atlas
+                environment["HETEROSIM_ATLAS_CHIP_CONFIG"] = str(
+                    atlas.chip_config
+                )
+                environment["HETEROSIM_ATLAS_OPERATOR_LIST"] = str(
+                    atlas.operator_list
+                )
+                environment["HETEROSIM_ATLAS_PLACEMENT_MAP"] = str(
+                    atlas.placement_map
+                )
             process = subprocess.run(
                 command,
                 cwd=output_directory,
@@ -443,6 +599,7 @@ class AccelSimBackend:
         cycles = int(stats["gpu_tot_sim_cycle"])
         instructions = int(stats["gpu_tot_sim_insn"])
         external_memory_stats = parse_ramulator2_stats(combined_output)
+        atlas_runtime_stats = parse_atlas_full_chip_runtime_stats(combined_output)
         if self.config.external_memory is not None:
             if external_memory_stats is None:
                 raise AccelSimBackendError(
@@ -463,7 +620,47 @@ class AccelSimBackend:
                 )
             if external_memory_stats["completed"] != accepted:
                 raise AccelSimBackendError(
-                    "external Ramulator2 did not complete every accepted GPU request"
+                    "external Ramulator2 did not complete every accepted parent request"
+                )
+        if self.config.co_resident_atlas is not None:
+            atlas = self.config.co_resident_atlas
+            if atlas_runtime_stats is None:
+                raise AccelSimBackendError(
+                    "co-resident ATLAS is configured but emitted no runtime summary"
+                )
+            if atlas_runtime_stats["status"] != "passed":
+                raise AccelSimBackendError(
+                    "co-resident ATLAS runtime did not finish successfully"
+                )
+            if atlas_runtime_stats["instances"] != atlas.expected_instances:
+                raise AccelSimBackendError(
+                    "co-resident ATLAS instance count violates the contract"
+                )
+            submitted = int(atlas_runtime_stats["submitted_parents"])
+            completed = int(atlas_runtime_stats["completed_parents"])
+            if atlas.require_nonzero_requests and submitted == 0:
+                raise AccelSimBackendError(
+                    "co-resident ATLAS emitted zero shared-memory requests"
+                )
+            if submitted != completed:
+                raise AccelSimBackendError(
+                    "co-resident ATLAS did not complete every submitted request"
+                )
+            if int(atlas_runtime_stats["bridge_atlas_parents"]) != submitted:
+                raise AccelSimBackendError(
+                    "ATLAS runtime and shared bridge disagree on submitted parents"
+                )
+            if int(atlas_runtime_stats["bridge_atlas_completed"]) != completed:
+                raise AccelSimBackendError(
+                    "ATLAS runtime and shared bridge disagree on completions"
+                )
+            expected_bytes = atlas.expected_transaction_bytes
+            if (
+                expected_bytes is not None
+                and int(atlas_runtime_stats["transaction_bytes"]) != expected_bytes
+            ):
+                raise AccelSimBackendError(
+                    "co-resident ATLAS transaction-byte count does not match config"
                 )
         duration_fs = math.ceil(cycles * 1_000_000_000_000_000 / self.config.core_frequency_hz)
         result = AccelSimRunResult(
@@ -474,6 +671,7 @@ class AccelSimBackend:
             instructions=instructions,
             stats=stats,
             external_memory_stats=external_memory_stats,
+            atlas_runtime_stats=atlas_runtime_stats,
             output_directory=output_directory,
         )
         _write_json(
@@ -487,6 +685,7 @@ class AccelSimBackend:
                 "core_frequency_hz": self.config.core_frequency_hz,
                 "raw_stats": stats,
                 "external_memory_stats": external_memory_stats,
+                "atlas_runtime_stats": atlas_runtime_stats,
             },
         )
         return result
@@ -504,7 +703,51 @@ class AccelSimBackend:
                 baseline.external_memory_stats,
                 adapter.external_memory_stats,
             ]
-        passed = all(left == right for left, right in compared.values())
+        if self.config.co_resident_atlas is not None:
+            compared["atlas_runtime_stats"] = [
+                baseline.atlas_runtime_stats,
+                adapter.atlas_runtime_stats,
+            ]
+        exact_match = all(left == right for left, right in compared.values())
+        overlap_evidence: list[dict[str, int | bool]] = []
+        if self.config.co_resident_atlas is not None:
+            for result in (baseline, adapter):
+                assert result.atlas_runtime_stats is not None
+                assert result.external_memory_stats is not None
+                finish = int(result.atlas_runtime_stats["finish_gpu_cycle"])
+                gpu_parents = int(result.external_memory_stats["gpu_parents"])
+                atlas_parents = int(result.external_memory_stats["atlas_parents"])
+                overlap_evidence.append(
+                    {
+                        "gpu_total_cycles": result.cycles,
+                        "atlas_finish_gpu_cycle": finish,
+                        "gpu_parents": gpu_parents,
+                        "atlas_parents": atlas_parents,
+                        "both_initiators_active": gpu_parents > 0
+                        and atlas_parents > 0,
+                        "atlas_finished_before_gpu_run_end": 0
+                        < finish
+                        < result.cycles,
+                    }
+                )
+        overlap_passed = not overlap_evidence or all(
+            bool(item["both_initiators_active"])
+            and bool(item["atlas_finished_before_gpu_run_end"])
+            for item in overlap_evidence
+        )
+        passed = exact_match and overlap_passed
+        qualified_scopes = [
+            "cycle_coupled_request_response"
+            if self.config.external_memory is not None
+            else "adapter_equivalence"
+        ]
+        if self.config.co_resident_atlas is not None:
+            qualified_scopes.extend(
+                (
+                    "full_atlas_chip_shared_memory_concurrency",
+                    "single_ramulator2_multi_initiator_conservation",
+                )
+            )
         record = output_directory / "qualification_record.json"
         _write_json(
             record,
@@ -524,14 +767,27 @@ class AccelSimBackend:
                     else None,
                     "dependency_commits": dict(self.config.dependency_commits),
                     "environment_overrides": dict(self.config.environment),
+                    "co_resident_atlas": {
+                        "execution_semantics": (
+                            self.config.co_resident_atlas.execution_semantics
+                        ),
+                        "chip_config": str(
+                            self.config.co_resident_atlas.chip_config
+                        ),
+                        "operator_list": str(
+                            self.config.co_resident_atlas.operator_list
+                        ),
+                        "placement_map": str(
+                            self.config.co_resident_atlas.placement_map
+                        ),
+                    }
+                    if self.config.co_resident_atlas is not None
+                    else None,
                 },
                 "comparison": compared,
+                "overlap_evidence": overlap_evidence,
                 "exact_match_required": True,
-                "qualified_scopes": [
-                    "cycle_coupled_request_response"
-                    if self.config.external_memory is not None
-                    else "adapter_equivalence"
-                ],
+                "qualified_scopes": qualified_scopes,
                 "replay_safety_qualified": False,
                 "timing_ownership": {
                     "gpu_core_cache_noc": "accel_sim",
@@ -544,7 +800,17 @@ class AccelSimBackend:
                     "duration_mode": "coupled"
                     if self.config.external_memory is not None
                     else "total",
+                    "co_resident_atlas_core_sram_noc": "atlasim"
+                    if self.config.co_resident_atlas is not None
+                    else False,
                 },
+                "claim_boundary": (
+                    "The same q_proj shape executes on both backends as a "
+                    "shared-memory contention stress case. This does not "
+                    "represent a valid single-placement end-to-end schedule."
+                    if self.config.co_resident_atlas is not None
+                    else None
+                ),
             },
         )
         if not passed:

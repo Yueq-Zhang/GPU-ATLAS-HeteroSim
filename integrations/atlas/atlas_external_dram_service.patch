@@ -1,0 +1,482 @@
+diff --git a/simulator/src/chip/chip.cpp b/simulator/src/chip/chip.cpp
+index ee6b51e..416a4cf 100644
+--- a/simulator/src/chip/chip.cpp
++++ b/simulator/src/chip/chip.cpp
+@@ -2,6 +2,8 @@
+ #include <vector>
+ #include <fstream>
+ #include <filesystem>
++#include <stdexcept>
++#include <utility>
+ // yaml-cpp include
+ #include <yaml-cpp/yaml.h>
+ // booksim include
+@@ -18,10 +20,12 @@ Chip::Chip(
+     std::string _arch_config_path,
+     std::string _operator_list_path,
+     std::string _placement_map_path,
+-    std::string _log_file_path
++    std::string _log_file_path,
++    ExternalDramService _external_dram_service
+ ) : arch_config_path(_arch_config_path),
+     operator_list_path(_operator_list_path),
+-    placement_map_path(_placement_map_path) {
++    placement_map_path(_placement_map_path),
++    external_dram_service(std::move(_external_dram_service)) {
+
+     YAML::Node arch_config_node = YAML::LoadFile(arch_config_path);
+     arch_config = std::make_shared<ChipConfig>(arch_config_node);
+@@ -107,7 +111,8 @@ Chip::Chip(
+     core_array = std::make_shared<CoreArray>(
+         arch_config, operator_list, placement_maps,
+         threshold,
+-        send_queues, received_queues, credit_board
++        send_queues, received_queues, credit_board,
++        external_dram_service
+     );
+
+     // Initialize clocks
+@@ -187,6 +192,13 @@ void Chip::reset_execution_status(std::string _operator_list_path) {
+
+
+ Performance Chip::simulate() {
++    if(external_dram_service) {
++        throw std::logic_error(
++            "Chip::simulate cannot own time with an external DRAM service; "
++            "use reset_execution_status(), coordinated tick(), and "
++            "get_performance()."
++        );
++    }
+     reset_execution_status();
+
+     int check_frequency = arch_config->has_noc ? booksim_config.GetInt("deadlock_check_freq") : 10000;
+diff --git a/simulator/src/chip/chip.h b/simulator/src/chip/chip.h
+index a3986d4..8c18343 100644
+--- a/simulator/src/chip/chip.h
++++ b/simulator/src/chip/chip.h
+@@ -35,6 +35,7 @@ private:
+     // Components
+     std::shared_ptr<NoCWrapper> noc;
+     std::shared_ptr<CoreArray> core_array;
++    ExternalDramService external_dram_service;
+
+     std::vector<uint64_t> prev_clk;
+     uint64_t clk;
+@@ -53,7 +54,8 @@ public:
+         std::string _arch_config_path,
+         std::string _operator_list_path,
+         std::string _placement_map_path,
+-        std::string _log_file_path = ""
++        std::string _log_file_path = "",
++        ExternalDramService _external_dram_service = nullptr
+     );
+     ~Chip();
+     const ArchConfig get_arch_config() const { return arch_config; }
+@@ -64,6 +66,8 @@ public:
+     Performance simulate();
+     // Invoked by simulate
+     void tick();
++    uint64_t get_clock() const { return clk; }
++    Performance get_performance() { return core_array->get_performance(); }
+
+     // Used for status checking
+     bool is_finished();
+diff --git a/simulator/src/core/core.cpp b/simulator/src/core/core.cpp
+index 2d2c776..8ef2022 100644
+--- a/simulator/src/core/core.cpp
++++ b/simulator/src/core/core.cpp
+@@ -1,5 +1,6 @@
+ #include <algorithm>
+ #include <numeric>
++#include <utility>
+ // atlasim include
+ #include "core/core.h"
+ #include "common/input.h"
+@@ -109,13 +110,15 @@ Packet make_unicast_packet(const NoCTask& task) {
+ Core::Core(
+     int _core_id, ArchConfig _arch_config, OperatorList _operator_list, PlacementMap _placement_map,
+     int _threshold,
+-    CNInterface _send_queue, CNInterface _received_queue, std::shared_ptr<std::vector<bool>> _pipe_open
++    CNInterface _send_queue, CNInterface _received_queue, std::shared_ptr<std::vector<bool>> _pipe_open,
++    ExternalDramService _external_dram_service
+ )
+     : core_id(_core_id)
+     , core_name(std::string("Core_") + std::to_string(_core_id))
+     , arch_config(_arch_config)
+     , operator_list(_operator_list)
+-    , placement_map(_placement_map) {
++    , placement_map(_placement_map)
++    , external_dram_service(std::move(_external_dram_service)) {
+
+     // Init clocks
+     clk = 0;
+@@ -127,6 +130,7 @@ Core::Core(
+     cur_iteration = 0;
+     cur_iteration_cycles = 0;
+     cur_iteration_elapsed_cycles = 0;
++    external_dram_submitted = false;
+
+     // Init hardware components and pre-simulation records
+     send_queue = _send_queue;
+@@ -153,7 +157,9 @@ Core::Core(
+                 pre_estimated_op_count_per_iter[name] = {};
+                 break;
+             case ComponentType::DRAM:
+-                components[name] = std::make_shared<DRAMWrapper>(core_name, arch_config);
++                components[name] = std::make_shared<DRAMWrapper>(
++                    core_name, arch_config, core_id, external_dram_service
++                );
+                 max_dram_bw = std::dynamic_pointer_cast<DRAMWrapper>(components[name])->get_max_bw();
+                 pre_estimated_cycles_per_iter[name] = {};
+                 pre_estimated_op_count_per_iter[name] = {};
+@@ -190,6 +196,8 @@ void Core::reset_execution_status() {
+     cur_iteration = 0;
+     cur_iteration_cycles = 0;
+     cur_iteration_elapsed_cycles = 0;
++    external_dram_submitted = false;
++    runtime_dram_inputs.clear();
+
+     for(auto& p: pre_estimated_cycles_per_iter) {
+         p.second.clear();
+@@ -861,6 +869,18 @@ void Core::pre_simulate(std::shared_ptr<OperatorTask> task) {
+         std::cerr << "[ERROR] Unsupported operator type: " << optype2str.at(task->type) << std::endl;
+     }
+
++    if(external_dram_service) {
++        auto dram = std::dynamic_pointer_cast<DRAMWrapper>(components[dram_name]);
++        runtime_dram_inputs = dram->get_captured_inputs();
++        if(runtime_dram_inputs.size() != static_cast<size_t>(cur_task_iteration_count)) {
++            std::cerr << "External DRAM capture count " << runtime_dram_inputs.size()
++                      << " does not match ATLAS iteration count "
++                      << cur_task_iteration_count << "." << std::endl;
++            exit(-1);
++        }
++        external_dram_submitted = false;
++    }
++
+     // Compute matrix bubble cycles from pre-estimated data
+     if(task->type == OperatorType::GEMM ||
+        task->type == OperatorType::DecodeAttention ||
+@@ -932,11 +952,26 @@ void Core::tick() {
+     // Tick all components
+     clk++;
+     if(!is_all_task_finished) {
++        ExternalDramRequestKey external_key{
++            core_id, cur_task_id, cur_iteration
++        };
++        bool external_dram_finished = true;
++        if(external_dram_service) {
++            if(!external_dram_submitted) {
++                external_dram_submitted = external_dram_service->submit_iteration(
++                    external_key, runtime_dram_inputs.at(cur_iteration)
++                );
++            }
++            external_dram_finished = external_dram_submitted &&
++                external_dram_service->iteration_complete(external_key);
++        }
++
+         cur_iteration_elapsed_cycles++;
+         cur_task_stats.e2e_cycles++;
+
+         // Judge whether all non-NoC components are finished
+-        bool non_NoC_finished = cur_iteration_elapsed_cycles >= cur_iteration_cycles;
++        bool on_chip_finished = cur_iteration_elapsed_cycles >= cur_iteration_cycles;
++        bool non_NoC_finished = on_chip_finished && external_dram_finished;
+         // NoC action is completed if all packets in send/receive buffers are processed
+         bool NoC_finished =  send_buffer->empty() && received_buffer->empty();
+
+@@ -944,6 +979,14 @@ void Core::tick() {
+         for(const auto& p: pre_estimated_cycles_per_iter) {
+             if(p.first == "Total")
+                 continue;
++
++            if(p.first == dram_name && external_dram_service) {
++                bool is_busy = external_dram_submitted && !external_dram_finished;
++                components[p.first]->tick(is_busy);
++                if(is_busy)
++                    cur_task_stats.dram_cycles++;
++                continue;
++            }
+
+             if(cur_iteration_elapsed_cycles <= p.second[cur_iteration]) {
+                 components[p.first]->tick(true);
+@@ -966,14 +1009,21 @@ void Core::tick() {
+         if(!NoC_finished)
+             cur_task_stats.noc_cycles++;
+
++        if(external_dram_service && on_chip_finished && !external_dram_finished)
++            cur_task_stats.matrix_bubble_dram_cycles++;
++
+         // If current iteration has passed all cycles, move on to the next cycle
+         if(non_NoC_finished && NoC_finished) {
+             cur_task_stats.flop_count += 2 * pre_estimated_op_count_per_iter[matrix_name][cur_iteration]
+                                        + pre_estimated_op_count_per_iter[vector_name][cur_iteration];
+             cur_task_stats.memory_access_bytes += pre_estimated_op_count_per_iter[dram_name][cur_iteration];
+
++            if(external_dram_service)
++                external_dram_service->retire_iteration(external_key);
++
+             cur_iteration++;
+             cur_iteration_elapsed_cycles = 0;
++            external_dram_submitted = false;
+             // Only update iteration state if there are remaining iterations
+             if(cur_iteration < cur_task_iteration_count) {
+                 cur_iteration_cycles = pre_estimated_cycles_per_iter["Total"][cur_iteration];
+diff --git a/simulator/src/core/core.h b/simulator/src/core/core.h
+index 9bda8d5..4cff3ad 100644
+--- a/simulator/src/core/core.h
++++ b/simulator/src/core/core.h
+@@ -12,6 +12,7 @@
+ #include "common/stats.h"
+ #include "common/packet.h"
+ #include "core/component.h"
++#include "dram/external_dram_service.h"
+
+
+ namespace atlasim {
+@@ -26,7 +27,8 @@ public:
+         // Booksim settings
+         int _threshold,
+         // Interface classes between Core and NoC wrapper
+-        CNInterface _send_queue, CNInterface _received_queue, std::shared_ptr<std::vector<bool>> _pipe_open
++        CNInterface _send_queue, CNInterface _received_queue, std::shared_ptr<std::vector<bool>> _pipe_open,
++        ExternalDramService _external_dram_service = nullptr
+     );
+
+     void reset_execution_status();
+@@ -83,6 +85,9 @@ private:
+     std::unordered_map<std::string, std::vector<double>> pre_estimated_op_count_per_iter;
+     // Used for storing pre-generated NoC packets in each iteration
+     std::vector<std::pair<std::vector<Packet>, std::vector<Packet>>> pre_generated_noc_packets;
++    ExternalDramService external_dram_service;
++    std::vector<ComponentInput> runtime_dram_inputs;
++    bool external_dram_submitted;
+
+     void pre_simulate(std::shared_ptr<OperatorTask> task);
+     void update_cur_task_energy();
+diff --git a/simulator/src/core/core_array.cpp b/simulator/src/core/core_array.cpp
+index 84748f0..0a7cfec 100644
+--- a/simulator/src/core/core_array.cpp
++++ b/simulator/src/core/core_array.cpp
+@@ -26,9 +26,10 @@ void update_all_core_energy(Stats& stats, const ArchConfig& arch_config, int cor
+ CoreArray::CoreArray(
+     const ArchConfig _arch_config, const OperatorList _operator_list, const PlacementMapCollection _placement_maps,
+     int _threshold,
+-    PCNInterfaceSet _send_queues, PCNInterfaceSet _received_queues, std::shared_ptr<std::vector<bool>> _pipe_open
++    PCNInterfaceSet _send_queues, PCNInterfaceSet _received_queue, std::shared_ptr<std::vector<bool>> _pipe_open,
++    ExternalDramService _external_dram_service
+ ) : arch_config(_arch_config), operator_list(_operator_list), placement_maps(_placement_maps),
+-    send_queues(_send_queues), received_queues(_received_queues), pipe_open(_pipe_open) {
++    send_queues(_send_queues), received_queues(_received_queue), pipe_open(_pipe_open) {
+
+     // Init clocks
+     prev_clk.clear();
+@@ -42,7 +43,8 @@ CoreArray::CoreArray(
+         cores.push_back(std::make_shared<Core>(
+             i, arch_config, operator_list, placement_maps->at(i),
+             _threshold,
+-            send_queues->at(i), received_queues->at(i), pipe_open
++            send_queues->at(i), received_queues->at(i), pipe_open,
++            _external_dram_service
+         ));
+     }
+ }
+diff --git a/simulator/src/core/core_array.h b/simulator/src/core/core_array.h
+index ecee9ac..c602e27 100644
+--- a/simulator/src/core/core_array.h
++++ b/simulator/src/core/core_array.h
+@@ -37,7 +37,8 @@ public:
+         // Booksim settings
+         int _threshold,
+         // Interface classes between Cores and NoC wrapper
+-        PCNInterfaceSet _send_queues, PCNInterfaceSet _received_queues, std::shared_ptr<std::vector<bool>> _pipe_open
++        PCNInterfaceSet _send_queues, PCNInterfaceSet _received_queues, std::shared_ptr<std::vector<bool>> _pipe_open,
++        ExternalDramService _external_dram_service = nullptr
+     );
+
+     // Used for simulation
+diff --git a/simulator/src/dram/dram_wrapper.cpp b/simulator/src/dram/dram_wrapper.cpp
+index 5d5b328..5f16d11 100644
+--- a/simulator/src/dram/dram_wrapper.cpp
++++ b/simulator/src/dram/dram_wrapper.cpp
+@@ -1,6 +1,7 @@
+ // ramulator include
+ #include "base/config.h"
+ #include <cstdint>
++#include <utility>
+ // atlasim include
+ #include "dram/dram_wrapper.h"
+
+@@ -8,12 +9,35 @@
+ namespace atlasim {
+
+
+-DRAMWrapper::DRAMWrapper(const std::string _name_prefix, const ArchConfig arch_config)
+-    : Component(_name_prefix+"_DRAM", ComponentType::DRAM) {
++DRAMWrapper::DRAMWrapper(
++    const std::string _name_prefix,
++    const ArchConfig arch_config,
++    int _core_id,
++    ExternalDramService _external_service
++)
++    : Component(_name_prefix+"_DRAM", ComponentType::DRAM)
++    , core_id(_core_id)
++    , external_service(std::move(_external_service)) {
+     config_path = arch_config->dram_config.config_path;
+     power = arch_config->dram_config.power;
+     frequency = arch_config->frequency;
+
++    if(external_service) {
++        frontend_tick = 0;
++        mem_tick = 0;
++        tick_mult = 0;
++        tx_bytes = 0;
++        ch_offset = 0;
++        row_size = 0;
++        max_bw = external_service->max_bandwidth_gbps_per_core();
++        clk_ratio = 0;
++        cur_read_byte = 0;
++        cur_write_byte = 0;
++        total_read_byte = 0;
++        total_write_byte = 0;
++        return;
++    }
++
+     // Create ramulator objects
+     std::vector<std::string> params;
+     YAML::Node ramulator_config = Ramulator::Config::parse_config_file(config_path, params);
+@@ -50,6 +74,12 @@ DRAMWrapper::DRAMWrapper(const std::string _name_prefix, const ArchConfig arch_c
+ }
+
+
++void DRAMWrapper::reset_execution_status(bool reset_total) {
++    Component::reset_execution_status(reset_total);
++    captured_inputs.clear();
++}
++
++
+ double DRAMWrapper::get_cur_op_count() const {
+     return cur_read_byte + cur_write_byte;
+ }
+@@ -150,6 +180,17 @@ uint64_t DRAMWrapper::simulate(ComponentInput input) {
+         exit(-1);
+     }
+
++    if(external_service) {
++        captured_inputs.push_back(input);
++        const ExternalDramTraffic traffic =
++            external_service->estimate_traffic(core_id, input);
++        cur_read_byte += traffic.read_bytes;
++        cur_write_byte += traffic.write_bytes;
++        total_read_byte += traffic.read_bytes;
++        total_write_byte += traffic.write_bytes;
++        return 0;
++    }
++
+     if(input->size() == 0)
+         return 0;
+
+diff --git a/simulator/src/dram/dram_wrapper.h b/simulator/src/dram/dram_wrapper.h
+index 8f45393..7b3697c 100644
+--- a/simulator/src/dram/dram_wrapper.h
++++ b/simulator/src/dram/dram_wrapper.h
+@@ -9,6 +9,7 @@
+ // atlasim include
+ #include "common/arch.h"
+ #include "core/component.h"
++#include "dram/external_dram_service.h"
+
+
+ namespace atlasim {
+@@ -16,8 +17,14 @@ namespace atlasim {
+
+ class DRAMWrapper: public Component {
+ public:
+-    DRAMWrapper(const std::string _name_prefix, const ArchConfig arch_config);
+-
++    DRAMWrapper(
++        const std::string _name_prefix,
++        const ArchConfig arch_config,
++        int _core_id = -1,
++        ExternalDramService _external_service = nullptr
++    );
++
++    virtual void reset_execution_status(bool reset_total = false) override;
+     virtual void reset_op_count(bool reset_total = false) override;
+     virtual uint64_t simulate(ComponentInput input) override;
+
+@@ -25,6 +32,10 @@ public:
+     Ramulator::Addr_t get_ch_offset() const { return ch_offset; }
+     Ramulator::Addr_t get_row_size() const { return row_size; }
+     double get_max_bw() const { return max_bw; }
++    bool uses_external_service() const { return external_service != nullptr; }
++    const std::vector<ComponentInput>& get_captured_inputs() const {
++        return captured_inputs;
++    }
+
+     virtual double get_cur_op_count() const override;
+     virtual double get_total_op_count() const override;
+@@ -36,6 +47,9 @@ private:
+     Ramulator::Addr_t ch_offset;
+     Ramulator::Addr_t row_size; // The unit is byte
+     double max_bw; // Maximum bandwidth of the DRAM, GB/s
++    int core_id;
++    ExternalDramService external_service;
++    std::vector<ComponentInput> captured_inputs;
+
+     // Ramulator objects & records for cycle-accurate simulatiom
+     std::shared_ptr<Ramulator::IFrontEnd> frontend;
+diff --git a/simulator/src/dram/external_dram_service.h b/simulator/src/dram/external_dram_service.h
+new file mode 100644
+index 0000000..532129a
+--- /dev/null
++++ b/simulator/src/dram/external_dram_service.h
+@@ -0,0 +1,48 @@
++#ifndef _ATLASIM_EXTERNAL_DRAM_SERVICE_H
++#define _ATLASIM_EXTERNAL_DRAM_SERVICE_H
++
++#include <cstdint>
++#include <memory>
++
++#include "core/component.h"
++
++namespace atlasim {
++
++struct ExternalDramRequestKey {
++    int core_id = -1;
++    int task_id = -1;
++    int iteration = -1;
++
++    bool operator==(const ExternalDramRequestKey& other) const {
++        return core_id == other.core_id &&
++               task_id == other.task_id &&
++               iteration == other.iteration;
++    }
++};
++
++struct ExternalDramTraffic {
++    uint64_t read_bytes = 0;
++    uint64_t write_bytes = 0;
++
++    uint64_t total_bytes() const { return read_bytes + write_bytes; }
++};
++
++class IExternalDramService {
++public:
++    virtual ~IExternalDramService() = default;
++
++    virtual ExternalDramTraffic estimate_traffic(
++        int core_id, const ComponentInput& input) const = 0;
++    virtual double max_bandwidth_gbps_per_core() const = 0;
++    virtual bool submit_iteration(
++        const ExternalDramRequestKey& key, const ComponentInput& input) = 0;
++    virtual bool iteration_complete(
++        const ExternalDramRequestKey& key) const = 0;
++    virtual void retire_iteration(const ExternalDramRequestKey& key) = 0;
++};
++
++using ExternalDramService = std::shared_ptr<IExternalDramService>;
++
++}  // namespace atlasim
++
++#endif  // _ATLASIM_EXTERNAL_DRAM_SERVICE_H

@@ -120,6 +120,11 @@ class OperatorEventDispatcher:
         backend_config = AccelSimBackendConfig.load(
             _resolve_path(config_ref, self.project_root)
         )
+        if backend_config.co_resident_atlas is not None:
+            raise OperatorEventError(
+                "co_resident_atlas is a duplicate-operator contention stress Backend "
+                "and cannot be used by the single-placement operator-event dispatcher"
+            )
         self._accel_sim = AccelSimBackend(backend_config)
         raw_bindings = gpu.get("trace_bindings")
         if not isinstance(raw_bindings, list) or not raw_bindings:

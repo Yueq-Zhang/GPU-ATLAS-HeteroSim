@@ -1,0 +1,74 @@
+{
+  "schema_version": "hetero-prefill-cycle-catalog/v1",
+  "model": {
+    "name": "TinyLlama-1.1B",
+    "hidden_size": 2048,
+    "intermediate_size": 5632,
+    "num_attention_heads": 32,
+    "num_kv_heads": 4,
+    "head_dim": 64,
+    "vocab_size": 32000,
+    "dtype": "fp16"
+  },
+  "phase": "prefill",
+  "parameter_source": "research_assumption_explicit_tiled_cycle_contract_not_hardware_calibrated",
+  "qualification": "deployment_only_unqualified",
+  "devices": {
+    "gpu0": {
+      "backend_id": "gpu0.tiled_cycle_replay.sm86_unqualified",
+      "clock_hz": 1200000000,
+      "operator_profiles": {
+        "request_start": {"kind": "fixed", "cycles": 1},
+        "kv_allocate": {"kind": "fixed", "cycles": 32},
+        "token_embedding": {"kind": "embedding", "tokens_per_cycle": 128, "launch_cycles": 64},
+        "attention_norm": {"kind": "elementwise", "elements_per_cycle": 2048, "launch_cycles": 48},
+        "qkv_projection": {"kind": "gemm", "tile_m": 16, "tile_n": 16, "tile_k": 16, "cycles_per_tile": 8, "parallel_tiles": 64, "launch_cycles": 96},
+        "rope": {"kind": "elementwise", "elements_per_cycle": 2048, "launch_cycles": 48},
+        "position_add": {"kind": "elementwise", "elements_per_cycle": 2048, "launch_cycles": 48},
+        "kv_append": {"kind": "elementwise", "elements_per_cycle": 1024, "launch_cycles": 48},
+        "causal_attention": {"kind": "attention", "tile_q": 16, "tile_kv": 64, "cycles_per_tile": 32, "parallel_heads": 16, "launch_cycles": 128},
+        "output_projection": {"kind": "gemm", "tile_m": 16, "tile_n": 16, "tile_k": 16, "cycles_per_tile": 8, "parallel_tiles": 64, "launch_cycles": 96},
+        "residual_add": {"kind": "elementwise", "elements_per_cycle": 4096, "launch_cycles": 32},
+        "mlp_norm": {"kind": "elementwise", "elements_per_cycle": 2048, "launch_cycles": 48},
+        "gate_up_projection": {"kind": "gemm", "tile_m": 16, "tile_n": 16, "tile_k": 16, "cycles_per_tile": 8, "parallel_tiles": 64, "launch_cycles": 96},
+        "fc1_projection": {"kind": "gemm", "tile_m": 16, "tile_n": 16, "tile_k": 16, "cycles_per_tile": 8, "parallel_tiles": 64, "launch_cycles": 96},
+        "silu_multiply": {"kind": "elementwise", "elements_per_cycle": 2048, "launch_cycles": 48},
+        "gelu": {"kind": "elementwise", "elements_per_cycle": 2048, "launch_cycles": 48},
+        "down_projection": {"kind": "gemm", "tile_m": 16, "tile_n": 16, "tile_k": 16, "cycles_per_tile": 8, "parallel_tiles": 64, "launch_cycles": 96},
+        "final_norm": {"kind": "elementwise", "elements_per_cycle": 2048, "launch_cycles": 48},
+        "lm_head": {"kind": "gemm", "tile_m": 1, "tile_n": 32, "tile_k": 16, "cycles_per_tile": 8, "parallel_tiles": 64, "launch_cycles": 96},
+        "sampling": {"kind": "sampling", "values_per_cycle": 256, "launch_cycles": 48},
+        "request_finish": {"kind": "fixed", "cycles": 1},
+        "kv_release": {"kind": "fixed", "cycles": 32}
+      }
+    },
+    "atlas0.compute": {
+      "backend_id": "atlas0.tiled_cycle_replay.logic_die_unqualified",
+      "clock_hz": 1000000000,
+      "operator_profiles": {
+        "request_start": {"kind": "fixed", "cycles": 1},
+        "kv_allocate": {"kind": "fixed", "cycles": 32},
+        "token_embedding": {"kind": "embedding", "tokens_per_cycle": 32, "launch_cycles": 64},
+        "attention_norm": {"kind": "elementwise", "elements_per_cycle": 1024, "launch_cycles": 32},
+        "qkv_projection": {"kind": "gemm", "tile_m": 16, "tile_n": 16, "tile_k": 16, "cycles_per_tile": 12, "parallel_tiles": 16, "launch_cycles": 64},
+        "rope": {"kind": "elementwise", "elements_per_cycle": 1024, "launch_cycles": 32},
+        "position_add": {"kind": "elementwise", "elements_per_cycle": 1024, "launch_cycles": 32},
+        "kv_append": {"kind": "elementwise", "elements_per_cycle": 1024, "launch_cycles": 32},
+        "causal_attention": {"kind": "attention", "tile_q": 16, "tile_kv": 64, "cycles_per_tile": 20, "parallel_heads": 32, "launch_cycles": 64},
+        "output_projection": {"kind": "gemm", "tile_m": 16, "tile_n": 16, "tile_k": 16, "cycles_per_tile": 12, "parallel_tiles": 16, "launch_cycles": 64},
+        "residual_add": {"kind": "elementwise", "elements_per_cycle": 2048, "launch_cycles": 24},
+        "mlp_norm": {"kind": "elementwise", "elements_per_cycle": 1024, "launch_cycles": 32},
+        "gate_up_projection": {"kind": "gemm", "tile_m": 16, "tile_n": 16, "tile_k": 16, "cycles_per_tile": 12, "parallel_tiles": 16, "launch_cycles": 64},
+        "fc1_projection": {"kind": "gemm", "tile_m": 16, "tile_n": 16, "tile_k": 16, "cycles_per_tile": 12, "parallel_tiles": 16, "launch_cycles": 64},
+        "silu_multiply": {"kind": "elementwise", "elements_per_cycle": 1024, "launch_cycles": 32},
+        "gelu": {"kind": "elementwise", "elements_per_cycle": 1024, "launch_cycles": 32},
+        "down_projection": {"kind": "gemm", "tile_m": 16, "tile_n": 16, "tile_k": 16, "cycles_per_tile": 12, "parallel_tiles": 16, "launch_cycles": 64},
+        "final_norm": {"kind": "elementwise", "elements_per_cycle": 1024, "launch_cycles": 32},
+        "lm_head": {"kind": "gemm", "tile_m": 1, "tile_n": 32, "tile_k": 16, "cycles_per_tile": 12, "parallel_tiles": 16, "launch_cycles": 64},
+        "sampling": {"kind": "sampling", "values_per_cycle": 128, "launch_cycles": 32},
+        "request_finish": {"kind": "fixed", "cycles": 1},
+        "kv_release": {"kind": "fixed", "cycles": 32}
+      }
+    }
+  }
+}

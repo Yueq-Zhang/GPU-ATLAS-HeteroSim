@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
@@ -11,10 +12,12 @@ namespace heterosim {
 
 AtlasHybridBondPort::AtlasHybridBondPort(heterosim_ramulator_handle handle,
                                          uint32_t partition_id,
-                                         uint32_t transaction_bytes)
+                                         uint32_t transaction_bytes,
+                                         uint64_t global_address_base)
     : handle_(handle),
       partition_id_(partition_id),
-      transaction_bytes_(transaction_bytes) {
+      transaction_bytes_(transaction_bytes),
+      global_address_base_(global_address_base) {
   if (!handle_ || transaction_bytes_ == 0) {
     throw std::invalid_argument("invalid ATLAS Hybrid-Bond port contract");
   }
@@ -54,8 +57,13 @@ std::vector<AtlasHbAccess> AtlasHybridBondPort::generate(
     std::unordered_set<uint64_t> tile_addresses;
     auto emit_contiguous_line = [&](int64_t element_offset,
                                     int64_t element_count) {
-      const uint64_t byte_address =
+      const uint64_t local_address =
           static_cast<uint64_t>(base_address + element_offset * element_size);
+      if (local_address >
+          std::numeric_limits<uint64_t>::max() - global_address_base_) {
+        throw std::overflow_error("ATLAS Global PA projection overflow");
+      }
+      const uint64_t byte_address = global_address_base_ + local_address;
       const uint64_t byte_count =
           static_cast<uint64_t>(element_count * element_size);
       uint64_t aligned = byte_address;
@@ -102,8 +110,16 @@ std::vector<AtlasHbAccess> AtlasHybridBondPort::generate(
       std::function<void(int64_t, int64_t)> emit =
           [&](int64_t dim, int64_t element_offset) {
             if (dim == rank) {
-              const uint64_t byte_address = static_cast<uint64_t>(
+              const uint64_t local_address = static_cast<uint64_t>(
                   base_address + element_offset * element_size);
+              if (local_address >
+                  std::numeric_limits<uint64_t>::max() -
+                      global_address_base_) {
+                throw std::overflow_error(
+                    "ATLAS Global PA projection overflow");
+              }
+              const uint64_t byte_address =
+                  global_address_base_ + local_address;
               const uint64_t aligned =
                   byte_address - byte_address % transaction_bytes_;
               const uint64_t covered =

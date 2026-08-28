@@ -24,6 +24,8 @@ class ModelSpec:
     mlp_type: str = "swiglu"
     position_encoding: str = "rope"
     tied_embeddings: bool = True
+    input_embedding_mode: str = "preembedded"
+    materialize_parameters: bool = False
 
     def __post_init__(self) -> None:
         integer_fields = (
@@ -44,6 +46,8 @@ class ModelSpec:
             raise ValueError("mlp_type must be swiglu or dense_gelu")
         if self.position_encoding not in {"rope", "learned_absolute"}:
             raise ValueError("unsupported position_encoding")
+        if self.input_embedding_mode not in {"preembedded", "token_ids"}:
+            raise ValueError("input_embedding_mode must be preembedded or token_ids")
 
 
 @dataclass(frozen=True, slots=True)
@@ -110,12 +114,427 @@ def _layer_ops(model: ModelSpec) -> Iterable[tuple[str, str]]:
     return (*attention, *mlp, ("mlp.down", "down_projection"), ("mlp.residual", "residual_add"))
 
 
+def _build_materialized_request_graph(
+    model: ModelSpec, request: RequestSpec
+) -> ModelGraph:
+    """Build the strict graph used by the Prefill deployment stages.
+
+    Unlike the legacy compatibility graph, this path materializes model
+    parameters, token embedding, residual inputs, packed QKV widths and the
+    SwiGLU intermediate widths.  It deliberately remains a serial legal DAG;
+    later runtimes may overlap independent requests but cannot invent missing
+    tensor dependencies.
+    """
+
+    values: list[Value] = []
+    nodes: list[ModelNode] = []
+    value_ids: set[str] = set()
+    previous_node: str | None = None
+
+    def add_value(
+        value_id: str,
+        storage: StorageClass,
+        shape: tuple[int | str, ...],
+        *,
+        dtype: str | None = None,
+        layout: str = "row_major",
+        alias_or_view: str | None = None,
+    ) -> None:
+        if value_id in value_ids:
+            return
+        value_ids.add(value_id)
+        values.append(
+            Value(
+                value_id=value_id,
+                shape_expr=shape,
+                dtype=dtype or model.dtype,
+                layout=layout,
+                storage_class=storage,
+                mutable=storage is StorageClass.KV_CACHE,
+                alias_or_view=alias_or_view,
+                lifetime=(
+                    "static" if storage is StorageClass.PARAMETER else "request"
+                ),
+            )
+        )
+
+    def add_node(
+        node_id: str,
+        kind: NodeKind,
+        op: str,
+        phase: Phase,
+        step_id: int,
+        *,
+        layer_id: int | None = None,
+        reads: tuple[str, ...] = (),
+        writes: tuple[str, ...] = (),
+        attributes: dict[str, object] | None = None,
+    ) -> None:
+        nonlocal previous_node
+        dependencies = () if previous_node is None else (previous_node,)
+        nodes.append(
+            ModelNode(
+                node_id=node_id,
+                kind=kind,
+                op=op,
+                phase=phase,
+                layer_id=layer_id,
+                step_id=step_id,
+                dependencies=dependencies,
+                read_values=reads,
+                write_values=writes,
+                attributes=attributes or {},
+            )
+        )
+        previous_node = node_id
+
+    prefix = request.request_id
+    h = model.hidden_size
+    i = model.intermediate_size
+    qkv_width = h + 2 * model.num_kv_heads * model.head_dim
+
+    # Static parameters are explicit Global-PA allocation candidates.
+    add_value("model.tok_embeddings.weight", StorageClass.PARAMETER, (model.vocab_size, h))
+    for layer_id in range(model.num_layers):
+        base = f"model.layers.{layer_id}"
+        add_value(f"{base}.attention_norm.weight", StorageClass.PARAMETER, (h,))
+        add_value(f"{base}.qkv.weight", StorageClass.PARAMETER, (h, qkv_width))
+        add_value(f"{base}.output.weight", StorageClass.PARAMETER, (h, h))
+        add_value(f"{base}.mlp_norm.weight", StorageClass.PARAMETER, (h,))
+        if model.mlp_type == "swiglu":
+            add_value(f"{base}.gate_up.weight", StorageClass.PARAMETER, (h, 2 * i))
+        else:
+            add_value(f"{base}.fc1.weight", StorageClass.PARAMETER, (h, i))
+        add_value(f"{base}.down.weight", StorageClass.PARAMETER, (i, h))
+    add_value("model.final_norm.weight", StorageClass.PARAMETER, (h,))
+    if not model.tied_embeddings:
+        add_value("model.lm_head.weight", StorageClass.PARAMETER, (h, model.vocab_size))
+
+    for layer_id in range(model.num_layers):
+        for kind in ("k", "v"):
+            add_value(
+                f"{prefix}.kv.l{layer_id}.{kind}",
+                StorageClass.KV_CACHE,
+                ("kv_tokens", model.num_kv_heads, model.head_dim),
+            )
+
+    add_node(
+        f"{prefix}.request_start", NodeKind.CONTROL, "request_start", Phase.CONTROL, 0
+    )
+    add_node(f"{prefix}.kv_allocate", NodeKind.STATE, "kv_allocate", Phase.CONTROL, 0)
+
+    forward_steps = (
+        [
+            (Phase.PREFILL, 0, request.prompt_length, 0),
+            *[
+                (Phase.DECODE, step, 1, request.prompt_length + step - 1)
+                for step in range(1, request.output_length)
+            ],
+        ]
+        if request.execution_scope == "full_request"
+        else [(Phase.DECODE, 0, 1, request.initial_kv_length)]
+    )
+
+    prompt_ids = f"{prefix}.prompt_token_ids"
+    if request.execution_scope == "full_request":
+        add_value(
+            prompt_ids,
+            StorageClass.METADATA,
+            (request.prompt_length,),
+            dtype="int32",
+        )
+
+    for phase, step_id, q_len, past_len in forward_steps:
+        phase_key = f"{phase.value}.s{step_id}"
+        if phase is Phase.PREFILL:
+            embedding_input = prompt_ids
+        elif request.execution_scope == "full_request":
+            embedding_input = f"{prefix}.token.{step_id - 1}"
+        else:
+            embedding_input = f"{prefix}.decode_token_id"
+            add_value(
+                embedding_input, StorageClass.METADATA, (1,), dtype="int32"
+            )
+        hidden = f"{prefix}.{phase_key}.embedding.out"
+        add_value(hidden, StorageClass.ACTIVATION, (q_len, h))
+        add_node(
+            f"{prefix}.{phase_key}.embedding",
+            NodeKind.COMPUTE,
+            "token_embedding",
+            phase,
+            step_id,
+            reads=(embedding_input, "model.tok_embeddings.weight"),
+            writes=(hidden,),
+            attributes={
+                "operator_group": "embedding",
+                "q_len": q_len,
+                "past_kv_len": past_len,
+                "attention_kv_len": past_len + q_len,
+            },
+        )
+
+        for layer_id in range(model.num_layers):
+            base = f"{prefix}.{phase_key}.l{layer_id}"
+            param = f"model.layers.{layer_id}"
+            layer_input = hidden
+            common = {
+                "q_len": q_len,
+                "past_kv_len": past_len,
+                "attention_kv_len": past_len + q_len,
+            }
+
+            attn_norm = f"{base}.norm.attention.out"
+            add_value(attn_norm, StorageClass.ACTIVATION, (q_len, h))
+            add_node(
+                f"{base}.norm.attention",
+                NodeKind.COMPUTE,
+                "attention_norm",
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(layer_input, f"{param}.attention_norm.weight"),
+                writes=(attn_norm,),
+                attributes={"operator_group": "norm", **common},
+            )
+
+            qkv = f"{base}.attention.projection.out"
+            add_value(qkv, StorageClass.ACTIVATION, (q_len, qkv_width))
+            add_node(
+                f"{base}.attention.projection",
+                NodeKind.COMPUTE,
+                "qkv_projection",
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(attn_norm, f"{param}.qkv.weight"),
+                writes=(qkv,),
+                attributes={"operator_group": "attention", **common},
+            )
+
+            positioned = f"{base}.attention.rope.out"
+            add_value(positioned, StorageClass.ACTIVATION, (q_len, qkv_width))
+            add_node(
+                f"{base}.attention.rope",
+                NodeKind.COMPUTE,
+                "rope" if model.position_encoding == "rope" else "position_add",
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(qkv,),
+                writes=(positioned,),
+                attributes={"operator_group": "attention", **common},
+            )
+
+            query = f"{base}.attention.kv_append.out"
+            k_value = f"{prefix}.kv.l{layer_id}.k"
+            v_value = f"{prefix}.kv.l{layer_id}.v"
+            add_value(query, StorageClass.ACTIVATION, (q_len, h))
+            add_node(
+                f"{base}.attention.kv_append",
+                NodeKind.STATE,
+                "kv_append",
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(positioned, k_value, v_value),
+                writes=(query, k_value, v_value),
+                attributes={"operator_group": "attention", **common},
+            )
+
+            context = f"{base}.attention.core.out"
+            add_value(context, StorageClass.ACTIVATION, (q_len, h))
+            add_node(
+                f"{base}.attention.core",
+                NodeKind.COMPUTE,
+                "causal_attention",
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(query, k_value, v_value),
+                writes=(context,),
+                attributes={"operator_group": "attention", **common},
+            )
+
+            projected = f"{base}.attention.output.out"
+            add_value(projected, StorageClass.ACTIVATION, (q_len, h))
+            add_node(
+                f"{base}.attention.output",
+                NodeKind.COMPUTE,
+                "output_projection",
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(context, f"{param}.output.weight"),
+                writes=(projected,),
+                attributes={"operator_group": "attention", **common},
+            )
+
+            attn_residual = f"{base}.attention.residual.out"
+            add_value(attn_residual, StorageClass.ACTIVATION, (q_len, h))
+            add_node(
+                f"{base}.attention.residual",
+                NodeKind.COMPUTE,
+                "residual_add",
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(layer_input, projected),
+                writes=(attn_residual,),
+                attributes={"operator_group": "attention", **common},
+            )
+
+            mlp_norm = f"{base}.mlp.norm.out"
+            add_value(mlp_norm, StorageClass.ACTIVATION, (q_len, h))
+            add_node(
+                f"{base}.mlp.norm",
+                NodeKind.COMPUTE,
+                "mlp_norm",
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(attn_residual, f"{param}.mlp_norm.weight"),
+                writes=(mlp_norm,),
+                attributes={"operator_group": "mlp", **common},
+            )
+
+            first_op = "gate_up_projection" if model.mlp_type == "swiglu" else "fc1_projection"
+            first_name = "gate_up" if model.mlp_type == "swiglu" else "fc1"
+            first_width = 2 * i if model.mlp_type == "swiglu" else i
+            first = f"{base}.mlp.{first_name}.out"
+            add_value(first, StorageClass.ACTIVATION, (q_len, first_width))
+            add_node(
+                f"{base}.mlp.{first_name}",
+                NodeKind.COMPUTE,
+                first_op,
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(mlp_norm, f"{param}.{first_name}.weight"),
+                writes=(first,),
+                attributes={"operator_group": "mlp", **common},
+            )
+
+            activated = f"{base}.mlp.activation.out"
+            add_value(activated, StorageClass.ACTIVATION, (q_len, i))
+            add_node(
+                f"{base}.mlp.activation",
+                NodeKind.COMPUTE,
+                "silu_multiply" if model.mlp_type == "swiglu" else "gelu",
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(first,),
+                writes=(activated,),
+                attributes={"operator_group": "mlp", **common},
+            )
+
+            down = f"{base}.mlp.down.out"
+            add_value(down, StorageClass.ACTIVATION, (q_len, h))
+            add_node(
+                f"{base}.mlp.down",
+                NodeKind.COMPUTE,
+                "down_projection",
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(activated, f"{param}.down.weight"),
+                writes=(down,),
+                attributes={"operator_group": "mlp", **common},
+            )
+
+            layer_output = f"{base}.mlp.residual.out"
+            add_value(layer_output, StorageClass.ACTIVATION, (q_len, h))
+            add_node(
+                f"{base}.mlp.residual",
+                NodeKind.COMPUTE,
+                "residual_add",
+                phase,
+                step_id,
+                layer_id=layer_id,
+                reads=(attn_residual, down),
+                writes=(layer_output,),
+                attributes={"operator_group": "mlp", **common},
+            )
+            hidden = layer_output
+
+        # Normal generation only consumes the last prompt/decode position.
+        norm = f"{prefix}.{phase_key}.final_norm.out"
+        logits = f"{prefix}.{phase_key}.logits"
+        token = f"{prefix}.token.{step_id}"
+        add_value(norm, StorageClass.ACTIVATION, (1, h))
+        add_value(logits, StorageClass.ACTIVATION, (1, model.vocab_size))
+        add_value(token, StorageClass.METADATA, (1,), dtype="int32")
+        final_attributes = {
+            "operator_group": "finalize",
+            "q_len": 1,
+            "source_q_len": q_len,
+            "past_kv_len": past_len,
+            "attention_kv_len": past_len + q_len,
+        }
+        add_node(
+            f"{prefix}.{phase_key}.final_norm",
+            NodeKind.COMPUTE,
+            "final_norm",
+            phase,
+            step_id,
+            reads=(hidden, "model.final_norm.weight"),
+            writes=(norm,),
+            attributes=final_attributes,
+        )
+        lm_weight = (
+            "model.tok_embeddings.weight"
+            if model.tied_embeddings
+            else "model.lm_head.weight"
+        )
+        add_node(
+            f"{prefix}.{phase_key}.lm_head",
+            NodeKind.COMPUTE,
+            "lm_head",
+            phase,
+            step_id,
+            reads=(norm, lm_weight),
+            writes=(logits,),
+            attributes=final_attributes,
+        )
+        add_node(
+            f"{prefix}.{phase_key}.sampling",
+            NodeKind.CONTROL,
+            "sampling",
+            phase,
+            step_id,
+            reads=(logits,),
+            writes=(token,),
+            attributes=final_attributes,
+        )
+
+    add_node(
+        f"{prefix}.request_finish",
+        NodeKind.CONTROL,
+        "request_finish",
+        Phase.CONTROL,
+        request.output_length,
+    )
+    add_node(
+        f"{prefix}.kv_release",
+        NodeKind.STATE,
+        "kv_release",
+        Phase.CONTROL,
+        request.output_length,
+    )
+    graph = ModelGraph("hetero-model-graph/v2", tuple(values), tuple(nodes))
+    graph.validate()
+    return graph
+
+
 def build_request_graph(model: ModelSpec, request: RequestSpec) -> ModelGraph:
     """Build one complete full-request logical graph.
 
     Prefill produces output token zero.  Decode forward ``j`` consumes output
     token ``j-1`` and therefore appears exactly ``output_length - 1`` times.
     """
+
+    if model.materialize_parameters:
+        return _build_materialized_request_graph(model, request)
 
     values: list[Value] = []
     nodes: list[ModelNode] = []
@@ -218,6 +637,12 @@ def build_request_graph(model: ModelSpec, request: RequestSpec) -> ModelGraph:
                 kind = NodeKind.COMPUTE
                 if op == "kv_append":
                     kind = NodeKind.STATE
+                    reads.extend(
+                        [
+                            f"{prefix}.kv.l{layer_id}.k",
+                            f"{prefix}.kv.l{layer_id}.v",
+                        ]
+                    )
                     writes.extend(
                         [
                             f"{prefix}.kv.l{layer_id}.k",

@@ -1,0 +1,12 @@
+{
+  "allocator": "first_fit",
+  "page_tokens": 16,
+  "kv_capacity_bytes": 1073741824,
+  "global_pa_capacity_bytes": 4294967296,
+  "allocation_alignment_bytes": 64,
+  "address_mapping": {
+    "virtual_memory_mode": "identity_untranslated",
+    "dram_mapper": "OneLevelInterleave",
+    "channel_lowest_bit": 0
+  }
+}

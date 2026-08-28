@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from frontend.hetero.operator_event import OperatorEventDispatcher, OperatorEventError
 from frontend.hetero.runner import execute_run
 from frontend.hetero.schema import load_and_validate_config, validate_config
 
@@ -103,6 +104,24 @@ def _operator_config(tmp_path: Path) -> dict[str, object]:
     return config
 
 
+def test_duplicate_operator_contention_backend_is_rejected_by_dispatcher(
+    tmp_path: Path,
+) -> None:
+    backends = {
+        "gpu": {
+            "kind": "accel_sim",
+            "config_ref": (
+                "configs/hetero/backends/"
+                "gpu_accelsim_rtx3070_full_atlas_chip_shared_hbdram_edge_16ch.json"
+            ),
+        },
+        "atlas": {"kind": "none"},
+        "host": {"kind": "none"},
+    }
+    with pytest.raises(OperatorEventError, match="duplicate-operator contention stress"):
+        OperatorEventDispatcher(Path.cwd(), tmp_path / "backend_runs", backends)
+
+
 @pytest.mark.skipif(os.name == "nt", reason="POSIX fake Accel-Sim executable")
 def test_operator_event_run_dispatches_trace_and_reuses_simulation_cache(
     tmp_path: Path,
@@ -113,6 +132,7 @@ def test_operator_event_run_dispatches_trace_and_reuses_simulation_cache(
     metrics = json.loads((run_dir / "metrics.json").read_text())
     provenance = json.loads((run_dir / "provenance.json").read_text())
     trace_bundle = json.loads((run_dir / "trace_manifest.json").read_text())
+    online = json.loads((run_dir / "online_dispatch.json").read_text())
 
     traced = [
         task for task in execution["tasks"] if task["fidelity"]["trace_coverage"] == 1.0
@@ -126,7 +146,24 @@ def test_operator_event_run_dispatches_trace_and_reuses_simulation_cache(
     assert metrics["run_status"] == "operator_event"
     assert 0 < metrics["fidelity"]["trace_coverage"] < 1
     assert metrics["performance_claim_allowed"] is False
-    assert provenance["runtime_owner"] == "cpp.GlobalEventRuntime"
+    assert provenance["runtime_owner"] == "python.OnlineOperatorRuntime"
+    assert execution["placement_contract"]["backend_dispatch_count"] == len(
+        execution["tasks"]
+    )
+    assert execution["placement_contract"]["online_dispatch_gate"][
+        "backend_launches_after_dependencies"
+    ] is True
+    assert online["backend_dispatch_count"] == len(execution["tasks"])
+    timing = {
+        record["task_id"]: record["timing"]
+        for record in [*execution["tasks"], *execution["routes"]]
+    }
+    for task in execution["tasks"]:
+        if task["dependencies"]:
+            assert task["backend_launch_time_fs"] >= max(
+                timing[dependency]["completion_time_fs"]
+                for dependency in task["dependencies"]
+            )
     assert provenance["backend_dispatch"]["timing_owners"]["gpu0.hbm"] == (
         "gpu.accel_sim.fake"
     )

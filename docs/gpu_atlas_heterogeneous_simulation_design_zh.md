@@ -5,7 +5,7 @@
 | 字段 | 内容 |
 | --- | --- |
 | 状态 | 已冻结的实现基线 |
-| 版本 | 1.5 |
+| 版本 | 1.14 |
 | 日期 | 2026-08-28 |
 | 适用工程 | ATLAS-MICRO-2026 |
 | 当前基线提交 | b2787399408e32d327c820daee96d4e6610f551a |
@@ -2640,6 +2640,82 @@ TPOT 平均值和 ITL 百分位必须分开报告；`G=1` 请求的 TPOT 为 `nu
 41. ATLAS原生`ComponentInput`端口通过不等于完整`atlasim.Chip`已经与Accel-Sim并发；资格记录必须分别标记`memory_port`和`full_chip_scheduler`覆盖范围。
 42. GPU Trace与ATLAS Artifact做性能比较前，模型Revision、算子、Phase、Batch、Context、Dtype和完整Shape必须逐字段相等；任一不匹配时比较生成器必须失败。
 43. 单算子资格结果不得外推为完整Layer、端到端模型或多Batch吞吐；报告必须携带明确的Artifact Coverage。
+44. 完整ATLAS Chip采用外部DRAM服务时不得构造或推进ATLAS原生Ramulator2；DRAM完成只能来自系统唯一共享MemoryService。
+45. GPU和ATLAS共享完成存储时必须按Initiator隔离出队，任一后端不得消费或解释另一后端的Payload。
+46. ATLAS各Core的局部`base_addr`必须先投影到互不重叠的Global PA区域，再进入共享地址映射；相同局部地址不代表相同物理数据。
+47. `full_chip_scheduler=true`且`accel_sim_compute_backend=false`只表示完整ATLAS Chip与GPU请求流并发，不得表述为两个完整计算后端并发。
+48. P9b运行时必须由版本化Backend Config显式启用；Chip Config、Operator List和Placement Map的内容哈希必须进入Simulation Key，禁止只靠未记录的环境变量改变运行语义。
+49. Accel-Sim结束Kernel后，只要ATLAS Chip或其共享内存请求未完成，全局`active()`仍必须为真；两个后端和唯一Ramulator2全部静默后才能结束。
+50. P9b资格必须同时证明GPU Parent非零、ATLAS Parent非零、Initiator出队隔离、全部Parent完成、一个Ramulator2、零在途以及执行窗口重叠。
+51. 若竞争资格用例让同一算子在GPU与ATLAS重复执行，必须标记为Contention Stress，不得解释为合法的单放置推理图或端到端性能。
+52. 正常执行图的Placement Decision集合必须与逻辑Node集合严格相等；缺失、重复、额外Node或未知Device均必须在Backend Dispatch前失败。
+53. 每个逻辑Node只能物化为一个Device Task并触发至多一次Backend Dispatch；跨设备Route不是第二次算子执行。
+54. 每个跨设备Read Value必须独立携带`value_id/version/offset/size`并Lowering，禁止用“前一节点最后一个输出”代替全部数据依赖。
+55. KV Append必须建模为旧K/V版本的Read与新K/V版本的Write；Write生成严格递增版本，消费者不得读取旧版本。
+56. `co_resident_atlas`只能声明为`contention_stress_duplicate_operator`并从正常单放置Dispatcher隔离；只有独立资格入口可以启动该模式。
+57. 正常`operator_event`的Backend只能在模拟时间到达、设备资源可用、全部依赖与Route完成且目标设备持有每个输入的最新版本后启动；禁止在执行图构造阶段提前执行Backend。
+58. Route的目标Residency/Version只能在Route完成时提交；Device Task的输出版本只能在任务完成时提交，禁止以计划存在代替运行时可见。
+59. 正常执行必须满足Backend Dispatch次数严格等于Device Task数；旧版本、缺失版本或错误设备Residency必须在调用Backend前失败。
+60. 在线执行必须确定性记录Backend启动顺序、模拟启动时刻、已验证输入版本和最终版本；相同输入的独立运行应生成一致的启动日志和Metrics。
+
+### 25.1 P9完整Chip耦合分级
+
+P9拆分为两个必须分别记录的资格级别：
+
+- P9a：完整`atlasim.Chip`通过非阻塞外部DRAM服务运行，GPU侧允许使用确定性Parent流量。验收包括真实Core/Task/Iteration输入、唯一Ramulator2、Initiator完成隔离、每核Global PA投影、竞争和零在途。
+- P9b：用真实Accel-Sim Kernel执行替换P9a的确定性GPU Parent生成器，两个完整计算后端在同一全局时间推进器内运行，并继续满足P9a全部不变量。
+
+P9b已经在固定TinyLlama Q投影竞争用例上通过：真实SM86 Accel-Sim产生262,272个GPU Parent，完整ATLAS Chip产生139,456个ATLAS Parent；唯一Ramulator2完成全部401,728个Parent并以零在途退出。该结果关闭“双完整计算后端未并发”的实现差距，但不关闭周期级算子单放置、跨设备Residency/Fence、完整层或端到端模型差距。
+
+### 25.2 P10单放置与Residency分级
+
+P10拆分为三个必须分别记录的资格级别：
+
+- P10a（已实现）：控制面在Backend Dispatch前验证Node与Placement一一对应；按每个Read Value生成版本化输入引用和必要Route；按每个Write生成下一版本；将外部输入绑定、Read、Write和Route动作写入`hetero-residency/v2`。Model 3的跨设备Route必须保留`writeback/release_fence/invalidate/acquire_fence`动作。
+- P10b-A（已实现）：严格计划驱动不同真实Accel-Sim/ATLAS总时长适配器；Backend启动由在线事件执行器门禁，必须等待依赖、资源、Route和最新版本就绪；Route与输出只在完成时提交版本，并记录`online_dispatch.json`。
+- P10b-B（已实现）：把P10b-A的门禁扩展到请求级周期执行；GPU外部端口、ATLAS内部端口和Fence/Acquire请求进入唯一实时Ramulator2，生产者写完成和消费者Acquire完成后才安装目标版本。
+
+P10b-B固定单层混合配置通过20个Device Task、4条Route和382个Parent；GPU/ATLAS分别产生347/35个Parent，全部由一个Ramulator2完成并以零在途退出。两个独立运行的七类核心产物逐字节一致。该阶段关闭“严格单放置计划未连接请求完成回调”的差距，但计算仍是分块周期契约而非全算子指令Trace，内存仍是有界代表请求采样。
+
+### 25.3 P11至P14 Prefill部署分级
+
+- P11（已实现）：物化全部Prefill Tensor与参数；显式Token Embedding、GQA QKV宽度、Residual双输入、KV读改写、SwiGLU、Final Norm、LM Head和Sampling。GPU/ATLAS周期目录必须覆盖全部19类算子，任何分析回退直接失败。
+- P12（已实现）：TinyLlama单层、BS=1、Context=16、GPU-only请求周期运行。20个任务、378个GPU Parent、0个ATLAS Parent，全部完成。
+- P13（已实现）：TinyLlama 22层、BS=1、Context=16规模扩展。272个任务、448个Global PA区间、3,382个GPU Parent，全部完成。
+- P14（已实现部署资格）：TinyLlama‑1.1B FP16、BS=1、Context=1024、22层完整Prefill生命周期。包含一次Embedding、每层KV Append、Final Norm、LM Head、Sampling和请求释放；最终KV长度为1024。
+
+P11至P14强制以下不变量：
+
+1. 每个Device Task恰好Dispatch一次，每个任务必须由周期目录覆盖，`analytical_fallback_tasks=0`；
+2. 算子遵循`read durable → compute cycles → write durable → version commit`，禁止输出写请求早于输入完成或计算结束；
+3. 唯一Ramulator2完成全部已接收Parent，完成ID守恒且退出时`outstanding=0`；
+4. GPU-only配置必须有`initiator_order=["gpu0"]`、零ATLAS任务、零ATLAS Parent和零跨设备Route；
+5. Global PA使用`identity_untranslated`语义，所有区间对齐、非重叠并在4 GiB容量内；DRAM Mapper保持`OneLevelInterleave(channel_lowest_bit=0)`；
+6. P14的448个区间占用3,957,580,290 B，Prompt、22层KV写入、Final Norm、LM Head和首Token均存在；
+7. 每个阶段独立运行两次，`metrics.json`、`memory_statistics.json`、`request_cycle_trace.json`、`global_memory_map.json`、`prefill_artifact_coverage.json`、`execution_graph.json`和`residency.json`必须逐字节一致。
+
+P14是**部署完整、性能未资格**：周期目录来自确定性Tile Schedule Contract，不是Accel-Sim SASS Trace或ATLAS完整编译Artifact；每个Tensor只产生有界均匀采样请求，而不是完整访存流。因此固定输出必须记录`compute_fidelity=tiled_cycle_contract_unqualified`、`memory_fidelity=live_ramulator2_sampled_requests`、`trace_coverage=0`、`extrapolated_fraction=1`和`performance_claim_allowed=false`。不得把P14 makespan用于发表GPU/ATLAS加速比。
+
+### 25.4 暂缓需求：虚拟地址与DRAM地址哈希
+
+该需求已经进入冻结规划，但**当前阶段不实现，也不得记为已完成功能**。当前P9b在线GPU路径把GPGPU-Sim的`data->get_addr()`直接写入Bridge `global_address`；离线`TraceAddr → TensorID+offset → Global PA`能力尚未接入该实时路径。当前共享DRAM固定使用`OneLevelInterleave(channel_lowest_bit=0)`，共享ATLAS排序路径不接受其他Mapper；配置与Artifact的SHA256不是内存地址哈希。
+
+未来地址翻译接口必须支持：
+
+1. `identity`：显式声明输入地址已经是目标Global PA；
+2. `range_rebase`：由Trace Manifest和Simulation Buffer Bindings完成`TraceAddr → TensorID+offset → PhysicalAddress(memory_space_id, offset_bytes)`；
+3. `mmu_tlb`：在研究虚拟内存时增加Page Size、TLB、Page Table、Page-table Walk、Fault/Migration和翻译延迟；
+4. 所有模式检查Range Coverage、Alignment、Capacity、Alias、Allocation Epoch和Backing/View关系，并把翻译模式、分配快照和页表快照纳入Simulation Key。
+
+未来DRAM地址映射接口必须支持：
+
+1. `OneLevelInterleave`、`RoBaRaCoCh/ChRaBaRoCo`、`MOP4CLXOR`和版本化自定义XOR表达式；
+2. GPU和ATLAS对同一Global PA只调用同一个Mapper，Logic Die不得提前编码Channel/Bank位；
+3. Mapper名称、参数和实现Hash进入Simulation Key，并输出可复核的Global PA→DRAM Tuple抽样；
+4. 解除ATLAS排序器对`OneLevelInterleave`的实现类型依赖，同时保持确定性排序和请求守恒；
+5. 增加容量越界、Tensor/Memory Space碰撞、跨Core重叠、Channel分布和Row-locality测试。
+
+启动该暂缓项的条件为：研究目标转向GPU虚拟内存/UVM/CXL共享页、需要地址映射DSE、Global PA容量不足，或准备发布Mapper相关性能结论。启动前的所有报告必须明确写出`virtual_memory_mode=identity_untranslated`和`dram_mapper=OneLevelInterleave`。
 
 ---
 
@@ -2649,7 +2725,7 @@ TPOT 平均值和 ITL 百分位必须分开报告；`G=1` 请求的 TPOT 为 `nu
 | --- | --- | --- |
 | Accel-Sim外部内存桥改动大 | 极高 | 先完成独立GPU资格验证；Adapter隔离；从最小Load/Store Trace开始 |
 | GPU与ATLAS重复拥有DRAM时间 | 极高 | TimingOwnershipRegistry；冲突直接拒绝启动 |
-| Trace地址直接当物理地址 | 极高 | 强制Manifest、TensorID+offset、PhysicalAddress和DRAM Decode |
+| Trace地址直接当物理地址 | 极高 | 当前P9b/P14明确标记`identity_untranslated`；未来按25.4接入Manifest Rebase或MMU/TLB，未完成前禁止发布虚拟内存结论 |
 | 多时钟破坏因果 | 高 | 全局整数fs；稳定事件序号；禁止直接加Cycle |
 | Prefill/Decode Token或KV生命周期错误 | 高 | 两层小模型逐Token黄金轨迹 |
 | Continuous Batching规模爆炸 | 高 | Roofline先覆盖；周期模式窗口化；Trace Library和Shape选择 |
@@ -2719,3 +2795,12 @@ TPOT 平均值和 ITL 百分位必须分开报告；`G=1` 请求的 TPOT 为 `nu
 | 1.3 | 2026-08-27 | 固化Model 3 GPU-only无竞争基线：全部算子位于GPU、Logic Die Backend关闭、共享3D-DRAM仅允许GPU请求，并强制派生任务、路由、请求和守恒验收；双发起方竞争作为后续独立模式开启 |
 | 1.4 | 2026-08-27 | 固化GPU外部带宽与Logic Die/3D-DRAM内部带宽分离；新增双向外部Link、LogicDieMemoryGateway、Parent/Child拆分汇聚、durable完成、多时钟域、带宽一致性校验和拓扑特定请求语义；明确当前单请求Bridge仅是最小资格原型 |
 | 1.5 | 2026-08-28 | 记录P1–P7分层内存路径与ATLAS内部端口已经实现；固化端口级与完整Chip级资格边界；新增真实LLM Trace/ATLAS Artifact逐字段形状匹配门槛和单算子外推限制 |
+| 1.6 | 2026-08-28 | 固化P9a/P9b分级；P9a完整ATLAS Chip外部DRAM服务、Initiator完成隔离、每核Global PA投影和唯一Ramulator2已实现；明确确定性GPU流量不等于Accel-Sim计算后端并发 |
+| 1.7 | 2026-08-28 | 记录P9b真实Accel-Sim与完整ATLAS Chip同进程并发已通过；冻结配置哈希、运行期存活、双发起方守恒与竞争压力用例声明边界 |
+| 1.8 | 2026-08-28 | 记录但暂缓虚拟地址翻译与可配置DRAM地址哈希；明确当前在线地址直传、OneLevelInterleave限制、未来接口、验收条件和启动门槛；将周期级单设备放置与Residency/Fence提升为最高优先级 |
+| 1.9 | 2026-08-28 | 实现P10a严格单放置与逐值版本化Residency控制面；KV Append改为读改写；按输入值生成拓扑Route与Fence；隔离P9b重复算子竞争Backend；冻结P10b真实多算子周期接入边界 |
+| 1.10 | 2026-08-28 | 实现P10b-A在线Backend启动门禁；Backend只在依赖、资源、Route和最新输入版本就绪后启动；Route与输出在完成时提交版本；冻结P10b-B请求级共享Ramulator2接入边界 |
+| 1.11 | 2026-08-28 | 实现P10b-B唯一live Ramulator2请求周期运行时；GPU外部端口、ATLAS内部端口和Fence/Acquire完成共同门禁版本提交；固定混合单层双跑资格 |
+| 1.12 | 2026-08-28 | 实现P11完整Prefill物化图、19类算子周期目录、确定性Global PA和有界代表请求流量契约 |
+| 1.13 | 2026-08-28 | 实现P12单层与P13 22层Context=16 GPU-only Prefill部署、零Logic Die请求门禁和双跑确定性资格 |
+| 1.14 | 2026-08-28 | 实现P14 TinyLlama‑1.1B FP16、BS=1、Context=1024完整Prefill部署；冻结性能未资格声明、复现脚本和七产物双跑验收 |

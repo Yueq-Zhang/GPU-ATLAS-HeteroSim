@@ -67,6 +67,8 @@ typedef struct heterosim_parent_completion_v2 {
 
 heterosim_ramulator_handle heterosim_ramulator_create(
     const char *config_path, unsigned partition_id, unsigned partition_count);
+heterosim_ramulator_handle heterosim_ramulator_retain(
+    heterosim_ramulator_handle handle);
 void heterosim_ramulator_destroy(heterosim_ramulator_handle handle);
 int heterosim_ramulator_send(heterosim_ramulator_handle handle,
                              uint64_t address, int is_write, void *payload);
@@ -82,10 +84,27 @@ int heterosim_ramulator_send_internal_v2(
     heterosim_ramulator_handle handle,
     const heterosim_parent_request_v2 *request);
 void heterosim_ramulator_tick(heterosim_ramulator_handle handle);
+/*
+ * Advance up to max_gpu_cycles, stopping immediately after the first cycle
+ * that produces any parent completion.  This lets an external event runtime
+ * skip idle compute intervals without losing the exact completion cycle.
+ * Returns the number of GPU clock cycles actually advanced.
+ */
+uint64_t heterosim_ramulator_advance_until_event(
+    heterosim_ramulator_handle handle, uint64_t max_gpu_cycles);
 void heterosim_ramulator_advance_gpu_cycle(void);
+int heterosim_ramulator_external_runtime_active(void);
 void *heterosim_ramulator_pop_completed(heterosim_ramulator_handle handle);
 int heterosim_ramulator_pop_completed_v2(
     heterosim_ramulator_handle handle,
+    heterosim_parent_completion_v2 *completion);
+/*
+ * Pop only a completion owned by one initiator.  This is required when
+ * Accel-Sim and a live ATLAS Chip share a partition completion queue: neither
+ * backend is allowed to consume and reinterpret the other backend's payload.
+ */
+int heterosim_ramulator_pop_completed_for_initiator_v2(
+    heterosim_ramulator_handle handle, uint32_t initiator,
     heterosim_parent_completion_v2 *completion);
 uint64_t heterosim_ramulator_clock(heterosim_ramulator_handle handle);
 uint64_t heterosim_ramulator_reads(heterosim_ramulator_handle handle);

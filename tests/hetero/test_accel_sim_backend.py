@@ -8,6 +8,7 @@ import pytest
 from frontend.hetero.backends.accel_sim import (
     AccelSimBackend,
     AccelSimBackendConfig,
+    parse_atlas_full_chip_runtime_stats,
     parse_accel_sim_stats,
     parse_ramulator2_stats,
 )
@@ -65,6 +66,7 @@ def test_checked_in_backend_configs_pin_accel_sim_v2() -> None:
         "gpu_accelsim_qv100.json",
         "gpu_accelsim_rtx3070.json",
         "gpu_accelsim_qv100_ramulator2_hbm3.json",
+        "gpu_accelsim_rtx3070_full_atlas_chip_shared_hbdram_edge_16ch.json",
     ):
         payload = json.loads(
             (repository / "configs" / "hetero" / "backends" / filename).read_text(
@@ -171,6 +173,21 @@ def test_ramulator2_parser_uses_final_summary() -> None:
     }
 
 
+def test_atlas_full_chip_runtime_parser_preserves_status_and_counters() -> None:
+    stats = parse_atlas_full_chip_runtime_stats(
+        "heterosim_atlas_full_chip_runtime_summary status=passed "
+        "atlas_cycles=63681 atlas_e2e_cycles=63681 finish_gpu_cycle=76418 "
+        "finish_time_fs=63681666666 memory_bytes=8916992 "
+        "transaction_bytes=8925184 submitted_parents=139456 "
+        "completed_parents=139456 bridge_atlas_parents=139456 "
+        "bridge_atlas_completed=139456 runtime_active=0 instances=1\n"
+    )
+    assert stats is not None
+    assert stats["status"] == "passed"
+    assert stats["transaction_bytes"] == 8_925_184
+    assert stats["submitted_parents"] == stats["completed_parents"] == 139_456
+
+
 def test_external_memory_descriptor_is_cycle_coupled(tmp_path) -> None:
     config_path, _ = _files(tmp_path)
     payload = json.loads(config_path.read_text(encoding="utf-8"))
@@ -192,6 +209,51 @@ def test_external_memory_descriptor_is_cycle_coupled(tmp_path) -> None:
     assert descriptor.supports_stall_resume is True
     assert "shared_3d_dram" in descriptor.ownable_resource_kinds
     assert "gpu_local_dram" not in descriptor.ownable_resource_kinds
+
+
+def test_co_resident_atlas_requires_external_memory_and_owns_logic_die(
+    tmp_path,
+) -> None:
+    config_path, _ = _files(tmp_path)
+    payload = json.loads(config_path.read_text(encoding="utf-8"))
+    for filename in (
+        "hbm3.yaml",
+        "bridge.so",
+        "chip.yaml",
+        "operators.yaml",
+        "placement.yaml",
+    ):
+        (tmp_path / filename).write_text("test\n", encoding="utf-8")
+    payload["external_memory"] = {
+        "kind": "ramulator2_in_process",
+        "config_file": "hbm3.yaml",
+        "bridge_library": "bridge.so",
+        "timing_owner": "shared3d.ramulator2",
+        "expected_instances": 1,
+        "require_nonzero_requests": True,
+        "bandwidth_contract": _valid_bandwidth_contract(),
+    }
+    payload["co_resident_atlas"] = {
+        "kind": "full_chip_external_dram",
+        "execution_semantics": "contention_stress_duplicate_operator",
+        "chip_config": "chip.yaml",
+        "operator_list": "operators.yaml",
+        "placement_map": "placement.yaml",
+        "expected_instances": 1,
+        "require_nonzero_requests": True,
+        "expected_transaction_bytes": 64,
+    }
+    config_path.write_text(json.dumps(payload), encoding="utf-8")
+    backend = AccelSimBackend(AccelSimBackendConfig.load(config_path))
+    descriptor = backend.descriptor()
+    assert "atlas_core" in descriptor.ownable_resource_kinds
+    assert "atlas_sram" in descriptor.ownable_resource_kinds
+    assert "atlas_noc" in descriptor.ownable_resource_kinds
+    assert backend.config.co_resident_atlas is not None
+    assert backend.config.co_resident_atlas.execution_semantics == (
+        "contention_stress_duplicate_operator"
+    )
+    assert backend.config.co_resident_atlas.expected_transaction_bytes == 64
 
 
 def test_command_preserves_native_accel_sim_contract(tmp_path) -> None:

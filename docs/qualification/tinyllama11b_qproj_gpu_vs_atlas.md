@@ -78,4 +78,4 @@ ATLAS DRAM请求量高于唯一逻辑Tensor字节数，是因为固定Tile按照
 2. GPU Trace的`replay_safe`仍为`false`；不能在没有额外验证时把同一Trace用于任意GPU/DRAM时序候选并声称安全。
 3. 12.8 GB/s是当前直连外部PHY研究参数，不是ATLAS论文或某块真实板卡的实测接口结论。
 4. ATLAS原生运行采用每核一个本地HBDRAM Partition的原生Edge组织；双发起方资格用例已经验证ATLAS内部端口可与GPU共享唯一Ramulator2，但完整`atlasim.Chip`任务调度尚未与Accel-Sim并发推进。
-5. 当前只覆盖一个Q投影。完整Attention、MLP、KV访问、22层、Prefill/Decode端到端以及多Batch周期运行仍未完成，不能用本页结果直接推导整模型Latency或Token/s。
+5. 本页只资格化一个Q投影，不能用本页结果直接推导整模型Latency或Token/s。P14另行完成了22层Prefill部署，但使用未校准分块周期契约和采样内存流量；完整Attention/MLP/KV的真实Accel-Sim Trace、完整ATLAS Artifact、Decode和多Batch性能资格仍未完成。

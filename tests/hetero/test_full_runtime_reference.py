@@ -24,6 +24,8 @@ def test_full_runtime_reference_runs_all_profiles(
     )
     run_dir = execute_run(config, Path.cwd(), tmp_path)
     metrics = json.loads((run_dir / "metrics.json").read_text())
+    graph = json.loads((run_dir / "execution_graph.json").read_text())
+    residency = json.loads((run_dir / "residency.json").read_text())
     batch = json.loads((run_dir / "batch_plan.json").read_text())
     lifecycle = json.loads((run_dir / "memory_lifecycle.json").read_text())
     links = json.loads((run_dir / "link_statistics.json").read_text())
@@ -36,6 +38,10 @@ def test_full_runtime_reference_runs_all_profiles(
     assert lifecycle["memory_spaces"][0]["peak_bytes"] > 0
     assert links["submitted_payload_bytes"] == links["completed_payload_bytes"]
     assert links["coupling_iterations"] >= 1
+    assert graph["placement_contract"]["each_logical_node_exactly_once"] is True
+    assert graph["placement_contract"]["logical_node_count"] == len(graph["tasks"])
+    assert all("value_version" in route for route in graph["routes"])
+    assert residency["schema_version"] == "hetero-residency/v2"
 
 
 def test_model3_has_one_shared_memory_owner_and_conservation(tmp_path: Path) -> None:
@@ -45,6 +51,8 @@ def test_model3_has_one_shared_memory_owner_and_conservation(tmp_path: Path) -> 
     run_dir = execute_run(config, Path.cwd(), tmp_path)
     memory = json.loads((run_dir / "memory_statistics.json").read_text())
     provenance = json.loads((run_dir / "provenance.json").read_text())
+    graph = json.loads((run_dir / "execution_graph.json").read_text())
+    residency = json.loads((run_dir / "residency.json").read_text())
 
     assert provenance["memory_timing_owner"] == "shared3d.memory_service"
     assert memory["timing_owner"] == "shared3d.memory_service"
@@ -55,6 +63,9 @@ def test_model3_has_one_shared_memory_owner_and_conservation(tmp_path: Path) -> 
     assert memory["coupling_iterations"] >= 2
     metrics = json.loads((run_dir / "metrics.json").read_text())
     assert memory["last_completion_fs"] <= metrics["makespan_fs"]
+    assert len(graph["tasks"]) == 228
+    assert len(graph["routes"]) == 28
+    assert len(residency["events"]) == 571
 
 
 def test_model3_gpu_only_disables_logic_die_and_has_no_cross_device_routes(

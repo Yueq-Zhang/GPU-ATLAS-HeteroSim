@@ -34,8 +34,8 @@ _PROFILES = {
 }
 
 _COUPLINGS = {"analytical", "operator_event", "request_cycle"}
-_GPU_BACKENDS = {"roofline", "accel_sim"}
-_ATLAS_BACKENDS = {"none", "atlasim", "analytical"}
+_GPU_BACKENDS = {"roofline", "accel_sim", "cycle_replay"}
+_ATLAS_BACKENDS = {"none", "atlasim", "analytical", "cycle_replay"}
 _HOST_BACKENDS = {"none", "analytical", "gem5"}
 _GENERATION_MODES = {
     "trace_locked",
@@ -61,6 +61,8 @@ _MODEL_OPTIONAL = {
     "mlp_type",
     "position_encoding",
     "tied_embeddings",
+    "input_embedding_mode",
+    "materialize_parameters",
 }
 
 
@@ -163,6 +165,8 @@ def validate_config(config: Mapping[str, Any]) -> None:
                 "external_memory_bridge",
                 "exports_memory_requests",
                 "supports_stall_resume",
+                "cycle_artifact_ref",
+                "device_clock_hz",
             },
             f"backends.{backend_name}",
         )
@@ -179,9 +183,15 @@ def validate_config(config: Mapping[str, Any]) -> None:
         "analytical_preview",
         "operator_event",
         "full_runtime",
+        "prefill_cycle",
     }:
         raise ConfigError("invalid simulation.execution_mode")
-    if execution_mode in {"analytical_preview", "operator_event", "full_runtime"}:
+    if execution_mode in {
+        "analytical_preview",
+        "operator_event",
+        "full_runtime",
+        "prefill_cycle",
+    }:
         for backend_name, backend in (("gpu", gpu), ("atlas", atlas)):
             needs_analytical = backend.get("kind") in {"roofline", "analytical"} or (
                 backend.get("fallback_kind") == "analytical"
@@ -229,6 +239,29 @@ def validate_config(config: Mapping[str, Any]) -> None:
                     raise ConfigError("backends.atlas.resource_bindings is required")
                 if atlas.get("fallback_kind", "none") not in {"none", "analytical"}:
                     raise ConfigError("invalid backends.atlas.fallback_kind")
+
+        if execution_mode == "prefill_cycle":
+            if coupling != "request_cycle":
+                raise ConfigError(
+                    "prefill_cycle execution_mode requires request_cycle coupling"
+                )
+            for backend_name, backend in (("gpu", gpu), ("atlas", atlas)):
+                if backend.get("kind") == "none":
+                    continue
+                if backend.get("kind") != "cycle_replay":
+                    raise ConfigError(
+                        f"prefill_cycle requires {backend_name} kind=cycle_replay or none"
+                    )
+                if not isinstance(backend.get("cycle_artifact_ref"), str) or not backend[
+                    "cycle_artifact_ref"
+                ]:
+                    raise ConfigError(
+                        f"backends.{backend_name}.cycle_artifact_ref is required"
+                    )
+                _positive_int(
+                    backend.get("device_clock_hz"),
+                    f"backends.{backend_name}.device_clock_hz",
+                )
 
         links = system.get("links")
         if not isinstance(links, Mapping) or not links:
@@ -283,6 +316,26 @@ def validate_config(config: Mapping[str, Any]) -> None:
                     "bank_busy_time_fs",
                     "initiator_order",
                     "config_ref",
+                    "bridge_library",
+                    "gpu_clock_hz",
+                    "link_clock_hz",
+                    "gateway_clock_hz",
+                    "dram_clock_hz",
+                    "gateway_ingress_queue_depth",
+                    "gateway_parent_table_entries",
+                    "gateway_issue_width",
+                    "write_ack_policy",
+                    "request_bandwidth_Bps",
+                    "response_bandwidth_Bps",
+                    "request_header_bytes",
+                    "response_header_bytes",
+                    "flit_bytes",
+                    "propagation_latency_fs",
+                    "external_queue_depth",
+                    "external_credits",
+                    "duplex_mode",
+                    "max_samples_per_value",
+                    "sampling_policy",
                     "parameter_source",
                 },
                 f"system.memory_services.{memory_id}",
@@ -330,10 +383,63 @@ def validate_config(config: Mapping[str, Any]) -> None:
                         f"system.memory_services.{memory_id}.access_mode=gpu_only "
                         "requires initiator_order=['gpu0']"
                     )
-            elif not isinstance(memory.get("config_ref"), str) or not memory["config_ref"]:
-                raise ConfigError(
-                    f"system.memory_services.{memory_id}.config_ref is required"
-                )
+            else:
+                if not isinstance(memory.get("config_ref"), str) or not memory[
+                    "config_ref"
+                ]:
+                    raise ConfigError(
+                        f"system.memory_services.{memory_id}.config_ref is required"
+                    )
+                if execution_mode == "prefill_cycle":
+                    if not isinstance(memory.get("bridge_library"), str) or not memory[
+                        "bridge_library"
+                    ]:
+                        raise ConfigError(
+                            f"system.memory_services.{memory_id}.bridge_library is required"
+                        )
+                    for field in (
+                        "gpu_clock_hz",
+                        "link_clock_hz",
+                        "gateway_clock_hz",
+                        "dram_clock_hz",
+                        "transaction_bytes",
+                        "gateway_ingress_queue_depth",
+                        "gateway_parent_table_entries",
+                        "gateway_issue_width",
+                        "request_bandwidth_Bps",
+                        "response_bandwidth_Bps",
+                        "flit_bytes",
+                        "external_queue_depth",
+                        "external_credits",
+                        "max_samples_per_value",
+                    ):
+                        _positive_int(
+                            memory.get(field),
+                            f"system.memory_services.{memory_id}.{field}",
+                        )
+                    for field in (
+                        "request_header_bytes",
+                        "response_header_bytes",
+                        "propagation_latency_fs",
+                    ):
+                        _unsigned_int(
+                            memory.get(field, 0),
+                            f"system.memory_services.{memory_id}.{field}",
+                        )
+                    if memory.get("write_ack_policy", "durable") not in {
+                        "durable",
+                        "posted",
+                    }:
+                        raise ConfigError("invalid Ramulator2 write_ack_policy")
+                    if memory.get("duplex_mode", "full_duplex") not in {
+                        "full_duplex",
+                        "half_duplex",
+                    }:
+                        raise ConfigError("invalid Ramulator2 duplex_mode")
+                    if memory.get("sampling_policy") != "evenly_spaced_bounded":
+                        raise ConfigError(
+                            "prefill_cycle requires sampling_policy=evenly_spaced_bounded"
+                        )
             for field in ("timing_owner", "parameter_source"):
                 if not isinstance(memory.get(field), str) or not memory[field]:
                     raise ConfigError(
@@ -358,6 +464,18 @@ def validate_config(config: Mapping[str, Any]) -> None:
                         raise ConfigError(
                             "Model 3 gpu_only shared DRAM requires backends.atlas.kind=none"
                         )
+        if execution_mode == "prefill_cycle":
+            if profile != "model3_gpu_native_3ddram":
+                raise ConfigError("P10b-B prefill_cycle currently requires Model 3")
+            shared = memory_services.get("shared0.dram3d")
+            if not isinstance(shared, Mapping) or shared.get("kind") != "ramulator2":
+                raise ConfigError(
+                    "prefill_cycle requires shared0.dram3d.kind=ramulator2"
+                )
+            if shared.get("timing_owner") != "shared3d.live_ramulator2":
+                raise ConfigError(
+                    "prefill_cycle requires exactly one shared3d.live_ramulator2 owner"
+                )
 
     model = _mapping(config, "model")
     _reject_unknown(model, _MODEL_REQUIRED | _MODEL_OPTIONAL, "model")
@@ -378,6 +496,18 @@ def validate_config(config: Mapping[str, Any]) -> None:
         raise ConfigError("invalid model.position_encoding")
     if not isinstance(model.get("tied_embeddings", True), bool):
         raise ConfigError("model.tied_embeddings must be a boolean")
+    if model.get("input_embedding_mode", "preembedded") not in {
+        "preembedded",
+        "token_ids",
+    }:
+        raise ConfigError("invalid model.input_embedding_mode")
+    if not isinstance(model.get("materialize_parameters", False), bool):
+        raise ConfigError("model.materialize_parameters must be a boolean")
+    if execution_mode == "prefill_cycle":
+        if model.get("input_embedding_mode") != "token_ids":
+            raise ConfigError("prefill_cycle requires model.input_embedding_mode=token_ids")
+        if model.get("materialize_parameters") is not True:
+            raise ConfigError("prefill_cycle requires model.materialize_parameters=true")
 
     scheduling = _mapping(config, "scheduling")
     _reject_unknown(
@@ -452,6 +582,12 @@ def validate_config(config: Mapping[str, Any]) -> None:
             raise ConfigError(
                 f"requests[{index}].decode_step requires initial_kv_length"
             )
+        if execution_mode == "prefill_cycle" and (
+            scope != "full_request" or int(request.get("output_length", 0)) != 1
+        ):
+            raise ConfigError(
+                "prefill_cycle requires full_request with output_length=1"
+            )
         arrival = request.get("arrival_time_fs", 0)
         if not isinstance(arrival, int) or isinstance(arrival, bool) or arrival < 0:
             raise ConfigError(f"requests[{index}].arrival_time_fs must be unsigned")
@@ -491,6 +627,7 @@ def validate_config(config: Mapping[str, Any]) -> None:
             "allocation_alignment_bytes",
             "memory_spaces",
             "address_mapping",
+            "global_pa_capacity_bytes",
         },
         "address",
     )
@@ -499,6 +636,10 @@ def validate_config(config: Mapping[str, Any]) -> None:
     _positive_int(
         address.get("allocation_alignment_bytes", 64),
         "address.allocation_alignment_bytes",
+    )
+    _positive_int(
+        address.get("global_pa_capacity_bytes", address.get("kv_capacity_bytes")),
+        "address.global_pa_capacity_bytes",
     )
 
     if profile == "model4_cxl_memory_tier":

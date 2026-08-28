@@ -20,6 +20,15 @@
 #include "frontend/frontend.h"
 #include "memory_system/memory_system.h"
 
+#if defined(__GNUC__)
+extern "C" void heterosim_atlas_runtime_autostart(
+    heterosim_ramulator_handle handle) __attribute__((weak));
+extern "C" void heterosim_atlas_runtime_advance(
+    uint64_t gpu_cycles, uint64_t global_time_fs) __attribute__((weak));
+extern "C" void heterosim_atlas_runtime_shutdown() __attribute__((weak));
+extern "C" int heterosim_atlas_runtime_active() __attribute__((weak));
+#endif
+
 namespace {
 
 uint64_t positive_env(const char *name, uint64_t fallback) {
@@ -245,6 +254,21 @@ struct SharedBridge {
            !request_link_busy && !response_link_busy;
   }
 
+  bool has_completions() const {
+    return std::any_of(completed_payloads.begin(), completed_payloads.end(),
+                       [](const auto &queue) { return !queue.empty(); });
+  }
+
+  uint64_t advance_until_event(uint64_t max_gpu_cycles) {
+    if (has_completions() || max_gpu_cycles == 0) return 0;
+    uint64_t advanced = 0;
+    while (advanced < max_gpu_cycles && !has_completions()) {
+      advance_gpu_cycle();
+      ++advanced;
+    }
+    return advanced;
+  }
+
   void enqueue_response(const heterosim_parent_request_v2 &request,
                         uint32_t total_children, bool durable) {
     const uint64_t payload = request.operation == HETEROSIM_MEMORY_READ
@@ -378,6 +402,11 @@ struct SharedBridge {
       memory->tick();
       dram_phase -= gpu_clock_hz;
     }
+#if defined(__GNUC__)
+    if (heterosim_atlas_runtime_advance) {
+      heterosim_atlas_runtime_advance(gpu_cycles, global_time_fs);
+    }
+#endif
   }
 
   bool byte_enabled(const heterosim_parent_request_v2 &request,
@@ -580,6 +609,11 @@ std::unique_ptr<SharedBridge> g_shared_bridge;
 bool g_atexit_registered = false;
 
 void finish_shared_bridge_at_exit() {
+#if defined(__GNUC__)
+  if (heterosim_atlas_runtime_shutdown) {
+    heterosim_atlas_runtime_shutdown();
+  }
+#endif
   if (!g_shared_bridge) return;
   try {
     g_shared_bridge->finish();
@@ -654,12 +688,26 @@ extern "C" heterosim_ramulator_handle heterosim_ramulator_create(
     }
     auto *handle = new PartitionHandle{g_shared_bridge.get(), partition_id};
     ++g_shared_bridge->references;
+#if defined(__GNUC__)
+    if (partition_id == 0 && heterosim_atlas_runtime_autostart) {
+      heterosim_atlas_runtime_autostart(handle);
+    }
+#endif
     return handle;
   } catch (const std::exception &error) {
     std::cerr << "heterosim_ramulator_create failed: " << error.what()
               << std::endl;
     return nullptr;
   }
+}
+
+extern "C" heterosim_ramulator_handle heterosim_ramulator_retain(
+    heterosim_ramulator_handle opaque) {
+  PartitionHandle *handle = as_handle(opaque);
+  SharedBridge *shared = shared_from(opaque);
+  if (!handle || !shared || shared->finalized) return nullptr;
+  ++shared->references;
+  return new PartitionHandle{shared, handle->partition_id};
 }
 
 extern "C" void heterosim_ramulator_destroy(
@@ -750,16 +798,40 @@ extern "C" void heterosim_ramulator_tick(heterosim_ramulator_handle handle) {
   if (shared && !shared->finalized) shared->advance_gpu_cycle();
 }
 
+extern "C" uint64_t heterosim_ramulator_advance_until_event(
+    heterosim_ramulator_handle handle, uint64_t max_gpu_cycles) {
+  SharedBridge *shared = shared_from(handle);
+  if (!shared) return 0;
+  try {
+    return shared->advance_until_event(max_gpu_cycles);
+  } catch (const std::exception &error) {
+    std::cerr << "heterosim_ramulator_advance_until_event failed: "
+              << error.what() << std::endl;
+    return 0;
+  }
+}
+
 extern "C" void heterosim_ramulator_advance_gpu_cycle() {
   if (g_shared_bridge && !g_shared_bridge->finalized) {
     g_shared_bridge->advance_gpu_cycle();
   }
 }
 
+extern "C" int heterosim_ramulator_external_runtime_active() {
+#if defined(__GNUC__)
+  return heterosim_atlas_runtime_active
+             ? heterosim_atlas_runtime_active()
+             : 0;
+#else
+  return 0;
+#endif
+}
+
 extern "C" void *heterosim_ramulator_pop_completed(
     heterosim_ramulator_handle opaque) {
   heterosim_parent_completion_v2 completion{};
-  return heterosim_ramulator_pop_completed_v2(opaque, &completion)
+  return heterosim_ramulator_pop_completed_for_initiator_v2(
+             opaque, HETEROSIM_INITIATOR_GPU, &completion)
              ? completion.payload
              : nullptr;
 }
@@ -774,6 +846,26 @@ extern "C" int heterosim_ramulator_pop_completed_v2(
   if (queue.empty()) return 0;
   *completion = queue.front();
   queue.pop_front();
+  return 1;
+}
+
+extern "C" int heterosim_ramulator_pop_completed_for_initiator_v2(
+    heterosim_ramulator_handle opaque, uint32_t initiator,
+    heterosim_parent_completion_v2 *completion) {
+  PartitionHandle *handle = as_handle(opaque);
+  SharedBridge *shared = shared_from(opaque);
+  if (!handle || !shared || !completion ||
+      initiator > HETEROSIM_INITIATOR_ATLAS_LOGIC_DIE) {
+    return 0;
+  }
+  auto &queue = shared->completed_payloads.at(handle->partition_id);
+  const auto found = std::find_if(
+      queue.begin(), queue.end(), [initiator](const auto &candidate) {
+        return candidate.initiator == initiator;
+      });
+  if (found == queue.end()) return 0;
+  *completion = *found;
+  queue.erase(found);
   return 1;
 }
 

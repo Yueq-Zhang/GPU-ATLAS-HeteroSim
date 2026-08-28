@@ -2,7 +2,7 @@
 
 GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端到端 LLM 联合仿真工程。工程把完整 Prefill/Decode 请求图、算子放置、跨设备数据移动、Paged KV Cache 和全局事件调度连接到同一条可复现运行路径。
 
-> 当前版本为 `0.7.0`。P1–P7 分层内存路径已实现并通过微基准资格验证；本机 RTX 3070/驱动 591.86 已采集 TinyLlama‑1.1B 真实 Q 投影 Trace，并完成 Accel‑Sim 2.0 原生显存、GPU 经外部链路访问 ATLAS 风格 3D‑DRAM、以及匹配 ATLAS 算子 Artifact 的逐周期运行。当前证据严格限定为一个真实算子；完整层、端到端 LLM、多 Batch 周期执行和完整 ATLAS Chip 与 GPU 同时运行仍待后续实现。
+> 当前版本为 `0.15.0`。P10b-B 至 P14 已完成：`prefill_cycle`运行时按read→compute→write周期阶段在线推进GPU、ATLAS和Route，所有请求进入唯一live Ramulator2；TinyLlama‑1.1B FP16、BS=1、Context=1024的22层Prefill已完成部署和双跑确定性验证。算子计算来自显式分块周期契约，内存只采样有界代表请求，因此该结果标记为`implemented_unqualified`且禁止作为已校准性能结论。
 
 完整架构约束以 [GPU + ATLAS 异构端到端仿真实现规范](docs/gpu_atlas_heterogeneous_simulation_design_zh.md) 为准，阶段进度见 [实现状态](docs/IMPLEMENTATION_STATUS.md)。
 
@@ -12,6 +12,13 @@ GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端�
 
 - 完整请求级 decoder-only LLM 图：Prefill、逐 Token Decode、KV Append、LM Head 与 Sampling；
 - 按 phase、layer、operator group、KV 长度和活动 Batch 进行 GPU/ATLAS 放置；
+- 严格单放置计划：缺失、重复或未知设备的放置立即失败，执行图记录逻辑节点/设备任务/Backend Dispatch守恒；
+- 逐值版本化依赖：每个输入记录`value_id/version/size/memory_space`，跨设备读分别Lowering为Copy、Migration、Remote或显式非一致同步；
+- `residency.json` v2：外部输入绑定、Read、Write和跨设备Route均关联具体任务开始/完成时间；
+- `OnlineOperatorRuntime`：在Backend启动前检查依赖完成、设备资源、输入最新版本与目标Residency，旧版本或未完成Fence立即失败；
+- `PrefillCycleRuntime`：按请求完成回调驱动严格read→compute→write阶段，GPU外部端口、ATLAS内部Hybrid-Bond端口和跨设备Acquire/Fence共用一个Ramulator2时间所有者；
+- 完整物化Prefill图：显式Token ID/Embedding、静态权重、GQA QKV宽度、Residual双输入、KV读改写、SwiGLU宽度、最终Norm、LM Head和首Token Sampling；
+- 确定性Global PA分配：参数、KV、Activation和Metadata独立区间，对齐、容量、重叠和采样代表字节守恒均强制校验；
 - 四种系统组织形式的配置与拓扑 Lowering：
   1. ATLAS 原生独立 3D-DRAM，外部 GPU 使用分析模型；
   2. 3D-DRAM 作为主存，GPU 保留独立显存并通过 PCIe 搬运；
@@ -25,6 +32,9 @@ GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端�
 - Cycle-Accurate ABI v2：GPU Parent经双向外部Link进入Logic-Die Gateway，按Byte/Sector Mask拆分为64B Child，全部完成后才经响应Link返回；
 - GPU、外部Link、Logic Die和DRAM独立时钟域，默认durable写确认，退出时强制零在途；
 - ATLAS原生`ComponentInput`内部Hybrid-Bond端口，和GPU端口共享唯一Ramulator2；GPU-only、ATLAS-only和双发起方竞争黄金用例均已通过；
+- 完整`atlasim.Chip`非阻塞外部DRAM模式：按真实Core/Task/Iteration提交请求，片上计算与共享内存并行推进，完成后解除对应迭代；
+- GPU与ATLAS按Initiator隔离完成队列，ATLAS每核局部地址投影到不重叠的1 MiB Global PA区域；
+- 真实Accel-Sim与完整ATLAS Chip同进程多时钟推进；后端配置把Chip、算子和Placement内容哈希纳入Simulation Key；
 - TinyLlama‑1.1B layer-0 Q投影的真实SM86 Trace、16核ATLAS列分块Artifact和形状锁定比较生成器；
 - C++ BoundedLinkModel：PCIe/CXL队列深度、Credit、全双工序列化、传播延迟与背压；
 - Static Ragged、Continuous/Chunked Prefill与按设备拆分的Device Sub-Batch计划；
@@ -127,7 +137,7 @@ ctest --test-dir simulator/build --output-on-failure
 .venv/bin/python -m pytest tests/hetero -q
 ```
 
-当前基线通过 9 个 C++ 测试和 73 个 Python 测试。测试数量会随实现推进增加；判断成功应以“0 failed”为准，而不是永久依赖固定数量。
+当前基线通过 9 个 C++ 测试和 90 个 Python 测试。测试数量会随实现推进增加；判断成功应以“0 failed”为准，而不是永久依赖固定数量。
 
 强制重新编译已有目标：
 
@@ -217,6 +227,8 @@ cmake --build simulator/build --clean-first --parallel
 
 首次运行会生成 `backend_runs/gpu/` 与 `backend_runs/atlas/`；相同输入再次运行时，任务的 `backend_statistics.cache_hit` 应为 `true`。这只验证异构调度和适配器闭环，不代表真实 LLM Operator 已编译或校准。
 
+从P10b-A开始，Backend不再在执行图构造阶段提前运行。`python.OnlineOperatorRuntime`按照模拟时间启动任务，并生成`online_dispatch.json`；每个Device Task的`backend_launch_time_fs`必须不早于全部依赖的完成时间，`validated_input_versions`记录启动前通过检查的值版本。总时长Backend仍在独立子进程内完成，不能把该模式表述为请求级共享Ramulator2耦合。
+
 单独复核 ATLAS 适配器的确定性：
 
 ```bash
@@ -256,6 +268,8 @@ done
 - `link_statistics.json`：PCIe/CXL/同步路径事务、Credit、背压与字节守恒；
 - `memory_statistics.json`：共享3D内存父子请求、地址译码、Channel分布和完成时间；
 - `residency.json`：Copy、Migration、Remote或显式同步后的Owner/Version状态。
+
+P10a 后，`execution_graph.json`还包含`placement_contract`与`residency_plan`：前者要求`logical_node_count == materialized_device_task_count`且`each_logical_node_exactly_once=true`；后者为每个Read/Write/Route保留值版本。`residency.json`使用`hetero-residency/v2`，把这些事件绑定到实际任务时间。当前外部输入采用显式记录的`first_consumer_binding`策略；它不是VA→PA翻译，也不替代后续的Simulation Buffer Binding。
 
 这些配置使用 `reference_unqualified` 参数。链路和共享内存响应会反向延长父任务并重新推进全局DAG，直到任务/链路/内存时间表确定性收敛；因此队列与背压会进入端到端延迟，但Fidelity仍是`event_modeled`，参数也不代表目标硬件精度已经验证。
 
@@ -372,6 +386,10 @@ runs/<experiment.name>/<simulation_input_key>/
 | `link_statistics.json` | 有界链路事务、Credit、背压和字节计数 |
 | `memory_statistics.json` | 共享内存请求、DRAM译码和守恒计数 |
 | `residency.json` | Copy/Migration/Remote/Sync后的Residency状态 |
+| `online_dispatch.json` | `operator_event`的Backend启动顺序、模拟启动时间、版本检查次数和最终版本 |
+| `request_cycle_trace.json` | `prefill_cycle`的父请求地址、读写类型、代表字节、发出/完成周期与Initiator |
+| `global_memory_map.json` | 物化Tensor到Global PA的确定性分配、容量和非重叠证明 |
+| `prefill_artifact_coverage.json` | 每个Prefill任务的周期契约覆盖，要求无分析回退 |
 
 从 CLI 输出复制完整 `run_dir` 后查看结果：
 
@@ -772,3 +790,85 @@ bash scripts/capture_accel_sim_trace.sh \
 ```
 
 已验证结果：RTX 3070原生显存为`36,324 cycles / 32.088 µs`；GPU经12.8 GB/s外部Link访问409.6 GB/s内部3D-DRAM为`1,498,113 cycles / 1,323.421 µs`；ATLAS内部3D-DRAM为`24,613 cycles / 24.613 µs`。这三项是同Checkpoint、同算子和同Shape，但计算微架构不同；只可作为当前配置研究结果，不能外推为整层、端到端模型或实测硬件加速比。详细证据见[TinyLlama Q投影资格对比](docs/qualification/tinyllama11b_qproj_gpu_vs_atlas.md)。
+
+### 14.5 P9a：完整ATLAS Chip实时共享内存
+
+P9a不再用合成`ComponentInput`直接压端口，而是运行完整`atlasim.Chip`。补丁令ATLAS在外部模式下不构造第二个Ramulator2：`Core::pre_simulate()`只捕获各迭代真实DRAM输入，运行时通过外部服务提交、重试、等待完成，同时Matrix/Vector/Buffer继续按ATLAS周期推进。
+
+构建和资格运行：
+
+```bash
+bash scripts/build_accel_sim_ramulator2.sh
+bash scripts/build_atlas_full_chip_runtime.sh
+bash scripts/qualify_full_chip_scheduler_memory_path.sh \
+  /opt/gpu-atlas/qualification/full-chip-scheduler-memory-path-20260828-p9a-final
+```
+
+固定TinyLlama Q投影结果如下：
+
+- ATLAS-only：完整Chip在`63,681`个ATLAS周期完成，对应`76,418`个1.2 GHz GPU全局推进周期；
+- 加入4,096个确定性GPU Parent后：ATLAS完成推迟到`81,329`个GPU周期，完整Chip记录`67,774`个ATLAS周期；
+- ATLAS产生139,456个64B Parent（8,925,184 B），GPU产生4,096个128B Parent；二者全部完成，唯一Ramulator2退出时`outstanding=0`；
+- 旧ATLAS原生统计为8,916,992 B，其中每核8次32B输出写按逻辑字节计数；实时共享路径按全部对齐64B事务计数，因此两者相差8,192 B，资格守恒以实时Parent/Child事务为准。
+
+此项只证明“完整ATLAS Chip调度器 + 共享Ramulator2 + 确定性GPU内存流量”闭环。`coverage.accel_sim_compute_backend=false`，所以不能表述为完整ATLAS Chip已经与真实Accel‑Sim Kernel并发；该闭环是下一步P9b的基础。详细证据见[完整ATLAS Chip共享内存资格](docs/qualification/tinyllama_qproj_full_atlas_chip_shared_memory.md)。
+
+### 14.6 P9b：真实Accel-Sim与完整ATLAS Chip并发
+
+P9b把完整Chip运行时编译进Accel-Sim使用的共享内存桥。GPU每推进一个Core周期，统一推进器按频率比轮询ATLAS完成、推进Chip并提交新的Logic-Die请求；当GPU Kernel先结束时，`active()`合同仍会保持仿真，直到ATLAS和共享内存均完成。GPU只能取GPU完成，ATLAS只能取ATLAS完成，二者不能误消费对方Payload。
+
+```bash
+bash scripts/build_accel_sim_ramulator2.sh
+bash scripts/build_atlas_full_chip_runtime.sh
+bash scripts/qualify_accel_sim_full_chip_concurrency.sh \
+  /opt/gpu-atlas/qualification/accel-sim-v2/rtx3070-tinyllama-qproj-full-atlas-chip-shared-memory-p9b
+```
+
+固定TinyLlama layer-0 `q_proj`竞争用例的单次结果为：GPU `1,541,401 cycles / 15,908,352 instructions / 262,272 Parent`；ATLAS完整Chip `141,255 cycles / 139,456 Parent`，在第`159,901`个GPU周期完成；唯一Ramulator2接收`401,728`个Parent和`401,728`个Child，全部完成且`outstanding=0`。ATLAS事务量为`8,925,184 B`，GPU与ATLAS在时间上重叠。
+
+该用例故意让同一Shape同时在两个设备执行，只用于验证计算后端并发和共享DRAM竞争，不能作为算子放置策略、端到端延迟或加速比。正式双次确定性证据见[P9b真实双计算后端资格](docs/qualification/tinyllama_qproj_accelsim_full_atlas_chip_concurrency.md)。
+
+### 14.7 P10a：单放置与版本化Residency控制面
+
+正常执行图先经过`build_single_placement_plan`。放置决策必须与逻辑节点一一对应；每个Read引用确定的值版本；写入生成下一版本；跨设备消费者为每个输入值分别插入路由任务。Model 3路由携带`writeback → release_fence → invalidate → acquire_fence`动作，Model 1/2/4继续按各自拓扑Lowering。
+
+```bash
+.venv/bin/python -m pytest tests/hetero/test_single_placement.py -q
+.venv/bin/python -m frontend.hetero.cli run \
+  --config configs/hetero/experiments/m8_model3_full_runtime_reference.json \
+  --runs-root /tmp/gpu-atlas-p10a
+```
+
+固定Model 3参考配置包含228个逻辑节点和228个设备任务，`each_logical_node_exactly_once=true`；逐值Lowering产生28条同步路由与571条带时间戳Residency事件。该结果验证控制面、事件级Link/Memory闭环与版本守恒，不表示这些228个算子都已经拥有真实Accel-Sim/ATLAS周期Artifact。P9b使用的`co_resident_atlas`配置现在必须声明`execution_semantics=contention_stress_duplicate_operator`，正常`operator_event` Dispatcher会拒绝它。完整证据与声明边界见[P10a单放置与Residency资格](docs/qualification/p10a_single_placement_residency.md)。
+
+### 14.8 P10b-A：依赖与版本门禁后的真实Backend启动
+
+`operator_event`现在先构造严格执行计划，再由`OnlineOperatorRuntime`按`(time_fs, priority, insertion_sequence)`推进。Route完成时才把指定版本登记到目标设备；Device Task启动前逐个核对`value_id/version/device`；Task完成时才提交输出的新版本。Backend Dispatch数量必须严格等于Device Task数量。
+
+```bash
+.venv/bin/python -m pytest tests/hetero/test_online_operator_runtime.py -q
+.venv/bin/python -m frontend.hetero.cli run \
+  --config configs/hetero/experiments/step2_model1_operator_event_probe.json \
+  --runs-root /opt/gpu-atlas/qualification/p10b-a-online-dispatch-run1
+```
+
+Step 2真实适配器用例包含85个逻辑节点、85次Backend Dispatch、12条Route和117次版本检查。一个官方QV100 Trace由Accel-Sim执行14,731 cycles，一个ATLAS GEMM Artifact执行48,446 cycles；GPU与ATLAS启动时刻分别为8,192,002 fs和14,248,172,886 fs，均等于各自最大依赖完成时刻。两个独立输出目录的`online_dispatch.json`和`metrics.json`逐字节一致。两项绑定仍是`surrogate_plumbing_probe`，P10b-A只资格化总时长真实适配器的启动门禁，不资格化跨设备请求级周期交互。详细记录见[P10b-A在线Backend门禁资格](docs/qualification/p10b_a_online_backend_gate.md)。
+
+### 14.9 P10b-B 至 P14：完整Prefill部署
+
+P10b-B把严格计划接到唯一live Ramulator2。GPU请求经过12.8 GB/s外部链路；ATLAS请求从Logic Die内部端口进入；Model 3跨设备Route等待生产者写完成，再执行Fence和消费者Acquire探测。每个算子只有在采样输入请求全部完成后才推进其显式分块计算周期，计算结束后才发出输出写请求。
+
+```bash
+bash scripts/qualify_prefill_p10b_to_p14.sh \
+  /opt/gpu-atlas/GPU-ATLAS-HeteroSim \
+  /opt/gpu-atlas/qualification/prefill-p10b-to-p14-final
+```
+
+阶段配置为：
+
+- P10b-B：单层Context=16，`causal_attention`放到ATLAS，其余任务放GPU；20任务、4 Route、GPU/ATLAS Parent为347/35；
+- P12：单层Context=16 GPU-only；20任务、378个GPU Parent、ATLAS为0；
+- P13：22层Context=16 GPU-only；272任务、448地址区间、3,382个GPU Parent；
+- P14：TinyLlama‑1.1B FP16、BS=1、Context=1024、22层GPU-only完整Prefill；272任务、3,385个GPU Parent、最终KV长度1024，Global PA占用3,957,580,290 B / 4 GiB。
+
+四个阶段均运行两次并逐字节比较七类核心产物，所有Parent完成、唯一Ramulator2、`outstanding=0`、周期契约覆盖100%、分析回退为0。P14输出的26,644.55 µs只是当前“分块周期契约 + 有界代表内存请求”部署值；`trace_coverage=0`、`extrapolated_fraction=1.0`、`performance_claim_allowed=false`，不可称为Accel-Sim全指令Trace端到端延迟、完整ATLAS Artifact结果或实机性能。详细记录见[P14完整Prefill部署资格](docs/qualification/p14_prefill_bs1_ctx1024.md)。

@@ -3,7 +3,7 @@ captured_at: 2026-08-27
 source_baseline:
   atlas_repository: pku-gsun/ATLAS-MICRO-2026
   atlas_commit: b2787399408e32d327c820daee96d4e6610f551a
-  design_spec_sha256: EB9AE19EF168F26B9B2B081BD116290C061B151EABA61F76BEF60A86B10A5333
+  design_spec_sha256: 197135049B64811E2E1BEB47A37CBC79B60EB250A1290DBA1B037A836F19E4C3
 environment:
   os: Ubuntu-22.04-WSL2
   wsl_kernel: 6.6.87.2-microsoft-standard-WSL2
@@ -30,7 +30,7 @@ dependencies:
   ramulator2:
     commit: 3996362187d7f8314936e5ad7560d93b66b6a215
     source: ATLAS-MICRO-2026/simulator/src/dram/ramulator2
-    integration_status: minimal_in_process_gpu_callback_bridge_qualified_bandwidth_pending
+    integration_status: one_owner_p9b_and_prefill_p10b_b_to_p14_deployment_qualified
   booksim2:
     commit: 1a8ec21ecc71f26be6907e373034e18c136ee459
     source: ATLAS-MICRO-2026/simulator/src/noc/booksim2
@@ -54,5 +54,9 @@ notes:
   - Accel-Sim 2.0 uses the rebuilt NVBit 1.8 tracer and compressed .tracez format; local RTX 3070 driver 591.86 capture and adapter-equivalence qualification passed on 2026-08-27.
   - The Accel-Sim 2.0 source archive does not pin GPGPU-Sim; the exact inspected dev revision is pinned here for reproducibility.
   - M5 Step 1 is an independent total-duration backend; Accel-Sim exclusively owns GPU core, cache, NoC and local DRAM timing.
-  - ATLAS, Ramulator2, BookSim2 and TileLang revisions are pinned; their coupled target-platform paths still require explicit qualification records before results are reported.
-  - The current QV100 + Ramulator2 result qualifies one-parent/one-request callbacks only. External-link timing, Logic-Die parent/child splitting, bandwidth consistency and dual-initiator contention remain planned under design contract v1.4.
+  - ATLAS, Ramulator2, BookSim2 and TileLang revisions are pinned; only paths with explicit qualification records may be reported.
+  - P1-P7 qualify external-link timing, Logic-Die parent/child splitting, bandwidth consistency and dual-initiator memory-port contention.
+  - P9b qualifies real Accel-Sim and a complete atlasim.Chip concurrently against one Ramulator2 for one fixed TinyLlama q_proj contention workload; this is not an end-to-end placement schedule.
+  - P10a qualifies strict one-node/one-device-task placement, per-value versioned routes and timed residency events in the reference control plane; real multi-operator cycle coupling remains pending.
+  - P10b-B qualifies dependency-, resource-, route-, version- and live request-completion gating for one mixed TinyLlama Prefill layer through one Ramulator2.
+  - P11-P14 deploy a complete materialized TinyLlama-1.1B FP16 BS=1 Context=1024 Prefill graph through first-token sampling; compute uses uncalibrated tiled cycle contracts and memory uses bounded representative requests, so performance claims remain disabled.

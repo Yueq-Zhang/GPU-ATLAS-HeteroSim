@@ -1,0 +1,11 @@
+{
+  "mode": "manual",
+  "unit": "operator",
+  "default_target": "gpu0",
+  "rules": [],
+  "data": {
+    "weights": {"home": "shared0.dram3d"},
+    "activations": {"home": "shared0.dram3d"},
+    "kv_cache": {"home": "shared0.dram3d", "layout": "paged", "page_tokens": 16}
+  }
+}

@@ -24,7 +24,8 @@ struct AtlasHbAccess {
 class AtlasHybridBondPort {
  public:
   AtlasHybridBondPort(heterosim_ramulator_handle handle,
-                      uint32_t partition_id, uint32_t transaction_bytes);
+                      uint32_t partition_id, uint32_t transaction_bytes,
+                      uint64_t global_address_base = 0);
 
   std::vector<AtlasHbAccess> generate(
       const atlasim::ComponentInput &input) const;
@@ -37,6 +38,7 @@ class AtlasHybridBondPort {
   heterosim_ramulator_handle handle_;
   uint32_t partition_id_;
   uint32_t transaction_bytes_;
+  uint64_t global_address_base_;
 };
 
 }  // namespace heterosim

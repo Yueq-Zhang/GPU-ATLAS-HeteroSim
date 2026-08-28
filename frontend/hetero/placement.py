@@ -20,6 +20,7 @@ def _matches(node: ModelNode, match: Mapping[str, Any], active_batch: int) -> bo
     checks = {
         "phase": node.phase.value,
         "layer_id": node.layer_id,
+        "op": node.op,
         "operator_group": node.attributes.get("operator_group"),
     }
     for key, expected in checks.items():

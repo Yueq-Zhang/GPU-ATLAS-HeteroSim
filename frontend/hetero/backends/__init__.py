@@ -5,6 +5,8 @@ from .accel_sim import (
     AccelSimBackendConfig,
     AccelSimBackendError,
     AccelSimRunResult,
+    CoResidentAtlasConfig,
+    parse_atlas_full_chip_runtime_stats,
 )
 from .contracts import (
     BackendDescriptor,
@@ -33,6 +35,8 @@ __all__ = [
     "AccelSimBackendConfig",
     "AccelSimBackendError",
     "AccelSimRunResult",
+    "CoResidentAtlasConfig",
+    "parse_atlas_full_chip_runtime_stats",
     "BackendDescriptor",
     "ResolvedTimingContract",
     "TimingContractError",

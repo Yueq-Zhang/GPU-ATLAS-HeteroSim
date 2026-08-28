@@ -11,22 +11,30 @@ from typing import Any, Mapping
 
 from .analytical import estimate_link_duration_fs, estimate_node_cost
 from .batching import build_batch_plan
+from .execution_plan import build_single_placement_plan, route_to_dict
+from .global_memory_map import build_global_memory_map
+from .live_ramulator2 import LiveRamulator2Bridge
 from .memory_system import (
-    CanonicalRange,
-    ResidencyManager,
     build_dynamic_kv_lifecycle,
     run_reference_coupled_dag,
 )
 from .model_graph import (
+    ModelSpec,
     build_request_graph,
     graph_counters,
     model_spec_from_config,
     request_specs_from_config,
 )
+from .online_operator_runtime import (
+    OnlineDispatchSpec,
+    run_online_operator_dag,
+)
 from .placement import place_nodes
 from .operator_event import OperatorEventDispatcher
+from .prefill_cycle_artifact import PrefillCycleDispatcher
+from .prefill_cycle_runtime import run_prefill_cycle_dag
 from .runtime_bridge import allocate_paged_kv, run_task_dag, simulate_token_barrier
-from .topology import lower_cross_device_dependency, primary_3ddram
+from .topology import primary_3ddram
 
 
 def simulation_input_key(config: Mapping[str, object]) -> str:
@@ -119,78 +127,112 @@ def _execution_graph(
     graphs: list[tuple[object, list[object], object]],
     profile: str,
     access_policy: str,
-    model: object,
+    model: ModelSpec,
     backends: Mapping[str, object],
     links: Mapping[str, object],
     execution_mode: str,
-    dispatcher: OperatorEventDispatcher | None = None,
-) -> tuple[dict[str, object], list[dict[str, object]]]:
+) -> tuple[
+    dict[str, object],
+    list[dict[str, object]],
+    dict[str, OnlineDispatchSpec],
+]:
     timed_execution = execution_mode in {
         "analytical_preview",
         "operator_event",
         "full_runtime",
+        "prefill_cycle",
     }
     tasks: list[dict[str, object]] = []
     routes: list[dict[str, object]] = []
     runtime_tasks: list[dict[str, object]] = []
+    residency_events: list[dict[str, object]] = []
+    final_residency: list[dict[str, object]] = []
+    request_conservation: list[dict[str, object]] = []
+    operator_dispatch_specs: dict[str, OnlineDispatchSpec] = {}
     for graph_object, decisions_object, request_object in graphs:
         graph = graph_object
         decisions = decisions_object
         request = request_object
-        by_node = {decision.node_id: decision for decision in decisions}
-        previous_device: str | None = None
-        previous_task: str | None = None
-        previous_value_id: str | None = None
-        for node in graph.nodes:
-            decision = by_node[node.node_id]
-            dependencies: list[str] = []
-            if previous_task is not None:
-                dependencies.append(previous_task)
-            if previous_device is not None and previous_device != decision.target_device:
-                lowering = lower_cross_device_dependency(
-                    profile, previous_device, decision.target_device, access_policy
-                )
-                route_task = f"route.{len(routes)}"
+        plan = build_single_placement_plan(
+            graph, decisions, profile, access_policy, model
+        )
+        request_conservation.append(
+            {"request_id": request.request_id, **dict(plan.conservation)}
+        )
+        residency_events.extend(plan.residency_events)
+        final_residency.extend(plan.final_records)
+        routes_by_consumer: dict[str, list[object]] = {}
+        for planned_route in plan.routes:
+            routes_by_consumer.setdefault(
+                planned_route.consumer_task_id, []
+            ).append(planned_route)
+
+        for planned_node in plan.nodes:
+            node = planned_node.node
+            decision = planned_node.decision
+            dependencies = list(planned_node.dependencies)
+            for planned_route in routes_by_consumer.get(planned_node.task_id, []):
                 route_record = {
-                    "task_id": route_task,
                     "request_id": request.request_id,
-                    "dependencies": [previous_task],
-                    "producer_device": previous_device,
-                    "consumer_device": decision.target_device,
-                    "value_id": previous_value_id or f"{request.request_id}.control",
-                    **asdict(lowering),
+                    "task_kind": "route",
+                    "release_time_fs": 0,
+                    **route_to_dict(planned_route),
                 }
                 if timed_execution:
-                    if lowering.route_id not in links:
+                    route_id = route_record["route_id"]
+                    if route_id not in links:
                         raise ValueError(
-                            f"missing analytical parameters for route {lowering.route_id}"
+                            f"missing analytical parameters for route {route_id}"
                         )
-                    link = links[lowering.route_id]
+                    link = links[route_id]
                     if not isinstance(link, Mapping):
-                        raise ValueError(f"route {lowering.route_id} must be an object")
-                    q_len = int(node.attributes.get("q_len", 1))
-                    payload_bytes = q_len * model.hidden_size * model.bytes_per_element
-                    duration_fs = estimate_link_duration_fs(payload_bytes, link)
+                        raise ValueError(f"route {route_id} must be an object")
+                    payload_bytes = int(route_record["payload_bytes"])
+                    duration_fs = (
+                        max(1, int(link.get("latency_fs", 0)))
+                        if execution_mode == "prefill_cycle"
+                        and str(
+                            getattr(
+                                route_record.get("kind"),
+                                "value",
+                                route_record.get("kind"),
+                            )
+                        )
+                        == "synchronization"
+                        else estimate_link_duration_fs(payload_bytes, link)
+                    )
                     route_record.update(
                         {
                             "resource_id": str(link["resource_id"]),
                             "payload_bytes": payload_bytes,
                             "duration_fs": duration_fs,
                             "analytical_parameters": dict(link),
+                            "route_timing_semantics": (
+                                "live_durable_fence_and_consumer_acquire_probe"
+                                if execution_mode == "prefill_cycle"
+                                and str(
+                                    getattr(
+                                        route_record.get("kind"),
+                                        "value",
+                                        route_record.get("kind"),
+                                    )
+                                )
+                                == "synchronization"
+                                else "payload_serialization"
+                            ),
                         }
                     )
                     runtime_tasks.append(
                         {
-                            "task_id": route_task,
+                            "task_id": planned_route.task_id,
                             "resource_id": str(link["resource_id"]),
-                            "dependencies": [previous_task],
+                            "dependencies": list(planned_route.dependencies),
                             "release_time_fs": 0,
                             "duration_fs": duration_fs,
                         }
                     )
                 routes.append(route_record)
-                dependencies = [route_task]
-            task_id = f"task.{node.node_id}"
+            task_id = planned_node.task_id
             backend_key = (
                 "gpu"
                 if decision.target_device == "gpu0"
@@ -213,9 +255,15 @@ def _execution_graph(
                 "step_id": node.step_id,
                 "read_values": list(node.read_values),
                 "write_values": list(node.write_values),
+                "input_values": list(planned_node.input_values),
+                "output_values": list(planned_node.output_values),
                 "device_id": decision.target_device,
                 "backend_id": f"{backend_key}.{backend['kind']}",
                 "dependencies": dependencies,
+                "resource_id": decision.target_device,
+                "release_time_fs": request.arrival_time_fs
+                if not node.dependencies
+                else 0,
                 "fidelity": {
                     "compute_fidelity": "unavailable",
                     "memory_fidelity": "unavailable",
@@ -258,53 +306,89 @@ def _execution_graph(
                         "resource_id": decision.target_device,
                         "dependencies": dependencies,
                         "release_time_fs": request.arrival_time_fs
-                        if previous_task is None
+                        if not node.dependencies
                         else 0,
                         "duration_fs": duration_fs,
                     }
                 )
-            elif execution_mode == "operator_event":
-                if dispatcher is None:
-                    raise ValueError("operator_event execution requires a Backend dispatcher")
-                result = dispatcher.dispatch(
-                    backend_key, node, model, decision.target_device
-                )
-                task_record.update(
-                    {
-                        "backend_id": result.backend_id,
-                        "resource_id": result.resource_id,
-                        "duration_fs": result.duration_fs,
-                        "timing_contract": dict(result.timing_contract),
-                        "backend_statistics": dict(result.statistics),
-                        "compiled_artifact": dict(result.artifact),
-                        "fidelity": dict(result.fidelity),
-                    }
-                )
-                runtime_tasks.append(
-                    {
-                        "task_id": task_id,
-                        "resource_id": result.resource_id,
-                        "dependencies": dependencies,
-                        "release_time_fs": request.arrival_time_fs
-                        if previous_task is None
-                        else 0,
-                        "duration_fs": result.duration_fs,
-                    }
+            elif execution_mode in {"operator_event", "prefill_cycle"}:
+                operator_dispatch_specs[task_id] = OnlineDispatchSpec(
+                    task_id=task_id,
+                    backend_key=backend_key,
+                    node=node,
+                    model=model,
+                    device_id=decision.target_device,
                 )
             tasks.append(task_record)
-            previous_device = decision.target_device
-            previous_task = task_id
-            previous_value_id = (
-                str(node.write_values[-1]) if node.write_values else previous_value_id
-            )
+    logical_nodes = sum(
+        int(item["logical_node_count"]) for item in request_conservation
+    )
+    exact_once = all(
+        bool(item["each_logical_node_exactly_once"])
+        for item in request_conservation
+    ) and logical_nodes == len(tasks)
     return (
         {
             "schema_version": "hetero-execution-graph/v1",
             "tasks": tasks,
             "routes": routes,
+            "placement_contract": {
+                "schema_version": "hetero-single-placement/v1",
+                "semantics": "one_logical_node_one_device_one_backend_dispatch",
+                "requests": request_conservation,
+                "logical_node_count": logical_nodes,
+                "materialized_device_task_count": len(tasks),
+                "backend_dispatch_count": 0
+                if execution_mode in {"operator_event", "prefill_cycle"}
+                else None,
+                "each_logical_node_exactly_once": exact_once,
+            },
+            "residency_plan": {
+                "schema_version": "hetero-residency-plan/v1",
+                "coherence": "explicit_noncoherent",
+                "initialization_policy": "first_consumer_binding",
+                "events": residency_events,
+                "final_records": final_residency,
+            },
         },
         runtime_tasks,
+        operator_dispatch_specs,
     )
+
+
+def _materialize_residency(
+    execution_graph: Mapping[str, object],
+    timing_by_id: Mapping[str, Mapping[str, object]],
+) -> dict[str, object]:
+    """Attach runtime timestamps to the already validated residency plan."""
+
+    plan = execution_graph.get("residency_plan")
+    if not isinstance(plan, Mapping):
+        raise ValueError("execution graph is missing residency_plan")
+    raw_events = plan.get("events")
+    if not isinstance(raw_events, list):
+        raise ValueError("residency plan events must be an array")
+    events: list[dict[str, object]] = []
+    for raw in raw_events:
+        if not isinstance(raw, Mapping):
+            raise ValueError("residency event must be an object")
+        trigger_task = str(raw["trigger_task_id"])
+        timing = timing_by_id[trigger_task]
+        trigger = str(raw["trigger"])
+        time_fs = (
+            int(timing["start_time_fs"])
+            if trigger == "task_start"
+            else int(timing["completion_time_fs"])
+        )
+        events.append({**dict(raw), "time_fs": time_fs})
+    events.sort(key=lambda item: (int(item["time_fs"]), int(item["sequence"])))
+    return {
+        "schema_version": "hetero-residency/v2",
+        "coherence": plan["coherence"],
+        "initialization_policy": plan["initialization_policy"],
+        "records": plan["final_records"],
+        "events": events,
+    }
 
 
 def _metrics(
@@ -499,7 +583,7 @@ def execute_run(
     links = system.get("links", {})
     if not isinstance(links, Mapping):
         raise ValueError("system.links must be an object")
-    execution_graph, runtime_tasks = _execution_graph(
+    execution_graph, runtime_tasks, operator_dispatch_specs = _execution_graph(
         placed_graphs,
         profile,
         access_policy,
@@ -507,16 +591,19 @@ def execute_run(
         backends,
         links,
         execution_mode,
-        dispatcher,
     )
     batch_plan: dict[str, object] | None = None
     memory_lifecycle: dict[str, object] | None = None
     link_statistics: dict[str, object] | None = None
     memory_statistics: dict[str, object] | None = None
     residency_payload: dict[str, object] | None = None
+    online_dispatch_payload: dict[str, object] | None = None
+    request_cycle_payload: dict[str, object] | None = None
+    global_memory_map_payload: dict[str, object] | None = None
+    prefill_coverage_payload: dict[str, object] | None = None
     shared_config: Mapping[str, object] | None = None
     shared_reference_active = False
-    if execution_mode == "full_runtime":
+    if execution_mode in {"full_runtime", "prefill_cycle"}:
         memory_services = system.get("memory_services", {})
         if not isinstance(memory_services, Mapping):
             raise ValueError("system.memory_services must be an object")
@@ -524,7 +611,7 @@ def execute_run(
         if isinstance(candidate, Mapping):
             shared_config = candidate
             shared_reference_active = candidate.get("kind") == "shared_3d_reference"
-            if candidate.get("kind") == "ramulator2":
+            if candidate.get("kind") == "ramulator2" and execution_mode == "full_runtime":
                 raise ValueError(
                     "full_runtime live Ramulator2 coupling is not qualified; "
                     "use 'qualify-memory' for standalone replay or configure "
@@ -533,7 +620,12 @@ def execute_run(
     competition_summary = _validate_gpu_only_shared_3d_baseline(
         execution_graph, shared_config
     )
-    if execution_mode in {"analytical_preview", "operator_event", "full_runtime"}:
+    if execution_mode in {
+        "analytical_preview",
+        "operator_event",
+        "full_runtime",
+        "prefill_cycle",
+    }:
         if execution_mode == "full_runtime":
             runtime_result, link_statistics, memory_statistics = (
                 run_reference_coupled_dag(
@@ -545,6 +637,99 @@ def execute_run(
                     memory_space_id,
                 )
             )
+        elif execution_mode == "operator_event":
+            if dispatcher is None:
+                raise ValueError(
+                    "operator_event execution requires a Backend dispatcher"
+                )
+            runtime_result = run_online_operator_dag(
+                execution_graph,
+                operator_dispatch_specs,
+                lambda spec: dispatcher.dispatch(
+                    spec.backend_key,
+                    spec.node,
+                    spec.model,
+                    spec.device_id,
+                ),
+            )
+            placement_contract = execution_graph["placement_contract"]
+            if not isinstance(placement_contract, dict):
+                raise ValueError("placement_contract must be an object")
+            placement_contract["backend_dispatch_count"] = runtime_result[
+                "backend_dispatch_count"
+            ]
+            placement_contract["online_dispatch_gate"] = {
+                "schema_version": runtime_result["schema_version"],
+                "version_checks": runtime_result["version_checks"],
+                "launch_count": len(runtime_result["launch_log"]),
+                "backend_launches_after_dependencies": True,
+            }
+            online_dispatch_payload = {
+                "schema_version": runtime_result["schema_version"],
+                "backend_dispatch_count": runtime_result[
+                    "backend_dispatch_count"
+                ],
+                "version_checks": runtime_result["version_checks"],
+                "launch_log": runtime_result["launch_log"],
+                "final_versions": runtime_result["final_versions"],
+            }
+        elif execution_mode == "prefill_cycle":
+            if not isinstance(shared_config, Mapping) or shared_config.get(
+                "kind"
+            ) != "ramulator2":
+                raise ValueError("prefill_cycle requires a live Ramulator2 service")
+            global_clock_hz = int(shared_config["gpu_clock_hz"])
+            prefill_dispatcher = PrefillCycleDispatcher(
+                project_root, backends, global_clock_hz
+            )
+            allocations, global_memory_map_payload = build_global_memory_map(
+                execution_graph,
+                memory_space_id,
+                int(
+                    address.get(
+                        "global_pa_capacity_bytes", address["kv_capacity_bytes"]
+                    )
+                ),
+                int(address.get("allocation_alignment_bytes", 64)),
+            )
+            bridge = LiveRamulator2Bridge(project_root, shared_config)
+            runtime_result = run_prefill_cycle_dag(
+                execution_graph,
+                operator_dispatch_specs,
+                prefill_dispatcher,
+                bridge,
+                allocations,
+                global_clock_hz=global_clock_hz,
+                transaction_bytes=int(shared_config["transaction_bytes"]),
+                max_samples_per_value=int(shared_config["max_samples_per_value"]),
+            )
+            memory_statistics = dict(runtime_result["memory_statistics"])
+            prefill_coverage_payload = dict(runtime_result["artifact_coverage"])
+            request_cycle_payload = {
+                "schema_version": runtime_result["schema_version"],
+                "backend_dispatch_count": runtime_result[
+                    "backend_dispatch_count"
+                ],
+                "version_checks": runtime_result["version_checks"],
+                "launch_log": runtime_result["launch_log"],
+                "final_versions": runtime_result["final_versions"],
+                "memory_trace": runtime_result["memory_trace"],
+            }
+            placement_contract = execution_graph["placement_contract"]
+            if not isinstance(placement_contract, dict):
+                raise ValueError("placement_contract must be an object")
+            placement_contract["backend_dispatch_count"] = runtime_result[
+                "backend_dispatch_count"
+            ]
+            placement_contract["request_cycle_gate"] = {
+                "schema_version": runtime_result["schema_version"],
+                "version_checks": runtime_result["version_checks"],
+                "one_live_ramulator2": True,
+                "zero_outstanding": memory_statistics["outstanding"] == 0,
+                "all_artifacts_covered": prefill_coverage_payload[
+                    "all_tasks_covered"
+                ],
+            }
         else:
             runtime_result = run_task_dag(runtime_tasks)
         metrics = _timed_metrics(
@@ -560,6 +745,40 @@ def execute_run(
                 int(record["timing"]["completion_time_fs"])
                 - int(record["timing"]["start_time_fs"])
             )
+        residency_payload = _materialize_residency(execution_graph, timing_by_id)
+        if execution_mode == "prefill_cycle":
+            metrics["run_status"] = "prefill_cycle_deployment"
+            metrics["implementation_status"] = "implemented_unqualified"
+            metrics["fidelity"]["scheduler_fidelity"] = "cycle_event"  # type: ignore[index]
+            metrics["fidelity"]["memory_fidelity"] = (  # type: ignore[index]
+                "live_ramulator2_sampled_requests"
+            )
+            metrics["fidelity"]["link_fidelity"] = (  # type: ignore[index]
+                "cycle_modeled" if execution_graph["routes"] else "external_gpu_link"
+            )
+            metrics["memory"] = memory_statistics
+            metrics["prefill_artifact_coverage"] = prefill_coverage_payload
+            if competition_summary is not None:
+                initiators = memory_statistics.get("initiators", {})
+                if not isinstance(initiators, Mapping):
+                    raise RuntimeError("live memory initiator statistics must be an object")
+                gpu_stats = initiators.get("gpu0", {})
+                atlas_stats = initiators.get("atlas0.compute", {})
+                if not isinstance(gpu_stats, Mapping) or not isinstance(
+                    atlas_stats, Mapping
+                ):
+                    raise RuntimeError("live memory initiator entries must be objects")
+                competition_summary["gpu_memory_requests"] = int(
+                    gpu_stats.get("parents", 0)
+                )
+                competition_summary["logic_die_memory_requests"] = int(
+                    atlas_stats.get("parents", 0)
+                )
+                if competition_summary["logic_die_memory_requests"] != 0:
+                    raise RuntimeError(
+                        "gpu_only baseline observed Logic Die memory requests"
+                    )
+                metrics["gpu_logic_die_competition"] = competition_summary
         if execution_mode == "full_runtime":
             scheduler_result = simulate_token_barrier(request_configs, scheduling)
             batch_plan = build_batch_plan(
@@ -579,49 +798,6 @@ def execute_run(
             bindings["peak_used_bytes"] = memory_lifecycle["memory_spaces"][0][  # type: ignore[index]
                 "peak_bytes"
             ]
-            residency = ResidencyManager()
-            registered: set[str] = set()
-            for route in execution_graph["routes"]:  # type: ignore[assignment]
-                value_id = str(route["value_id"])
-                if value_id not in registered:
-                    residency.register(
-                        value_id,
-                        str(route["source_space"]),
-                        str(route["producer_device"]),
-                        1,
-                    )
-                    registered.add(value_id)
-                route_kind = (
-                    route["kind"].value
-                    if hasattr(route["kind"], "value")
-                    else str(route["kind"])
-                )
-                action = {
-                    "transfer": "copy",
-                    "migration": "migrate",
-                    "remote_access": "remote",
-                    "synchronization": "synchronize",
-                    "local_dependency": "synchronize",
-                }[route_kind]
-                route_timing = timing_by_id[str(route["task_id"])]
-                residency.transition(
-                    CanonicalRange(
-                        value_id,
-                        0,
-                        0,
-                        int(route.get("payload_bytes", 1)),
-                    ),
-                    str(route["destination_space"]),
-                    str(route["consumer_device"]),
-                    action,
-                    int(route_timing["completion_time_fs"]),
-                )
-            residency_payload = {
-                "schema_version": "hetero-residency/v1",
-                "coherence": "explicit_noncoherent",
-                "records": residency.snapshot(),
-                "events": residency.events,
-            }
             metrics["run_status"] = "full_runtime_reference"
             metrics["implementation_status"] = "implemented_unqualified"
             metrics["fidelity"]["link_fidelity"] = "event_modeled"  # type: ignore[index]
@@ -666,23 +842,40 @@ def execute_run(
             "schema_version": "hetero-provenance/v1",
             "simulator_revision": _git_revision(project_root),
             "simulation_input_key": key,
-            "runtime_owner": "cpp.GlobalEventRuntime"
-            if execution_mode in {"analytical_preview", "operator_event", "full_runtime"}
+            "runtime_owner": "python.OnlineOperatorRuntime"
+            if execution_mode == "operator_event"
+            else "python.PrefillCycleRuntime"
+            if execution_mode == "prefill_cycle"
+            else "cpp.GlobalEventRuntime"
+            if execution_mode in {"analytical_preview", "full_runtime"}
             else "cpp.TokenBarrierScheduler",
             "address_owner": (
                 "cpp.RuntimeMemoryPlanner"
                 if execution_mode == "full_runtime"
+                else "python.GlobalPhysicalAddressAllocator"
+                if execution_mode == "prefill_cycle"
                 else "cpp.PagedKvAllocator"
             ),
             "memory_timing_owner": (
-                "shared3d.memory_service"
-                if execution_mode == "full_runtime"
-                and profile == "model3_gpu_native_3ddram"
-                and isinstance(shared_config, Mapping)
-                and shared_config.get("kind") == "shared_3d_reference"
-                else None
+                "shared3d.live_ramulator2"
+                if execution_mode == "prefill_cycle"
+                else (
+                    "shared3d.memory_service"
+                    if execution_mode == "full_runtime"
+                    and profile == "model3_gpu_native_3ddram"
+                    and isinstance(shared_config, Mapping)
+                    and shared_config.get("kind") == "shared_3d_reference"
+                    else None
+                )
             ),
             "backend_dispatch": dispatcher.provenance() if dispatcher else None,
+            "prefill_cycle": {
+                "one_live_ramulator2": True,
+                "request_sampling": "evenly_spaced_bounded",
+                "performance_eligible": False,
+            }
+            if execution_mode == "prefill_cycle"
+            else None,
         },
     )
     _write_json(
@@ -701,9 +894,36 @@ def execute_run(
         _write_json(run_dir / "memory_statistics.json", memory_statistics)
     if residency_payload is not None:
         _write_json(run_dir / "residency.json", residency_payload)
+    if online_dispatch_payload is not None:
+        _write_json(run_dir / "online_dispatch.json", online_dispatch_payload)
+    if request_cycle_payload is not None:
+        _write_json(run_dir / "request_cycle_trace.json", request_cycle_payload)
+    if global_memory_map_payload is not None:
+        _write_json(run_dir / "global_memory_map.json", global_memory_map_payload)
+    if prefill_coverage_payload is not None:
+        _write_json(
+            run_dir / "prefill_artifact_coverage.json", prefill_coverage_payload
+        )
     trace_payload = (
         dispatcher.trace_bundle()
         if dispatcher
+        else {
+            "schema_version": "hetero-prefill-cycle-trace/v1",
+            "trace_semantics": "bounded_value_range_sampling",
+            "replay_safe": False,
+            "qualification_record": None,
+            "capture": {
+                "status": "no_instruction_trace",
+                "execution_mode": execution_mode,
+                "cycle_artifact_coverage": prefill_coverage_payload,
+            },
+            "address_ranges": (
+                global_memory_map_payload["ranges"]
+                if global_memory_map_payload is not None
+                else []
+            ),
+        }
+        if execution_mode == "prefill_cycle"
         else {
             "schema_version": "hetero-trace-manifest/v1",
             "trace_id": f"unavailable.{key}",
@@ -721,7 +941,8 @@ def execute_run(
     with (run_dir / "event_log.jsonl").open("w", encoding="utf-8") as stream:
         event_records = (
             runtime_result["tasks"]
-            if execution_mode in {"analytical_preview", "operator_event", "full_runtime"}
+            if execution_mode
+            in {"analytical_preview", "operator_event", "full_runtime", "prefill_cycle"}
             else runtime_result["epochs"]
         )  # type: ignore[index]
         for event in event_records:

@@ -96,3 +96,37 @@ def test_gpu_only_shared_memory_rejects_non_gpu_placement() -> None:
     broken["placement"]["default_target"] = "atlas0.compute"
     with pytest.raises(ConfigError, match="placement.default_target=gpu0"):
         validate_config(broken)
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "p10b_b_tinyllama_prefill_1layer_mixed_live_ramulator2.json",
+        "p12_tinyllama_prefill_1layer_gpu_live_ramulator2.json",
+        "p13_tinyllama_prefill_22layer_ctx16_gpu_live_ramulator2.json",
+        "p14_tinyllama_prefill_bs1_ctx1024_gpu_live_ramulator2.json",
+    ],
+)
+def test_prefill_cycle_stage_configs_are_strictly_valid(name: str) -> None:
+    config = load_and_validate_config(f"configs/hetero/experiments/{name}")
+    assert config["simulation"] == {
+        "coupling": "request_cycle",
+        "execution_mode": "prefill_cycle",
+        "validation_policy": "required",
+    }
+    assert config["model"]["materialize_parameters"] is True
+    assert config["workload"]["requests"][0]["output_length"] == 1
+
+
+def test_prefill_cycle_rejects_decode_and_nonmaterialized_parameters() -> None:
+    config = load_and_validate_config(
+        "configs/hetero/experiments/p14_tinyllama_prefill_bs1_ctx1024_gpu_live_ramulator2.json"
+    )
+    broken = deepcopy(config)
+    broken["workload"]["requests"][0]["output_length"] = 2
+    with pytest.raises(ConfigError, match="output_length=1"):
+        validate_config(broken)
+    broken = deepcopy(config)
+    broken["model"]["materialize_parameters"] = False
+    with pytest.raises(ConfigError, match="materialize_parameters=true"):
+        validate_config(broken)

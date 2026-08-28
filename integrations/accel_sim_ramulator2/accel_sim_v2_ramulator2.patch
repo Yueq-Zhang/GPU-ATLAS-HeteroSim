@@ -298,6 +298,16 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/gpu-sim.cc b/gpu-simulator/gp
 
  #include <execinfo.h>
  #include <math.h>
+@@ -1381,6 +1384,9 @@ bool gpgpu_sim::active() {
+   for (unsigned i = 0; i < m_memory_config->m_n_mem; i++)
+     if (m_memory_partition_unit[i]->busy() > 0) return true;
+   ;
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  if (heterosim_ramulator_external_runtime_active()) return true;
++#endif
+   if (icnt_busy()) return true;
+   if (get_more_cta_left()) return true;
+   return false;
 @@ -2232,6 +2235,11 @@ unsigned long long g_single_step =
      0;  // set this in gdb to single step the pipeline
 

@@ -1,0 +1,13 @@
+{
+  "mode": "static_ragged",
+  "epoch_mode": "token_step_barrier",
+  "admission": "fcfs",
+  "decode_priority": true,
+  "prefill_aging": true,
+  "max_num_sequences": 1,
+  "max_batched_tokens": 1024,
+  "prefill_chunk_tokens": 1024,
+  "max_prefill_wait_epochs": 8,
+  "kv_reservation_mode": "full_request",
+  "epoch_duration_fs": 1000
+}
