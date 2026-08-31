@@ -1,0 +1,207 @@
+{
+  "catalog_id": "p17.tinyllama.layer0.ctx16.shared3d.qualified_artifacts",
+  "measurement_scope": {
+    "memory_topology": "external_shared_3ddram",
+    "timing_owner": "accel_sim.sm86.compute_cache_plus_memory_path"
+  },
+  "model_contract": {
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "dtype": "fp16",
+    "model_spec_name": "TinyLlama-1.1B"
+  },
+  "operator_count": 14,
+  "operators": [
+    {
+      "cycles": 66697,
+      "implementation": "transformers.LlamaRMSNorm",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "3e9241ba12ecfbc00bae8b5cbeaafcfd6a77e464301f9454537c7b424cfbd6a3",
+      "operator_latency_fs": 58919611307,
+      "operator_type": "attention_norm",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.attention_norm",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15e\\tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
+      "trace_manifest_sha256": "64785c8ff333a2c0eae25af7ac47cd2427b2a6f9a7768b5806dbdd3c00e6228c"
+    },
+    {
+      "cycles": 43624,
+      "implementation": "torch.scaled_dot_product_attention_causal",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "a7f215765e0b1c7185f717f8db7a1dfda1e2d94e0282136a89c57175c7f87294",
+      "operator_latency_fs": 38537102473,
+      "operator_type": "causal_attention",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.causal_attention",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.causal_attention.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15h\\tinyllama_prefill_bs1_ctx16_causal_attention_sm86_trace.json",
+      "trace_manifest_sha256": "b7071dd41d6c9b1fedff652140b1e6f805187d851374096d142db9bc6f7d106c"
+    },
+    {
+      "cycles": 4161411,
+      "implementation": "transformers.LlamaMLP.down_proj",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_down_projection_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "5c4c51e61411a148ce6f5ab5ac02e0843fdc0b4d7a5bef0ac58fa2f3d00f4a87",
+      "operator_latency_fs": 3676158127208,
+      "operator_type": "down_projection",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.down_projection",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.down_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15h\\tinyllama_prefill_bs1_ctx16_down_projection_sm86_trace.json",
+      "trace_manifest_sha256": "dfcd34a20ec4225008d842545996e06d7cb9526901c4299b6a67ea6371c8e5f0"
+    },
+    {
+      "cycles": 49571,
+      "implementation": "transformers.LlamaRMSNorm.final_position_only",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_final_norm_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "8b77eeb62b23b921395c0daba752d79c3b55be8d2d9482a60d6577e06ee17a9c",
+      "operator_latency_fs": 43790636042,
+      "operator_type": "final_norm",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.final_norm",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.final_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15h\\tinyllama_prefill_bs1_ctx16_final_norm_sm86_trace.json",
+      "trace_manifest_sha256": "0c64325f264de83afc2012aed97d2948805faacbdcd068c28e851bc476ab884e"
+    },
+    {
+      "cycles": 8324273,
+      "implementation": "two_exact_checkpoint_linear_projections_plus_pack",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "c599dbe1c55879bde5359e1ad0f49f76916ff17b84a34f7888dedea83e3ff81d",
+      "operator_latency_fs": 7353598056537,
+      "operator_type": "gate_up_projection",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.gate_up_projection",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.gate_up_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15h\\tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json",
+      "trace_manifest_sha256": "175aee51b44fcf430f3b057a4d90e1567ab13e96e0c16019f26ba719322a0826"
+    },
+    {
+      "cycles": 23193196,
+      "implementation": "transformers.LlamaForCausalLM.lm_head.final_position_only",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_lm_head_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "ac180bc99e8c19076e3f65205ae5a8d3a6f309bdad5382e31726351f2dd6444c",
+      "operator_latency_fs": 20488689045936,
+      "operator_type": "lm_head",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.lm_head",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.lm_head.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15h\\tinyllama_prefill_bs1_ctx16_lm_head_sm86_trace.json",
+      "trace_manifest_sha256": "84864ab1255db96328fb2f9945e083690f11d639e9e0b64b3ca5c5eeed03ea57"
+    },
+    {
+      "cycles": 66661,
+      "implementation": "transformers.LlamaRMSNorm.post_attention_layernorm",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "b1508a98cc6dcfcde446052a82b2aa81dd907ee4f7a2485b98c2d5d429225818",
+      "operator_latency_fs": 58887809187,
+      "operator_type": "mlp_norm",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.mlp_norm",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.mlp_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15h\\tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_trace.json",
+      "trace_manifest_sha256": "dd112464cc0f8fb5cf61c78ac7b40911d4bff81a946769214e68702452459493"
+    },
+    {
+      "cycles": 1748181,
+      "implementation": "transformers.LlamaAttention.o_proj",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_output_projection_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "7c5e318e93aaceef9215eab63c82fdc3cc239747ce670afddc85a7f33ef5a225",
+      "operator_latency_fs": 1544329505300,
+      "operator_type": "output_projection",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.output_projection",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.output_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15h\\tinyllama_prefill_bs1_ctx16_output_projection_sm86_trace.json",
+      "trace_manifest_sha256": "c5e6b792d46415f7cda4a0b16f690d8d8250684fe4466f51db207df54fa52988"
+    },
+    {
+      "cycles": 2168865,
+      "implementation": "three_exact_checkpoint_linear_projections_plus_pack",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "23684c39bfa9becf31a310e604610b02530a1963a795a4cdac32943db80df03b",
+      "operator_latency_fs": 1915958480565,
+      "operator_type": "qkv_projection",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.qkv_projection",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15f\\tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
+      "trace_manifest_sha256": "f4c772e3b38e12120e5d0c40843ae36f5da8d336293fe03e485548314a85f97a"
+    },
+    {
+      "cycles": 28772,
+      "implementation": "heterosim_cuda_reference_residual_add_v1",
+      "operator_artifact": "configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_residual_add_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "cadecc33d749e61968742082685bcaa393a9489f13656d5cc63490581ac52828",
+      "operator_latency_fs": 25416961131,
+      "operator_type": "residual_add",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.residual_add",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p16\\tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json",
+      "trace_manifest_sha256": "b5b419b9160f5e77b9e2221b72b89beff99636d4c1a0aabdb077c3cede9a7677"
+    },
+    {
+      "cycles": 135684,
+      "implementation": "transformers.LlamaRotaryEmbedding_plus_apply_rotary_pos_emb",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_rope_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "89c190e2a38fc4c289cc78c7ce03f772240339d36059c521bb09a9c1e10eb5fd",
+      "operator_latency_fs": 119862190813,
+      "operator_type": "rope",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.rope",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.rope.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15h\\tinyllama_prefill_bs1_ctx16_rope_sm86_trace.json",
+      "trace_manifest_sha256": "30946c351369e53d54558e1d164d75ece2091da05b2f4aec88ee2e93894b0064"
+    },
+    {
+      "cycles": 19188,
+      "implementation": "torch.argmax.greedy_sampling.final_position_only",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_sampling_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "82ebd59827a64621717a6bad66408328ddb3747681938a1e51a1964e081b3dff",
+      "operator_latency_fs": 16950530035,
+      "operator_type": "sampling",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.sampling",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.sampling.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15h\\tinyllama_prefill_bs1_ctx16_sampling_sm86_trace.json",
+      "trace_manifest_sha256": "a5a9c1aba62dccc1d379b6e5208dcf4ea78760ec95bb173ff5e42ab046b88795"
+    },
+    {
+      "cycles": 75553,
+      "implementation": "torch.nn.functional.silu_times_up_projection",
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "5f9fe854f173a56dd75653c8160820e4be0fef0c47a0867634ed5c4849de5afb",
+      "operator_latency_fs": 66742932862,
+      "operator_type": "silu_multiply",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.silu_multiply",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p15h\\tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_trace.json",
+      "trace_manifest_sha256": "56c47c4416e43d5a3f642fc7094a45b8c74f103ba3ee62710aaddcd685ffd2bc"
+    },
+    {
+      "cycles": 6691,
+      "implementation": "heterosim_cuda_reference_token_embedding_v1",
+      "operator_artifact": "configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "7ba140dcb244c6a1a75804de0e0abfad6a70504517c5c12782099f3f4a06fbf0",
+      "operator_latency_fs": 5910777385,
+      "operator_type": "token_embedding",
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.token_embedding",
+      "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
+      "trace_id": "tinyllama.1_1b.layer0.token_embedding.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p16\\tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json",
+      "trace_manifest_sha256": "96e8d7e820e862e03937b166edadd45e25c4af194b0ba3a2aa38cf4e51c88037"
+    }
+  ],
+  "performance_qualification": {
+    "eligible": false,
+    "reason": "requires exact native measurement pairing with the same memory topology"
+  },
+  "protocol": {
+    "core_frequency_hz": 1132000000,
+    "repetitions": 2,
+    "statistic": "qualified_deterministic_cycle_count"
+  },
+  "schema_version": "hetero-gpu-operator-simulator-measurements/v1"
+}

@@ -28,7 +28,7 @@
       "dram3d"
     ],
     "required_metrics": {
-      "gpu_kernel": ["kernel_latency_fs"],
+      "gpu_kernel": ["operator_latency_fs"],
       "copy_engine": ["copy_latency_fs", "copy_bandwidth_Bps"],
       "runtime_control": ["launch_latency_fs"],
       "external_link": ["link_bandwidth_Bps", "round_trip_latency_fs"],
@@ -84,17 +84,17 @@
           "description": "Configured Accel-Sim SM86 core frequency; not a latency measurement"
         },
         {
-          "source_id": "rtx3070_native_simple_kernels",
+          "source_id": "rtx3070_native_fourteen_operators",
           "evidence_class": "hardware_measurement",
-          "locator": "validation/p17/native_rtx3070/native_measurements.json",
-          "description": "500-iteration CUDA-event measurements for exact Context-16 embedding and residual kernels on the local RTX 3070",
-          "artifact_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+          "locator": "validation/p17/gpu_operator_pairing/native_rtx3070_local_vram.json",
+          "description": "Exact-contract native measurements for all 14 Context-16 GPU operator types: shape-locked CUDA kernels for embedding/residual and the same PyTorch targets used for the remaining NVBit captures",
+          "artifact_sha256": "72535255fb2703b272c7cc3d2949cf2dd95ef428def1d1fd4beac72248fb6bb1",
           "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram"
         }
       ],
       "reference_points": [],
       "applicable_shape_keys": [],
-      "notes": "Requires per-kernel native RTX 3070 latency measurements matched to the 14 exact operator shapes."
+      "notes": "All 14 exact native operator measurements exist, but the current qualified simulator catalog uses external shared 3D-DRAM. A native-VRAM Accel-Sim rerun is required before reference points may be added."
     },
     "copy_engine": {
       "required": true,

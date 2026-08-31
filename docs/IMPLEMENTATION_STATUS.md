@@ -1,5 +1,13 @@
 # Implementation status
 
+## 2026-08-31 — v0.26.0 / P17 exact 14-operator native catalog and topology-safe pairing
+
+- Added a native RTX 3070 benchmark that reuses the exact TinyLlama Layer-0 BS=1 Context=16 operator builders used for NVBit capture. The two P16 shape-locked CUDA operators import their matching CUDA-reference measurements; the other twelve operators execute the same high-level PyTorch targets. All fourteen records bind the exact implementation, shape key and qualified Artifact SHA-256.
+- Downloaded and content-hashed the fixed TinyLlama revision `fe8a4ea1ffedaf415f4da2f062534de366a451e6`; ran 50 warmups plus 500 per-iteration CUDA Event measurements for every GPU operator. The result, benchmark source, model config/weights, capability catalog, operator builder and imported simple-kernel evidence are sealed by `validation/p17/gpu_operator_pairing/measurement_manifest.json`.
+- Added machine-readable simulator catalogs and a fail-closed pairing audit. Pairing now requires exact operator coverage, implementation, shape, Artifact hash, Trace/binary identity, memory topology and relative-error tolerance. The existing qualified cycles were extracted as an `external_shared_3ddram` catalog; the native measurements are `gpu_local_vram`, so the audit correctly reports 0/14 paired operators and leaves performance claims disabled.
+- Added a resumable Linux qualification script for fourteen deterministic native-VRAM Accel-Sim double runs and a strict importer that rejects external-memory statistics, non-identical cycles/instructions, incorrect timing ownership or Trace identity. These runs still require the full remote Trace deployment and have not yet produced a native-VRAM simulator catalog.
+- P17 remains `audit_complete_blocked`: the GPU component is measured but unvalidated, Copy/Runtime still lack semantically matched references, and the external Link, Logic-Die Gateway and 3D-DRAM lack independent calibration points. Six-component performance qualification remains 0/6.
+
 ## 2026-08-31 — v0.25.0 / P17 performance-calibration gate and first native measurements
 
 - Added a machine-readable calibration contract and fail-closed audit for GPU kernels, Copy Engine, runtime control, external Link, Logic-Die Gateway and 3D-DRAM. Configuration artifacts and measurement artifacts are content-hashed; validated status additionally requires accepted evidence classes, required metrics, matched Shape scope and reference errors within tolerance.

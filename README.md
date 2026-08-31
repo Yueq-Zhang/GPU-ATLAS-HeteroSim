@@ -2,7 +2,7 @@
 
 GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端到端 LLM 联合仿真工程。工程把完整 Prefill/Decode 请求图、算子放置、跨设备数据移动、Paged KV Cache 和全局事件调度连接到同一条可复现运行路径。
 
-> 当前版本为 `0.25.0`。P16固定Shape的全任务请求周期建模已经完成；P17现已增加独立的性能校准合同、配置/测量哈希、逐组件误差门禁和RTX 3070原生参考测量。GPU本地显存测量尚未与同拓扑模拟对齐，外部Link、Logic-Die Gateway和3D-DRAM也没有可信参考点，因此继续禁止把当前结果作为端到端性能结论。
+> 当前版本为 `0.26.0`。P16固定Shape的全任务请求周期建模已经完成；P17现已完成14类GPU算子的RTX 3070原生测量Catalog，并增加实现、Shape、Artifact、Trace身份和内存拓扑的严格配对审计。当前原生测量使用GPU本地显存，而既有Accel-Sim资格使用外接共享3D-DRAM，Trace二进制身份也未核验；外部Link、Logic-Die Gateway和3D-DRAM仍没有可信参考点，因此继续禁止把当前结果作为端到端性能结论。
 
 长时间资格验证可以部署到`192.168.0.197`并把两个确定性Leg绑定到不同CPU并行执行；密码不进入仓库或日志。远端路径、GPT‑5.6 Luna `xhigh`编排约定、单轮入口和完成后严格合并方法见[远端验证规范](docs/REMOTE_VALIDATION.md)。
 
@@ -22,7 +22,7 @@ GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端�
 - 可审计的[算子建模与测试状态表](docs/OPERATOR_MODELING_STATUS.md)：机器可读 Catalog 固定模型 Revision、Batch、Context、Q/KV 长度、dtype 与模型维度，并分别记录“已建模、已测试、请求周期 Ready、性能可用”；
 - Fail-closed性能校准门禁：分别跟踪GPU Kernel、Copy Engine、Runtime、外部Link、Logic-Die Gateway和3D-DRAM的参数绑定、证据类型、参考点、误差阈值与适用Shape；只有全部组件和全部设备任务同时通过才允许打开性能声明；
 - 可复现的实验与 DSE：配置/产物内容哈希、Simulation Key、运行缓存、依赖锁、Fidelity 标签、候选搜索和规范化报告；
-- 当前验证边界：P16已双遍验证固定TinyLlama Layer-0、FP16、BS=1、Context=16的20任务时间线；P17已在本机RTX 3070上完成500次Embedding、Residual、32 KiB D2D Copy和同步空Kernel Launch测量，并自动确认P16双遍确定性。该测量只适用于GPU本地显存，不能校准外接3D-DRAM，当前6个必需组件的完整性能资格仍为0/6。
+- 当前验证边界：P16已双遍验证固定TinyLlama Layer-0、FP16、BS=1、Context=16的20任务时间线；P17已在本机RTX 3070上完成14类GPU算子各500次原生测量，并保留32 KiB D2D Copy和同步空Kernel Launch基准。机器审计确认14/14合同覆盖，但因`gpu_local_vram != external_shared_3ddram`且Native/Trace二进制身份未核验，正式配对为0/14；当前6个必需组件的完整性能资格仍为0/6。
 
 ## 2. 目录结构
 
@@ -125,6 +125,24 @@ Windows本机RTX 3070原生参考测量：
 powershell -ExecutionPolicy Bypass -File scripts/run_p17_rtx3070_native_calibration.ps1 `
   -OutputRoot validation/p17/native_rtx3070 -Warmup 50 -Iterations 500
 ```
+
+固定TinyLlama Revision的14类精确算子测量与配对审计：
+
+```powershell
+powershell -ExecutionPolicy Bypass `
+  -File scripts/run_p17_tinyllama_native_operator_calibration.ps1 `
+  -ModelPath "F:/models/TinyLlama-1.1B-Chat-v1.0-fe8a4e" `
+  -Python "F:/study_apps/python/Anaconda/envs/LLM_Design_env/python.exe" `
+  -Warmup 50 -Iterations 500
+```
+
+在具备完整SM86 Trace和Accel-Sim 2.0部署的Linux主机上，补跑同为GPU本地显存的双遍模拟：
+
+```bash
+bash scripts/run_p17_native_vram_accelsim_qualification.sh
+```
+
+该脚本可恢复逐算子长时间运行，并在14类全部完成后生成Native-VRAM模拟Catalog和误差审计；只有内存拓扑、实现、Shape、Artifact和Trace身份都匹配时才可能形成正式参考点。
 
 对P16双遍结果执行校准门禁审计：
 

@@ -1,0 +1,389 @@
+{
+  "catalog_id": "p17.tinyllama.layer0.bs1.ctx16.rtx3070.native_vram",
+  "created_at": "2026-08-31T15:39:09.836816+00:00",
+  "device": {
+    "compute_capability": "8.6",
+    "global_memory_bytes": 8589410304,
+    "multiprocessors": 46,
+    "name": "NVIDIA GeForce RTX 3070"
+  },
+  "measurement_scope": {
+    "memory_topology": "gpu_local_vram",
+    "scope": "one_shape_locked_operator_not_end_to_end",
+    "timing_owner": "physical_rtx3070_cuda_execution"
+  },
+  "model_contract": {
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "dtype": "fp16",
+    "model_config_sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9",
+    "model_spec_name": "TinyLlama-1.1B"
+  },
+  "operator_count": 14,
+  "operators": [
+    {
+      "implementation": "heterosim_cuda_reference_token_embedding_v1",
+      "measurement_backend": "shape_locked_cuda_reference_kernel",
+      "measurement_software": {
+        "cuda_driver_version": 13010,
+        "cuda_runtime_version": 11060,
+        "cudart_compile_version": 11060
+      },
+      "measurement_source_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+      "operator_artifact": "configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "7ba140dcb244c6a1a75804de0e0abfad6a70504517c5c12782099f3f4a06fbf0",
+      "operator_latency_fs": {
+        "max": 203776001930,
+        "mean": 10331712160,
+        "median": 9216000326,
+        "min": 3072000109,
+        "p10": 9216000326,
+        "p90": 10239999741
+      },
+      "operator_type": "token_embedding",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.token_embedding",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "heterosim_cuda_reference_residual_add_v1",
+      "measurement_backend": "shape_locked_cuda_reference_kernel",
+      "measurement_software": {
+        "cuda_driver_version": 13010,
+        "cuda_runtime_version": 11060,
+        "cudart_compile_version": 11060
+      },
+      "measurement_source_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+      "operator_artifact": "configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_residual_add_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "cadecc33d749e61968742082685bcaa393a9489f13656d5cc63490581ac52828",
+      "operator_latency_fs": {
+        "max": 41983999312,
+        "mean": 9592000194,
+        "median": 9216000326,
+        "min": 3072000109,
+        "p10": 9119999595,
+        "p90": 9983999655
+      },
+      "operator_type": "residual_add",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.residual_add",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "transformers.LlamaRMSNorm",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "3e9241ba12ecfbc00bae8b5cbeaafcfd6a77e464301f9454537c7b424cfbd6a3",
+      "operator_latency_fs": {
+        "max": 957599997520,
+        "mean": 295384255655,
+        "median": 272576004267,
+        "min": 27648000047,
+        "p10": 251904010773,
+        "p90": 359488010406
+      },
+      "operator_type": "attention_norm",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.attention_norm",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "three_exact_checkpoint_linear_projections_plus_pack",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "23684c39bfa9becf31a310e604610b02530a1963a795a4cdac32943db80df03b",
+      "operator_latency_fs": {
+        "max": 888831973076,
+        "mean": 206873343803,
+        "median": 147264003754,
+        "min": 53151998669,
+        "p10": 127967998385,
+        "p90": 295583993196
+      },
+      "operator_type": "qkv_projection",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.qkv_projection",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "transformers.LlamaRotaryEmbedding_plus_apply_rotary_pos_emb",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_rope_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "89c190e2a38fc4c289cc78c7ce03f772240339d36059c521bb09a9c1e10eb5fd",
+      "operator_latency_fs": {
+        "max": 1298431992531,
+        "mean": 565798848450,
+        "median": 655391991138,
+        "min": 94208002090,
+        "p10": 307200014591,
+        "p90": 816128015518
+      },
+      "operator_type": "rope",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.rope",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "torch.scaled_dot_product_attention_causal",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "a7f215765e0b1c7185f717f8db7a1dfda1e2d94e0282136a89c57175c7f87294",
+      "operator_latency_fs": {
+        "max": 710943996906,
+        "mean": 71316928031,
+        "median": 59392001480,
+        "min": 8096000180,
+        "p10": 53024001420,
+        "p90": 86751997471
+      },
+      "operator_type": "causal_attention",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.causal_attention",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "transformers.LlamaAttention.o_proj",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_output_projection_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "7c5e318e93aaceef9215eab63c82fdc3cc239747ce670afddc85a7f33ef5a225",
+      "operator_latency_fs": {
+        "max": 742399990559,
+        "mean": 95487166900,
+        "median": 84799997509,
+        "min": 26623999700,
+        "p10": 82943998277,
+        "p90": 94112001359
+      },
+      "operator_type": "output_projection",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.output_projection",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "transformers.LlamaRMSNorm.post_attention_layernorm",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "b1508a98cc6dcfcde446052a82b2aa81dd907ee4f7a2485b98c2d5d429225818",
+      "operator_latency_fs": {
+        "max": 791552007198,
+        "mean": 162804479457,
+        "median": 116864003241,
+        "min": 27648000047,
+        "p10": 101248003542,
+        "p90": 289088010788
+      },
+      "operator_type": "mlp_norm",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.mlp_norm",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "two_exact_checkpoint_linear_projections_plus_pack",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "c599dbe1c55879bde5359e1ad0f49f76916ff17b84a34f7888dedea83e3ff81d",
+      "operator_latency_fs": {
+        "max": 910048007965,
+        "mean": 202289728165,
+        "median": 189311996102,
+        "min": 139264002442,
+        "p10": 186368003488,
+        "p90": 202399998903
+      },
+      "operator_type": "gate_up_projection",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.gate_up_projection",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "torch.nn.functional.silu_times_up_projection",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "5f9fe854f173a56dd75653c8160820e4be0fef0c47a0867634ed5c4849de5afb",
+      "operator_latency_fs": {
+        "max": 687103986740,
+        "mean": 31486015827,
+        "median": 26623999700,
+        "min": 7168000098,
+        "p10": 24671999738,
+        "p90": 34816000611
+      },
+      "operator_type": "silu_multiply",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.silu_multiply",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "transformers.LlamaMLP.down_proj",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_down_projection_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "5c4c51e61411a148ce6f5ab5ac02e0843fdc0b4d7a5bef0ac58fa2f3d00f4a87",
+      "operator_latency_fs": {
+        "max": 854016005993,
+        "mean": 98989887789,
+        "median": 89088000357,
+        "min": 63487999141,
+        "p10": 84991998971,
+        "p90": 99104002118
+      },
+      "operator_type": "down_projection",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.down_projection",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "transformers.LlamaRMSNorm.final_position_only",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_final_norm_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "8b77eeb62b23b921395c0daba752d79c3b55be8d2d9482a60d6577e06ee17a9c",
+      "operator_latency_fs": {
+        "max": 782335996628,
+        "mean": 140607487682,
+        "median": 111616000533,
+        "min": 25599999353,
+        "p10": 103295996785,
+        "p90": 270336002111
+      },
+      "operator_type": "final_norm",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.final_norm",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "transformers.LlamaForCausalLM.lm_head.final_position_only",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_lm_head_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "ac180bc99e8c19076e3f65205ae5a8d3a6f309bdad5382e31726351f2dd6444c",
+      "operator_latency_fs": {
+        "max": 1171455979347,
+        "mean": 386620096385,
+        "median": 367615997791,
+        "min": 319487988949,
+        "p10": 337920010090,
+        "p90": 382975995541
+      },
+      "operator_type": "lm_head",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.lm_head",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    },
+    {
+      "implementation": "torch.argmax.greedy_sampling.final_position_only",
+      "measurement_backend": "pytorch_exact_capture_target_cuda_event",
+      "measurement_software": {
+        "cuda_runtime": "13.0",
+        "pytorch": "2.9.0+cu130"
+      },
+      "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_sampling_sm86_shared_hbdram_range_rebase.json",
+      "operator_artifact_sha256": "82ebd59827a64621717a6bad66408328ddb3747681938a1e51a1964e081b3dff",
+      "operator_latency_fs": {
+        "max": 82879997790,
+        "mean": 21299392041,
+        "median": 17408000305,
+        "min": 12288000435,
+        "p10": 16383999959,
+        "p90": 28672000393
+      },
+      "operator_type": "sampling",
+      "repetitions": 500,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.sampling",
+      "statistic": "median",
+      "trace_binary_identity": "unverified_new_native_execution"
+    }
+  ],
+  "performance_qualification": {
+    "eligible": false,
+    "reason": "native local-VRAM measurements still require a matched native-memory Accel-Sim catalog"
+  },
+  "protocol": {
+    "measured_iterations": 500,
+    "statistic": "median",
+    "synchronization": "stop_event_synchronize_each_iteration",
+    "timer": "cuda_event_per_operator_iteration",
+    "warmup_iterations": 50
+  },
+  "required_operator_count": 14,
+  "run_status": "complete",
+  "schema_version": "hetero-gpu-operator-native-measurements/v1",
+  "selected_operators": [
+    "token_embedding",
+    "attention_norm",
+    "qkv_projection",
+    "rope",
+    "causal_attention",
+    "output_projection",
+    "residual_add",
+    "mlp_norm",
+    "gate_up_projection",
+    "silu_multiply",
+    "down_projection",
+    "final_norm",
+    "lm_head",
+    "sampling"
+  ],
+  "simple_kernel_source": {
+    "path": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\validation\\p17\\native_rtx3070\\native_measurements.json",
+    "sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d"
+  },
+  "software": {
+    "cuda_runtime": "13.0",
+    "python": "3.12.7",
+    "pytorch": "2.9.0+cu130"
+  }
+}

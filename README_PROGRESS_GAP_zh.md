@@ -1,8 +1,8 @@
 # GPU-ATLAS-HeteroSim 当前完成情况与计划差距
 
 评估日期：2026-08-31
-当前版本：`0.25.0`
-规范基线：`hetero-sim/v1`、设计合同v1.25
+当前版本：`0.26.0`
+规范基线：`hetero-sim/v1`、设计合同v1.26
 
 ## 1. 当前结论
 
@@ -20,7 +20,7 @@ P15e已完成Context=16一层Prefill大型请求轨迹的流式gzip双跑、Atte
 
 P16已完成固定Shape的全任务请求周期建模：能力Catalog精确覆盖19种算子/20个实例；14种GPU算子覆盖15个真实Accel-Sim Trace实例；KV Allocate/Append/Release把精确Global PA请求经外部Link送入唯一live Ramulator2；Request Start/Finish作为主机控制边界参与因果时间线但排除在设备性能边界之外。两遍完整运行均完成517个KV运行时Parent、31次版本检查和18次版本提交，全部零在途。17/19种算子类型为`request_cycle_ready=true`，性能资格仍为0/19。
 
-P17已完成性能校准基础设施和第一批本机参考测量：机器合同把GPU Kernel、Copy Engine、Runtime、外部Link、Logic-Die Gateway和3D-DRAM拆成6个独立校准组件，核验配置与测量SHA-256、可信证据类型、必需指标、误差阈值和适用Shape。RTX 3070原生本地显存基准已完成50次Warmup和500次测量；但它没有同拓扑模拟对照，也不能代表外接3D-DRAM，所以GPU/Copy/Runtime仅为`measured_unvalidated`，其余3项为`specified_only`，整机性能资格仍为0/6。P16两遍确定性已由P17审计复核，`performance_claim_allowed=false`保持不变。
+P17已完成性能校准基础设施和14类GPU算子的首轮本机测量：机器合同把GPU Operator、Copy Engine、Runtime、外部Link、Logic-Die Gateway和3D-DRAM拆成6个独立校准组件，核验配置与测量SHA-256、可信证据类型、必需指标、误差阈值和适用Shape。RTX 3070原生本地显存Catalog对每类算子执行50次Warmup和500次CUDA Event测量；Embedding/Residual复用与P16同源码的定形CUDA基准，其余12类复用NVBit捕获所用高层Target。严格配对审计同时检查实现、Shape、Artifact SHA-256、Trace身份和内存拓扑。当前Native为`gpu_local_vram`，既有模拟为`external_shared_3ddram`，且新执行尚未证明与已捕获Trace二进制一致，因此0/14可形成正式误差点。GPU/Copy/Runtime仅为`measured_unvalidated`，其余3项为`specified_only`，整机性能资格仍为0/6。P16两遍确定性已由P17审计复核，`performance_claim_allowed=false`保持不变。
 
 内存与片上网络的当前状态必须分开表述：Ramulator2已经是`prefill_cycle`和既有耦合资格路径的实时内存时序所有者；BookSim2源码已随ATLAS固定版本并编译进`libatlasim-lib.so`，但当前P9a/P9b Chip配置没有`architecture.noc`，P14也未调用ATLAS完整Chip，因此BookSim2尚未在当前主实验中激活，状态保持`adapter_pending_qualification`。
 
@@ -101,7 +101,7 @@ P17已完成性能校准基础设施和第一批本机参考测量：机器合�
 | 能力 | 参考/接口 | 周期后端 | 资格状态 |
 |---|---:|---:|---|
 | 四种系统组织形式 | ✅ | 部分 | Model 3直连路径已落地；Model 2 PCIe DMA与Model 4 CXL.mem仍主要是事件级 |
-| 自由算子放置 | ✅ 严格一一对应 | Prefill部署周期 | 首批5类Artifact已注册、GPU严格绑定已验证；真实全算子Artifact仍待生成 |
+| 自由算子放置 | ✅ 严格一一对应 | Prefill部署周期 | 固定Shape的14类GPU Artifact与3类KV运行时任务已请求周期资格；其他Shape/Decode/多Batch仍需新Artifact |
 | Prefill/Decode完整图 | ✅ | Prefill已部署 | 22层Prefill生命周期完成；Decode请求周期部署待完成；当前计算契约/采样流量性能未资格 |
 | 多Batch Continuous/Ragged | ✅ | ⬜ | 需要真实Batched/Fused Kernel Trace与ATLAS分块Artifact |
 | GPU/ATLAS共享DRAM竞争 | ✅ 参考 | ✅ 真实Accel-Sim+完整ATLAS Chip | 长时间混合读写、公平性和QoS待实现 |
@@ -111,7 +111,7 @@ P17已完成性能校准基础设施和第一批本机参考测量：机器合�
 
 ## 6. 下一步顺序
 
-1. 继续P17性能校准：为14类GPU Kernel补齐同拓扑原生显存Accel-Sim对照；为Copy Engine和Runtime补齐语义匹配的框架测量；为外部Link、Logic-Die Gateway和3D-DRAM引入独立硬件或可信参考模拟器点。禁止用本地显存结果替代外接3D-DRAM校准。
+1. 继续P17性能校准：已完成14类原生GPU算子测量和fail-closed配对器；下一步在完整Trace主机运行`run_p17_native_vram_accelsim_qualification.sh`，取得14类同拓扑Native-VRAM Accel-Sim双遍记录，并补做Native执行与捕获Trace的Kernel/Binary身份核验。随后为Copy Engine和Runtime补齐语义匹配的框架测量，为外部Link、Logic-Die Gateway和3D-DRAM引入独立硬件或可信参考模拟器点。禁止用本地显存结果替代外接3D-DRAM校准。
 2. 构建一层TinyLlama Decode，再扩展到22层单Token Decode；逐层核对依赖、KV生命周期、内存容量、任务数和请求守恒。
 3. 将P16从一层Context=16扩展到多层模型图，验证跨层KV生命周期、Global PA容量、Workspace复用和长时间运行确定性；不得按层数线性外推现有周期。
 4. 增加多Batch Continuous/Ragged周期运行，使用真实Batched/Fused Kernel而不是复制单请求延迟。
@@ -143,4 +143,4 @@ P17已完成性能校准基础设施和第一批本机参考测量：机器合�
 
 ## 8. 声明边界
 
-目录、接口或一次运行存在，不等于性能已经资格。当前可准确表述为：**P16固定TinyLlama Layer-0、FP16、BS=1、Context=16的20个任务已无分析回退地完成双遍因果运行；15个GPU Trace实例和3个KV运行时实例具备请求周期资格，2个主机控制事件被显式排除在设备性能边界之外；依赖、资源、Global PA、唯一Ramulator2、请求守恒和版本提交均已验证。** 当前不可表述为：P16是校准端到端性能、Request Start/Finish是设备周期任务、Decode或多Batch周期执行已完成、RTX 3070/目标3D‑DRAM已实机校准、VA→PA/MMU/TLB或XOR地址映射已实现，或固定Trace可安全复用于任意Shape/内存候选。
+目录、接口或一次运行存在，不等于性能已经资格。当前可准确表述为：**P16固定TinyLlama Layer-0、FP16、BS=1、Context=16的20个任务已无分析回退地完成双遍因果运行；15个GPU Trace实例和3个KV运行时实例具备请求周期资格，2个主机控制事件被显式排除在设备性能边界之外；依赖、资源、Global PA、唯一Ramulator2、请求守恒和版本提交均已验证。P17另有14类同Shape原生GPU测量，但当前正式模拟配对仍为0/14。** 当前不可表述为：P16是校准端到端性能、Request Start/Finish是设备周期任务、Decode或多Batch周期执行已完成、RTX 3070/目标3D‑DRAM已实机校准、Native高层Target执行与NVBit Trace已证明二进制相同、VA→PA/MMU/TLB或XOR地址映射已实现，或固定Trace可安全复用于任意Shape/内存候选。

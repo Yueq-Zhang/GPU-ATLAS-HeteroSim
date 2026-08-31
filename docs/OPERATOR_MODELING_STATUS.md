@@ -47,7 +47,7 @@
 - **请求周期 Ready**：GPU Trace必须满足精确Shape/Revision、SM86双跑、地址零漏配、唯一Ramulator2、Parent/Child/durable守恒和零在途；非SM的KV任务必须满足精确Global PA事务、唯一Ramulator2和相同守恒。纯主机控制事件不产生设备请求，因此只获得因果资格。
 - **性能可用**：还需整机参数校准和所有关键任务覆盖；当前数量为 0。
 
-P17已经为性能可用增加独立机器门禁。除本表的逐任务`performance_eligible`外，还必须同时通过GPU Kernel、Copy Engine、Runtime、外部Link、Logic-Die Gateway和3D-DRAM六项校准。当前RTX 3070本地显存原生测量只构成`measured_unvalidated`证据，不能校准外接3D-DRAM，因此本表19种算子的性能可用数量仍为0。
+P17已经为性能可用增加独立机器门禁。除本表的逐任务`performance_eligible`外，还必须同时通过GPU Operator、Copy Engine、Runtime、外部Link、Logic-Die Gateway和3D-DRAM六项校准。当前14种GPU算子都已具备同Shape的RTX 3070本地显存原生测量，但既有Accel-Sim资格使用外接共享3D-DRAM，且新Native执行尚未证明与NVBit捕获Trace二进制一致；严格配对结果仍为0/14。因此这些数据只构成`measured_unvalidated`证据，本表19种算子的性能可用数量仍为0。
 
 ## 规模变化的处理原则
 

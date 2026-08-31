@@ -5,7 +5,7 @@
 | 字段 | 内容 |
 | --- | --- |
 | 状态 | 已冻结的实现基线 |
-| 版本 | 1.24 |
+| 版本 | 1.26 |
 | 日期 | 2026-08-31 |
 | 适用工程 | ATLAS-MICRO-2026 |
 | 当前基线提交 | 96202b410b9c26702e6b6b60f280ecb80914b927 |
@@ -2792,7 +2792,9 @@ P17引入`hetero-performance-calibration/v1`，把请求周期正确性与性能
 
 校准必须保持拓扑和语义匹配。RTX 3070本地显存Kernel或D2D Copy不能校准GPU经12.8 GB/s外部Link访问3D-DRAM的路径；空Kernel同步时延不能直接替代框架Request Start/Finish；3D-DRAM理论峰值也不能替代Row-hit、Row-miss和混合流量参考。任何跨拓扑结果只能记录为`measured_unvalidated`，不得计算为正式误差点。
 
-P17首批本机测量固定RTX 3070、SM86、CUDA 11.6、50次Warmup和500次测量，覆盖Context=16的Embedding、Residual、32 KiB本地D2D Copy及空Kernel事件/同步时延。测量产物、源码和可执行文件均有SHA-256。由于尚缺少完整14类Kernel的同拓扑Accel-Sim对照，以及外部Link、Gateway和3D-DRAM独立参考，当前审计必须返回`audit_complete_blocked`并保持`performance_claim_allowed=false`。
+P17首批本机测量固定RTX 3070、SM86、CUDA 11.6、50次Warmup和500次测量，覆盖Context=16的Embedding、Residual、32 KiB本地D2D Copy及空Kernel事件/同步时延。第二批测量固定TinyLlama revision、Layer 0、FP16、BS=1和Context=16，覆盖全部14类GPU算子；Embedding/Residual使用P16定形CUDA参考实现，其余12类复用NVBit捕获脚本的高层Target。模型权重、源码、能力Catalog、算子Artifact和测量产物均有SHA-256。
+
+14算子配对必须额外满足：Operator类型全集一致、Implementation一致、精确Shape Key一致、Artifact哈希一致、Native执行与Trace Manifest/二进制身份一致、内存拓扑一致以及误差阈值通过。高层PyTorch Target名称相同不能替代Trace二进制身份核验。当前Native Catalog为`gpu_local_vram`，既有Accel-Sim Catalog为`external_shared_3ddram`，且Native新执行未绑定已捕获Trace身份，因此正式配对为0/14。实现已提供可恢复的Native-VRAM Accel-Sim双遍脚本和严格Importer，但远端14算子结果尚未生成。外部Link、Gateway和3D-DRAM独立参考同样缺失，当前审计必须返回`audit_complete_blocked`并保持`performance_claim_allowed=false`。
 
 ---
 
@@ -2892,3 +2894,4 @@ P17首批本机测量固定RTX 3070、SM86、CUDA 11.6、50次Warmup和500次测
 | 1.23 | 2026-08-31 | 启动P16全任务建模：增加19类/20实例能力Catalog、实际图一致性检查、精确模型与Shape门禁、5类控制/KV运行时周期合同，以及Embedding/Residual轻量捕获流程；所有新增合同在双跑和校准前保持性能未资格 |
 | 1.24 | 2026-08-31 | 完成P16固定Shape全任务请求周期闭环：15个GPU Trace实例、3个KV live Ramulator2实例和2个主机控制边界双遍通过；增加顶部输入宽度Shadow、20任务因果与性能边界自动资格记录，同时保持整机性能未校准 |
 | 1.25 | 2026-08-31 | 启动P17独立性能校准：增加六组件机器合同、配置/测量哈希、证据/Shape/误差fail-closed门禁和全局任务资格AND规则；完成RTX 3070首批原生测量并明确本地显存不可外推外接3D-DRAM |
+| 1.26 | 2026-08-31 | 完成固定TinyLlama Shape的14类RTX 3070原生算子测量Catalog；增加Implementation/Shape/Artifact/Trace身份/内存拓扑严格配对、Native-VRAM Accel-Sim双遍Runner与Importer；当前0/14正式配对且整机性能门禁保持关闭 |

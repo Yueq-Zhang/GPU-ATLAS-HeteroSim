@@ -16,7 +16,7 @@
     "component:external_link:shape_not_covered",
     "component:gpu_kernel:status=measured_unvalidated",
     "component:gpu_kernel:insufficient_reference_points",
-    "component:gpu_kernel:missing_metrics=kernel_latency_fs",
+    "component:gpu_kernel:missing_metrics=operator_latency_fs",
     "component:gpu_kernel:shape_not_covered",
     "component:logic_die_gateway:status=specified_only",
     "component:logic_die_gateway:no_validating_source",
@@ -47,7 +47,7 @@
       "component:external_link:shape_not_covered",
       "component:gpu_kernel:status=measured_unvalidated",
       "component:gpu_kernel:insufficient_reference_points",
-      "component:gpu_kernel:missing_metrics=kernel_latency_fs",
+      "component:gpu_kernel:missing_metrics=operator_latency_fs",
       "component:gpu_kernel:shape_not_covered",
       "component:logic_die_gateway:status=specified_only",
       "component:logic_die_gateway:no_validating_source",
@@ -161,11 +161,11 @@
         "blockers": [
           "status=measured_unvalidated",
           "insufficient_reference_points",
-          "missing_metrics=kernel_latency_fs",
+          "missing_metrics=operator_latency_fs",
           "shape_not_covered"
         ],
         "missing_metrics": [
-          "kernel_latency_fs"
+          "operator_latency_fs"
         ],
         "observed_metrics": [],
         "parameter_binding_count": 1,
@@ -173,24 +173,24 @@
         "reference_points": [],
         "required": true,
         "required_metrics": [
-          "kernel_latency_fs"
+          "operator_latency_fs"
         ],
         "source_artifacts": [
           {
-            "actual_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+            "actual_sha256": "72535255fb2703b272c7cc3d2949cf2dd95ef428def1d1fd4beac72248fb6bb1",
             "exists": true,
-            "expected_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
-            "locator": "validation/p17/native_rtx3070/native_measurements.json",
+            "expected_sha256": "72535255fb2703b272c7cc3d2949cf2dd95ef428def1d1fd4beac72248fb6bb1",
+            "locator": "validation/p17/gpu_operator_pairing/native_rtx3070_local_vram.json",
             "matched": true,
             "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram",
-            "source_id": "rtx3070_native_simple_kernels"
+            "source_id": "rtx3070_native_fourteen_operators"
           }
         ],
         "status": "measured_unvalidated",
         "timing_owner": "accel_sim.sm86.compute_and_cache",
         "validating_source_count": 1,
         "validating_sources": [
-          "rtx3070_native_simple_kernels"
+          "rtx3070_native_fourteen_operators"
         ]
       },
       "logic_die_gateway": {

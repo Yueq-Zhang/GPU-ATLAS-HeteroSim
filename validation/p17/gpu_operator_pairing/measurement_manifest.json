@@ -1,0 +1,21 @@
+{
+  "schema_version": "hetero-p17-gpu-operator-calibration-manifest/v1",
+  "measured_at_utc": "2026-08-31T15:52:05.1573273Z",
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "model_config_sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9",
+  "model_weights_sha256": "6e6001da2106d4757498752a021df6c2bdc332c650aae4bae6b0c004dcf14933",
+  "capability_catalog_sha256": "82b99eb7e93ed7cabed98ef0406b0396550e7d21c8bb859c71e7680bf3088a00",
+  "benchmark_source_sha256": "e9f6088ea7d6f1f47379a2686be6b2af6282268a16bf6ad67bf5b09d2019fcca",
+  "operator_builder_sha256": "64323dc906a80edca3ea8082d8d89c1b93ea76b17bee787dce42eb6957340d51",
+  "simple_kernel_measurement_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+  "native_catalog_sha256": "72535255fb2703b272c7cc3d2949cf2dd95ef428def1d1fd4beac72248fb6bb1",
+  "simulator_catalog_sha256": "eeed28b62b1e89c069e11f82b41a076c800d73545039a376b37ce9b3e786313a",
+  "pairing_audit_sha256": "c1790667cb463b2aa5c8c6f955eee9b4f12f735f62222e1d500db28460ae1365",
+  "warmup_iterations": 50,
+  "measured_iterations": 500,
+  "native_memory_topology": "gpu_local_vram",
+  "simulator_memory_topology": "external_shared_3ddram",
+  "performance_eligible": false,
+  "blocking_reason": "native and simulator memory topologies do not match"
+}
