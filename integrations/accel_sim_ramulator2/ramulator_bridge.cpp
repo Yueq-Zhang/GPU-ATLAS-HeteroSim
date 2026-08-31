@@ -6,6 +6,8 @@
 #include <cstring>
 #include <deque>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <limits>
 #include <memory>
 #include <stdexcept>
@@ -54,6 +56,112 @@ uint64_t unsigned_env(const char *name, uint64_t fallback) {
   }
   return static_cast<uint64_t>(value);
 }
+
+struct AddressBindingRange {
+  uint64_t trace_begin = 0;
+  uint64_t trace_end = 0;
+  uint64_t global_begin = 0;
+  uint64_t global_end = 0;
+};
+
+struct AddressTranslator {
+  bool initialized = false;
+  bool enabled = false;
+  std::vector<AddressBindingRange> ranges;
+  uint64_t translated = 0;
+  uint64_t already_global = 0;
+  uint64_t unmapped = 0;
+
+  void initialize() {
+    if (initialized) return;
+    initialized = true;
+    const char *path = std::getenv("HETEROSIM_GPU_ADDRESS_BINDINGS");
+    if (!path || !path[0]) return;
+    std::ifstream input(path);
+    if (!input) throw std::runtime_error("cannot open GPU address binding table");
+    std::string line;
+    if (!std::getline(input, line) || line != "HETEROSIM_ADDRESS_BINDINGS_V1") {
+      throw std::runtime_error("invalid GPU address binding table header");
+    }
+    uint64_t declared_ranges = std::numeric_limits<uint64_t>::max();
+    while (std::getline(input, line)) {
+      if (line.empty()) continue;
+      std::istringstream fields(line);
+      std::string kind;
+      fields >> kind;
+      if (kind == "trace_key" || kind == "memory_space") {
+        std::string value;
+        if (!(fields >> value) || value.empty())
+          throw std::runtime_error("invalid GPU address binding metadata");
+      } else if (kind == "range_count") {
+        if (!(fields >> declared_ranges))
+          throw std::runtime_error("invalid GPU address binding range count");
+      } else if (kind == "range") {
+        AddressBindingRange range;
+        if (!(fields >> range.trace_begin >> range.trace_end >>
+              range.global_begin >> range.global_end) ||
+            range.trace_begin >= range.trace_end ||
+            range.global_begin >= range.global_end ||
+            range.trace_end - range.trace_begin !=
+                range.global_end - range.global_begin) {
+          throw std::runtime_error("invalid GPU address binding range");
+        }
+        ranges.push_back(range);
+      } else {
+        throw std::runtime_error("unknown GPU address binding record");
+      }
+    }
+    std::sort(ranges.begin(), ranges.end(), [](const auto &lhs, const auto &rhs) {
+      return lhs.trace_begin < rhs.trace_begin;
+    });
+    if (ranges.empty() || declared_ranges != ranges.size())
+      throw std::runtime_error("GPU address binding count mismatch");
+    for (std::size_t index = 1; index < ranges.size(); ++index) {
+      if (ranges[index - 1].trace_end > ranges[index].trace_begin)
+        throw std::runtime_error("overlapping GPU trace address ranges");
+    }
+    for (const auto &trace : ranges) {
+      for (const auto &global : ranges) {
+        if (std::max(trace.trace_begin, global.global_begin) <
+            std::min(trace.trace_end, global.global_end))
+          throw std::runtime_error("GPU trace and Global-PA ranges overlap");
+      }
+    }
+    enabled = true;
+  }
+
+  int translate(uint64_t address, uint32_t size, uint64_t *result) {
+    initialize();
+    if (!result || size == 0 || address >
+        std::numeric_limits<uint64_t>::max() - size) {
+      ++unmapped;
+      return HETEROSIM_ADDRESS_INVALID;
+    }
+    if (!enabled) {
+      *result = address;
+      return HETEROSIM_ADDRESS_IDENTITY;
+    }
+    const uint64_t end = address + size;
+    for (const auto &range : ranges) {
+      if (range.trace_begin <= address && end <= range.trace_end) {
+        *result = range.global_begin + address - range.trace_begin;
+        ++translated;
+        return HETEROSIM_ADDRESS_TRANSLATED;
+      }
+    }
+    for (const auto &range : ranges) {
+      if (range.global_begin <= address && end <= range.global_end) {
+        *result = address;
+        ++already_global;
+        return HETEROSIM_ADDRESS_IDENTITY;
+      }
+    }
+    ++unmapped;
+    return HETEROSIM_ADDRESS_INVALID;
+  }
+};
+
+AddressTranslator g_address_translator;
 
 struct ChildDescriptor {
   uint64_t address = 0;
@@ -594,6 +702,12 @@ struct SharedBridge {
               << children_by_initiator.at(HETEROSIM_INITIATOR_GPU)
               << " atlas_children="
               << children_by_initiator.at(HETEROSIM_INITIATOR_ATLAS_LOGIC_DIE)
+              << " address_translated=" << g_address_translator.translated
+              << " address_already_global="
+              << g_address_translator.already_global
+              << " address_unmapped=" << g_address_translator.unmapped
+              << " address_binding_ranges="
+              << g_address_translator.ranges.size()
               << std::endl;
     memory->finalize();
     finalized = true;
@@ -669,6 +783,41 @@ void record_parent_acceptance(SharedBridge *shared,
 }
 
 }  // namespace
+
+extern "C" int heterosim_translate_gpu_address(uint64_t trace_address,
+                                                 uint32_t size_bytes,
+                                                 uint64_t *global_address) {
+  try {
+    return g_address_translator.translate(trace_address, size_bytes,
+                                          global_address);
+  } catch (const std::exception &error) {
+    ++g_address_translator.unmapped;
+    std::cerr << "heterosim_translate_gpu_address failed: " << error.what()
+              << std::endl;
+    return HETEROSIM_ADDRESS_INVALID;
+  }
+}
+
+extern "C" uint64_t heterosim_address_translated_requests() {
+  return g_address_translator.translated;
+}
+
+extern "C" uint64_t heterosim_address_already_global_requests() {
+  return g_address_translator.already_global;
+}
+
+extern "C" uint64_t heterosim_address_unmapped_requests() {
+  return g_address_translator.unmapped;
+}
+
+extern "C" uint64_t heterosim_address_binding_ranges() {
+  try {
+    g_address_translator.initialize();
+    return g_address_translator.ranges.size();
+  } catch (const std::exception &) {
+    return 0;
+  }
+}
 
 extern "C" heterosim_ramulator_handle heterosim_ramulator_create(
     const char *config_path, unsigned partition_id, unsigned partition_count) {

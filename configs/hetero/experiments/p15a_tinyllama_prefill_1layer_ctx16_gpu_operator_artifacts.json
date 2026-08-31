@@ -1,0 +1,77 @@
+{
+  "schema_version": "hetero-sim/v1",
+  "experiment": {
+    "name": "p15a_tinyllama_prefill_1layer_ctx16_gpu_operator_artifacts",
+    "seed": 1,
+    "generation_mode": "trace_locked"
+  },
+  "simulation": {
+    "coupling": "operator_event",
+    "execution_mode": "operator_event",
+    "validation_policy": "required"
+  },
+  "system": {
+    "profile": "model3_gpu_native_3ddram",
+    "links": {
+      "shared3d.explicit_noncoherent": {
+        "wire_bandwidth_Bps": 12800000000,
+        "latency_fs": 10000000,
+        "header_bytes": 16,
+        "resource_id": "unused.operator_event.gpu_only",
+        "parameter_source": "unused_no_cross_device_route"
+      }
+    }
+  },
+  "backends": {
+    "gpu": {
+      "kind": "accel_sim",
+      "requested_timing_mode": "total",
+      "config_ref": "configs/hetero/backends/gpu_accelsim_rtx3070.json",
+      "resource_bindings": {
+        "gpu_core": "gpu0.core",
+        "gpu_l1": "gpu0.l1",
+        "gpu_l2": "gpu0.l2",
+        "gpu_noc": "gpu0.noc",
+        "gpu_local_dram": "gpu0.hbm"
+      },
+      "trace_bindings": [
+        {
+          "selector": {"phase": "prefill", "op": "attention_norm", "layer_id": 0, "step_id": 0},
+          "trace_manifest": "configs/hetero/operator_artifacts/p15a/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
+          "operator_artifact": "configs/hetero/operator_artifacts/p15a/tinyllama_prefill_bs1_ctx16_attention_norm_sm86.json",
+          "compatibility": "exact_operator"
+        },
+        {
+          "selector": {"phase": "prefill", "op": "qkv_projection", "layer_id": 0, "step_id": 0},
+          "trace_manifest": "configs/hetero/operator_artifacts/p15a/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
+          "operator_artifact": "configs/hetero/operator_artifacts/p15a/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86.json",
+          "compatibility": "exact_operator"
+        },
+        {
+          "selector": {"phase": "prefill", "op": "rope", "layer_id": 0, "step_id": 0},
+          "trace_manifest": "configs/hetero/operator_artifacts/p15a/tinyllama_prefill_bs1_ctx16_rope_sm86_trace.json",
+          "operator_artifact": "configs/hetero/operator_artifacts/p15a/tinyllama_prefill_bs1_ctx16_rope_sm86.json",
+          "compatibility": "exact_operator"
+        },
+        {
+          "selector": {"phase": "prefill", "op": "causal_attention", "layer_id": 0, "step_id": 0},
+          "trace_manifest": "configs/hetero/operator_artifacts/p15a/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_trace.json",
+          "operator_artifact": "configs/hetero/operator_artifacts/p15a/tinyllama_prefill_bs1_ctx16_causal_attention_sm86.json",
+          "compatibility": "exact_operator"
+        }
+      ],
+      "fallback_kind": "analytical",
+      "effective_compute_flops_per_s": 81300000000000,
+      "effective_memory_bandwidth_Bps": 448000000000,
+      "parameter_source": "RTX3070_theoretical_fallback_for_untraced_operators"
+    },
+    "atlas": {"kind": "none"},
+    "host": {"kind": "none"}
+  },
+  "model": {"ref": "configs/hetero/models/tinyllama_1_1b_prefill_1layer_fp16.json"},
+  "workload": {"ref": "configs/hetero/workloads/tinyllama11b_bs1_ctx16_prefill.json"},
+  "scheduling": {"ref": "configs/hetero/schedulers/prefill_bs1_ctx16.json"},
+  "placement": {"ref": "configs/hetero/placements/prefill_gpu_only.json"},
+  "address": {"ref": "configs/hetero/addresses/tinyllama11b_prefill_global_pa.json"},
+  "metrics": {"ref": "configs/hetero/metrics/e2e_validation.json"}
+}

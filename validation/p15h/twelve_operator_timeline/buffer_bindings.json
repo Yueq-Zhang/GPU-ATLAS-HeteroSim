@@ -1,0 +1,18 @@
+{
+  "allocations": [
+    {
+      "allocated_blocks": 2,
+      "allocated_bytes": 16384,
+      "allocation_epoch": 1,
+      "bytes_per_block": 8192,
+      "final_committed_tokens": 16,
+      "logical_bytes": 16384,
+      "memory_space_id": "shared0.dram3d",
+      "offset_bytes": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0"
+    }
+  ],
+  "memory_space_id": "shared0.dram3d",
+  "schema_version": "hetero-buffer-bindings/v1",
+  "used_bytes": 16384
+}

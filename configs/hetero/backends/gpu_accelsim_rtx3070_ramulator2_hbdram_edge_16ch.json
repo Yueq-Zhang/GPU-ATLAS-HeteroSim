@@ -7,7 +7,7 @@
   "target_gpu": "RTX 3070 SM86 compute complex with shared ATLAS-style 3D-DRAM",
   "target_sm": 86,
   "core_frequency_hz": 1132000000,
-  "timeout_seconds": 3600,
+  "timeout_seconds": 43200,
   "dependency_commits": {
     "accel_sim_framework": "64653015f85fb5664c84a10f48527e8897d289d0",
     "gpgpu_sim_distribution": "e10018b67a4b668e7b43f89280cf67624f1df4ff",

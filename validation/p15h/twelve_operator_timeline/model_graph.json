@@ -1,0 +1,949 @@
+{
+  "requests": [
+    {
+      "counters": {
+        "decode_forwards": 0,
+        "final_committed_kv_len": 16,
+        "kv_append_pairs": 16,
+        "kv_range_writes": 32,
+        "lm_head": 1,
+        "prefill_forwards": 1,
+        "sampling": 1
+      },
+      "graph": {
+        "nodes": [
+          {
+            "attributes": {},
+            "dependencies": [],
+            "kind": "control",
+            "layer_id": null,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.request_start",
+            "op": "request_start",
+            "phase": "control",
+            "read_values": [],
+            "step_id": 0,
+            "write_values": []
+          },
+          {
+            "attributes": {},
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.request_start"
+            ],
+            "kind": "state",
+            "layer_id": null,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.kv_allocate",
+            "op": "kv_allocate",
+            "phase": "control",
+            "read_values": [],
+            "step_id": 0,
+            "write_values": []
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "embedding",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.kv_allocate"
+            ],
+            "kind": "compute",
+            "layer_id": null,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+            "op": "token_embedding",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prompt_token_ids",
+              "model.tok_embeddings.weight"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "norm",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding"
+            ],
+            "kind": "compute",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+            "op": "attention_norm",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+              "model.layers.0.attention_norm.weight"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "attention",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention"
+            ],
+            "kind": "compute",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+            "op": "qkv_projection",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+              "model.layers.0.qkv.weight"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "attention",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection"
+            ],
+            "kind": "compute",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+            "op": "rope",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "attention",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope"
+            ],
+            "kind": "state",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+            "op": "kv_append",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+              "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+              "TINYLLAMA11B-PREFILL-R0.kv.l0.v"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+              "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+              "TINYLLAMA11B-PREFILL-R0.kv.l0.v"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "attention",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append"
+            ],
+            "kind": "compute",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+            "op": "causal_attention",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+              "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+              "TINYLLAMA11B-PREFILL-R0.kv.l0.v"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "attention",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core"
+            ],
+            "kind": "compute",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+            "op": "output_projection",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+              "model.layers.0.output.weight"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "attention",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output"
+            ],
+            "kind": "compute",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+            "op": "residual_add",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "mlp",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual"
+            ],
+            "kind": "compute",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+            "op": "mlp_norm",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+              "model.layers.0.mlp_norm.weight"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "mlp",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm"
+            ],
+            "kind": "compute",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+            "op": "gate_up_projection",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+              "model.layers.0.gate_up.weight"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "mlp",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up"
+            ],
+            "kind": "compute",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+            "op": "silu_multiply",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "mlp",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation"
+            ],
+            "kind": "compute",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+            "op": "down_projection",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+              "model.layers.0.down.weight"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "mlp",
+              "past_kv_len": 0,
+              "q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down"
+            ],
+            "kind": "compute",
+            "layer_id": 0,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+            "op": "residual_add",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "finalize",
+              "past_kv_len": 0,
+              "q_len": 1,
+              "source_q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual"
+            ],
+            "kind": "compute",
+            "layer_id": null,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+            "op": "final_norm",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+              "model.final_norm.weight"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "finalize",
+              "past_kv_len": 0,
+              "q_len": 1,
+              "source_q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm"
+            ],
+            "kind": "compute",
+            "layer_id": null,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+            "op": "lm_head",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+              "model.lm_head.weight"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits"
+            ]
+          },
+          {
+            "attributes": {
+              "attention_kv_len": 16,
+              "operator_group": "finalize",
+              "past_kv_len": 0,
+              "q_len": 1,
+              "source_q_len": 16
+            },
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head"
+            ],
+            "kind": "control",
+            "layer_id": null,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+            "op": "sampling",
+            "phase": "prefill",
+            "read_values": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits"
+            ],
+            "step_id": 0,
+            "write_values": [
+              "TINYLLAMA11B-PREFILL-R0.token.0"
+            ]
+          },
+          {
+            "attributes": {},
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling"
+            ],
+            "kind": "control",
+            "layer_id": null,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.request_finish",
+            "op": "request_finish",
+            "phase": "control",
+            "read_values": [],
+            "step_id": 1,
+            "write_values": []
+          },
+          {
+            "attributes": {},
+            "dependencies": [
+              "TINYLLAMA11B-PREFILL-R0.request_finish"
+            ],
+            "kind": "state",
+            "layer_id": null,
+            "node_id": "TINYLLAMA11B-PREFILL-R0.kv_release",
+            "op": "kv_release",
+            "phase": "control",
+            "read_values": [],
+            "step_id": 1,
+            "write_values": []
+          }
+        ],
+        "schema_version": "hetero-model-graph/v2",
+        "values": [
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "static",
+            "mutable": false,
+            "shape_expr": [
+              32000,
+              2048
+            ],
+            "storage_class": "parameter",
+            "value_id": "model.tok_embeddings.weight"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "static",
+            "mutable": false,
+            "shape_expr": [
+              2048
+            ],
+            "storage_class": "parameter",
+            "value_id": "model.layers.0.attention_norm.weight"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "static",
+            "mutable": false,
+            "shape_expr": [
+              2048,
+              2560
+            ],
+            "storage_class": "parameter",
+            "value_id": "model.layers.0.qkv.weight"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "static",
+            "mutable": false,
+            "shape_expr": [
+              2048,
+              2048
+            ],
+            "storage_class": "parameter",
+            "value_id": "model.layers.0.output.weight"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "static",
+            "mutable": false,
+            "shape_expr": [
+              2048
+            ],
+            "storage_class": "parameter",
+            "value_id": "model.layers.0.mlp_norm.weight"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "static",
+            "mutable": false,
+            "shape_expr": [
+              2048,
+              11264
+            ],
+            "storage_class": "parameter",
+            "value_id": "model.layers.0.gate_up.weight"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "static",
+            "mutable": false,
+            "shape_expr": [
+              5632,
+              2048
+            ],
+            "storage_class": "parameter",
+            "value_id": "model.layers.0.down.weight"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "static",
+            "mutable": false,
+            "shape_expr": [
+              2048
+            ],
+            "storage_class": "parameter",
+            "value_id": "model.final_norm.weight"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "static",
+            "mutable": false,
+            "shape_expr": [
+              2048,
+              32000
+            ],
+            "storage_class": "parameter",
+            "value_id": "model.lm_head.weight"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": true,
+            "shape_expr": [
+              "kv_tokens",
+              4,
+              64
+            ],
+            "storage_class": "kv_cache",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": true,
+            "shape_expr": [
+              "kv_tokens",
+              4,
+              64
+            ],
+            "storage_class": "kv_cache",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "int32",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16
+            ],
+            "storage_class": "metadata",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              2048
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              2048
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              2560
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              2560
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              2048
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              2048
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              2048
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              2048
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              2048
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              11264
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              5632
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              2048
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              16,
+              2048
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              1,
+              2048
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "fp16",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              1,
+              32000
+            ],
+            "storage_class": "activation",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits"
+          },
+          {
+            "alias_or_view": null,
+            "dtype": "int32",
+            "layout": "row_major",
+            "lifetime": "request",
+            "mutable": false,
+            "shape_expr": [
+              1
+            ],
+            "storage_class": "metadata",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.token.0"
+          }
+        ]
+      },
+      "placement": [
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.request_start",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.kv_allocate",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.request_finish",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        },
+        {
+          "matched_rule": null,
+          "node_id": "TINYLLAMA11B-PREFILL-R0.kv_release",
+          "reason": "default_target",
+          "target_device": "gpu0"
+        }
+      ],
+      "request_id": "TINYLLAMA11B-PREFILL-R0"
+    }
+  ],
+  "schema_version": "hetero-model-graph-bundle/v1"
+}

@@ -9,8 +9,8 @@ completion timestamps belong to the deterministic simulated timeline.
 from __future__ import annotations
 
 import heapq
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Callable, Mapping, Sequence
 
 from .ir import ModelNode
 from .model_graph import ModelSpec
@@ -28,6 +28,8 @@ class OnlineDispatchSpec:
     node: ModelNode
     model: ModelSpec
     device_id: str
+    input_values: tuple[Mapping[str, object], ...] = ()
+    output_values: tuple[Mapping[str, object], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -94,7 +96,9 @@ def run_online_operator_dag(
         if not isinstance(raw_dependencies, Sequence) or isinstance(
             raw_dependencies, (str, bytes)
         ):
-            raise OnlineOperatorRuntimeError(f"dependencies must be an array: {task_id}")
+            raise OnlineOperatorRuntimeError(
+                f"dependencies must be an array: {task_id}"
+            )
         dependencies = [str(item) for item in raw_dependencies]
         if len(dependencies) != len(set(dependencies)):
             raise OnlineOperatorRuntimeError(f"duplicate dependency for {task_id}")
@@ -111,7 +115,9 @@ def run_online_operator_dag(
 
     plan = execution_graph.get("residency_plan")
     if not isinstance(plan, Mapping) or not isinstance(plan.get("events"), list):
-        raise OnlineOperatorRuntimeError("online runtime requires residency_plan events")
+        raise OnlineOperatorRuntimeError(
+            "online runtime requires residency_plan events"
+        )
     initial_by_task: dict[str, list[Mapping[str, object]]] = {}
     for raw in plan["events"]:
         if not isinstance(raw, Mapping):
@@ -136,7 +142,9 @@ def run_online_operator_dag(
             latest_version[value_id] = version
             available_version[(value_id, device_id)] = version
 
-    def require_value(value_id: str, version: int, device_id: str, task_id: str) -> None:
+    def require_value(
+        value_id: str, version: int, device_id: str, task_id: str
+    ) -> None:
         nonlocal version_checks
         version_checks += 1
         latest = latest_version.get(value_id)
@@ -144,7 +152,8 @@ def run_online_operator_dag(
         if latest != version or available != version:
             raise OnlineOperatorRuntimeError(
                 f"stale or unavailable value for {task_id}: {value_id} "
-                f"needs v{version} on {device_id}, latest={latest}, available={available}"
+                f"needs v{version} on {device_id}, latest={latest}, "
+                f"available={available}"
             )
 
     events: list[tuple[int, int, int, str, str]] = []
@@ -167,6 +176,7 @@ def run_online_operator_dag(
     launch_log: list[dict[str, object]] = []
     makespan = 0
     backend_dispatch_count = 0
+    version_commits: list[dict[str, object]] = []
 
     while events:
         time_fs, priority, _sequence, kind, task_id = heapq.heappop(events)
@@ -197,7 +207,9 @@ def run_online_operator_dag(
                 checked_inputs: list[dict[str, object]] = []
                 for value in inputs:
                     if not isinstance(value, Mapping):
-                        raise OnlineOperatorRuntimeError("input value must be an object")
+                        raise OnlineOperatorRuntimeError(
+                            "input value must be an object"
+                        )
                     value_id = str(value["value_id"])
                     version = int(value["version"])
                     require_value(value_id, version, device_id, task_id)
@@ -290,6 +302,16 @@ def run_online_operator_dag(
                 for key in [key for key in available_version if key[0] == value_id]:
                     del available_version[key]
                 available_version[(value_id, device_id)] = version
+                version_commits.append(
+                    {
+                        "task_id": task_id,
+                        "value_id": value_id,
+                        "version": version,
+                        "device_id": device_id,
+                        "commit_time_fs": time_fs,
+                        "cause": "backend_completion",
+                    }
+                )
         else:
             value_id = str(record["value_id"])
             version = int(record["value_version"])
@@ -305,16 +327,12 @@ def run_online_operator_dag(
                 else str(record.get("kind"))
             )
             if route_kind == "migration":
-                available_version.pop(
-                    (value_id, str(record["producer_device"])), None
-                )
+                available_version.pop((value_id, str(record["producer_device"])), None)
 
         completed.add(task_id)
         makespan = max(makespan, time_fs)
         for dependent in sorted(dependents[task_id]):
-            dependency_ready[dependent] = max(
-                dependency_ready[dependent], time_fs
-            )
+            dependency_ready[dependent] = max(dependency_ready[dependent], time_fs)
             remaining[dependent] -= 1
             if remaining[dependent] < 0:
                 raise OnlineOperatorRuntimeError("dependency counter underflow")
@@ -335,5 +353,6 @@ def run_online_operator_dag(
         "backend_dispatch_count": backend_dispatch_count,
         "version_checks": version_checks,
         "launch_log": launch_log,
+        "version_commits": version_commits,
         "final_versions": dict(sorted(latest_version.items())),
     }

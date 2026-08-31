@@ -1,0 +1,146 @@
+{
+  "address_contract": {
+    "capture_address": "cuda_allocation_address_no_instruction_trace",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.kv_append.prefill.bs1_ctx16.fp16.runtime_state_v1",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "driver": "591.86",
+    "gpu": "NVIDIA GeForce RTX 3070",
+    "kind": "runtime_state",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "memory_traffic": "not_extracted",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": false,
+    "trace_semantics": "none"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "/opt/gpu-atlas/qualification/p15a/tinyllama-prefill-bs1-ctx16-kv-append/operator_metadata.json",
+      "sha256": "1c2bb0903a77c1546be2b6eea6724639a7c25248ab2b5605c450856264a44312",
+      "size_bytes": 2121
+    },
+    {
+      "kind": "kernels_list",
+      "path": "/opt/gpu-atlas/qualification/p15a/tinyllama-prefill-bs1-ctx16-kv-append/traces/kernelslist.g",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    }
+  ],
+  "qualification": {
+    "performance_eligible": false,
+    "qualification_record": null,
+    "status": "semantic_state_operation_pending_full_memory_lowering"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "explicit_prefill_kv_cache_store",
+    "kv_length": 16,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "kv_append",
+    "phase": "prefill",
+    "q_len": 16
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        4,
+        16,
+        64
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        4096,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.kv_append.key",
+      "trace_base": 47380222464
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        4,
+        16,
+        64
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        4096,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.kv_append.value",
+      "trace_base": 47380230656
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        4,
+        16,
+        64
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        4096,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.kv_append.key_cache",
+      "trace_base": 47380238848
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        4,
+        16,
+        64
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        4096,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.kv_append.value_cache",
+      "trace_base": 47380247040
+    }
+  ]
+}

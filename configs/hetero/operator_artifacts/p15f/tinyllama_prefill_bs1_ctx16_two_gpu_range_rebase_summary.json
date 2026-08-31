@@ -1,0 +1,101 @@
+{
+  "aggregate": {
+    "address_translated": 777807,
+    "gpu_children": 378120,
+    "gpu_parents": 378075,
+    "internal_bytes": 24199680,
+    "logical_bytes": 12102720,
+    "operator_count": 2
+  },
+  "catalog": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_two_gpu_range_rebase_catalog.json",
+  "claim_boundary": {
+    "dram_mapper": "OneLevelInterleave(channel_lowest_bit=0)",
+    "global_pa_binding_ready": true,
+    "performance_claim_allowed": false,
+    "prefill_global_timeline_integrated": false,
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": true,
+    "virtual_memory_mode": "range_rebase"
+  },
+  "invariants": {
+    "all_gpu_children_completed": true,
+    "all_gpu_parents_completed": true,
+    "all_trace_addresses_rebased": true,
+    "deterministic_double_run": true,
+    "full_instruction_trace": true,
+    "one_ramulator2_per_qualified_run": true,
+    "real_mem_fetch_stall_resume": true,
+    "zero_atlas_requests": true,
+    "zero_outstanding": true
+  },
+  "operators": {
+    "attention_norm": {
+      "address_binding_ranges": 6,
+      "address_translated": 40970,
+      "address_unmapped": 0,
+      "artifact_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "artifact_manifest": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_shared_hbdram_range_rebase.json",
+      "backpressure_retries": 272804,
+      "compute_memory_coupled": true,
+      "dram_cycles": 23567,
+      "global_pa_binding_ready": true,
+      "gpu_children": 2176,
+      "gpu_cycles": 66697,
+      "gpu_parents": 2176,
+      "instructions": 5290064,
+      "internal_bytes": 139264,
+      "kv_length": 16,
+      "link_cycles": 23567,
+      "logical_bytes": 69632,
+      "outstanding": 0,
+      "q_len": 16,
+      "qualification_record": "/opt/gpu-atlas/qualification/p15e-address/attention-norm-range-rebase-qualified/qualification_record.json",
+      "ramulator2_instances": 1,
+      "reads": 2176,
+      "request_cycle_ready": true,
+      "writes": 0
+    },
+    "qkv_projection": {
+      "address_binding_ranges": 12,
+      "address_translated": 736837,
+      "address_unmapped": 0,
+      "artifact_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "artifact_manifest": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_shared_hbdram_range_rebase.json",
+      "backpressure_retries": 55088482,
+      "compute_memory_coupled": true,
+      "dram_cycles": 766383,
+      "global_pa_binding_ready": true,
+      "gpu_children": 375944,
+      "gpu_cycles": 2168865,
+      "gpu_parents": 375899,
+      "instructions": 34943066,
+      "internal_bytes": 24060416,
+      "kv_length": 16,
+      "link_cycles": 766383,
+      "logical_bytes": 12033088,
+      "outstanding": 0,
+      "q_len": 16,
+      "qualification_record": "/opt/gpu-atlas/qualification/p15f-address/qkv-range-rebase-qualified-v3/qualification_record.json",
+      "ramulator2_instances": 1,
+      "reads": 375854,
+      "request_cycle_ready": true,
+      "writes": 45
+    }
+  },
+  "qualification_map": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_two_gpu_range_rebase_qualification_map.json",
+  "schema_version": "hetero-range-rebased-gpu-artifact-summary/v1",
+  "scope": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "layer_id": 0,
+    "model": "TinyLlama-1.1B",
+    "operators": [
+      "attention_norm",
+      "qkv_projection"
+    ],
+    "phase": "prefill"
+  },
+  "status": "passed"
+}

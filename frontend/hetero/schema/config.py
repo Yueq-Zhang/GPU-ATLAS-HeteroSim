@@ -165,8 +165,12 @@ def validate_config(config: Mapping[str, Any]) -> None:
                 "external_memory_bridge",
                 "exports_memory_requests",
                 "supports_stall_resume",
+                "require_request_cycle_ready",
                 "cycle_artifact_ref",
                 "device_clock_hz",
+                "operator_artifact_catalog_ref",
+                "artifact_use_mode",
+                "full_traffic_operators",
             },
             f"backends.{backend_name}",
         )
@@ -262,6 +266,40 @@ def validate_config(config: Mapping[str, Any]) -> None:
                     backend.get("device_clock_hz"),
                     f"backends.{backend_name}.device_clock_hz",
                 )
+                catalog_ref = backend.get("operator_artifact_catalog_ref")
+                full_traffic = backend.get("full_traffic_operators")
+                if catalog_ref is not None:
+                    if not isinstance(catalog_ref, str) or not catalog_ref:
+                        raise ConfigError(
+                            f"backends.{backend_name}.operator_artifact_catalog_ref "
+                            "must be a path"
+                        )
+                    if backend.get("artifact_use_mode") != (
+                        "memory_traffic_lowering_only"
+                    ):
+                        raise ConfigError(
+                            f"backends.{backend_name}.artifact_use_mode must be "
+                            "memory_traffic_lowering_only"
+                        )
+                if full_traffic is not None:
+                    if catalog_ref is None:
+                        raise ConfigError(
+                            f"backends.{backend_name}.full_traffic_operators "
+                            "requires operator_artifact_catalog_ref"
+                        )
+                    if (
+                        not isinstance(full_traffic, list)
+                        or not full_traffic
+                        or any(
+                            not isinstance(item, str) or not item
+                            for item in full_traffic
+                        )
+                        or len(set(full_traffic)) != len(full_traffic)
+                    ):
+                        raise ConfigError(
+                            f"backends.{backend_name}.full_traffic_operators "
+                            "must be a non-empty unique string array"
+                        )
 
         links = system.get("links")
         if not isinstance(links, Mapping) or not links:

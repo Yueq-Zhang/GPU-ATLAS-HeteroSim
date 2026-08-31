@@ -1,0 +1,198 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "capture_allocator_coverage": "target_window_pytorch_allocator_plus_tensor_segments",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "range_rebase"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.causal_attention.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+    "driver": "591.86",
+    "gpu": "NVIDIA GeForce RTX 3070",
+    "kind": "accel_sim",
+    "memory_coupling": "ramulator2_in_process",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "compute_memory_coupled": true,
+    "global_pa_binding_ready": true,
+    "memory_traffic": "full_instruction_trace",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": true,
+    "supports_stall_resume": true,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-causal-attention/operator_metadata.json",
+      "sha256": "e5b5a7744b80f22d76408c5eed95c3b6992668a5c075e80d3863bf8341bdd922",
+      "size_bytes": 2398
+    },
+    {
+      "kind": "kernels_list",
+      "path": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-causal-attention/traces/kernelslist.g",
+      "sha256": "d8a7344b7bdad77ed14649b0e243507d4b8cb18f04b5dbda7f0f8c4237cd2432",
+      "size_bytes": 105
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-causal-attention/traces/kernel-1-ctx_0x5c65cee54570.tracez",
+      "sha256": "4757e76ee5ec769a06911cf814edbf7d965080b33a361914b7eeb062889dcfe2",
+      "size_bytes": 383936
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-causal-attention/traces/kernel-2-ctx_0x5c65cee54570.tracez",
+      "sha256": "e2d974a09bf52c5444418551a5ca31ca6959ecfc883e1c09bb97684d0a5ba39e",
+      "size_bytes": 386215
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-causal-attention/traces/kernel-3-ctx_0x5c65cee54570.tracez",
+      "sha256": "3eb11e3234551a4ace04b3525ba777ab8424022f5390e8086e1e2c16b97a839f",
+      "size_bytes": 3008156
+    },
+    {
+      "kind": "accel_sim_trace_manifest",
+      "path": "tinyllama_prefill_bs1_ctx16_causal_attention_sm86_trace.json",
+      "sha256": "b7071dd41d6c9b1fedff652140b1e6f805187d851374096d142db9bc6f7d106c",
+      "size_bytes": 4741
+    },
+    {
+      "kind": "standalone_operator_artifact",
+      "path": "tinyllama_prefill_bs1_ctx16_causal_attention_sm86.json",
+      "sha256": "d42c6339e2ef9e03dc2059606dbb0b3fc62e5d521a2b1d6200cdcab2a8d9ba1b",
+      "size_bytes": 4987
+    },
+    {
+      "kind": "coupled_accel_sim_backend",
+      "path": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+      "sha256": "da41dc6c68070d01dc44a1f6d7b6009d8fb1a2167868eb1f7bb34cd88ad9b8df",
+      "size_bytes": 3113
+    },
+    {
+      "kind": "cycle_coupled_qualification_record",
+      "path": "/opt/gpu-atlas/qualification/p15h-address/causal-attention-range-rebase/qualification_record.json",
+      "sha256": "f82bc593a6a0f85a228cb3dede6f08a43be1e9b122134ae1d639ae040f76ddb0",
+      "size_bytes": 4024
+    }
+  ],
+  "qualification": {
+    "cycles": 43624,
+    "gpu_parents": 2560,
+    "instructions": 11962112,
+    "outstanding": 0,
+    "performance_eligible": false,
+    "qualification_record": "/opt/gpu-atlas/qualification/p15h-address/causal-attention-range-rebase/qualification_record.json",
+    "ramulator2_instances": 1,
+    "status": "cycle_coupled_range_rebased_pending_global_timeline"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "torch.scaled_dot_product_attention_causal",
+    "kv_length": 16,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "causal_attention",
+    "phase": "prefill",
+    "q_len": 16
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        32,
+        16,
+        64
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.causal_attention.query",
+      "trace_base": 47380156928
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        32,
+        16,
+        64
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.causal_attention.key",
+      "trace_base": 47380238848
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        32,
+        16,
+        64
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.causal_attention.value",
+      "trace_base": 47380304384
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        32,
+        16,
+        64
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.causal_attention.output",
+      "trace_base": 47380091392
+    }
+  ]
+}

@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from collections.abc import Iterable, Iterator
+from pathlib import Path
 from typing import Mapping, Sequence
 
 from .global_memory_map import (
     GlobalAllocation,
-    sampled_requests_for_values,
+    iter_requests_for_values,
 )
 from .live_ramulator2 import LiveRamulator2Bridge, LiveRamulator2Error
 from .online_operator_runtime import OnlineDispatchSpec
@@ -15,6 +17,7 @@ from .prefill_cycle_artifact import (
     CycleTaskPlan,
     PrefillCycleDispatcher,
 )
+from .request_cycle_trace import RequestCycleTraceRecorder
 
 
 class PrefillCycleRuntimeError(RuntimeError):
@@ -38,8 +41,8 @@ class _Active:
     compute_cycles: int
     compute_done_cycle: int
     plan: CycleTaskPlan | None
-    pending_reads: list[dict[str, object]] = field(default_factory=list)
-    pending_writes: list[dict[str, object]] = field(default_factory=list)
+    pending_reads: "_LazyRequests" = field(default_factory=lambda: _LazyRequests(()))
+    pending_writes: "_LazyRequests" = field(default_factory=lambda: _LazyRequests(()))
     outstanding: set[int] = field(default_factory=set)
     phase: str = "reading"
     writes_released: bool = False
@@ -48,6 +51,41 @@ class _Active:
     represented_read_bytes: int = 0
     represented_write_bytes: int = 0
     simulated_request_bytes: int = 0
+
+
+class _LazyRequests:
+    """One-record look-ahead over a potentially very large request sequence."""
+
+    _EMPTY = object()
+
+    def __init__(self, values: Iterable[dict[str, object]]) -> None:
+        self._iterator: Iterator[dict[str, object]] = iter(values)
+        self._current: object = self._EMPTY
+        self._exhausted = False
+
+    def _prime(self) -> None:
+        if self._current is not self._EMPTY or self._exhausted:
+            return
+        try:
+            self._current = next(self._iterator)
+        except StopIteration:
+            self._exhausted = True
+
+    def __bool__(self) -> bool:
+        self._prime()
+        return not self._exhausted
+
+    def first(self) -> dict[str, object]:
+        self._prime()
+        if self._exhausted:
+            raise IndexError("request stream is exhausted")
+        assert isinstance(self._current, dict)
+        return self._current
+
+    def consume(self) -> dict[str, object]:
+        result = self.first()
+        self._current = self._EMPTY
+        return result
 
 
 def _records(execution_graph: Mapping[str, object]) -> list[dict[str, object]]:
@@ -73,6 +111,7 @@ def run_prefill_cycle_dag(
     global_clock_hz: int,
     transaction_bytes: int,
     max_samples_per_value: int,
+    request_trace_path: Path | None = None,
 ) -> dict[str, object]:
     """Run device tasks, routes and one live Ramulator2 on one cycle timeline."""
 
@@ -166,8 +205,7 @@ def run_prefill_cycle_dag(
     completed: set[str] = set()
     timing: dict[str, dict[str, object]] = {}
     parent_owner: dict[int, str] = {}
-    parent_metadata: dict[int, dict[str, object]] = {}
-    memory_trace: list[dict[str, object]] = []
+    trace_recorder = RequestCycleTraceRecorder(request_trace_path)
     launch_log: list[dict[str, object]] = []
     next_parent_id = 1
     backend_dispatch_count = 0
@@ -190,7 +228,8 @@ def run_prefill_cycle_dag(
             require_value(value_id, version, device_id, task_id)
             checked.append({"value_id": value_id, "version": version})
         plan = dispatcher.dispatch(dispatch_specs[task_id])
-        reads = sampled_requests_for_values(
+        traffic_mode = dispatcher.memory_traffic_mode(task_id)
+        reads = _LazyRequests(iter_requests_for_values(
             task_id,
             device_id,
             inputs,
@@ -198,8 +237,9 @@ def run_prefill_cycle_dag(
             "read",
             transaction_bytes,
             max_samples_per_value,
-        )
-        writes = sampled_requests_for_values(
+            full_traffic=traffic_mode == "full",
+        ))
+        writes = _LazyRequests(iter_requests_for_values(
             task_id,
             device_id,
             outputs,
@@ -207,7 +247,8 @@ def run_prefill_cycle_dag(
             "write",
             transaction_bytes,
             max_samples_per_value,
-        )
+            full_traffic=traffic_mode == "full",
+        ))
         record.update(
             {
                 "backend_id": plan.backend_id,
@@ -218,6 +259,7 @@ def run_prefill_cycle_dag(
                 "cycle_formula": dict(plan.formula),
                 "compiled_artifact": dict(plan.artifact),
                 "fidelity": dict(plan.fidelity),
+                "memory_traffic_mode": traffic_mode,
                 "validated_input_versions": checked,
             }
         )
@@ -247,8 +289,8 @@ def run_prefill_cycle_dag(
             pending_reads=reads,
             pending_writes=writes,
             phase="computing" if not reads else "reading",
-            represented_read_bytes=sum(int(item["represented_bytes"]) for item in reads),
-            represented_write_bytes=sum(int(item["represented_bytes"]) for item in writes),
+            represented_read_bytes=sum(int(item["size_bytes"]) for item in inputs),
+            represented_write_bytes=sum(int(item["size_bytes"]) for item in outputs),
         )
 
     def make_route_active(task_id: str, current_cycle: int) -> _Active:
@@ -279,6 +321,7 @@ def run_prefill_cycle_dag(
             "sample_count": 1,
             "logical_value_bytes": int(record["payload_bytes"]),
             "coherence_probe": True,
+            "traffic_mode": "coherence_probe",
         }
         launch_log.append(
             {
@@ -303,7 +346,7 @@ def run_prefill_cycle_dag(
             compute_cycles=route_cycles,
             compute_done_cycle=-1,
             plan=None,
-            pending_reads=[probe],
+            pending_reads=_LazyRequests((probe,)),
         )
 
     def submit_pending(item: _Active) -> bool:
@@ -317,7 +360,7 @@ def run_prefill_cycle_dag(
         )
         if not pending:
             return False
-        sample = pending[0]
+        sample = pending.first()
         device_id = str(sample["device_id"])
         initiator = (
             LiveRamulator2Bridge.GPU_INITIATOR
@@ -341,13 +384,12 @@ def run_prefill_cycle_dag(
             return False
         parent_id = next_parent_id
         next_parent_id += 1
-        pending.pop(0)
+        pending.consume()
         item.outstanding.add(parent_id)
         item.accepted_parents += 1
         item.simulated_request_bytes += int(sample["size_bytes"])
         parent_owner[parent_id] = item.task_id
-        parent_metadata[parent_id] = dict(sample)
-        memory_trace.append(
+        trace_recorder.issue(
             {
                 "parent_id": parent_id,
                 "issue_cycle": bridge.current_cycle,
@@ -383,7 +425,12 @@ def run_prefill_cycle_dag(
                 "represented_read_bytes": item.represented_read_bytes,
                 "represented_write_bytes": item.represented_write_bytes,
                 "simulated_request_bytes": item.simulated_request_bytes,
-                "sampling_policy": "evenly_spaced_bounded",
+                "traffic_mode": record["memory_traffic_mode"],
+                "sampling_policy": (
+                    "none_full_value_transactions"
+                    if record["memory_traffic_mode"] == "full"
+                    else "evenly_spaced_bounded"
+                ),
             }
         else:
             value_id = str(record["value_id"])
@@ -440,13 +487,8 @@ def run_prefill_cycle_dag(
                     raise PrefillCycleRuntimeError(f"duplicate completion {parent_id}")
                 owner.outstanding.remove(parent_id)
                 owner.completed_parents += 1
-                metadata = parent_metadata[parent_id]
-                for trace in reversed(memory_trace):
-                    if trace["parent_id"] == parent_id:
-                        trace.update(completion)
-                        break
-                else:
-                    raise PrefillCycleRuntimeError("memory trace lost parent metadata")
+                parent_owner.pop(parent_id)
+                trace_recorder.complete(parent_id, completion)
 
             # An operator follows a strict read -> compute -> write lifecycle.
             # Compute does not begin until every sampled input request is durable;
@@ -539,6 +581,7 @@ def run_prefill_cycle_dag(
                 bridge.close()
         except Exception:
             pass
+        trace_recorder.abort()
         raise
 
     if backend_dispatch_count != len(device_task_ids):
@@ -546,37 +589,35 @@ def run_prefill_cycle_dag(
             "Backend dispatch conservation failed: "
             f"expected={len(device_task_ids)}, actual={backend_dispatch_count}"
         )
-    if int(memory_stats["accepted_parent_ids"]) != len(memory_trace):
+    trace_stats = trace_recorder.statistics()
+    if int(memory_stats["accepted_parent_ids"]) != trace_stats["issued_parents"]:
         raise PrefillCycleRuntimeError("memory trace parent conservation failed")
     if int(memory_stats["outstanding"]) != 0:
         raise PrefillCycleRuntimeError("live Ramulator2 exited with outstanding work")
 
     coverage = dispatcher.coverage(device_task_ids)
-    represented_read = sum(
-        int(item.get("represented_bytes", 0))
-        for item in memory_trace
-        if item["operation"] == "read"
-    )
-    represented_write = sum(
-        int(item.get("represented_bytes", 0))
-        for item in memory_trace
-        if item["operation"] == "write"
-    )
+    represented_read = trace_stats["represented_read_bytes"]
+    represented_write = trace_stats["represented_write_bytes"]
     memory_stats.update(
         {
-            "sampling_policy": "evenly_spaced_bounded",
+            "traffic_policy": "mixed_per_operator",
+            "sampling_policy": "evenly_spaced_bounded_for_non_full_operators",
             "max_samples_per_value": max_samples_per_value,
+            "full_traffic_parents": trace_stats["full_traffic_parents"],
+            "sampled_traffic_parents": trace_stats["sampled_traffic_parents"],
+            "coherence_probe_parents": trace_stats["coherence_probe_parents"],
             "represented_read_bytes": represented_read,
             "represented_write_bytes": represented_write,
             "represented_total_bytes": represented_read + represented_write,
-            "simulated_parent_payload_bytes": sum(
-                int(item["size_bytes"]) for item in memory_trace
-            ),
+            "simulated_parent_payload_bytes": trace_stats[
+                "simulated_parent_payload_bytes"
+            ],
             "one_live_timing_owner": True,
         }
     )
     ordered_timing = [timing[str(record["task_id"])] for record in records]
     makespan_fs = max(int(item["completion_time_fs"]) for item in ordered_timing)
+    memory_trace = trace_recorder.finalize()
     return {
         "schema_version": "hetero-prefill-cycle-runtime/v1",
         "makespan_fs": makespan_fs,

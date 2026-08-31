@@ -1,0 +1,176 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.causal_attention.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "driver": "591.86",
+    "gpu": "NVIDIA GeForce RTX 3070",
+    "kind": "accel_sim",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "memory_traffic": "not_extracted",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": false,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "/opt/gpu-atlas/qualification/p15a/tinyllama-prefill-bs1-ctx16-causal-attention/operator_metadata.json",
+      "sha256": "43d4d96f978e9559fdf028930091c90ad45aebae2358087f32b773ef62e80394",
+      "size_bytes": 2168
+    },
+    {
+      "kind": "kernels_list",
+      "path": "/opt/gpu-atlas/qualification/p15a/tinyllama-prefill-bs1-ctx16-causal-attention/traces/kernelslist.g",
+      "sha256": "4af317e4d523dfc07f6de9c518fe6b555da3731a9f91d59b3dee6c86177ae0da",
+      "size_bytes": 105
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p15a/tinyllama-prefill-bs1-ctx16-causal-attention/traces/kernel-1-ctx_0x5ba97924f020.tracez",
+      "sha256": "9bafc66f92725aefda410c97421889ce5ff99ae64e762469e1362706c7cefb3d",
+      "size_bytes": 383936
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p15a/tinyllama-prefill-bs1-ctx16-causal-attention/traces/kernel-2-ctx_0x5ba97924f020.tracez",
+      "sha256": "027ea4b41cedee09b29db0d2cefe89bf7aaee312d659bff5f328d15230d95461",
+      "size_bytes": 386215
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p15a/tinyllama-prefill-bs1-ctx16-causal-attention/traces/kernel-3-ctx_0x5ba97924f020.tracez",
+      "sha256": "b1bb39b07291fdbbb40a0847a778d6ca8f637117e3c0c90c61ea89230b11b1f7",
+      "size_bytes": 3008156
+    },
+    {
+      "kind": "accel_sim_trace_manifest",
+      "path": "tinyllama_prefill_bs1_ctx16_causal_attention_sm86_trace.json",
+      "sha256": "25f6c2dca13e1a079ce2799cdaf73ec6d94b875c64208f978635e772c14c4a45",
+      "size_bytes": 3102
+    },
+    {
+      "kind": "accel_sim_qualification_record",
+      "path": "/opt/gpu-atlas/qualification/p15a/accel-sim-rtx3070-tinyllama-causal-attention-prefill-bs1-ctx16/qualification_record.json",
+      "sha256": "5aade6a887125a1a3de2e0cd50cff5483b08f80a5e5b77560829ba2cc87180a3",
+      "size_bytes": 1536
+    }
+  ],
+  "qualification": {
+    "performance_eligible": false,
+    "qualification_record": "/opt/gpu-atlas/qualification/p15a/accel-sim-rtx3070-tinyllama-causal-attention-prefill-bs1-ctx16/qualification_record.json",
+    "status": "standalone_accel_sim_qualified_pending_shared_request_cycle"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "torch.scaled_dot_product_attention_causal",
+    "kv_length": 16,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "causal_attention",
+    "phase": "prefill",
+    "q_len": 16
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        32,
+        16,
+        64
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.causal_attention.query",
+      "trace_base": 47380156928
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        32,
+        16,
+        64
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.causal_attention.key",
+      "trace_base": 47380238848
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        32,
+        16,
+        64
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.causal_attention.value",
+      "trace_base": 47380304384
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        32,
+        16,
+        64
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.causal_attention.output",
+      "trace_base": 47380091392
+    }
+  ]
+}

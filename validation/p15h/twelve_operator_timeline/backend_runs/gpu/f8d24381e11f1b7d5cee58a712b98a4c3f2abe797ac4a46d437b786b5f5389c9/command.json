@@ -1,0 +1,87 @@
+{
+  "argv": [
+    "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-ramulator2/gpu-simulator/build-ramulator2/accel-sim.out",
+    "-trace",
+    "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-causal-attention/traces/kernelslist.g",
+    "-config",
+    "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-ramulator2/gpu-simulator/gpgpu-sim/configs/tested-cfgs/SM86_RTX3070/gpgpusim.config",
+    "-config",
+    "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/backends/rtx3070_ramulator2.trace.config"
+  ],
+  "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+  "environment_overrides": {},
+  "online_address_binding": {
+    "allocated_bytes": 2097152,
+    "allocation_owner": "prefill_global_timeline",
+    "bindings": [
+      {
+        "memory_space_id": "shared0.dram3d",
+        "physical_offset_bytes": 350322688,
+        "size_bytes": 65536,
+        "tensor_id": "tinyllama.layer0.causal_attention.output",
+        "tensor_offset_bytes": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "physical_offset_bytes": 350388224,
+        "size_bytes": 65536,
+        "tensor_id": "tinyllama.layer0.causal_attention.query",
+        "tensor_offset_bytes": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "physical_offset_bytes": 353700608,
+        "size_bytes": 65536,
+        "tensor_id": "tinyllama.layer0.causal_attention.key",
+        "tensor_offset_bytes": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "physical_offset_bytes": 353766144,
+        "size_bytes": 1233408,
+        "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_0",
+        "tensor_offset_bytes": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "physical_offset_bytes": 354999552,
+        "size_bytes": 16384,
+        "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_1",
+        "tensor_offset_bytes": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "physical_offset_bytes": 355015936,
+        "size_bytes": 585216,
+        "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_2",
+        "tensor_offset_bytes": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "physical_offset_bytes": 355601152,
+        "size_bytes": 65536,
+        "tensor_id": "tinyllama.layer0.causal_attention.value",
+        "tensor_offset_bytes": 0
+      }
+    ],
+    "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+    "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+    "policy": {
+      "alignment_bytes": 256,
+      "capacity_bytes": 4294967296,
+      "memory_space_id": "shared0.dram3d",
+      "mode": "range_rebase_packed_manifest",
+      "physical_base_bytes": 0,
+      "require_nonzero_translations": true
+    },
+    "range_count": 7,
+    "schema_version": "hetero-online-address-binding/v1",
+    "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/f8d24381e11f1b7d5cee58a712b98a4c3f2abe797ac4a46d437b786b5f5389c9/online_address_bindings.tsv",
+    "table_sha256": "0e07f06ec9f13e836a89d26a5cfbcc860600b8ec5372f3834152c93bea21098a",
+    "tensor_count": 7,
+    "trace_key": "a9c33cb91e7bf3e956b72f784ae0e5a7ce49d27ec67a627078b99d38551de5a6",
+    "translation_point": "mem_fetch_before_gpu_cache_lookup"
+  },
+  "schema_version": "hetero-command/v1",
+  "simulation_key": "f8d24381e11f1b7d5cee58a712b98a4c3f2abe797ac4a46d437b786b5f5389c9"
+}

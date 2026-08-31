@@ -1,0 +1,187 @@
+{
+  "address_owner": "python.GlobalPhysicalAddressAllocator",
+  "backend_dispatch": {
+    "atlas_timing_contract": null,
+    "gpu_timing_contract": {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "duration_semantics": "coupled",
+      "exports": [],
+      "owns": [
+        "gpu0.core",
+        "gpu0.l1",
+        "gpu0.l2",
+        "gpu0.noc",
+        "shared0.dram3d"
+      ],
+      "replay_safe": false,
+      "supports_stall_resume": true,
+      "trace_semantics": "functional"
+    },
+    "request_cycle_ready_required": true,
+    "runtime_global_pa_bindings": [
+      {
+        "operator_artifact_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 351615744,
+            "size_bytes": 8192,
+            "tensor_id": "tinyllama.layer0.qkv_projection.key"
+          },
+          {
+            "global_pa_base": 351623936,
+            "size_bytes": 12582912,
+            "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 364206848,
+            "size_bytes": 1233408,
+            "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 365440256,
+            "size_bytes": 634368,
+            "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_2"
+          },
+          {
+            "global_pa_base": 366074624,
+            "size_bytes": 8519680,
+            "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_3"
+          },
+          {
+            "global_pa_base": 374594304,
+            "size_bytes": 65536,
+            "tensor_id": "tinyllama.layer0.qkv_projection.query"
+          },
+          {
+            "global_pa_base": 374659840,
+            "size_bytes": 8192,
+            "tensor_id": "tinyllama.layer0.qkv_projection.value"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "global_pa_base": 351485952,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.qkv_projection.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "global_pa_base": 77606912,
+            "size_bytes": 8388608,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.qkv_projection.q_weight",
+            "value_id": "model.layers.0.qkv.weight",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "global_pa_base": 85995520,
+            "size_bytes": 1048576,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.qkv_projection.k_weight",
+            "value_id": "model.layers.0.qkv.weight",
+            "value_index": 1,
+            "value_offset_bytes": 8388608,
+            "value_version": 0
+          },
+          {
+            "global_pa_base": 87044096,
+            "size_bytes": 1048576,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.qkv_projection.v_weight",
+            "value_id": "model.layers.0.qkv.weight",
+            "value_index": 1,
+            "value_offset_bytes": 9437184,
+            "value_version": 0
+          },
+          {
+            "global_pa_base": 350519296,
+            "size_bytes": 81920,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.qkv_projection.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+        "trace_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "operator_artifact_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 374668032,
+            "size_bytes": 65536,
+            "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 374733568,
+            "size_bytes": 131136,
+            "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 374864896,
+            "size_bytes": 131072,
+            "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_2"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "global_pa_base": 350253056,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.attention_norm.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "global_pa_base": 4096,
+            "size_bytes": 4096,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.attention_norm.weight",
+            "value_id": "model.layers.0.attention_norm.weight",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "global_pa_base": 351485952,
+            "size_bytes": 65536,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.attention_norm.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+        "trace_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      }
+    ],
+    "timing_owners": {
+      "gpu0.core": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "gpu0.l1": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "gpu0.l2": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "gpu0.noc": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "shared0.dram3d": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0"
+    }
+  },
+  "memory_timing_owner": "shared3d.per_operator_in_process_ramulator2",
+  "prefill_cycle": null,
+  "runtime_owner": "python.OnlineOperatorRuntime",
+  "schema_version": "hetero-provenance/v1",
+  "simulation_input_key": "be9f927b7c3846c80f19206f9c0eb966aaf9f14084901971788d8f9d345c22e6",
+  "simulator_revision": "8c58dbb1a2209829198451cbfd8fb6c95c16c53c-dirty"
+}

@@ -1,0 +1,7 @@
+{
+  "schema_version": "hetero-coupled-qualification-map/v1",
+  "records": {
+    "attention_norm": "/opt/gpu-atlas/qualification/p15e-address/attention-norm-range-rebase-qualified/qualification_record.json",
+    "qkv_projection": "/opt/gpu-atlas/qualification/p15f-address/qkv-range-rebase-qualified-v3/qualification_record.json"
+  }
+}

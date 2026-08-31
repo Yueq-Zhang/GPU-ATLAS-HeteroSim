@@ -13,7 +13,13 @@ from pathlib import Path
 from typing import Mapping
 
 from ..bandwidth import BandwidthContract, BandwidthContractError
-from ..trace_manifest import TraceManifest
+from ..online_address_binding import (
+    OnlineAddressBindingError,
+    PackedRangeRebasePolicy,
+    materialize_explicit_online_address_bindings,
+    materialize_online_address_bindings,
+)
+from ..trace_manifest import SimulationBufferBinding, TraceManifest
 from .contracts import BackendDescriptor
 
 
@@ -35,6 +41,7 @@ class ExternalMemoryConfig:
     expected_instances: int
     require_nonzero_requests: bool
     bandwidth_contract: BandwidthContract
+    address_translation: PackedRangeRebasePolicy | None
 
     @classmethod
     def load(cls, payload: object, base: Path) -> "ExternalMemoryConfig":
@@ -50,7 +57,8 @@ class ExternalMemoryConfig:
             "bandwidth_contract",
         }
         missing = required - payload.keys()
-        extra = payload.keys() - required
+        optional = {"address_translation"}
+        extra = payload.keys() - (required | optional)
         if missing or extra:
             raise AccelSimBackendError(
                 "external_memory keys mismatch: "
@@ -74,6 +82,11 @@ class ExternalMemoryConfig:
             expected_instances=int(payload["expected_instances"]),
             require_nonzero_requests=bool(payload["require_nonzero_requests"]),
             bandwidth_contract=bandwidth_contract,
+            address_translation=PackedRangeRebasePolicy.load(
+                payload["address_translation"]
+            )
+            if "address_translation" in payload
+            else None,
         )
         if not result.timing_owner or result.expected_instances != 1:
             raise AccelSimBackendError(
@@ -434,7 +447,170 @@ class AccelSimBackend:
             str(self.config.trace_config),
         )
 
-    def simulation_key(self, manifest: TraceManifest) -> str:
+    def _validate_external_memory_stats(
+        self, external_memory_stats: Mapping[str, int] | None
+    ) -> None:
+        external = self.config.external_memory
+        if external is None:
+            if external_memory_stats is not None:
+                raise AccelSimBackendError(
+                    "run reports external-memory statistics for a backend "
+                    "without external memory"
+                )
+            return
+        if external_memory_stats is None:
+            raise AccelSimBackendError(
+                "external Ramulator2 is configured but emitted no bridge statistics"
+            )
+        required = {
+            "instances",
+            "outstanding",
+            "reads",
+            "writes",
+            "completed",
+        }
+        missing = required - external_memory_stats.keys()
+        if missing:
+            raise AccelSimBackendError(
+                "external-memory statistics lack required counters: "
+                f"{sorted(missing)}"
+            )
+        try:
+            instances = int(external_memory_stats["instances"])
+            outstanding = int(external_memory_stats["outstanding"])
+            reads = int(external_memory_stats["reads"])
+            writes = int(external_memory_stats["writes"])
+            completed = int(external_memory_stats["completed"])
+        except (TypeError, ValueError) as error:
+            raise AccelSimBackendError(
+                "external-memory statistics contain non-integer counters"
+            ) from error
+        if instances != external.expected_instances:
+            raise AccelSimBackendError(
+                "external Ramulator2 instance count violates the single-owner contract"
+            )
+        if outstanding != 0:
+            raise AccelSimBackendError(
+                "external Ramulator2 exited with outstanding GPU requests"
+            )
+        accepted = reads + writes
+        if external.require_nonzero_requests and accepted == 0:
+            raise AccelSimBackendError(
+                "external Ramulator2 accepted zero requests; the trace did not "
+                "exercise the cycle bridge"
+            )
+        if completed != accepted:
+            raise AccelSimBackendError(
+                "external Ramulator2 did not complete every accepted parent request"
+            )
+        translation = external.address_translation
+        if translation is not None:
+            translation_fields = {
+                "address_translated",
+                "address_already_global",
+                "address_unmapped",
+                "address_binding_ranges",
+            }
+            translation_missing = translation_fields - external_memory_stats.keys()
+            if translation_missing:
+                raise AccelSimBackendError(
+                    "online address translation lacks required counters: "
+                    f"{sorted(translation_missing)}"
+                )
+            translated = int(external_memory_stats["address_translated"])
+            unmapped = int(external_memory_stats["address_unmapped"])
+            ranges = int(external_memory_stats["address_binding_ranges"])
+            if unmapped != 0:
+                raise AccelSimBackendError(
+                    "online address translation observed unmapped GPU requests"
+                )
+            if ranges <= 0:
+                raise AccelSimBackendError(
+                    "online address translation loaded no binding ranges"
+                )
+            if translation.require_nonzero_translations and translated == 0:
+                raise AccelSimBackendError(
+                    "online address translation rebased zero GPU requests"
+                )
+
+    def _validate_atlas_runtime_stats(
+        self, atlas_runtime_stats: Mapping[str, int | str] | None
+    ) -> None:
+        atlas = self.config.co_resident_atlas
+        if atlas is None:
+            if atlas_runtime_stats is not None:
+                raise AccelSimBackendError(
+                    "run reports ATLAS statistics for a backend without co-resident ATLAS"
+                )
+            return
+        if atlas_runtime_stats is None:
+            raise AccelSimBackendError(
+                "co-resident ATLAS is configured but emitted no runtime summary"
+            )
+        required = {
+            "status",
+            "instances",
+            "submitted_parents",
+            "completed_parents",
+            "bridge_atlas_parents",
+            "bridge_atlas_completed",
+            "transaction_bytes",
+        }
+        missing = required - atlas_runtime_stats.keys()
+        if missing:
+            raise AccelSimBackendError(
+                "ATLAS runtime statistics lack required counters: "
+                f"{sorted(missing)}"
+            )
+        if atlas_runtime_stats["status"] != "passed":
+            raise AccelSimBackendError(
+                "co-resident ATLAS runtime did not finish successfully"
+            )
+        try:
+            instances = int(atlas_runtime_stats["instances"])
+            submitted = int(atlas_runtime_stats["submitted_parents"])
+            completed = int(atlas_runtime_stats["completed_parents"])
+            bridge_submitted = int(atlas_runtime_stats["bridge_atlas_parents"])
+            bridge_completed = int(atlas_runtime_stats["bridge_atlas_completed"])
+            transaction_bytes = int(atlas_runtime_stats["transaction_bytes"])
+        except (TypeError, ValueError) as error:
+            raise AccelSimBackendError(
+                "ATLAS runtime statistics contain non-integer counters"
+            ) from error
+        if instances != atlas.expected_instances:
+            raise AccelSimBackendError(
+                "co-resident ATLAS instance count violates the contract"
+            )
+        if atlas.require_nonzero_requests and submitted == 0:
+            raise AccelSimBackendError(
+                "co-resident ATLAS emitted zero shared-memory requests"
+            )
+        if submitted != completed:
+            raise AccelSimBackendError(
+                "co-resident ATLAS did not complete every submitted request"
+            )
+        if bridge_submitted != submitted:
+            raise AccelSimBackendError(
+                "ATLAS runtime and shared bridge disagree on submitted parents"
+            )
+        if bridge_completed != completed:
+            raise AccelSimBackendError(
+                "ATLAS runtime and shared bridge disagree on completions"
+            )
+        expected_bytes = atlas.expected_transaction_bytes
+        if (
+            expected_bytes is not None
+            and transaction_bytes != expected_bytes
+        ):
+            raise AccelSimBackendError(
+                "co-resident ATLAS transaction-byte count does not match config"
+            )
+
+    def simulation_key(
+        self,
+        manifest: TraceManifest,
+        simulation_bindings: tuple[SimulationBufferBinding, ...] | None = None,
+    ) -> str:
         payload = {
             "backend_id": self.config.backend_id,
             "dependency_commits": self.config.dependency_commits,
@@ -451,6 +627,11 @@ class AccelSimBackend:
                 "bandwidth_contract": asdict(
                     self.config.external_memory.bandwidth_contract
                 ),
+                "address_translation": asdict(
+                    self.config.external_memory.address_translation
+                )
+                if self.config.external_memory.address_translation is not None
+                else None,
             }
             if self.config.external_memory is not None
             else None,
@@ -483,11 +664,19 @@ class AccelSimBackend:
                 self.config.trace_config.read_bytes()
             ).hexdigest(),
             "trace_key": manifest.trace_key(),
+            "runtime_global_pa_bindings": [asdict(item) for item in simulation_bindings]
+            if simulation_bindings is not None
+            else None,
         }
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
-    def run(self, manifest: TraceManifest, output_directory: Path) -> AccelSimRunResult:
+    def run(
+        self,
+        manifest: TraceManifest,
+        output_directory: Path,
+        simulation_bindings: tuple[SimulationBufferBinding, ...] | None = None,
+    ) -> AccelSimRunResult:
         self.config.validate_files()
         if manifest.kernels_list is None or not manifest.kernels_list.is_file():
             raise AccelSimBackendError(
@@ -495,6 +684,28 @@ class AccelSimBackend:
             )
         output_directory.mkdir(parents=True, exist_ok=True)
         command = self.command(manifest)
+        address_binding: dict[str, object] | None = None
+        external = self.config.external_memory
+        if external is not None and external.address_translation is not None:
+            try:
+                address_binding = (
+                    materialize_explicit_online_address_bindings(
+                        manifest,
+                        external.address_translation,
+                        simulation_bindings,
+                        output_directory,
+                    )
+                    if simulation_bindings is not None
+                    else materialize_online_address_bindings(
+                        manifest, external.address_translation, output_directory
+                    )
+                )
+            except OnlineAddressBindingError as error:
+                raise AccelSimBackendError(str(error)) from error
+        # Never leave a previously successful result beside a new command when
+        # a rerun fails or times out.  A completed leg becomes reusable only
+        # after this invocation writes a fresh stats.json.
+        (output_directory / "stats.json").unlink(missing_ok=True)
         _write_json(
             output_directory / "command.json",
             {
@@ -502,7 +713,8 @@ class AccelSimBackend:
                 "argv": list(command),
                 "backend_id": self.config.backend_id,
                 "environment_overrides": dict(self.config.environment),
-                "simulation_key": self.simulation_key(manifest),
+                "simulation_key": self.simulation_key(manifest, simulation_bindings),
+                "online_address_binding": address_binding,
             },
         )
         try:
@@ -561,6 +773,10 @@ class AccelSimBackend:
                 )
                 environment["HETEROSIM_LINK_CREDITS"] = str(link.credits)
                 environment["HETEROSIM_LINK_DUPLEX_MODE"] = link.duplex_mode
+                if address_binding is not None:
+                    environment["HETEROSIM_GPU_ADDRESS_BINDINGS"] = str(
+                        address_binding["table_path"]
+                    )
             if self.config.co_resident_atlas is not None:
                 atlas = self.config.co_resident_atlas
                 environment["HETEROSIM_ATLAS_CHIP_CONFIG"] = str(
@@ -600,68 +816,8 @@ class AccelSimBackend:
         instructions = int(stats["gpu_tot_sim_insn"])
         external_memory_stats = parse_ramulator2_stats(combined_output)
         atlas_runtime_stats = parse_atlas_full_chip_runtime_stats(combined_output)
-        if self.config.external_memory is not None:
-            if external_memory_stats is None:
-                raise AccelSimBackendError(
-                    "external Ramulator2 is configured but emitted no bridge statistics"
-                )
-            if external_memory_stats["instances"] != self.config.external_memory.expected_instances:
-                raise AccelSimBackendError(
-                    "external Ramulator2 instance count violates the single-owner contract"
-                )
-            if external_memory_stats["outstanding"] != 0:
-                raise AccelSimBackendError(
-                    "external Ramulator2 exited with outstanding GPU requests"
-                )
-            accepted = external_memory_stats["reads"] + external_memory_stats["writes"]
-            if self.config.external_memory.require_nonzero_requests and accepted == 0:
-                raise AccelSimBackendError(
-                    "external Ramulator2 accepted zero requests; the trace did not exercise the cycle bridge"
-                )
-            if external_memory_stats["completed"] != accepted:
-                raise AccelSimBackendError(
-                    "external Ramulator2 did not complete every accepted parent request"
-                )
-        if self.config.co_resident_atlas is not None:
-            atlas = self.config.co_resident_atlas
-            if atlas_runtime_stats is None:
-                raise AccelSimBackendError(
-                    "co-resident ATLAS is configured but emitted no runtime summary"
-                )
-            if atlas_runtime_stats["status"] != "passed":
-                raise AccelSimBackendError(
-                    "co-resident ATLAS runtime did not finish successfully"
-                )
-            if atlas_runtime_stats["instances"] != atlas.expected_instances:
-                raise AccelSimBackendError(
-                    "co-resident ATLAS instance count violates the contract"
-                )
-            submitted = int(atlas_runtime_stats["submitted_parents"])
-            completed = int(atlas_runtime_stats["completed_parents"])
-            if atlas.require_nonzero_requests and submitted == 0:
-                raise AccelSimBackendError(
-                    "co-resident ATLAS emitted zero shared-memory requests"
-                )
-            if submitted != completed:
-                raise AccelSimBackendError(
-                    "co-resident ATLAS did not complete every submitted request"
-                )
-            if int(atlas_runtime_stats["bridge_atlas_parents"]) != submitted:
-                raise AccelSimBackendError(
-                    "ATLAS runtime and shared bridge disagree on submitted parents"
-                )
-            if int(atlas_runtime_stats["bridge_atlas_completed"]) != completed:
-                raise AccelSimBackendError(
-                    "ATLAS runtime and shared bridge disagree on completions"
-                )
-            expected_bytes = atlas.expected_transaction_bytes
-            if (
-                expected_bytes is not None
-                and int(atlas_runtime_stats["transaction_bytes"]) != expected_bytes
-            ):
-                raise AccelSimBackendError(
-                    "co-resident ATLAS transaction-byte count does not match config"
-                )
+        self._validate_external_memory_stats(external_memory_stats)
+        self._validate_atlas_runtime_stats(atlas_runtime_stats)
         duration_fs = math.ceil(cycles * 1_000_000_000_000_000 / self.config.core_frequency_hz)
         result = AccelSimRunResult(
             command=command,
@@ -679,6 +835,7 @@ class AccelSimBackend:
             {
                 "schema_version": "hetero-accel-sim-stats/v1",
                 "backend_id": self.config.backend_id,
+                "simulation_key": self.simulation_key(manifest, simulation_bindings),
                 "cycles": cycles,
                 "instructions": instructions,
                 "duration_fs": duration_fs,
@@ -690,10 +847,133 @@ class AccelSimBackend:
         )
         return result
 
-    def qualify(self, manifest: TraceManifest, output_directory: Path) -> Path:
+    def _load_completed_run(
+        self, manifest: TraceManifest, output_directory: Path
+    ) -> AccelSimRunResult | None:
+        """Load a successful same-key run so long qualifications can resume safely."""
+
+        command_path = output_directory / "command.json"
+        stats_path = output_directory / "stats.json"
+        if not command_path.is_file() or not stats_path.is_file():
+            return None
+        try:
+            command_payload = json.loads(command_path.read_text(encoding="utf-8"))
+            stats_payload = json.loads(stats_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as error:
+            raise AccelSimBackendError(
+                f"cannot load completed Accel-Sim run {output_directory}: {error}"
+            ) from error
+        expected_command = list(self.command(manifest))
+        expected_key = self.simulation_key(manifest)
+        if (
+            not isinstance(command_payload, dict)
+            or command_payload.get("schema_version") != "hetero-command/v1"
+            or command_payload.get("backend_id") != self.config.backend_id
+            or command_payload.get("argv") != expected_command
+            or command_payload.get("simulation_key") != expected_key
+        ):
+            raise AccelSimBackendError(
+                f"completed run identity does not match current qualification: "
+                f"{output_directory}"
+            )
+        if (
+            not isinstance(stats_payload, dict)
+            or stats_payload.get("schema_version") != "hetero-accel-sim-stats/v1"
+            or stats_payload.get("backend_id") != self.config.backend_id
+            or stats_payload.get("core_frequency_hz")
+            != self.config.core_frequency_hz
+        ):
+            raise AccelSimBackendError(
+                f"completed run statistics do not match current backend: "
+                f"{output_directory}"
+            )
+        raw_stats = stats_payload.get("raw_stats")
+        external_stats = stats_payload.get("external_memory_stats")
+        atlas_stats = stats_payload.get("atlas_runtime_stats")
+        if not isinstance(raw_stats, dict):
+            raise AccelSimBackendError(
+                f"completed run lacks raw statistics: {output_directory}"
+            )
+        if external_stats is not None and not isinstance(external_stats, dict):
+            raise AccelSimBackendError(
+                f"completed run has invalid external-memory statistics: "
+                f"{output_directory}"
+            )
+        if atlas_stats is not None and not isinstance(atlas_stats, dict):
+            raise AccelSimBackendError(
+                f"completed run has invalid ATLAS statistics: {output_directory}"
+            )
+        try:
+            cycles = int(stats_payload["cycles"])
+            instructions = int(stats_payload["instructions"])
+            duration_fs = int(stats_payload["duration_fs"])
+        except (KeyError, TypeError, ValueError) as error:
+            raise AccelSimBackendError(
+                f"completed run has invalid required counters: {output_directory}"
+            ) from error
+        stored_key = stats_payload.get("simulation_key")
+        if stored_key is not None and stored_key != expected_key:
+            raise AccelSimBackendError(
+                f"completed run statistics have a different Simulation Key: "
+                f"{output_directory}"
+            )
+        if (
+            int(raw_stats.get("gpu_tot_sim_cycle", -1)) != cycles
+            or int(raw_stats.get("gpu_tot_sim_insn", -1)) != instructions
+        ):
+            raise AccelSimBackendError(
+                f"completed run top-level and raw GPU counters disagree: "
+                f"{output_directory}"
+            )
+        expected_duration = math.ceil(
+            cycles * 1_000_000_000_000_000 / self.config.core_frequency_hz
+        )
+        if duration_fs != expected_duration:
+            raise AccelSimBackendError(
+                f"completed run duration does not match cycles and frequency: "
+                f"{output_directory}"
+            )
+        self._validate_external_memory_stats(external_stats)
+        self._validate_atlas_runtime_stats(atlas_stats)
+        return AccelSimRunResult(
+            command=tuple(expected_command),
+            return_code=0,
+            duration_fs=duration_fs,
+            cycles=cycles,
+            instructions=instructions,
+            stats=raw_stats,
+            external_memory_stats=external_stats,
+            atlas_runtime_stats=atlas_stats,
+            output_directory=output_directory,
+        )
+
+    def qualify(
+        self,
+        manifest: TraceManifest,
+        output_directory: Path,
+        *,
+        resume_completed_runs: bool = False,
+    ) -> Path:
         """Compare direct baseline and adapter invocations of the same pinned backend."""
-        baseline = self.run(manifest, output_directory / "native_baseline")
-        adapter = self.run(manifest, output_directory / "adapter")
+        self.config.validate_files()
+        baseline_directory = output_directory / "native_baseline"
+        adapter_directory = output_directory / "adapter"
+        baseline = (
+            self._load_completed_run(manifest, baseline_directory)
+            if resume_completed_runs
+            else None
+        )
+        baseline_reused = baseline is not None
+        if baseline is None:
+            baseline = self.run(manifest, baseline_directory)
+        adapter = (
+            self._load_completed_run(manifest, adapter_directory)
+            if resume_completed_runs
+            else None
+        )
+        adapter_reused = adapter is not None
+        if adapter is None:
+            adapter = self.run(manifest, adapter_directory)
         compared = {
             "gpu_tot_sim_cycle": [baseline.cycles, adapter.cycles],
             "gpu_tot_sim_insn": [baseline.instructions, adapter.instructions],
@@ -783,6 +1063,11 @@ class AccelSimBackend:
                     }
                     if self.config.co_resident_atlas is not None
                     else None,
+                    "resume_completed_runs": {
+                        "enabled": resume_completed_runs,
+                        "native_baseline_reused": baseline_reused,
+                        "adapter_reused": adapter_reused,
+                    },
                 },
                 "comparison": compared,
                 "overlap_evidence": overlap_evidence,

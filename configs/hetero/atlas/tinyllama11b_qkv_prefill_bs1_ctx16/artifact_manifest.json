@@ -1,0 +1,138 @@
+{
+  "artifact_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.atlas_edge",
+  "expected_totals": {
+    "atlas_dram_request_bytes": 42024960,
+    "atlas_reported_operation_count": 168427520,
+    "logical_input_bytes": 65536,
+    "logical_output_bytes": 81920,
+    "logical_weight_bytes": 10485760,
+    "mac_count": 83886080,
+    "matrix_flop_count": 167772160,
+    "vector_accumulation_op_count": 655360
+  },
+  "files": {
+    "data_placement.yaml": "c30087750939d98f7f2d884f244c8c01198ec91eae418e6a8c0f2da3bd24ab5f",
+    "operator_description.yaml": "bc0de18aab5c9b5f76729d572efea682ae5995f6e3358706722586104db5be69"
+  },
+  "global_column_slices": [
+    {
+      "core_id": 0,
+      "n_begin": 0,
+      "n_end": 160
+    },
+    {
+      "core_id": 1,
+      "n_begin": 160,
+      "n_end": 320
+    },
+    {
+      "core_id": 2,
+      "n_begin": 320,
+      "n_end": 480
+    },
+    {
+      "core_id": 3,
+      "n_begin": 480,
+      "n_end": 640
+    },
+    {
+      "core_id": 4,
+      "n_begin": 640,
+      "n_end": 800
+    },
+    {
+      "core_id": 5,
+      "n_begin": 800,
+      "n_end": 960
+    },
+    {
+      "core_id": 6,
+      "n_begin": 960,
+      "n_end": 1120
+    },
+    {
+      "core_id": 7,
+      "n_begin": 1120,
+      "n_end": 1280
+    },
+    {
+      "core_id": 8,
+      "n_begin": 1280,
+      "n_end": 1440
+    },
+    {
+      "core_id": 9,
+      "n_begin": 1440,
+      "n_end": 1600
+    },
+    {
+      "core_id": 10,
+      "n_begin": 1600,
+      "n_end": 1760
+    },
+    {
+      "core_id": 11,
+      "n_begin": 1760,
+      "n_end": 1920
+    },
+    {
+      "core_id": 12,
+      "n_begin": 1920,
+      "n_end": 2080
+    },
+    {
+      "core_id": 13,
+      "n_begin": 2080,
+      "n_end": 2240
+    },
+    {
+      "core_id": 14,
+      "n_begin": 2240,
+      "n_end": 2400
+    },
+    {
+      "core_id": 15,
+      "n_begin": 2400,
+      "n_end": 2560
+    }
+  ],
+  "lowering": {
+    "core_count": 16,
+    "iterations_per_core": 640,
+    "per_core_shape": {
+      "K": 2048,
+      "M": 16,
+      "N": 160
+    },
+    "rule": "ATLAS frontend/atlang/simulator/edge/gemm.py fixed tiling",
+    "sharding": "N-column partition, replicated input",
+    "tile": {
+      "K": 128,
+      "M": 8,
+      "N": 8
+    }
+  },
+  "per_core_local_address_space": {
+    "input_base": 0,
+    "output_base": 65536,
+    "span_bytes": 737280,
+    "weight_base": 81920
+  },
+  "schema_version": "hetero-atlas-artifact/v1",
+  "source_contract": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "float16",
+    "kv_length": 16,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "operator": "qkv_projection",
+    "phase": "prefill",
+    "q_len": 16,
+    "shape": {
+      "K": 2048,
+      "M": 16,
+      "N": 2560
+    }
+  }
+}

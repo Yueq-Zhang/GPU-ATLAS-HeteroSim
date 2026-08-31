@@ -1,0 +1,463 @@
+{
+  "backend_dispatch_count": 20,
+  "final_versions": {
+    "TINYLLAMA11B-PREFILL-R0.kv.l0.k": 1,
+    "TINYLLAMA11B-PREFILL-R0.kv.l0.v": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out": 1,
+    "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits": 1,
+    "TINYLLAMA11B-PREFILL-R0.prompt_token_ids": 0,
+    "TINYLLAMA11B-PREFILL-R0.token.0": 1,
+    "model.final_norm.weight": 0,
+    "model.layers.0.attention_norm.weight": 0,
+    "model.layers.0.down.weight": 0,
+    "model.layers.0.gate_up.weight": 0,
+    "model.layers.0.mlp_norm.weight": 0,
+    "model.layers.0.output.weight": 0,
+    "model.layers.0.qkv.weight": 0,
+    "model.lm_head.weight": 0,
+    "model.tok_embeddings.weight": 0
+  },
+  "launch_log": [
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_start",
+      "time_fs": 0,
+      "validated_input_versions": []
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate",
+      "time_fs": 1,
+      "validated_input_versions": []
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+      "time_fs": 2,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids",
+          "version": 0
+        },
+        {
+          "value_id": "model.tok_embeddings.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+      "time_fs": 3,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.attention_norm.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+      "time_fs": 58881625445,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.qkv.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+      "time_fs": 1981901060074,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+      "time_fs": 2101873674915,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+          "version": 1
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+          "version": 0
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+      "time_fs": 2102202817773,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+          "version": 1
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+          "version": 1
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+      "time_fs": 2140606528021,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.output.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+      "time_fs": 3685737270071,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+          "version": 1
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+      "time_fs": 3686029841500,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.mlp_norm.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+      "time_fs": 3744909700158,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.gate_up.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+      "time_fs": 11091832845035,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+      "time_fs": 11158508640089,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.down.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+      "time_fs": 14834801042916,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+          "version": 1
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+      "time_fs": 14835093614345,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.final_norm.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+      "time_fs": 14878864815759,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.lm_head.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+      "time_fs": 35373491140848,
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_finish",
+      "time_fs": 35390378066644,
+      "validated_input_versions": []
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release",
+      "time_fs": 35390378066645,
+      "validated_input_versions": []
+    }
+  ],
+  "schema_version": "hetero-online-operator-runtime/v1",
+  "version_checks": 31,
+  "version_commits": [
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 3,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 58881625445,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 1981901060074,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 2101873674915,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 2102202817773,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 2102202817773,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 2102202817773,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 2140606528021,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 3685737270071,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 3686029841500,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 3744909700158,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 11091832845035,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 11158508640089,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 14834801042916,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 14835093614345,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 14878864815759,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 35373491140848,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 35390378066644,
+      "device_id": "gpu0",
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.token.0",
+      "version": 1
+    }
+  ]
+}

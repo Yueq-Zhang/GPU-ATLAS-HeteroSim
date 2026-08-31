@@ -1,0 +1,126 @@
+{
+  "address_contract": {
+    "capture_address": "atlas_per_core_local_address",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.atlas_edge",
+  "backend": {
+    "core_count": 16,
+    "frontend": "ATLAS edge GEMM lowering",
+    "kind": "atlasim",
+    "tile": {
+      "K": 128,
+      "M": 8,
+      "N": 8
+    }
+  },
+  "execution_contract": {
+    "memory_traffic": "full",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": true,
+    "trace_semantics": "declarative_task_graph"
+  },
+  "files": [
+    {
+      "kind": "atlas_source_manifest",
+      "path": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/atlas/tinyllama11b_qkv_prefill_bs1_ctx16/artifact_manifest.json",
+      "sha256": "3edb5693c03951ff37182ccfd00e26e3a9b1ae718ece37ba69848c5498777e92",
+      "size_bytes": 2796
+    },
+    {
+      "kind": "atlas_operator_description",
+      "path": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/atlas/tinyllama11b_qkv_prefill_bs1_ctx16/operator_description.yaml",
+      "sha256": "bc0de18aab5c9b5f76729d572efea682ae5995f6e3358706722586104db5be69",
+      "size_bytes": 1484
+    },
+    {
+      "kind": "atlas_data_placement",
+      "path": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/atlas/tinyllama11b_qkv_prefill_bs1_ctx16/data_placement.yaml",
+      "sha256": "c30087750939d98f7f2d884f244c8c01198ec91eae418e6a8c0f2da3bd24ab5f",
+      "size_bytes": 7251
+    },
+    {
+      "kind": "atlas_qualification_record",
+      "path": "/opt/gpu-atlas/qualification/p15a/atlas-tinyllama-qkv-prefill-bs1-ctx16-edge16/qualification_record.json",
+      "sha256": "b18547d2a9e3645e1ce8740967ae71aff3b8fdd76884909b1a9eb2c84e5d3fe2",
+      "size_bytes": 4819
+    }
+  ],
+  "qualification": {
+    "performance_eligible": false,
+    "qualification_record": "/opt/gpu-atlas/qualification/p15a/atlas-tinyllama-qkv-prefill-bs1-ctx16-edge16/qualification_record.json",
+    "status": "standalone_atlas_qualified_pending_shared_request_cycle"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "ATLAS frontend/atlang/simulator/edge/gemm.py fixed tiling",
+    "kv_length": 16,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "qkv_projection",
+    "phase": "prefill",
+    "q_len": 16
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 16384,
+      "dtype": "float16",
+      "layout": "row_major_per_core_template",
+      "role": "input",
+      "shape": [
+        16,
+        2048
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        2048,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.qkv_projection.input.per_core_template",
+      "trace_base": 0
+    },
+    {
+      "alignment_bytes": 16384,
+      "dtype": "float16",
+      "layout": "row_major_per_core_template",
+      "role": "output",
+      "shape": [
+        16,
+        160
+      ],
+      "size_bytes": 5120,
+      "strides": [
+        160,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.qkv_projection.output.per_core_template",
+      "trace_base": 65536
+    },
+    {
+      "alignment_bytes": 16384,
+      "dtype": "float16",
+      "layout": "column_major_per_core_template",
+      "role": "parameter",
+      "shape": [
+        2048,
+        160
+      ],
+      "size_bytes": 655360,
+      "strides": [
+        1,
+        2048
+      ],
+      "tensor_id": "tinyllama.layer0.qkv_projection.weight.per_core_template",
+      "trace_base": 81920
+    }
+  ]
+}

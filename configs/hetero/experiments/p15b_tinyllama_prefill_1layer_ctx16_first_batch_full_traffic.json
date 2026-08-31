@@ -1,0 +1,43 @@
+{
+  "schema_version": "hetero-sim/v1",
+  "experiment": {"name": "p15b_tinyllama_prefill_1layer_ctx16_first_batch_full_traffic", "seed": 1, "generation_mode": "trace_locked"},
+  "simulation": {"coupling": "request_cycle", "execution_mode": "prefill_cycle", "validation_policy": "required"},
+  "system": {
+    "profile": "model3_gpu_native_3ddram",
+    "links": {
+      "shared3d.explicit_noncoherent": {"wire_bandwidth_Bps": 12800000000, "latency_fs": 10000000, "header_bytes": 16, "resource_id": "unused.prefill.gpu_only", "parameter_source": "unused_no_cross_device_route"}
+    },
+    "memory_services": {
+      "shared0.dram3d": {
+        "kind": "ramulator2", "access_mode": "gpu_only", "initiator_order": ["gpu0"], "timing_owner": "shared3d.live_ramulator2",
+        "config_ref": "configs/hetero/memory/ramulator2_hbdram_edge_16ch_shared.yaml",
+        "bridge_library": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-ramulator2/ramulator2_bridge/libramulator_gpgpusim_bridge.so",
+        "transaction_bytes": 64, "gpu_clock_hz": 1200000000, "link_clock_hz": 400000000, "gateway_clock_hz": 400000000, "dram_clock_hz": 400000000,
+        "gateway_ingress_queue_depth": 256, "gateway_parent_table_entries": 256, "gateway_issue_width": 16, "write_ack_policy": "durable",
+        "request_bandwidth_Bps": 12800000000, "response_bandwidth_Bps": 12800000000, "request_header_bytes": 16, "response_header_bytes": 16,
+        "flit_bytes": 32, "propagation_latency_fs": 10000000, "external_queue_depth": 64, "external_credits": 64, "duplex_mode": "full_duplex",
+        "max_samples_per_value": 8, "sampling_policy": "evenly_spaced_bounded",
+        "parameter_source": "ATLAS_HBDRAM_config_plus_first_batch_selective_full_traffic"
+      }
+    }
+  },
+  "backends": {
+    "gpu": {
+      "kind": "cycle_replay",
+      "cycle_artifact_ref": "configs/hetero/cycle_artifacts/tinyllama11b_prefill_fp16_v1.json",
+      "device_clock_hz": 1200000000,
+      "operator_artifact_catalog_ref": "configs/hetero/operator_artifacts/p15a/tinyllama_prefill_bs1_ctx16_first_batch_catalog.json",
+      "artifact_use_mode": "memory_traffic_lowering_only",
+      "full_traffic_operators": ["attention_norm", "qkv_projection", "rope", "kv_append", "causal_attention"],
+      "parameter_source": "tiled_compute_plus_shape_locked_first_batch_full_memory_traffic"
+    },
+    "atlas": {"kind": "none"},
+    "host": {"kind": "none"}
+  },
+  "model": {"ref": "configs/hetero/models/tinyllama_1_1b_prefill_1layer_fp16.json"},
+  "workload": {"ref": "configs/hetero/workloads/tinyllama11b_bs1_ctx16_prefill.json"},
+  "scheduling": {"ref": "configs/hetero/schedulers/prefill_bs1_ctx16.json"},
+  "placement": {"ref": "configs/hetero/placements/prefill_gpu_only.json"},
+  "address": {"ref": "configs/hetero/addresses/tinyllama11b_prefill_global_pa.json"},
+  "metrics": {"ref": "configs/hetero/metrics/e2e_validation.json"}
+}

@@ -1,0 +1,139 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "driver": "591.86",
+    "gpu": "NVIDIA GeForce RTX 3070",
+    "kind": "accel_sim",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "compute_memory_coupled": false,
+    "global_pa_binding_ready": false,
+    "memory_traffic": "not_extracted",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": false,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "/opt/gpu-atlas/qualification/p15d/capture/tinyllama-prefill-bs1-ctx16-silu-multiply/operator_metadata.json",
+      "sha256": "0b0cb2bc3ca3760a06c995a595589eba5bdb08331209e215158af98a69cee899",
+      "size_bytes": 1706
+    },
+    {
+      "kind": "kernels_list",
+      "path": "/opt/gpu-atlas/qualification/p15d/capture/tinyllama-prefill-bs1-ctx16-silu-multiply/traces/kernelslist.g",
+      "sha256": "0aa43fd1772ae35e869d6a710621a5d138b26fa76c49c555532f4dd249767ebe",
+      "size_bytes": 70
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p15d/capture/tinyllama-prefill-bs1-ctx16-silu-multiply/traces/kernel-1-ctx_0x581b71881bc0.tracez",
+      "sha256": "1eb482793d79399d8b9495d17deafec996672a46d95cd07cbcaf9d06a7adcaa0",
+      "size_bytes": 893864
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p15d/capture/tinyllama-prefill-bs1-ctx16-silu-multiply/traces/kernel-2-ctx_0x581b71881bc0.tracez",
+      "sha256": "4a9074ab605cfacec46715565673a7b3051c9c0a5cb5034234735bcb703a41a9",
+      "size_bytes": 446062
+    },
+    {
+      "kind": "accel_sim_trace_manifest",
+      "path": "tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_trace.json",
+      "sha256": "5736a3f47bc19ebfb25476ea96d95405774f3d07230210e8ea5a465555d09780",
+      "size_bytes": 2527
+    }
+  ],
+  "qualification": {
+    "performance_eligible": false,
+    "qualification_record": null,
+    "status": "capture_only_pending_cycle_qualification"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "torch.nn.functional.silu_times_up_projection",
+    "kv_length": 16,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "silu_multiply",
+    "phase": "prefill",
+    "q_len": 16
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "strides": [
+        90112,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.silu_multiply.gate",
+      "trace_base": 47380156928
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "strides": [
+        90112,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.silu_multiply.up",
+      "trace_base": 47380337152
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "strides": [
+        90112,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.silu_multiply.output",
+      "trace_base": 47380697600
+    }
+  ]
+}

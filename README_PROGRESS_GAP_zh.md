@@ -1,8 +1,8 @@
 # GPU-ATLAS-HeteroSim 当前完成情况与计划差距
 
-评估日期：2026-08-28
-当前版本：`0.15.0`
-规范基线：`hetero-sim/v1`、设计合同v1.14
+评估日期：2026-08-30
+当前版本：`0.22.0`
+规范基线：`hetero-sim/v1`、设计合同v1.21
 
 ## 1. 当前结论
 
@@ -16,6 +16,8 @@ P10a已经完成单放置控制面：每个逻辑节点必须恰好映射到一�
 
 P10b-B至P14进一步完成了请求级Prefill部署：任务按读完成、计算周期、写完成和版本提交推进；GPU外部端口、ATLAS内部端口与Route Acquire请求共用唯一Ramulator2。完整TinyLlama‑1.1B FP16、BS=1、Context=1024、22层Prefill已双跑通过，但计算是未校准分块周期契约，内存是有界代表采样，因此不能发布端到端Latency、Token/s或加速比。
 
+P15e已完成Context=16一层Prefill大型请求轨迹的流式gzip双跑、Attention Norm在线Range-Rebase以及LM Head长时双遍资格；P15f完成QKV Projection的Allocator Segment Range-Rebase；P15g首先验证两个Ready算子的全局时间线。P15h现已完成其余10个GPU算子的重捕获、双遍资格与统一接入：12个`request_cycle_ready=true`真实Accel-Sim算子共享同一Prefill时间线，并通过依赖、GPU资源互斥、Global PA、唯一Ramulator2、Parent/Child/durable守恒、零在途和版本提交因果验证。其余8个控制、KV管理与残差任务仍为分析/运行时模型，性能资格保持关闭。
+
 内存与片上网络的当前状态必须分开表述：Ramulator2已经是`prefill_cycle`和既有耦合资格路径的实时内存时序所有者；BookSim2源码已随ATLAS固定版本并编译进`libatlasim-lib.so`，但当前P9a/P9b Chip配置没有`architecture.noc`，P14也未调用ATLAS完整Chip，因此BookSim2尚未在当前主实验中激活，状态保持`adapter_pending_qualification`。
 
 ## 2. 三步GPU集成计划对照
@@ -26,7 +28,7 @@ P10b-B至P14进一步完成了请求级Prefill部署：任务按读完成、计�
 | 第二步：算子事件级GPU+ATLAS | ✅ | 同一ModelGraph支持GPU/ATLAS放置、传输和回退；精确Q投影GPU Trace与ATLAS YAML已匹配 | 把全部层算子替换为真实Artifact；真实多Batch Kernel Shape |
 | 第三步：共享3D‑DRAM请求级耦合 | ✅ P10b-B/P14部署闭环 | 严格计划、GPU/ATLAS端口、Route Fence/Acquire、单Owner Ramulator2、22层Prefill全部连通 | 用全算子真实Trace/ATLAS Artifact替换分块周期契约和采样流量；长时间竞争与QoS |
 
-## 3. P1–P14执行状态
+## 3. P1–P15执行状态
 
 | 顺序 | 计划项 | 状态 | 验收证据或差距 |
 |---:|---|---:|---|
@@ -37,7 +39,7 @@ P10b-B至P14进一步完成了请求级Prefill部署：任务按读完成、计�
 | P5 | 多时钟推进 | ✅ | GPU 1.2 GHz、Link/Gateway/DRAM 400 MHz黄金用例满足精确3:1周期比 |
 | P6 | GPU-only分层资格 | ✅ | 外部瓶颈346 DRAM cycles；内部瓶颈163；父子、字节和完成语义全部通过 |
 | P7 | ATLAS端口与竞争 | ✅ 端口级 | GPU-only/ATLAS-only/并发为163/90/239 cycles；两方均观察竞争；完整Chip并发由P9a/P9b继续验证 |
-| P8 | 真实LLM Artifact | 🟡 单算子完成 | TinyLlama Q投影三路径通过；其余算子、全层、端到端和多Batch周期执行待完成 |
+| P8 | 真实LLM Artifact | 🟡 一层源Trace扩展 | Decode Q投影三路径通过；P15d已有13类完整流量源Artifact；12个非空GPU算子完成独立耦合资格；全层真实Artifact和多Batch待完成 |
 | P9a | 完整ATLAS Chip共享内存 | ✅ | 16核真实迭代产生139,456个ATLAS Parent；ATLAS-only 76,418全局GPU周期，并发确定性GPU流量后81,329；唯一Ramulator2、全完成、0在途 |
 | P9b | Accel-Sim+完整ATLAS Chip并发 | ✅ | GPU 1,541,401 cycles/262,272 Parent；ATLAS 141,255 cycles/139,456 Parent；唯一Ramulator2共401,728 Parent，全完成、0在途 |
 | P10a | 单放置与版本化Residency控制面 | ✅ 参考闭环 | 缺失/重复放置拒绝；逐输入值路由；KV 0→1读改写；Model 3参考图228节点=228任务、28路由、571 Residency事件；真实多算子周期耦合待P10b |
@@ -47,6 +49,14 @@ P10b-B至P14进一步完成了请求级Prefill部署：任务按读完成、计�
 | P12 | 单层GPU Prefill | ✅ | Context=16，20任务、378 GPU Parent、ATLAS=0，双跑一致 |
 | P13 | 22层规模扩展 | ✅ | Context=16，272任务、448地址区间、3,382 GPU Parent，双跑一致 |
 | P14 | 完整Prefill部署 | ✅ 性能未资格 | TinyLlama‑1.1B FP16、BS=1、Context=1024；最终KV=1024；3,385 Parent全完成；地址占用3,957,580,290 B / 4 GiB |
+| P15a | 首批真实算子Artifact | ✅ 独立资格 | 4类GPU Trace双跑；KV为`runtime_state`；ATLAS QKV双跑150,932 cycles；严格绑定运行Trace Coverage=20% |
+| P15b | 首批选择性完整流量 | ✅ 部署资格 | 5/20任务完整64B事务；175,936 Full Parent + 234 Sampled Parent；唯一Ramulator2完成176,170 Parent，双跑核心产物一致 |
+| P15c | 四算子指令—内存周期闭环 | ✅ 耦合资格；🟡 地址/全局调度待接入 | RMSNorm/QKV/RoPE/Attention双跑全部一致；383,260个GPU Parent、383,286个Child均完成；每次单Ramulator2、0在途；4/4 `compute_memory_coupled=true`，0/4 `request_cycle_ready` |
+| P15d | 13算子完整Value流量与新增Trace | ✅ | 13/20任务完整流量、7/20采样；3,462,738 Parent/Child全完成；12个真实GPU算子独立耦合双跑通过，合计6,993,530 Parent和6,996,227 Child |
+| P15e | 流式轨迹与在线地址重绑定 | ✅ 单算子资格；🟡 扩展待完成 | gzip双跑94,859,940 B、峰值RSS约524.6 MiB；Attention Norm 40,970次转换零漏配，6个范围、2,176 Parent/Child、双跑66,697 cycles；仅该重捕获Artifact可标记`request_cycle_ready=true` |
+| P15f | QKV Allocator Segment Range-Rebase | ✅ 双算子Ready；🟡 全局时间线待接入 | QKV双跑2,168,865 cycles、34,943,066条指令；736,837次转换零漏配，12个范围；375,899 Parent与375,944 Child全部完成；Attention Norm+QKV共2个`request_cycle_ready=true` Artifact |
+| P15g | 两个Ready算子嵌入Prefill全局时间线 | ✅ 因果资格；性能未资格 | Attention在58,833,038,873 fs完成，QKV同刻启动；共享Value与Global PA 351,485,952；GPU资源不重叠；请求零在途；QKV验证Attention输出v1；其余任务分析回退 |
+| P15h | 12算子Range-Rebase与统一Prefill时间线 | ✅ 因果资格；性能未资格 | 10个新增算子重捕获与双遍资格全部通过；12个Ready算子共40,060,873 GPU cycles、6,995,173 Parent、6,998,046 Child和804,512,881次成功转换；84个Global PA区间、56个Workspace、12条请求绑定与18次版本提交通过因果检查；其余8任务仍为分析/运行时模型 |
 
 ## 4. 当前准确运行证据
 
@@ -86,7 +96,7 @@ P10b-B至P14进一步完成了请求级Prefill部署：任务按读完成、计�
 | 能力 | 参考/接口 | 周期后端 | 资格状态 |
 |---|---:|---:|---|
 | 四种系统组织形式 | ✅ | 部分 | Model 3直连路径已落地；Model 2 PCIe DMA与Model 4 CXL.mem仍主要是事件级 |
-| 自由算子放置 | ✅ 严格一一对应 | Prefill部署周期 | 混合单层已验证GPU/ATLAS不同算子与Route；真实全算子Artifact仍待生成 |
+| 自由算子放置 | ✅ 严格一一对应 | Prefill部署周期 | 首批5类Artifact已注册、GPU严格绑定已验证；真实全算子Artifact仍待生成 |
 | Prefill/Decode完整图 | ✅ | Prefill已部署 | 22层Prefill生命周期完成；Decode请求周期部署待完成；当前计算契约/采样流量性能未资格 |
 | 多Batch Continuous/Ragged | ✅ | ⬜ | 需要真实Batched/Fused Kernel Trace与ATLAS分块Artifact |
 | GPU/ATLAS共享DRAM竞争 | ✅ 参考 | ✅ 真实Accel-Sim+完整ATLAS Chip | 长时间混合读写、公平性和QoS待实现 |
@@ -96,12 +106,12 @@ P10b-B至P14进一步完成了请求级Prefill部署：任务按读完成、计�
 
 ## 6. 下一步顺序
 
-1. 自动化Q/K/V/O Projection、Attention QK/SV、RMSNorm/RoPE、Gate/Up/Down、KV Append等算子的GPU Trace捕获与ATLAS Artifact生成，以真实全流量替换P14分块周期契约和代表请求采样。
-2. 构建一层TinyLlama Decode，再扩展到22层单Token Decode；逐层核对依赖、KV生命周期、内存容量、任务数和请求守恒。
-3. 增加多Batch Continuous/Ragged周期运行，使用真实Batched/Fused Kernel而不是复制单请求延迟。
-4. 校准周期Artifact、RTX 3070、外部Link和3D-DRAM，在校准和全流量资格完成前保持`performance_claim_allowed=false`。
-5. 激活并资格化ATLAS BookSim2：显式配置拓扑、Router/VC/Buffer/Flit，生成实际NoC Packet，验证`noc_cycles`、Packet/Flit守恒、背压、死锁检查和双跑确定性。
-6. 增加长时间混合读写竞争、公平性、QoS和死锁/活锁压力测试，并补齐Model 2 PCIe DMA与Model 4 CXL.mem周期路径。
+1. 将P15h从一层Context=16功能资格扩展到多层模型图，优先验证跨层KV生命周期、Global PA容量、Workspace复用和长时间运行的确定性；不得直接按层数线性外推当前周期。
+2. 为仍采用分析/运行时模型的控制、KV Allocate/Append/Release和Residual Add补齐可审计的周期模型或真实Backend，并重新执行端到端依赖、资源、地址、请求和版本门禁。
+3. 构建一层TinyLlama Decode，再扩展到22层单Token Decode；逐层核对依赖、KV生命周期、内存容量、任务数和请求守恒。
+4. 增加多Batch Continuous/Ragged周期运行，使用真实Batched/Fused Kernel而不是复制单请求延迟。
+5. 使用硬件测量或可信参考点校准RTX 3070、外部Link和3D-DRAM，并激活、资格化ATLAS BookSim2；在此之前保持`performance_claim_allowed=false`。
+6. 增加长时间混合读写、公平性、QoS和死锁/活锁压力测试，并补齐Model 2 PCIe DMA与Model 4 CXL.mem周期路径。
 
 ## 7. 已记录但暂缓：虚拟地址与地址哈希
 
@@ -129,4 +139,4 @@ P10b-B至P14进一步完成了请求级Prefill部署：任务按读完成、计�
 
 ## 8. 声明边界
 
-目录、接口或一次运行存在，不等于性能已经资格。当前可准确表述为：**分层GPU↔Logic‑Die↔3D‑DRAM路径、真实Accel-Sim与完整ATLAS Chip并发、严格单放置/版本化Residency、live Ramulator2请求周期运行时，以及TinyLlama‑1.1B BS=1 Context=1024完整Prefill部署已经实现。** 当前不可表述为：P14是全算子Accel-Sim指令Trace或完整ATLAS编译结果、26.64455 ms是校准端到端性能、Decode或多Batch周期执行已完成、RTX 3070/目标3D‑DRAM已实机校准、RTX 4090已部署、VA→PA/MMU/TLB或XOR地址映射已实现，或固定Trace可安全复用于任意内存候选。
+目录、接口或一次运行存在，不等于性能已经资格。当前可准确表述为：**分层GPU↔Logic‑Die↔3D‑DRAM路径、真实Accel-Sim与完整ATLAS Chip并发、严格单放置/版本化Residency、live Ramulator2请求周期运行时、Context=1024的P14部署、Context=16的P15d 13算子完整Value流量、12算子独立耦合资格、流式gzip请求轨迹，以及Attention Norm和QKV两个真实Accel-Sim算子的Prefill全局因果接入已经实现。** 当前不可表述为：全部算子稳定Global PA重绑定已完成、完整Prefill已由真实Accel-Sim算子覆盖、P14/P15是校准端到端性能、Decode或多Batch周期执行已完成、RTX 3070/目标3D‑DRAM已实机校准、VA→PA/MMU/TLB或XOR地址映射已实现，或固定Trace可安全复用于任意内存候选。

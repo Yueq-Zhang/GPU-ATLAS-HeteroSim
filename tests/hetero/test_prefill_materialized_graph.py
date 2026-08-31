@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from frontend.hetero.global_memory_map import (
+    GlobalAllocation,
     build_global_memory_map,
     sampled_requests_for_values,
 )
@@ -70,6 +71,18 @@ def test_one_layer_prefill_materializes_complete_tensor_contract() -> None:
     residuals = [node for node in graph.nodes if node.op == "residual_add"]
     assert len(residuals) == 2
     assert all(len(node.read_values) == 2 for node in residuals)
+    final_position_ops = {
+        node.op: node
+        for node in graph.nodes
+        if node.op in {"final_norm", "lm_head", "sampling"}
+    }
+    assert set(final_position_ops) == {"final_norm", "lm_head", "sampling"}
+    assert all(
+        node.attributes["q_len"] == 1
+        and node.attributes["source_q_len"] == 16
+        and node.attributes["attention_kv_len"] == 16
+        for node in final_position_ops.values()
+    )
 
 
 def test_p11_cycle_catalog_covers_every_prefill_operator_on_both_devices() -> None:
@@ -128,3 +141,44 @@ def test_p14_global_pa_map_fits_four_gib_and_sampling_conserves_bytes() -> None:
         str(value["value_id"]): int(value["size_bytes"])
         for value in first_task["input_values"]
     }
+
+
+def test_full_value_requests_cover_every_transaction_without_extrapolation() -> None:
+    allocation = GlobalAllocation(
+        "v", "shared0.dram3d", 4096, 130, 64, "activation", "fp16"
+    )
+    requests = sampled_requests_for_values(
+        "task",
+        "gpu0",
+        [{"value_id": "v", "version": 1, "size_bytes": 130}],
+        {"v": allocation},
+        "write",
+        64,
+        1,
+        full_traffic=True,
+    )
+    assert [item["global_address"] for item in requests] == [4096, 4160, 4224]
+    assert [item["size_bytes"] for item in requests] == [64, 64, 2]
+    assert [item["represented_bytes"] for item in requests] == [64, 64, 2]
+    assert all(item["traffic_mode"] == "full" for item in requests)
+
+
+def test_full_value_request_iterator_does_not_materialize_large_range() -> None:
+    from frontend.hetero.global_memory_map import iter_requests_for_values
+
+    logical_size = 64 * 10_000_000
+    allocation = GlobalAllocation(
+        "large", "shared0.dram3d", 0, logical_size, 64, "parameter", "fp16"
+    )
+    requests = iter_requests_for_values(
+        "task",
+        "gpu0",
+        [{"value_id": "large", "version": 0, "size_bytes": logical_size}],
+        {"large": allocation},
+        "read",
+        64,
+        1,
+        full_traffic=True,
+    )
+    assert iter(requests) is requests
+    assert next(requests)["sample_count"] == 10_000_000

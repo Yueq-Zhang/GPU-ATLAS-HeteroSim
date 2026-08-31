@@ -54,6 +54,23 @@
         "timing_owner": {"type": "string", "minLength": 1},
         "expected_instances": {"const": 1},
         "require_nonzero_requests": {"type": "boolean"},
+        "address_translation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode", "memory_space_id", "physical_base_bytes",
+            "capacity_bytes", "alignment_bytes",
+            "require_nonzero_translations"
+          ],
+          "properties": {
+            "mode": {"const": "range_rebase_packed_manifest"},
+            "memory_space_id": {"type": "string", "minLength": 1},
+            "physical_base_bytes": {"type": "integer", "minimum": 0},
+            "capacity_bytes": {"type": "integer", "minimum": 1},
+            "alignment_bytes": {"type": "integer", "minimum": 1},
+            "require_nonzero_translations": {"type": "boolean"}
+          }
+        },
         "bandwidth_contract": {
           "type": "object",
           "additionalProperties": false,
@@ -130,6 +147,24 @@
             }
           }
         }
+      }
+    },
+    "co_resident_atlas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind", "execution_semantics", "chip_config", "operator_list",
+        "placement_map", "expected_instances", "require_nonzero_requests"
+      ],
+      "properties": {
+        "kind": {"const": "full_chip_external_dram"},
+        "execution_semantics": {"const": "contention_stress_duplicate_operator"},
+        "chip_config": {"type": "string", "minLength": 1},
+        "operator_list": {"type": "string", "minLength": 1},
+        "placement_map": {"type": "string", "minLength": 1},
+        "expected_instances": {"const": 1},
+        "require_nonzero_requests": {"type": "boolean"},
+        "expected_transaction_bytes": {"type": "integer", "minimum": 1}
       }
     }
   }

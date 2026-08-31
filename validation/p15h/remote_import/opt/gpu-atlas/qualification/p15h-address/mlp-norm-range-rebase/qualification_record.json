@@ -1,0 +1,122 @@
+{
+  "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+  "claim_boundary": null,
+  "comparison": {
+    "external_memory_stats": [
+      {
+        "address_already_global": 0,
+        "address_binding_ranges": 7,
+        "address_translated": 40976,
+        "address_unmapped": 0,
+        "atlas_children": 0,
+        "atlas_completed": 0,
+        "atlas_parents": 0,
+        "child_retries": 0,
+        "children_completed": 2176,
+        "children_sent": 2176,
+        "completed": 2176,
+        "cycles": 23555,
+        "durable_completed": 2176,
+        "gateway_cycles": 23555,
+        "global_time_fs": 58887809187,
+        "gpu_children": 2176,
+        "gpu_completed": 2176,
+        "gpu_cycles": 66661,
+        "gpu_parents": 2176,
+        "instances": 1,
+        "internal_bytes": 139264,
+        "link_cycles": 23555,
+        "logical_bytes": 69632,
+        "outstanding": 0,
+        "partitions": 16,
+        "reads": 2176,
+        "rejected": 272807,
+        "request_payload_bytes": 0,
+        "request_wire_bytes": 69632,
+        "response_payload_bytes": 69632,
+        "response_wire_bytes": 139264,
+        "transaction_bytes": 64,
+        "writes": 0
+      },
+      {
+        "address_already_global": 0,
+        "address_binding_ranges": 7,
+        "address_translated": 40976,
+        "address_unmapped": 0,
+        "atlas_children": 0,
+        "atlas_completed": 0,
+        "atlas_parents": 0,
+        "child_retries": 0,
+        "children_completed": 2176,
+        "children_sent": 2176,
+        "completed": 2176,
+        "cycles": 23555,
+        "durable_completed": 2176,
+        "gateway_cycles": 23555,
+        "global_time_fs": 58887809187,
+        "gpu_children": 2176,
+        "gpu_completed": 2176,
+        "gpu_cycles": 66661,
+        "gpu_parents": 2176,
+        "instances": 1,
+        "internal_bytes": 139264,
+        "link_cycles": 23555,
+        "logical_bytes": 69632,
+        "outstanding": 0,
+        "partitions": 16,
+        "reads": 2176,
+        "rejected": 272807,
+        "request_payload_bytes": 0,
+        "request_wire_bytes": 69632,
+        "response_payload_bytes": 69632,
+        "response_wire_bytes": 139264,
+        "transaction_bytes": 64,
+        "writes": 0
+      }
+    ],
+    "gpu_tot_sim_cycle": [
+      66661,
+      66661
+    ],
+    "gpu_tot_sim_insn": [
+      5290064,
+      5290064
+    ]
+  },
+  "exact_match_required": true,
+  "overlap_evidence": [],
+  "provenance": {
+    "backend_config": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+    "co_resident_atlas": null,
+    "dependency_commits": {
+      "accel_sim_framework": "64653015f85fb5664c84a10f48527e8897d289d0",
+      "gpgpu_sim_distribution": "e10018b67a4b668e7b43f89280cf67624f1df4ff",
+      "ramulator2": "3996362187d7f8314936e5ad7560d93b66b6a215"
+    },
+    "environment_overrides": {},
+    "resume_completed_runs": {
+      "adapter_reused": false,
+      "enabled": true,
+      "native_baseline_reused": false
+    },
+    "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_trace.json"
+  },
+  "qualified_scopes": [
+    "cycle_coupled_request_response"
+  ],
+  "replay_safety_qualified": false,
+  "schema_version": "hetero-accel-sim-qualification/v1",
+  "simulation_key": "299a4ad3e6f355b71ce6f5b9bb9d7554f93463de6e8c61ac797e4897d81705b0",
+  "status": "passed",
+  "target_gpu": "RTX 3070 SM86 compute complex with range-rebased ATLAS-style 3D-DRAM",
+  "target_sm": 86,
+  "timing_ownership": {
+    "co_resident_atlas_core_sram_noc": false,
+    "duration_mode": "coupled",
+    "external_ramulator2": "shared3d.ramulator2",
+    "gpu_core_cache_noc": "accel_sim",
+    "gpu_local_dram": null
+  },
+  "trace_id": "tinyllama.1_1b.layer0.mlp_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+  "trace_key": "e66722c1d79bb2abf149cccc91844e197d104bf417d620777a91648c5e2fe9a3"
+}

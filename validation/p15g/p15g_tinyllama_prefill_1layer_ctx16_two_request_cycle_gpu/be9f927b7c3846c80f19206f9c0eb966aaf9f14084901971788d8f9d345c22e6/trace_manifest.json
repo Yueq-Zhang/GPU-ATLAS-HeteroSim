@@ -1,0 +1,30 @@
+{
+  "atlas_artifacts": [],
+  "captures": [
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15e-address-capture/tinyllama-prefill-bs1-ctx16-attention-norm/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "aa1f5c3757dbc7b7f739986be64762862d6b7889c15e756da13684251f4e37c8",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15f-address-capture-v2/tinyllama-prefill-bs1-ctx16-qkv-projection/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "aa34cdec22c0dc5230e8c16b45a16b365694969902dbf0a7e3f722f6f865bcee",
+      "trace_semantics": "functional"
+    }
+  ],
+  "schema_version": "hetero-run-trace-bundle/v1"
+}

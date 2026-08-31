@@ -27,7 +27,15 @@
         "external_memory_bridge": {"type": "string"},
         "exports_memory_requests": {"type": "boolean"},
         "supports_stall_resume": {"type": "boolean"},
+        "require_request_cycle_ready": {"type": "boolean"},
         "cycle_artifact_ref": {"type": "string", "minLength": 1},
+        "operator_artifact_catalog_ref": {"type": "string", "minLength": 1},
+        "artifact_use_mode": {"const": "memory_traffic_lowering_only"},
+        "full_traffic_operators": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
         "device_clock_hz": {"type": "integer", "minimum": 1},
         "resource_bindings": {
           "type": "object",
@@ -43,7 +51,22 @@
             "properties": {
               "selector": {"type": "object", "minProperties": 1},
               "trace_manifest": {"type": "string", "minLength": 1},
-              "compatibility": {"enum": ["exact_operator", "surrogate_plumbing_probe"]}
+              "operator_artifact": {"type": "string", "minLength": 1},
+              "compatibility": {"enum": ["exact_operator", "surrogate_plumbing_probe"]},
+              "value_bindings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["tensor_id", "source", "index", "value_offset_bytes"],
+                  "properties": {
+                    "tensor_id": {"type": "string", "minLength": 1},
+                    "source": {"enum": ["input", "output"]},
+                    "index": {"type": "integer", "minimum": 0},
+                    "value_offset_bytes": {"type": "integer", "minimum": 0}
+                  }
+                }
+              }
             }
           }
         },

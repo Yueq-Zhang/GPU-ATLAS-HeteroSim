@@ -1,0 +1,77 @@
+operator:
+- name: tinyllama_layer0_qkv_projection_prefill
+  type: gemm
+  iteration: 640
+  execution:
+    matrix:
+    - name: gemm_tile
+      mac_count: 8192
+    vector:
+    - name: gemm_tile_accumulation
+      vec_count: 64
+    buffer_load:
+    - name: gemm_tile_load
+      byte_count: 4096
+      is_write: false
+    - name: gemm_tile_accumulation_load
+      byte_count: 128
+      is_write: false
+    buffer_store:
+    - name: gemm_tile_store
+      byte_count: 128
+      is_write: true
+    - name: gemm_tile_accumulation_store
+      byte_count: 128
+      is_write: true
+    dram:
+    - name: input_layer0_qkv_projection
+      is_write: false
+      access_base:
+      - 0
+      - 0
+      access_extent:
+      - 8
+      - 128
+      access_stride_add:
+      - 320
+      - 1
+      access_offset_add:
+      - 8
+      - 128
+      init_iter: 0
+      stride_iter: 1
+      total_iter: 640
+    - name: weight_layer0_qkv_projection_slice
+      is_write: false
+      access_base:
+      - 0
+      - 0
+      access_extent:
+      - 128
+      - 8
+      access_stride_add:
+      - 1
+      - 16
+      access_offset_add:
+      - 128
+      - 8
+      init_iter: 0
+      stride_iter: 1
+      total_iter: 640
+    - name: output_layer0_qkv_projection
+      is_write: true
+      access_base:
+      - 0
+      - 0
+      access_extent:
+      - 8
+      - 8
+      access_stride_add:
+      - 320
+      - 16
+      access_offset_add:
+      - 8
+      - 8
+      init_iter: 17
+      stride_iter: 16
+      total_iter: 40

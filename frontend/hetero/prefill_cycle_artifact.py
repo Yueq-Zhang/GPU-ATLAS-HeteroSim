@@ -10,13 +10,18 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Mapping
 
 from .ir import ModelNode
 from .model_graph import ModelSpec
 from .online_operator_runtime import OnlineDispatchSpec
+from .operator_artifact import (
+    OperatorArtifactCatalog,
+    OperatorArtifactError,
+    OperatorArtifactManifest,
+)
 
 
 class PrefillCycleArtifactError(ValueError):
@@ -284,6 +289,10 @@ class PrefillCycleDispatcher:
         self.backends = backends
         self.global_clock_hz = global_clock_hz
         self._catalogs: dict[str, PrefillCycleCatalog] = {}
+        self._operator_catalogs: dict[str, OperatorArtifactCatalog] = {}
+        self._full_traffic_ops: dict[str, set[str]] = {}
+        self._traffic_mode: dict[str, str] = {}
+        self._registered_artifacts: dict[str, OperatorArtifactManifest] = {}
         self._plans: dict[str, CycleTaskPlan] = {}
         for backend_key in ("gpu", "atlas"):
             backend = backends.get(backend_key)
@@ -297,6 +306,22 @@ class PrefillCycleDispatcher:
             if not path.is_absolute():
                 path = project_root / path
             self._catalogs[backend_key] = PrefillCycleCatalog.load(path.resolve())
+            operator_catalog_ref = backend.get("operator_artifact_catalog_ref")
+            if operator_catalog_ref is not None:
+                operator_path = Path(str(operator_catalog_ref))
+                if not operator_path.is_absolute():
+                    operator_path = project_root / operator_path
+                self._operator_catalogs[backend_key] = OperatorArtifactCatalog.load(
+                    operator_path.resolve()
+                )
+                full_ops = backend.get("full_traffic_operators", [])
+                if not isinstance(full_ops, list):
+                    raise PrefillCycleArtifactError(
+                        f"{backend_key}.full_traffic_operators must be an array"
+                    )
+                self._full_traffic_ops[backend_key] = {
+                    str(item) for item in full_ops
+                }
 
     def dispatch(self, spec: OnlineDispatchSpec) -> CycleTaskPlan:
         if spec.task_id in self._plans:
@@ -307,8 +332,70 @@ class PrefillCycleDispatcher:
                 f"no cycle catalog for backend {spec.backend_key}"
             )
         plan = catalog.plan(spec, self.global_clock_hz)
+        traffic_mode = "sampled"
+        if spec.node.op in self._full_traffic_ops.get(spec.backend_key, set()):
+            operator_catalog = self._operator_catalogs.get(spec.backend_key)
+            if operator_catalog is None:
+                raise PrefillCycleArtifactError(
+                    f"full traffic requested without a catalog: {spec.task_id}"
+                )
+            backend_kinds = (
+                {"accel_sim", "runtime_state"}
+                if spec.backend_key == "gpu"
+                else {"atlasim", "runtime_state"}
+            )
+            try:
+                registered = operator_catalog.match(
+                    model_spec_name=spec.model.name,
+                    operator=spec.node.op,
+                    phase="prefill",
+                    layer_id=int(spec.node.layer_id or 0),
+                    batch_size=1,
+                    context_length=int(
+                        spec.node.attributes.get(
+                            "source_q_len", spec.node.attributes.get("q_len", 1)
+                        )
+                    ),
+                    q_len=int(spec.node.attributes.get("q_len", 1)),
+                    kv_length=int(
+                        spec.node.attributes.get("attention_kv_len", 1)
+                    ),
+                    dtype=spec.model.dtype,
+                    backend_kinds=backend_kinds,
+                )
+            except OperatorArtifactError as error:
+                raise PrefillCycleArtifactError(str(error)) from error
+            if registered is None:
+                raise PrefillCycleArtifactError(
+                    f"no shape-locked artifact permits full traffic for {spec.task_id}"
+                )
+            traffic_mode = "full"
+            self._registered_artifacts[spec.task_id] = registered
+            plan = replace(
+                plan,
+                fidelity={
+                    **dict(plan.fidelity),
+                    "memory_fidelity": "live_ramulator2_full_value_transactions",
+                },
+                artifact={
+                    **dict(plan.artifact),
+                    "operator_artifact_id": registered.artifact_id,
+                    "operator_artifact_manifest": str(registered.source_path),
+                    "operator_artifact_sha256": registered.content_sha256,
+                    "artifact_execution_use": "memory_traffic_lowering_only",
+                },
+            )
+        self._traffic_mode[spec.task_id] = traffic_mode
         self._plans[spec.task_id] = plan
         return plan
+
+    def memory_traffic_mode(self, task_id: str) -> str:
+        mode = self._traffic_mode.get(task_id)
+        if mode not in {"sampled", "full"}:
+            raise PrefillCycleArtifactError(
+                f"memory traffic requested before dispatch: {task_id}"
+            )
+        return mode
 
     def coverage(self, expected_task_ids: set[str]) -> dict[str, object]:
         actual = set(self._plans)
@@ -324,6 +411,12 @@ class PrefillCycleDispatcher:
             by_device[plan.device_id] = by_device.get(plan.device_id, 0) + 1
             op = str(plan.artifact["operator"])
             by_op[op] = by_op.get(op, 0) + 1
+        full_by_op: dict[str, int] = {}
+        for task_id, mode in self._traffic_mode.items():
+            if mode != "full":
+                continue
+            op = str(self._plans[task_id].artifact["operator"])
+            full_by_op[op] = full_by_op.get(op, 0) + 1
         return {
             "schema_version": "hetero-prefill-artifact-coverage/v1",
             "expected_tasks": len(expected_task_ids),
@@ -331,6 +424,9 @@ class PrefillCycleDispatcher:
             "coverage": 1.0,
             "all_tasks_covered": True,
             "analytical_fallback_tasks": 0,
+            "full_traffic_tasks": sum(full_by_op.values()),
+            "sampled_traffic_tasks": len(actual) - sum(full_by_op.values()),
+            "full_traffic_by_operator": dict(sorted(full_by_op.items())),
             "by_device": dict(sorted(by_device.items())),
             "by_operator": dict(sorted(by_op.items())),
             "catalogs": {

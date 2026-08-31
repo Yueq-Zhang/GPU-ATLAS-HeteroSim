@@ -4,9 +4,37 @@ from pathlib import Path
 
 import pytest
 
-from frontend.hetero.operator_event import OperatorEventDispatcher, OperatorEventError
+from frontend.hetero.global_memory_map import GlobalAllocation
+from frontend.hetero.ir import ModelNode, NodeKind, Phase
+from frontend.hetero.model_graph import ModelSpec
+from frontend.hetero.operator_artifact import (
+    OperatorArtifactManifest,
+    OperatorCompatibilityKey,
+)
+from frontend.hetero.operator_event import (
+    OperatorEventDispatcher,
+    OperatorEventError,
+    TraceBinding,
+    _reserved_allocation_extents,
+)
 from frontend.hetero.runner import execute_run
 from frontend.hetero.schema import load_and_validate_config, validate_config
+from frontend.hetero.trace_manifest import TraceManifest
+
+
+def test_global_pa_reservation_exposes_alignment_padding() -> None:
+    allocations = {
+        "token": GlobalAllocation(
+            "token", "shared0.dram3d", 0, 8, 64, "activation", "int64"
+        ),
+        "next": GlobalAllocation(
+            "next", "shared0.dram3d", 64, 16, 64, "activation", "fp16"
+        ),
+    }
+    assert _reserved_allocation_extents(allocations, 128) == {
+        "token": 64,
+        "next": 64,
+    }
 
 
 def _fake_accel_sim_files(tmp_path: Path) -> tuple[Path, Path]:
@@ -118,8 +146,117 @@ def test_duplicate_operator_contention_backend_is_rejected_by_dispatcher(
         "atlas": {"kind": "none"},
         "host": {"kind": "none"},
     }
-    with pytest.raises(OperatorEventError, match="duplicate-operator contention stress"):
+    with pytest.raises(
+        OperatorEventError, match="duplicate-operator contention stress"
+    ):
         OperatorEventDispatcher(Path.cwd(), tmp_path / "backend_runs", backends)
+
+
+def test_shape_locked_trace_binding_rejects_wrong_prefill_length() -> None:
+    key = OperatorCompatibilityKey(
+        model_spec_name="TinyLlama-1.1B",
+        checkpoint_revision="fe8a4e",
+        operator="attention_norm",
+        phase="prefill",
+        layer_id=0,
+        batch_size=1,
+        context_length=16,
+        q_len=16,
+        kv_length=16,
+        dtype="fp16",
+    )
+    artifact = OperatorArtifactManifest(
+        Path("artifact.json"),
+        "fake.norm",
+        key,
+        {"backend": {"kind": "accel_sim"}},
+        "hash",
+    )
+    manifest = TraceManifest.from_dict(
+        {
+            "schema_version": "hetero-trace-manifest/v1",
+            "trace_id": "fake.norm",
+            "trace_semantics": "functional",
+            "replay_safe": False,
+            "qualification_record": None,
+            "kernels_list": "kernelslist.g",
+            "capture": {},
+            "compilation": {},
+            "address_ranges": [],
+        }
+    )
+    binding = TraceBinding(
+        {"op": "attention_norm"}, manifest, "exact_operator", artifact
+    )
+    node = ModelNode(
+        "n0",
+        NodeKind.COMPUTE,
+        "attention_norm",
+        Phase.PREFILL,
+        0,
+        0,
+        attributes={"q_len": 32, "attention_kv_len": 32},
+    )
+    model = ModelSpec(
+        "TinyLlama-1.1B", 2048, 5632, 1, 32, 4, 64, 32000, dtype="fp16"
+    )
+    with pytest.raises(OperatorEventError, match="q_len"):
+        binding.validate_exact_contract(node, model)
+
+
+def test_shape_locked_trace_binding_accepts_explicit_layer_contract_override() -> None:
+    key = OperatorCompatibilityKey(
+        model_spec_name="TinyLlama-1.1B",
+        checkpoint_revision="fe8a4e",
+        operator="final_norm",
+        phase="prefill",
+        layer_id=0,
+        batch_size=1,
+        context_length=16,
+        q_len=16,
+        kv_length=16,
+        dtype="fp16",
+    )
+    artifact = OperatorArtifactManifest(
+        Path("artifact.json"),
+        "fake.final_norm",
+        key,
+        {"backend": {"kind": "accel_sim"}},
+        "hash",
+    )
+    manifest = TraceManifest.from_dict(
+        {
+            "schema_version": "hetero-trace-manifest/v1",
+            "trace_id": "fake.final_norm",
+            "trace_semantics": "functional",
+            "replay_safe": False,
+            "qualification_record": None,
+            "kernels_list": "kernelslist.g",
+            "capture": {},
+            "compilation": {},
+            "address_ranges": [],
+        }
+    )
+    binding = TraceBinding(
+        {"op": "final_norm"},
+        manifest,
+        "exact_operator",
+        artifact,
+        contract_overrides={"layer_id": 0},
+    )
+    node = ModelNode(
+        "n0",
+        NodeKind.COMPUTE,
+        "final_norm",
+        Phase.PREFILL,
+        None,
+        0,
+        attributes={"q_len": 16, "attention_kv_len": 16},
+    )
+    model = ModelSpec(
+        "TinyLlama-1.1B", 2048, 5632, 1, 32, 4, 64, 32000, dtype="fp16"
+    )
+    binding.validate_exact_contract(node, model)
 
 
 @pytest.mark.skipif(os.name == "nt", reason="POSIX fake Accel-Sim executable")

@@ -56,6 +56,14 @@ def build_bundle(
     tile_k: int,
     tile_n: int,
     element_size: int,
+    artifact_id: str = (
+        "tinyllama.1_1b.layer0.q_proj.decode.bs1_ctx1024.fp16.atlas_edge"
+    ),
+    source_operator: str = "model.layers.0.self_attn.q_proj",
+    phase: str = "decode_step",
+    batch_size: int = 1,
+    context_length: int = 1024,
+    bundle_name: str = "q_proj",
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     values = (m_dim, k_dim, n_dim, core_count, tile_m, tile_k, tile_n, element_size)
     if any(value <= 0 for value in values):
@@ -72,16 +80,23 @@ def build_bundle(
     n_n = per_core_n // tile_n
     iterations = n_m * n_k * n_n
 
-    input_name = "input_layer0_q_proj"
-    output_name = "output_layer0_q_proj"
-    weight_name = "weight_layer0_q_proj_slice"
+    if phase not in {"decode_step", "prefill"}:
+        raise ValueError("phase must be decode_step or prefill")
+    if batch_size <= 0 or context_length <= 0:
+        raise ValueError("batch_size and context_length must be positive")
+    if not artifact_id or not source_operator or not bundle_name:
+        raise ValueError("artifact/operator/bundle names must be non-empty")
+
+    input_name = f"input_layer0_{bundle_name}"
+    output_name = f"output_layer0_{bundle_name}"
+    weight_name = f"weight_layer0_{bundle_name}_slice"
 
     mac_count = tile_m * tile_k * tile_n
     output_tile_bytes = element_size * tile_m * tile_n
     operator = {
         "operator": [
             {
-                "name": "tinyllama_layer0_q_proj_decode",
+                "name": f"tinyllama_layer0_{bundle_name}_{phase}",
                 "type": "gemm",
                 "iteration": iterations,
                 "execution": {
@@ -196,19 +211,29 @@ def build_bundle(
     per_core_input_dram_bytes = iterations * tile_m * tile_k * element_size
     per_core_weight_dram_bytes = iterations * tile_k * tile_n * element_size
     per_core_output_dram_bytes = n_m * n_n * tile_m * tile_n * element_size
+    source_contract: dict[str, Any] = {
+        "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+        "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+        "operator": source_operator,
+        "phase": phase,
+        "batch_size": batch_size,
+        "dtype": "float16",
+        "shape": {"M": m_dim, "K": k_dim, "N": n_dim},
+    }
+    if phase == "decode_step":
+        source_contract["initial_kv_length"] = context_length
+    else:
+        source_contract.update(
+            {
+                "context_length": context_length,
+                "q_len": m_dim,
+                "kv_length": context_length,
+            }
+        )
     manifest = {
         "schema_version": "hetero-atlas-artifact/v1",
-        "artifact_id": "tinyllama.1_1b.layer0.q_proj.decode.bs1_ctx1024.fp16.atlas_edge",
-        "source_contract": {
-            "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-            "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
-            "operator": "model.layers.0.self_attn.q_proj",
-            "phase": "decode_step",
-            "batch_size": 1,
-            "initial_kv_length": 1024,
-            "dtype": "float16",
-            "shape": {"M": m_dim, "K": k_dim, "N": n_dim},
-        },
+        "artifact_id": artifact_id,
+        "source_contract": source_contract,
         "lowering": {
             "rule": "ATLAS frontend/atlang/simulator/edge/gemm.py fixed tiling",
             "core_count": core_count,
@@ -271,6 +296,12 @@ def main() -> int:
     parser.add_argument("--tile-k", type=int, default=512)
     parser.add_argument("--tile-n", type=int, default=16)
     parser.add_argument("--element-size", type=int, default=2)
+    parser.add_argument("--artifact-id")
+    parser.add_argument("--source-operator", default="model.layers.0.self_attn.q_proj")
+    parser.add_argument("--phase", choices=("decode_step", "prefill"), default="decode_step")
+    parser.add_argument("--batch-size", type=int, default=1)
+    parser.add_argument("--context-length", type=int, default=1024)
+    parser.add_argument("--bundle-name", default="q_proj")
     args = parser.parse_args()
 
     operator, placement, manifest = build_bundle(
@@ -282,6 +313,13 @@ def main() -> int:
         tile_k=args.tile_k,
         tile_n=args.tile_n,
         element_size=args.element_size,
+        artifact_id=args.artifact_id
+        or "tinyllama.1_1b.layer0.q_proj.decode.bs1_ctx1024.fp16.atlas_edge",
+        source_operator=args.source_operator,
+        phase=args.phase,
+        batch_size=args.batch_size,
+        context_length=args.context_length,
+        bundle_name=args.bundle_name,
     )
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)

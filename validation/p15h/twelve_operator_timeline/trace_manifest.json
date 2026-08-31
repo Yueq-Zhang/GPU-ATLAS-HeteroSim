@@ -1,0 +1,150 @@
+{
+  "atlas_artifacts": [],
+  "captures": [
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15e-address-capture/tinyllama-prefill-bs1-ctx16-attention-norm/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "aa1f5c3757dbc7b7f739986be64762862d6b7889c15e756da13684251f4e37c8",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15f-address-capture-v2/tinyllama-prefill-bs1-ctx16-qkv-projection/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "aa34cdec22c0dc5230e8c16b45a16b365694969902dbf0a7e3f722f6f865bcee",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-rope/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_rope_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.rope.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "1ac595e158c7dc0ebdcde7f7995acc2a974dae4b0f740762cfb2e34d0b2a74ec",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-causal-attention/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.causal_attention.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "a9c33cb91e7bf3e956b72f784ae0e5a7ce49d27ec67a627078b99d38551de5a6",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-output-projection/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_output_projection_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.output_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "b7511b68bcdfff880f714faf7e2ad413ec26f3a85133dacbcc22a619debef07a",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-mlp-norm/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.mlp_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "e66722c1d79bb2abf149cccc91844e197d104bf417d620777a91648c5e2fe9a3",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-gate-up-projection/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.gate_up_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "9df8a83fa8e9081a0ed02705b7399e661f115e6760f222f82b23d106b3e13544",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-silu-multiply/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "acf1961387fe6a979e8ad474df64196bdcae9937e8a032d30e761e3ac897b605",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-down-projection/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_down_projection_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.down_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "790893f4eddf548d32f950cb924cb985e1fb88d5e1294a0647c015f3545f8677",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-final-norm/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_final_norm_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.final_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "3a46baa580c5cb9e1a43c3812ef4267f5b6b902d5b9d393b79cf6b2038bdf7eb",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-lm-head/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_lm_head_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.lm_head.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "314986f99600b971e8667d0d7796c1502d5590213d470a7940639ea31b144f40",
+      "trace_semantics": "functional"
+    },
+    {
+      "compatibility": "exact_operator",
+      "kernels_list": "/opt/gpu-atlas/qualification/p15h-address-capture/tinyllama-prefill-bs1-ctx16-sampling/traces/kernelslist.g",
+      "replay_safe": false,
+      "source_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_sampling_sm86_trace.json",
+      "task_ids": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling"
+      ],
+      "trace_id": "tinyllama.1_1b.layer0.sampling.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+      "trace_key": "bd5a921285901acd9eaf5d682bbd1f76d10247e181da691e8893ef9eb13c3d57",
+      "trace_semantics": "functional"
+    }
+  ],
+  "schema_version": "hetero-run-trace-bundle/v1"
+}

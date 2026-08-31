@@ -5,10 +5,10 @@
 | 字段 | 内容 |
 | --- | --- |
 | 状态 | 已冻结的实现基线 |
-| 版本 | 1.14 |
-| 日期 | 2026-08-28 |
+| 版本 | 1.21 |
+| 日期 | 2026-08-30 |
 | 适用工程 | ATLAS-MICRO-2026 |
-| 当前基线提交 | b2787399408e32d327c820daee96d4e6610f551a |
+| 当前基线提交 | 8c58dbb1a2209829198451cbfd8fb6c95c16c53c |
 | 主要目标 | GPU 与 3D-DRAM Compute Die/ATLAS 的端到端 LLM 联合仿真 |
 
 本文档是后续实现、代码评审、配置设计和实验解释的主规范。后续工作如果与本文档冲突，应先修改本文档并记录原因，再修改代码。不能在实现中静默改变本文档已经冻结的拓扑语义、地址语义、计时所有权或端到端 Token 语义。
@@ -2717,6 +2717,59 @@ P14是**部署完整、性能未资格**：周期目录来自确定性Tile Sched
 
 启动该暂缓项的条件为：研究目标转向GPU虚拟内存/UVM/CXL共享页、需要地址映射DSE、Global PA容量不足，或准备发布Mapper相关性能结论。启动前的所有报告必须明确写出`virtual_memory_mode=identity_untranslated`和`dram_mapper=OneLevelInterleave`。
 
+### 25.5 P15真实算子Artifact与完整Value流量分级
+
+P15把“算子名称命中”提升为版本化、内容寻址的Artifact合同。`OperatorCompatibilityKey`至少包含Checkpoint Revision、模型规格名、Operator、Phase、Layer、Batch、Context、Q长度、KV长度和Dtype；Manifest还必须记录Backend类型、Trace/ATLAS文件SHA-256、地址语义、流量完整度、暂停/恢复能力和资格记录。任一兼容字段或文件哈希不匹配时，Backend必须在启动前失败。
+
+Artifact地址边界固定为：
+
+```text
+Capture Address
+  -> TensorID + Offset（Artifact身份，不随DRAM候选变化）
+  -> Global PA（运行期Buffer Binding）
+  -> Channel/Bank/Row/Column（候选相关Mapper）
+```
+
+Trace不得提前编码候选DRAM Tuple；`replay_safe=false`时不得把同一Trace的时序资格外推到新的内存候选。当前P15不改变25.4冻结的在线VA/MMU和XOR Mapper状态。
+
+P15第一批固定为TinyLlama‑1.1B FP16、Layer 0、BS=1、Context/Q/KV=16：
+
+1. `attention_norm`、`qkv_projection`、`rope`和`causal_attention`具有非空SM86 Trace并通过Accel-Sim 2.0独立双跑；周期分别为58,736、95,151、127,094和34,923；
+2. `kv_append`实测为CUDA设备到设备状态拷贝且没有NVBit Kernel，必须注册为`runtime_state`，不得伪造计算Trace；
+3. QKV的ATLAS Artifact固定`M=16,K=2048,N=2560`、16核和`8x128x8`分块，原生Chip双跑均为150,932 cycles；
+4. 严格`operator_event`绑定覆盖4/20个一层任务；不匹配的Context、Shape、Dtype、Artifact ID或Backend类型在Dispatch前拒绝；
+5. `prefill_cycle`只对Catalog匹配的五类任务Lowering全部64B Value事务，其余任务继续使用有界采样。固定运行包含175,936个Full-Traffic Parent和234个Sampled Parent；唯一Ramulator2完成全部176,170个Parent并以零在途退出。
+
+P15-A/B资格必须拆分记录：独立Accel-Sim/ATLAS运行证明真实计算Artifact可执行；选择性完整流量运行证明Value级地址、请求和唯一内存Owner闭环。两者**不是同一个周期闭环**，完整流量运行的计算仍来自未校准分块周期合同。P15c虽已单独关闭四类非空GPU Trace的真实`mem_fetch`暂停/恢复子门槛，但它尚未与P15b Prefill全局时间线及稳定Global PA绑定合并。因此`request_cycle_ready=false`、`performance_claim_allowed=false`；禁止将任一独立Trace/P15c周期与P15b完整Value流量延迟相加或据此发布端到端Latency、Token/s和加速比。
+
+P15c已经为RMSNorm、QKV、RoPE和Causal Attention关闭指令—内存暂停/恢复子门槛：双跑周期分别为66,653、2,170,258、135,833和43,500；四项合计383,260个GPU Parent与383,286个内部Child全部完成。每次运行只有一个Ramulator2、ATLAS Parent为0且退出零在途。严格Artifact用`compute_memory_coupled=true`记录该证据，并分别守恒Parent、Child和durable completion。
+
+P15c尚未关闭地址和全局调度门槛：现有补丁仍把`data->get_addr()`作为`identity_untranslated`地址送入桥，未按Manifest执行Trace Range→TensorID+offset→运行期Global PA重绑定；独立Accel-Sim进程也尚未嵌入一层Prefill的全局调度器。因此四类Artifact必须记录`global_pa_binding_ready=false`和`request_cycle_ready=false`。地址需求冻结期间可以为其余新Trace增加同等级耦合证据，但不得提高Ready状态；只有明确解除`range_rebase`子项冻结并完成稳定Global PA重绑定后，才能接入端到端时间线。
+
+P15d把源Artifact扩展到Output Projection、MLP Norm、Gate/Up Projection、SiLU Multiply、Down Projection、Final Norm、LM Head和Sampling，并与P15a合并为13类完整流量Catalog。Final Norm、LM Head和Sampling必须以`source_q_len=16`匹配请求Context，同时保持真实算子`q_len=1`；不得为了Catalog匹配把最终位置算子伪装为16 Token计算。
+
+P15d的一层Prefill部署固定20个任务中13个任务展开全部Value事务、7个任务使用有界采样。确定性双跑均产生3,462,738个Parent/Child，其中3,462,673个来自完整流量、65个来自采样；读写分别为3,444,241和18,497，唯一Ramulator2推进10,401,594 cycles后零在途退出。该路径计算仍来自未校准分块周期合同，必须与各算子的独立Accel-Sim耦合周期分开报告。
+
+P15e把大型请求轨迹改为逐条写入确定性`jsonl.gz`，摘要文件只保存索引、数量和内容摘要；读取方必须以迭代器消费，禁止重新物化全部请求。相同P15d工作量双跑的压缩流为94,859,940 B、峰值RSS约524.6 MiB，并保持Parent/Child、唯一Ramulator2、零在途及核心文件哈希完全一致。
+
+在线地址模式现分为`identity_untranslated`和`range_rebase`。`range_rebase`必须同时覆盖Manifest中已知Tensor范围、目标窗口内由CUDA Allocator事件恢复的不透明Workspace范围，以及包含目标Tensor地址的既存Backing Segment。加入Backing Segment的原因是Tensor Core可产生落在语义Tensor末端之外、但仍属于同一Allocator Segment Padding的真实事务；捕获器只能选中目标Tensor所属Segment，不得包含无关进程Segment。随后执行`TraceAddr → Capture Range + Offset → Runtime Global PA`，任何未命中、重叠、容量越界或对齐冲突立即失败。只有重新捕获且双跑证明全部访问完成重绑定的算子可标记`request_cycle_ready=true`；旧Trace不能因算子同名或布局相似而继承资格。在P15f阶段仅Attention Norm与QKV Projection满足该门槛；P15h随后按同一标准逐算子补齐其余10个真实GPU算子。
+
+P15f的QKV Projection Manifest固定12个不重叠Capture范围、33,685,504 B Global PA。远端双遍均为2,168,865 GPU cycles、34,943,066条指令、736,837次成功重绑定和0次漏配；375,899个GPU Parent与375,944个内部Child全部完成，唯一Ramulator2推进766,383 cycles后零在途退出。Attention Norm与QKV两算子严格Range-Rebase Catalog合计378,075个Parent、378,120个Child和777,807次地址转换。该Catalog只关闭算子级地址/暂停恢复门槛，不代表两个独立周期可相加，也不代表Prefill全局时间线已经接入。
+
+P15g将`request_cycle_ready=true`作为真实Backend进入全局Prefill时间线的强制门禁。全局分配器先为图Value分配稳定Global PA，再为每个算子的私有Allocator Workspace分配不重叠区间；调用方把显式绑定计入Simulation Key并交给Range-Rebase桥。算子只能在DAG依赖、目标资源、输入版本和Residency均就绪后启动，输出版本只能在该Backend全部请求完成并退出零在途时提交。
+
+固定P15g资格仅用Attention Norm和QKV Projection替换分析回退。Attention在58,833,038,873 fs完成，QKV在同一时刻启动；二者共享Value `TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out`及Global PA 351,485,952，QKV验证该Value版本1。两段运行都保持单`gpu0`互斥、单Ramulator2、地址零漏配、Parent/Child/durable守恒和零在途。其余任务仍为分析回退，因此该资格只关闭“两个真实算子的全局因果接入”门槛，不关闭端到端性能门槛。
+
+P15h按相同捕获和资格流程扩展剩余10个GPU算子。每个算子必须重新捕获自己的Allocator窗口和目标Tensor Backing Segment，并独立通过双遍GPU周期、指令、地址转换、Parent/Child/durable、单Ramulator2和零在途验证；不得从同名旧Trace或其他算子继承`request_cycle_ready`。SM86捕获与周期仿真允许分离到不同主机，但模型Revision、算子Shape、Trace内容哈希、Backend配置和Global PA绑定必须进入资格记录。
+
+P15h最终完成全部10个新增算子的重捕获和双遍资格，并与既有Attention Norm、QKV Projection合并为12算子Ready Catalog。统一一层Context=16 Prefill时间线共执行40,060,873 GPU cycles，完成6,995,173个Parent和6,998,046个Child，804,512,881次地址转换全部命中；每个算子使用唯一Ramulator2，ATLAS请求、地址漏配和退出在途均为0。全局分配包含84个互不重叠的PA区间、56个私有Workspace、12条请求绑定和38条语义Tensor绑定；全部DAG依赖、`gpu0`互斥以及18次Backend完成时版本提交均通过验证。
+
+该时间线输出35,390.378 µs的模拟makespan，但`performance_claim_allowed=false`仍是强制门禁：20个任务中只有12个GPU算子采用真实请求周期Backend，Request Start/Finish、KV Allocate/Append/Release、Token Embedding和两次Residual Add仍为分析或运行时模型；GPU、3D-DRAM与互联参数也尚未用实测系统校准。因此P15h关闭的是“12算子统一地址—请求—调度—版本因果”门槛，而不是可发布的端到端延迟门槛。
+
+LM Head identity-untranslated双遍必须精确一致：23,193,593 GPU cycles、476,608,000条指令、4,096,686个Parent与4,097,138个Child，唯一Ramulator2且零在途。SM86请求掩码归一化允许任意连续的已选32B Sector区间，但仅当`sector_count × 32 == request_size`；归一化后的地址、Byte Mask和Sector Mask必须继续满足父子请求与字节守恒。
+
+新增Trace的耦合资格可以在稳定Global PA工作解除冻结前逐算子推进，但正式Artifact只能在双跑GPU周期、指令数和完整外部内存统计一致，且Parent、Child、durable completion、单Ramulator2、零ATLAS请求和零在途全部满足时标记`compute_memory_coupled=true`。大型Gate/Up和LM Head虽已完成identity-untranslated耦合资格，仍不得因源Artifact或计算—内存耦合证据存在而提升Global PA Ready状态。
+
 ---
 
 ## 26. 风险与控制
@@ -2804,3 +2857,11 @@ P14是**部署完整、性能未资格**：周期目录来自确定性Tile Sched
 | 1.12 | 2026-08-28 | 实现P11完整Prefill物化图、19类算子周期目录、确定性Global PA和有界代表请求流量契约 |
 | 1.13 | 2026-08-28 | 实现P12单层与P13 22层Context=16 GPU-only Prefill部署、零Logic Die请求门禁和双跑确定性资格 |
 | 1.14 | 2026-08-28 | 实现P14 TinyLlama‑1.1B FP16、BS=1、Context=1024完整Prefill部署；冻结性能未资格声明、复现脚本和七产物双跑验收 |
+| 1.15 | 2026-08-28 | 实现P15首批形状锁定GPU/ATLAS Artifact、严格内容哈希与兼容键绑定、选择性完整Value流量；冻结独立计算资格与共享Ramulator2流量资格不可相加的边界，并明确增量Accel-Sim暂停/恢复为下一门槛 |
+| 1.16 | 2026-08-28 | 实现P15c首个RMSNorm真实指令—分层Ramulator2周期耦合资格；将`compute_memory_coupled`与`global_pa_binding_ready/request_cycle_ready`拆分，明确identity-untranslated耦合证据不能替代稳定Global PA和Prefill全局调度接入 |
+| 1.17 | 2026-08-28 | 将P15c周期耦合扩展到RMSNorm、QKV、RoPE和Causal Attention全部四类非空首批GPU Trace；增加四算子总资格、Parent/Child/durable独立守恒，并把Artifact匹配补全为Batch与Context严格比较 |
+| 1.18 | 2026-08-29 | 将一层Prefill源Artifact扩展到13类完整流量算子；为最终位置算子分离整体Context与真实q_len；完成13/20任务完整Value流量双跑并冻结独立Accel-Sim耦合周期不可与Prefill分块周期相加的边界 |
+| 1.19 | 2026-08-30 | 实现大型请求轨迹流式gzip输出、Allocator Workspace驱动的在线Range-Rebase与单算子Ready门禁；完成LM Head双遍资格和12算子严格耦合Catalog；冻结旧Artifact不得外推Global PA就绪的边界 |
+| 1.20 | 2026-08-30 | 将Range-Rebase捕获扩展为目标窗口分配加目标Tensor Backing Segment；完成QKV Projection远端双遍资格、双算子Ready Catalog和严格地址/父子请求守恒汇总；继续冻结未重捕获Artifact与Prefill全局时间线声明边界 |
+| 1.21 | 2026-08-30 | 将Attention Norm与QKV Projection两个Ready Accel-Sim后端嵌入同一Prefill全局时间线；加入调用方Global PA绑定、资源互斥、请求完成和完成时版本提交门禁；启动其余10算子P15h重捕获与远端资格流程 |
+| 1.22 | 2026-08-31 | 完成其余10个GPU算子的Range-Rebase重捕获和双遍资格，建立12算子Ready Catalog并全部嵌入同一Prefill全局时间线；验证84个Global PA区间、唯一Ramulator2、请求守恒、GPU互斥和18次版本提交因果，同时保持端到端性能资格关闭 |

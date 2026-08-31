@@ -1,0 +1,223 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.gate_up_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_identity_v1",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.v2_0_0",
+    "driver": "591.86",
+    "gpu": "NVIDIA GeForce RTX 3070",
+    "kind": "accel_sim",
+    "memory_coupling": "ramulator2_in_process",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "compute_memory_coupled": true,
+    "global_pa_binding_ready": false,
+    "memory_traffic": "full_instruction_trace",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": true,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "/opt/gpu-atlas/qualification/p15d/capture/tinyllama-prefill-bs1-ctx16-gate-up-projection/operator_metadata.json",
+      "sha256": "d5a11f832bc3a29964e59e1c3432d36bc4f71589753a5670b494690aec4f9654",
+      "size_bytes": 2816
+    },
+    {
+      "kind": "kernels_list",
+      "path": "/opt/gpu-atlas/qualification/p15d/capture/tinyllama-prefill-bs1-ctx16-gate-up-projection/traces/kernelslist.g",
+      "sha256": "edf91d648b5f8849b6d2e356a21de484c738e163af475b762e8230d0579c4e51",
+      "size_bytes": 105
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p15d/capture/tinyllama-prefill-bs1-ctx16-gate-up-projection/traces/kernel-1-ctx_0x5bcf9a16ba80.tracez",
+      "sha256": "4c930481f4e77305b862f8ecfcdfd8ceb8e6447110ad3fb8f38c935b3438d314",
+      "size_bytes": 3144461
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p15d/capture/tinyllama-prefill-bs1-ctx16-gate-up-projection/traces/kernel-2-ctx_0x5bcf9a16ba80.tracez",
+      "sha256": "dcbefbb8b9f8c673c99dde9d9dcf4d1773d221c2b2596a5ceaeb607f5960cbfa",
+      "size_bytes": 3097535
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p15d/capture/tinyllama-prefill-bs1-ctx16-gate-up-projection/traces/kernel-3-ctx_0x5bcf9a16ba80.tracez",
+      "sha256": "9b62daa03aab5d940f9d69169d3403818e55f5ac07061c33d1560f9d608d54d9",
+      "size_bytes": 3685129
+    },
+    {
+      "kind": "accel_sim_trace_manifest",
+      "path": "tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json",
+      "sha256": "7ea4223e88947cc5f824491aa58abbf88deb705e398a6ed25547d1830d766c7c",
+      "size_bytes": 4150
+    },
+    {
+      "kind": "standalone_operator_artifact",
+      "path": "tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86.json",
+      "sha256": "a6951b49ede8a46301a397b0dd9d54705493c2cb9152352b69511de79ecf95e4",
+      "size_bytes": 5527
+    },
+    {
+      "kind": "coupled_accel_sim_backend",
+      "path": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch.json",
+      "sha256": "7726af9e96fad0091160e2a86c14d19a5924f2302bfbf9e3744c2154e0258abd",
+      "size_bytes": 2827
+    },
+    {
+      "kind": "cycle_coupled_qualification_record",
+      "path": "/opt/gpu-atlas/qualification/p15d/coupled/accel-sim-rtx3070-gate-up-projection-shared-hbdram-identity/qualification_record.json",
+      "sha256": "30906edfde04605975f95dab1595f2bb42e470a3bea033fc3c30c4be50b0ab80",
+      "size_bytes": 3819
+    }
+  ],
+  "qualification": {
+    "cycles": 8309172,
+    "gpu_parents": 1462619,
+    "instructions": 86599740,
+    "outstanding": 0,
+    "performance_eligible": false,
+    "qualification_record": "/opt/gpu-atlas/qualification/p15d/coupled/accel-sim-rtx3070-gate-up-projection-shared-hbdram-identity/qualification_record.json",
+    "ramulator2_instances": 1,
+    "status": "cycle_coupled_identity_untranslated_pending_global_pa_binding"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "two_exact_checkpoint_linear_projections_plus_pack",
+    "kv_length": 16,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "gate_up_projection",
+    "phase": "prefill",
+    "q_len": 16
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        16,
+        2048
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        2048,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.input",
+      "trace_base": 47380091392
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "parameter",
+      "shape": [
+        5632,
+        2048
+      ],
+      "size_bytes": 23068672,
+      "strides": [
+        2048,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.gate_weight",
+      "trace_base": 47309651968
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "parameter",
+      "shape": [
+        5632,
+        2048
+      ],
+      "size_bytes": 23068672,
+      "strides": [
+        2048,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.up_weight",
+      "trace_base": 47332720640
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "strides": [
+        90112,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.gate",
+      "trace_base": 47380156928
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "strides": [
+        90112,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.up",
+      "trace_base": 47380337152
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        16,
+        11264
+      ],
+      "size_bytes": 360448,
+      "strides": [
+        180224,
+        11264,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.output",
+      "trace_base": 47380517376
+    }
+  ]
+}

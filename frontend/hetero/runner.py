@@ -5,9 +5,10 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+from collections.abc import Mapping
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from .analytical import estimate_link_duration_fs, estimate_node_cost
 from .batching import build_batch_plan
@@ -29,8 +30,8 @@ from .online_operator_runtime import (
     OnlineDispatchSpec,
     run_online_operator_dag,
 )
-from .placement import place_nodes
 from .operator_event import OperatorEventDispatcher
+from .placement import place_nodes
 from .prefill_cycle_artifact import PrefillCycleDispatcher
 from .prefill_cycle_runtime import run_prefill_cycle_dag
 from .runtime_bridge import allocate_paged_kv, run_task_dag, simulate_token_barrier
@@ -65,9 +66,10 @@ def _validate_gpu_only_shared_3d_baseline(
 ) -> dict[str, object] | None:
     """Enforce the no-Logic-Die-contention baseline at the derived task level."""
 
-    if not isinstance(memory_config, Mapping) or memory_config.get(
-        "access_mode", "shared_gpu_atlas"
-    ) != "gpu_only":
+    if (
+        not isinstance(memory_config, Mapping)
+        or memory_config.get("access_mode", "shared_gpu_atlas") != "gpu_only"
+    ):
         return None
     tasks = execution_graph.get("tasks")
     routes = execution_graph.get("routes")
@@ -163,9 +165,9 @@ def _execution_graph(
         final_residency.extend(plan.final_records)
         routes_by_consumer: dict[str, list[object]] = {}
         for planned_route in plan.routes:
-            routes_by_consumer.setdefault(
-                planned_route.consumer_task_id, []
-            ).append(planned_route)
+            routes_by_consumer.setdefault(planned_route.consumer_task_id, []).append(
+                planned_route
+            )
 
         for planned_node in plan.nodes:
             node = planned_node.node
@@ -318,14 +320,19 @@ def _execution_graph(
                     node=node,
                     model=model,
                     device_id=decision.target_device,
+                    input_values=tuple(
+                        dict(item) for item in planned_node.input_values
+                    ),
+                    output_values=tuple(
+                        dict(item) for item in planned_node.output_values
+                    ),
                 )
             tasks.append(task_record)
     logical_nodes = sum(
         int(item["logical_node_count"]) for item in request_conservation
     )
     exact_once = all(
-        bool(item["each_logical_node_exactly_once"])
-        for item in request_conservation
+        bool(item["each_logical_node_exactly_once"]) for item in request_conservation
     ) and logical_nodes == len(tasks)
     return (
         {
@@ -496,7 +503,9 @@ def _timed_metrics(
     fidelity = {
         "compute_fidelity": aggregate("compute_fidelity"),
         "memory_fidelity": aggregate("memory_fidelity"),
-        "link_fidelity": "analytical" if execution_graph["routes"] else "not_applicable",
+        "link_fidelity": "analytical"
+        if execution_graph["routes"]
+        else "not_applicable",
         "scheduler_fidelity": "event_modeled",
         "extrapolated_fraction": sum(
             float(item["extrapolated_fraction"]) for item in fidelities
@@ -546,7 +555,9 @@ def execute_run(
     placed_graphs: list[tuple[object, list[object], object]] = []
     for request in requests:
         graph = build_request_graph(model, request)
-        decisions = place_nodes(graph.nodes, placement_config, active_batch=len(requests))
+        decisions = place_nodes(
+            graph.nodes, placement_config, active_batch=len(requests)
+        )
         placed_graphs.append((graph, decisions, request))
         graph_payloads.append(
             {
@@ -603,6 +614,28 @@ def execute_run(
     prefill_coverage_payload: dict[str, object] | None = None
     shared_config: Mapping[str, object] | None = None
     shared_reference_active = False
+    if (
+        execution_mode == "operator_event"
+        and dispatcher is not None
+        and dispatcher.requires_global_pa_bindings
+    ):
+        capacity_bytes = int(
+            address.get("global_pa_capacity_bytes", address["kv_capacity_bytes"])
+        )
+        alignment_bytes = int(address.get("allocation_alignment_bytes", 64))
+        allocations, global_memory_map_payload = build_global_memory_map(
+            execution_graph,
+            memory_space_id,
+            capacity_bytes,
+            alignment_bytes,
+        )
+        dispatcher.configure_global_pa_bindings(
+            allocations,
+            operator_dispatch_specs,
+            global_memory_map_payload,
+            capacity_bytes=capacity_bytes,
+            alignment_bytes=alignment_bytes,
+        )
     if execution_mode in {"full_runtime", "prefill_cycle"}:
         memory_services = system.get("memory_services", {})
         if not isinstance(memory_services, Mapping):
@@ -611,7 +644,10 @@ def execute_run(
         if isinstance(candidate, Mapping):
             shared_config = candidate
             shared_reference_active = candidate.get("kind") == "shared_3d_reference"
-            if candidate.get("kind") == "ramulator2" and execution_mode == "full_runtime":
+            if (
+                candidate.get("kind") == "ramulator2"
+                and execution_mode == "full_runtime"
+            ):
                 raise ValueError(
                     "full_runtime live Ramulator2 coupling is not qualified; "
                     "use 'qualify-memory' for standalone replay or configure "
@@ -650,6 +686,7 @@ def execute_run(
                     spec.node,
                     spec.model,
                     spec.device_id,
+                    spec.task_id,
                 ),
             )
             placement_contract = execution_graph["placement_contract"]
@@ -666,17 +703,17 @@ def execute_run(
             }
             online_dispatch_payload = {
                 "schema_version": runtime_result["schema_version"],
-                "backend_dispatch_count": runtime_result[
-                    "backend_dispatch_count"
-                ],
+                "backend_dispatch_count": runtime_result["backend_dispatch_count"],
                 "version_checks": runtime_result["version_checks"],
                 "launch_log": runtime_result["launch_log"],
+                "version_commits": runtime_result["version_commits"],
                 "final_versions": runtime_result["final_versions"],
             }
         elif execution_mode == "prefill_cycle":
-            if not isinstance(shared_config, Mapping) or shared_config.get(
-                "kind"
-            ) != "ramulator2":
+            if (
+                not isinstance(shared_config, Mapping)
+                or shared_config.get("kind") != "ramulator2"
+            ):
                 raise ValueError("prefill_cycle requires a live Ramulator2 service")
             global_clock_hz = int(shared_config["gpu_clock_hz"])
             prefill_dispatcher = PrefillCycleDispatcher(
@@ -702,14 +739,13 @@ def execute_run(
                 global_clock_hz=global_clock_hz,
                 transaction_bytes=int(shared_config["transaction_bytes"]),
                 max_samples_per_value=int(shared_config["max_samples_per_value"]),
+                request_trace_path=run_dir / "request_cycle_trace.jsonl.gz",
             )
             memory_statistics = dict(runtime_result["memory_statistics"])
             prefill_coverage_payload = dict(runtime_result["artifact_coverage"])
             request_cycle_payload = {
                 "schema_version": runtime_result["schema_version"],
-                "backend_dispatch_count": runtime_result[
-                    "backend_dispatch_count"
-                ],
+                "backend_dispatch_count": runtime_result["backend_dispatch_count"],
                 "version_checks": runtime_result["version_checks"],
                 "launch_log": runtime_result["launch_log"],
                 "final_versions": runtime_result["final_versions"],
@@ -726,9 +762,7 @@ def execute_run(
                 "version_checks": runtime_result["version_checks"],
                 "one_live_ramulator2": True,
                 "zero_outstanding": memory_statistics["outstanding"] == 0,
-                "all_artifacts_covered": prefill_coverage_payload[
-                    "all_tasks_covered"
-                ],
+                "all_artifacts_covered": prefill_coverage_payload["all_tasks_covered"],
             }
         else:
             runtime_result = run_task_dag(runtime_tasks)
@@ -741,10 +775,9 @@ def execute_run(
         }
         for record in [*execution_graph["tasks"], *execution_graph["routes"]]:  # type: ignore[index]
             record["timing"] = timing_by_id[str(record["task_id"])]
-            record["effective_duration_fs"] = (
-                int(record["timing"]["completion_time_fs"])
-                - int(record["timing"]["start_time_fs"])
-            )
+            record["effective_duration_fs"] = int(
+                record["timing"]["completion_time_fs"]
+            ) - int(record["timing"]["start_time_fs"])
         residency_payload = _materialize_residency(execution_graph, timing_by_id)
         if execution_mode == "prefill_cycle":
             metrics["run_status"] = "prefill_cycle_deployment"
@@ -761,7 +794,9 @@ def execute_run(
             if competition_summary is not None:
                 initiators = memory_statistics.get("initiators", {})
                 if not isinstance(initiators, Mapping):
-                    raise RuntimeError("live memory initiator statistics must be an object")
+                    raise RuntimeError(
+                        "live memory initiator statistics must be an object"
+                    )
                 gpu_stats = initiators.get("gpu0", {})
                 atlas_stats = initiators.get("atlas0.compute", {})
                 if not isinstance(gpu_stats, Mapping) or not isinstance(
@@ -854,11 +889,20 @@ def execute_run(
                 if execution_mode == "full_runtime"
                 else "python.GlobalPhysicalAddressAllocator"
                 if execution_mode == "prefill_cycle"
+                or (
+                    execution_mode == "operator_event"
+                    and dispatcher is not None
+                    and dispatcher.requires_global_pa_bindings
+                )
                 else "cpp.PagedKvAllocator"
             ),
             "memory_timing_owner": (
                 "shared3d.live_ramulator2"
                 if execution_mode == "prefill_cycle"
+                else "shared3d.per_operator_in_process_ramulator2"
+                if execution_mode == "operator_event"
+                and dispatcher is not None
+                and dispatcher.requires_global_pa_bindings
                 else (
                     "shared3d.memory_service"
                     if execution_mode == "full_runtime"

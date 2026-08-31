@@ -1,0 +1,62 @@
+schema_version: hetero-sim/dependency-lock/v1
+captured_at: 2026-08-27
+source_baseline:
+  atlas_repository: pku-gsun/ATLAS-MICRO-2026
+  atlas_commit: b2787399408e32d327c820daee96d4e6610f551a
+  design_spec_sha256: 197135049B64811E2E1BEB47A37CBC79B60EB250A1290DBA1B037A836F19E4C3
+environment:
+  os: Ubuntu-22.04-WSL2
+  wsl_kernel: 6.6.87.2-microsoft-standard-WSL2
+  python: 3.10.12
+  pytest: 9.1.1
+  cmake: 3.22.1
+  gcc: 11.4.0
+dependencies:
+  accel_sim:
+    version: v2.0.0
+    commit: 64653015f85fb5664c84a10f48527e8897d289d0
+    source_archive_sha256: 1ab59739f00b006cefa9ce1dbe0a3196050bb82a8a820f77d71c45d8574ea711
+  gpgpu_sim:
+    version: dev_for_accel_sim_v2.0.0
+    commit: e10018b67a4b668e7b43f89280cf67624f1df4ff
+    source_archive_sha256: a85c3c16b2636fca999fab3d2fb1d0475c7e54f7e204a75e5c0244377ddfbb98
+  nvbit:
+    version: 1.8
+    archive_sha256: 72a2b827f9531dcb86b6be13844f267640fb440929d92944177029da6da2b9e1
+    capture_status: passed_local_rtx3070_driver_591_86
+  cuda_toolkit:
+    build_and_capture_version: 11.8
+    explicit_root: /usr/local/cuda-11.8
+  ramulator2:
+    commit: 3996362187d7f8314936e5ad7560d93b66b6a215
+    source: ATLAS-MICRO-2026/simulator/src/dram/ramulator2
+    integration_status: one_owner_p9b_and_prefill_p10b_b_to_p14_deployment_qualified
+  booksim2:
+    commit: 1a8ec21ecc71f26be6907e373034e18c136ee459
+    source: ATLAS-MICRO-2026/simulator/src/noc/booksim2
+    integration_status: adapter_pending_qualification
+  pybind11:
+    simulator_runtime_package: 2.9.1-2_ubuntu_jammy
+    accel_sim_bundled_version: 2.9.1
+    source_archive_sha256: c6160321dc98e6e1184cc791fbeadd2907bb4a0ce0e447f2ea4ff8ab56550913
+  tilelang:
+    commit: 3772fd2f52ea95ae67cb884955c9a11ac718764a
+    version_describe: v0.1.7.post3-80-g3772fd2f
+    source: ATLAS-MICRO-2026/frontend/tilelang
+    integration_status: compiler_path_pending_qualification
+research_candidates:
+  rtx4090_sm89_community_config:
+    accel_sim_fork_commit: 59679f1afcdbec0de6361f75e3230848c1fa6255
+    gpgpu_sim_fork_commit: fdd4f16417b4325258a1c3b3701cd24410c732f2
+    status: downloaded_unqualified_deadlock_reported_upstream
+notes:
+  - Local GPU is NVIDIA GeForce RTX 3070 (SM86); pinned SM86_RTX3070 configs are used.
+  - Accel-Sim 2.0 uses the rebuilt NVBit 1.8 tracer and compressed .tracez format; local RTX 3070 driver 591.86 capture and adapter-equivalence qualification passed on 2026-08-27.
+  - The Accel-Sim 2.0 source archive does not pin GPGPU-Sim; the exact inspected dev revision is pinned here for reproducibility.
+  - M5 Step 1 is an independent total-duration backend; Accel-Sim exclusively owns GPU core, cache, NoC and local DRAM timing.
+  - ATLAS, Ramulator2, BookSim2 and TileLang revisions are pinned; only paths with explicit qualification records may be reported.
+  - P1-P7 qualify external-link timing, Logic-Die parent/child splitting, bandwidth consistency and dual-initiator memory-port contention.
+  - P9b qualifies real Accel-Sim and a complete atlasim.Chip concurrently against one Ramulator2 for one fixed TinyLlama q_proj contention workload; this is not an end-to-end placement schedule.
+  - P10a qualifies strict one-node/one-device-task placement, per-value versioned routes and timed residency events in the reference control plane; real multi-operator cycle coupling remains pending.
+  - P10b-B qualifies dependency-, resource-, route-, version- and live request-completion gating for one mixed TinyLlama Prefill layer through one Ramulator2.
+  - P11-P14 deploy a complete materialized TinyLlama-1.1B FP16 BS=1 Context=1024 Prefill graph through first-token sampling; compute uses uncalibrated tiled cycle contracts and memory uses bounded representative requests, so performance claims remain disabled.

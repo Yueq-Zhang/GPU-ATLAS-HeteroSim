@@ -1,0 +1,545 @@
+{
+  "address_semantics": "allocated_global_pa_range_rebased",
+  "alignment_bytes": 64,
+  "allocated_bytes": 374995968,
+  "allocation_count": 38,
+  "capacity_bytes": 4294967296,
+  "memory_space_id": "shared0.dram3d",
+  "non_overlapping": true,
+  "operator_workspace_count": 10,
+  "ranges": [
+    {
+      "alignment_bytes": 64,
+      "base_address": 0,
+      "dtype": "fp16",
+      "end_address_exclusive": 4096,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "parameter",
+      "value_id": "model.final_norm.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 4096,
+      "dtype": "fp16",
+      "end_address_exclusive": 8192,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.attention_norm.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 8192,
+      "dtype": "fp16",
+      "end_address_exclusive": 23076864,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 23068672,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.down.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 23076864,
+      "dtype": "fp16",
+      "end_address_exclusive": 69214208,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 46137344,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.gate_up.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 69214208,
+      "dtype": "fp16",
+      "end_address_exclusive": 69218304,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.mlp_norm.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 69218304,
+      "dtype": "fp16",
+      "end_address_exclusive": 77606912,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8388608,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.output.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 77606912,
+      "dtype": "fp16",
+      "end_address_exclusive": 88092672,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 10485760,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.qkv.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 88092672,
+      "dtype": "fp16",
+      "end_address_exclusive": 219164672,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 131072000,
+      "storage_class": "parameter",
+      "value_id": "model.lm_head.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 219164672,
+      "dtype": "fp16",
+      "end_address_exclusive": 350236672,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 131072000,
+      "storage_class": "parameter",
+      "value_id": "model.tok_embeddings.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350236672,
+      "dtype": "fp16",
+      "end_address_exclusive": 350244864,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "kv_cache",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350244864,
+      "dtype": "fp16",
+      "end_address_exclusive": 350253056,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "kv_cache",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350253056,
+      "dtype": "fp16",
+      "end_address_exclusive": 350318592,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350318592,
+      "dtype": "fp16",
+      "end_address_exclusive": 350322688,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350322688,
+      "dtype": "fp16",
+      "end_address_exclusive": 350388224,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350388224,
+      "dtype": "fp16",
+      "end_address_exclusive": 350453760,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350453760,
+      "dtype": "fp16",
+      "end_address_exclusive": 350519296,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350519296,
+      "dtype": "fp16",
+      "end_address_exclusive": 350601216,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 81920,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350601216,
+      "dtype": "fp16",
+      "end_address_exclusive": 350666752,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350666752,
+      "dtype": "fp16",
+      "end_address_exclusive": 350748672,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 81920,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350748672,
+      "dtype": "fp16",
+      "end_address_exclusive": 350928896,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 180224,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350928896,
+      "dtype": "fp16",
+      "end_address_exclusive": 350994432,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350994432,
+      "dtype": "fp16",
+      "end_address_exclusive": 351354880,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 360448,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351354880,
+      "dtype": "fp16",
+      "end_address_exclusive": 351420416,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351420416,
+      "dtype": "fp16",
+      "end_address_exclusive": 351485952,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351485952,
+      "dtype": "fp16",
+      "end_address_exclusive": 351551488,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351551488,
+      "dtype": "fp16",
+      "end_address_exclusive": 351615488,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 64000,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351615488,
+      "dtype": "int32",
+      "end_address_exclusive": 351615520,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 32,
+      "storage_class": "metadata",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351615552,
+      "dtype": "int32",
+      "end_address_exclusive": 351615554,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 2,
+      "storage_class": "metadata",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.token.0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 351615744,
+      "dtype": "opaque",
+      "end_address_exclusive": 351623936,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.key"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 351623936,
+      "dtype": "opaque",
+      "end_address_exclusive": 364206848,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 12582912,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 364206848,
+      "dtype": "opaque",
+      "end_address_exclusive": 365440256,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 365440256,
+      "dtype": "opaque",
+      "end_address_exclusive": 366074624,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 634368,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 366074624,
+      "dtype": "opaque",
+      "end_address_exclusive": 374594304,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 374594304,
+      "dtype": "opaque",
+      "end_address_exclusive": 374659840,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.query"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 374659840,
+      "dtype": "opaque",
+      "end_address_exclusive": 374668032,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.value"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 374668032,
+      "dtype": "opaque",
+      "end_address_exclusive": 374733568,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention:tinyllama.layer0.attention_norm.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 374733568,
+      "dtype": "opaque",
+      "end_address_exclusive": 374864704,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 131136,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention:tinyllama.layer0.attention_norm.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 374864896,
+      "dtype": "opaque",
+      "end_address_exclusive": 374995968,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 131072,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention:tinyllama.layer0.attention_norm.opaque_workspace_2"
+    }
+  ],
+  "request_cycle_bindings": [
+    {
+      "operator_artifact_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 351615744,
+          "size_bytes": 8192,
+          "tensor_id": "tinyllama.layer0.qkv_projection.key"
+        },
+        {
+          "global_pa_base": 351623936,
+          "size_bytes": 12582912,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 364206848,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 365440256,
+          "size_bytes": 634368,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 366074624,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_3"
+        },
+        {
+          "global_pa_base": 374594304,
+          "size_bytes": 65536,
+          "tensor_id": "tinyllama.layer0.qkv_projection.query"
+        },
+        {
+          "global_pa_base": 374659840,
+          "size_bytes": 8192,
+          "tensor_id": "tinyllama.layer0.qkv_projection.value"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "global_pa_base": 351485952,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.qkv_projection.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "global_pa_base": 77606912,
+          "size_bytes": 8388608,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.qkv_projection.q_weight",
+          "value_id": "model.layers.0.qkv.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "global_pa_base": 85995520,
+          "size_bytes": 1048576,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.qkv_projection.k_weight",
+          "value_id": "model.layers.0.qkv.weight",
+          "value_index": 1,
+          "value_offset_bytes": 8388608,
+          "value_version": 0
+        },
+        {
+          "global_pa_base": 87044096,
+          "size_bytes": 1048576,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.qkv_projection.v_weight",
+          "value_id": "model.layers.0.qkv.weight",
+          "value_index": 1,
+          "value_offset_bytes": 9437184,
+          "value_version": 0
+        },
+        {
+          "global_pa_base": 350519296,
+          "size_bytes": 81920,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.qkv_projection.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+      "trace_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "operator_artifact_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 374668032,
+          "size_bytes": 65536,
+          "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 374733568,
+          "size_bytes": 131136,
+          "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 374864896,
+          "size_bytes": 131072,
+          "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "global_pa_base": 350253056,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.attention_norm.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "global_pa_base": 4096,
+          "size_bytes": 4096,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.attention_norm.weight",
+          "value_id": "model.layers.0.attention_norm.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "global_pa_base": 351485952,
+          "size_bytes": 65536,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.attention_norm.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+      "trace_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    }
+  ],
+  "schema_version": "hetero-global-memory-map/v1"
+}

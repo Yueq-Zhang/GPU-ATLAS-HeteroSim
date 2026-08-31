@@ -1,0 +1,41 @@
+{
+  "claim_boundary": "two request-cycle-ready operators share one logical Prefill timeline; remaining operators are analytical fallbacks",
+  "dependency_causality": {
+    "attention_completion_fs": 58833038873,
+    "qkv_after_attention": true,
+    "qkv_start_fs": 58833038873
+  },
+  "global_pa_causality": {
+    "global_pa_base": 351485952,
+    "same_output_input_binding": true,
+    "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out"
+  },
+  "performance_eligible": false,
+  "request_completion": {
+    "attention_norm": {
+      "children": 2176,
+      "outstanding": 0,
+      "parents": 2176,
+      "translated": 40758
+    },
+    "qkv_projection": {
+      "children": 376734,
+      "outstanding": 0,
+      "parents": 376690,
+      "translated": 736827
+    }
+  },
+  "resource_causality": {
+    "non_overlapping": true,
+    "resource_id": "gpu0"
+  },
+  "run_dir": "/opt/gpu-atlas/qualification/p15g-timeline/p15g_tinyllama_prefill_1layer_ctx16_two_request_cycle_gpu/be9f927b7c3846c80f19206f9c0eb966aaf9f14084901971788d8f9d345c22e6",
+  "schema_version": "hetero-p15g-prefill-timeline-qualification/v1",
+  "simulator_revision": "8c58dbb1a2209829198451cbfd8fb6c95c16c53c-dirty",
+  "status": "passed",
+  "version_causality": {
+    "commit_count": 18,
+    "qkv_validated_attention_output_v1": true,
+    "ready_operator_commits_at_completion": true
+  }
+}

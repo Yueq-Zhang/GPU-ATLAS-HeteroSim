@@ -17,6 +17,92 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/CMakeLists.txt b/gpu-simulato
 +  target_link_libraries(gpgpusim PUBLIC
 +    "${HETEROSIM_RAMULATOR2_BRIDGE_DIR}/libramulator_gpgpusim_bridge.so")
 +endif()
+diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/mem_fetch.cc b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/mem_fetch.cc
+--- a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/mem_fetch.cc
++++ b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/mem_fetch.cc
+@@ -30,5 +30,8 @@
+ #include "mem_fetch.h"
+ #include <cstdint>
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++#include "ramulator_bridge.h"
++#endif
+ #include "gpu-sim.h"
+ #include "mem_latency_stat.h"
+ #include "shader.h"
+@@ -63,6 +66,21 @@ mem_fetch::mem_fetch(const mem_access_t &access, const warp_inst_t *inst,
+ {
+   m_request_uid = sm_next_mf_request_uid++;
+   m_access = access;
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  if (m_access.get_type() == GLOBAL_ACC_R ||
++      m_access.get_type() == GLOBAL_ACC_W) {
++    uint64_t translated_address = 0;
++    const int translation = heterosim_translate_gpu_address(
++        m_access.get_addr(), m_access.get_size(), &translated_address);
++    if (translation == HETEROSIM_ADDRESS_INVALID) {
++      fprintf(stderr, "Unmapped GPU request %u addr=0x%llx size=%u\n",
++              m_request_uid, (unsigned long long)m_access.get_addr(),
++              m_access.get_size());
++      abort();
++    }
++    m_access.set_addr(translated_address);
++  }
++#endif
+   if (inst) {
+     m_inst = std::make_shared<warp_inst_t>(*inst);
+     assert(wid == m_inst->warp_id());
+@@ -79,12 +97,12 @@ mem_fetch::mem_fetch(const mem_access_t &access, const warp_inst_t *inst,
+   if (!config->is_SST_mode()) {
+     // In SST memory model, the SST memory hierarchy is
+     // responsible to generate the correct address mapping
+-    config->m_address_mapping.addrdec_tlx(access.get_addr(), &m_raw_addr, tpc);
++    config->m_address_mapping.addrdec_tlx(m_access.get_addr(), &m_raw_addr, tpc);
+     m_partition_addr =
+-        config->m_address_mapping.partition_address(access.get_addr());
++        config->m_address_mapping.partition_address(m_access.get_addr());
+   }
+   if (config->n_chiplet > 1) {
+-    m_dest_chiplet = config->get_dest_chiplet(access.get_addr());
++    m_dest_chiplet = config->get_dest_chiplet(m_access.get_addr());
+     m_src_chiplet = config->get_src_chiplet(tpc);
+   } else {
+     m_dest_chiplet = 0;
+@@ -112,6 +130,21 @@ mem_fetch::mem_fetch(const mem_access_t &access,
+       m_inst(inst_ptr ? inst_ptr : std::make_shared<warp_inst_t>()) {
+   m_request_uid = sm_next_mf_request_uid++;
+   m_access = access;
++#ifdef HETEROSIM_RAMULATOR2_BRIDGE
++  if (m_access.get_type() == GLOBAL_ACC_R ||
++      m_access.get_type() == GLOBAL_ACC_W) {
++    uint64_t translated_address = 0;
++    const int translation = heterosim_translate_gpu_address(
++        m_access.get_addr(), m_access.get_size(), &translated_address);
++    if (translation == HETEROSIM_ADDRESS_INVALID) {
++      fprintf(stderr, "Unmapped GPU request %u addr=0x%llx size=%u\n",
++              m_request_uid, (unsigned long long)m_access.get_addr(),
++              m_access.get_size());
++      abort();
++    }
++    m_access.set_addr(translated_address);
++  }
++#endif
+   if (inst_ptr) {
+     assert(wid == m_inst->warp_id());
+   }
+@@ -127,10 +160,10 @@ mem_fetch::mem_fetch(const mem_access_t &access,
+   if (!config->is_SST_mode()) {
+-    config->m_address_mapping.addrdec_tlx(access.get_addr(), &m_raw_addr, tpc);
++    config->m_address_mapping.addrdec_tlx(m_access.get_addr(), &m_raw_addr, tpc);
+     m_partition_addr =
+-        config->m_address_mapping.partition_address(access.get_addr());
++        config->m_address_mapping.partition_address(m_access.get_addr());
+   }
+   if (config->n_chiplet > 1) {
+-    m_dest_chiplet = config->get_dest_chiplet(access.get_addr());
++    m_dest_chiplet = config->get_dest_chiplet(m_access.get_addr());
+     m_src_chiplet = config->get_src_chiplet(tpc);
+   } else {
+     m_dest_chiplet = 0;
 diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.h b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.h
 --- a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.h
 +++ b/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.h
@@ -143,7 +229,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
    assert(id == data->get_tlx_addr()
                     .chip);  // Ensure request is in correct memory partition
 
-@@ -288,6 +343,101 @@ void dram_t::scheduler_fifo() {
+@@ -288,6 +343,114 @@ void dram_t::scheduler_fifo() {
    a ^= b;
 
  void dram_t::cycle() {
@@ -184,14 +270,27 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
 +      const mem_access_sector_mask_t sector_mask =
 +          data->get_access_sector_mask();
 +      unsigned byte_mask_source_offset = 0;
-+      if (request.size_bytes == SECTOR_SIZE && sector_mask.count() == 1) {
-+        unsigned sector = 0;
-+        while (!sector_mask.test(sector)) ++sector;
++      const unsigned selected_sector_count = sector_mask.count();
++      unsigned first_selected_sector = 0;
++      while (first_selected_sector < sector_mask.size() &&
++             !sector_mask.test(first_selected_sector)) {
++        ++first_selected_sector;
++      }
++      bool selected_sectors_are_contiguous = selected_sector_count != 0;
++      for (unsigned sector = 0; sector < selected_sector_count; ++sector) {
++        if (first_selected_sector + sector >= sector_mask.size() ||
++            !sector_mask.test(first_selected_sector + sector)) {
++          selected_sectors_are_contiguous = false;
++          break;
++        }
++      }
++      if (selected_sectors_are_contiguous &&
++          request.size_bytes == selected_sector_count * SECTOR_SIZE) {
 +        request.global_address =
 +            data->get_addr() - data->get_addr() % MAX_MEMORY_ACCESS_SIZE
-+            + sector * SECTOR_SIZE;
-+        byte_mask_source_offset = sector * SECTOR_SIZE;
-+        request.sector_mask = 1;
++            + first_selected_sector * SECTOR_SIZE;
++        byte_mask_source_offset = first_selected_sector * SECTOR_SIZE;
++        request.sector_mask = (uint32_t(1) << selected_sector_count) - 1;
 +        request.flags |= HETEROSIM_REQUEST_SECTOR_MASK_VALID;
 +      } else {
 +        request.sector_mask = sector_mask.to_ulong();
@@ -245,7 +344,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
    if (!returnq->full()) {
      dram_req_t *cmd = rwq->pop();
      if (cmd) {
-@@ -701,6 +857,19 @@ void dram_t::print(FILE *simFile) const {
+@@ -701,6 +870,19 @@ void dram_t::print(FILE *simFile) const {
        "n_rd=%llu n_rd_L2_A=%llu n_write=%llu n_wr_bk=%llu bw_util=%.4g\n",
        n_cmd, n_nop, n_act, n_pre, n_ref, n_req, n_rd, n_rd_L2_A, n_wr, n_wr_WB,
        (float)bwutil / n_cmd);
@@ -265,7 +364,7 @@ diff --git a/gpu-simulator/gpgpu-sim/src/gpgpu-sim/dram.cc b/gpu-simulator/gpgpu
    fprintf(simFile, "n_activity=%llu dram_eff=%.4g\n", n_activity,
            (float)bwutil / n_activity);
    for (i = 0; i < m_config->nbk; i++) {
-@@ -801,6 +970,19 @@ void dram_t::print_stat(FILE *simFile) {
+@@ -801,6 +983,19 @@ void dram_t::print_stat(FILE *simFile) {
            (float)bwutil / n_cmd);
    fprintf(simFile, "mrqq: %d %.4g mrqsmax=%llu ", max_mrqs,
            (float)ave_mrqs / n_cmd, max_mrqs_temp);

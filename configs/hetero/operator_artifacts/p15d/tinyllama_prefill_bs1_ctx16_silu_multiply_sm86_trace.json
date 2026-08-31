@@ -1,0 +1,84 @@
+{
+  "address_ranges": [
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.silu_multiply.gate.capture0",
+      "capture_allocation_id": "tinyllama.layer0.silu_multiply.gate.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "tensor_id": "tinyllama.layer0.silu_multiply.gate",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47380156928,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.silu_multiply.up.capture0",
+      "capture_allocation_id": "tinyllama.layer0.silu_multiply.up.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "tensor_id": "tinyllama.layer0.silu_multiply.up",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47380337152,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.silu_multiply.output.capture0",
+      "capture_allocation_id": "tinyllama.layer0.silu_multiply.output.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "tensor_id": "tinyllama.layer0.silu_multiply.output",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47380697600,
+      "view_offset_bytes": 0
+    }
+  ],
+  "capture": {
+    "dtype": "fp16",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "operator": "silu_multiply",
+    "phase": "prefill",
+    "scope": "one_shape_locked_operator_not_end_to_end",
+    "shape": {
+      "batch_size": 1,
+      "context_length": 16,
+      "kv_length": 16,
+      "q_len": 16
+    },
+    "source": "P15 shape-locked operator capture",
+    "tool": "NVBit",
+    "version": "1.8"
+  },
+  "compilation": {
+    "cuda_runtime": "12.1",
+    "implementation": "torch.nn.functional.silu_times_up_projection",
+    "pytorch": "2.3.0+cu121",
+    "target_sm": 86
+  },
+  "kernels_list": "/opt/gpu-atlas/qualification/p15d/capture/tinyllama-prefill-bs1-ctx16-silu-multiply/traces/kernelslist.g",
+  "qualification_record": null,
+  "replay_safe": false,
+  "schema_version": "hetero-trace-manifest/v1",
+  "trace_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+  "trace_semantics": "functional"
+}

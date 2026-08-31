@@ -7,6 +7,8 @@ dist/
 build/
 simulator/build/
 runs/
+validation/**/*.tar.gz
+validation/**/perf_counter*.csv.gz
 *.log
 *.so
 *.pyd

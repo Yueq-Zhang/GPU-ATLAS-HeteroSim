@@ -1,5 +1,70 @@
 # Implementation status
 
+## 2026-08-30 — v0.22.0
+
+- Design contract: v1.22. P15h extends caller-owned runtime Global PA bindings to all twelve real GPU operators in the one-layer Context=16 Prefill graph and validates them in one online Accel-Sim timeline.
+- P15h local SM86 capture and remote deterministic double qualification are complete for the remaining ten GPU operators. Together with Attention Norm and QKV Projection, twelve request-cycle-ready operators now execute in one Prefill timeline.
+- The twelve real GPU backends total 40,060,873 GPU cycles, 6,995,173 parents, 6,998,046 children and 804,512,881 translated addresses. Every operator has zero unmapped and outstanding requests, zero ATLAS requests, and exactly one Ramulator2 owner.
+- All DAG dependencies complete before consumer launch and all `gpu0` intervals are non-overlapping. The Global PA map contains 84 non-overlapping ranges, 56 private workspaces, twelve request bindings and 38 semantic bindings derived from graph Values.
+- All eighteen graph output versions commit at Backend completion, and every ready operator validates the exact input Value versions observed at launch.
+- Eight control, KV-management and residual tasks remain analytical/runtime models. The reported 35,390.378 µs makespan is therefore functional causality evidence, not calibrated end-to-end performance; `performance_eligible=false` remains mandatory. Details are in `docs/qualification/p15h_twelve_operator_prefill_timeline.md`.
+
+## 2026-08-30 — v0.21.0
+
+- Design contract: v1.20. P15f extends allocator capture with the pre-existing CUDA backing segments that contain the target tensors. This closes real Tensor Core transactions into allocator padding while excluding unrelated process segments; missing target coverage remains fail-closed.
+- The recaptured QKV Projection manifest has 12 non-overlapping ranges and materializes 33,685,504 bytes of Global PA. Its remote deterministic double run produces 2,168,865 GPU cycles, 34,943,066 instructions, 736,837 translated accesses and zero unmapped accesses in each leg.
+- One Ramulator2 completes 375,899 GPU parents and 375,944 internal children (375,854 reads / 45 writes), advances 766,383 DRAM/link/gateway cycles and exits with zero ATLAS requests and zero outstanding.
+- Attention Norm and QKV Projection are the two `request_cycle_ready=true` Artifacts at this historical P15f milestone. Their strict range-rebase Catalog conserves 378,075 parents, 378,120 children and 777,807 translated addresses; readiness is not inferred for the other ten operators.
+- These are still independent operator qualifications. No request-cycle-ready Accel-Sim process is embedded in the Prefill global scheduler, so `performance_claim_allowed=false` remains mandatory.
+- Qualification details are in `docs/qualification/p15f_qkv_range_rebase.md`.
+
+## 2026-08-30 — v0.20.0
+
+- Design contract: v1.19. P15e replaces the monolithic request-cycle JSON payload with a deterministic streaming `jsonl.gz` payload plus a compact manifest. The qualified one-layer Context=16 double run completes 3,462,738 parents, advances 10,401,594 DRAM cycles and exits with zero outstanding; the compressed stream is 94,859,940 bytes with SHA-256 `aa3edd9ca85dd3f600e8a1646d1b3af9bfc84f99d50c81f6b422c4897564795d`, and peak RSS is about 524.6 MiB in both runs.
+- The online Accel-Sim bridge now has explicit identity and range-rebase address modes. A recaptured Attention Norm trace uses three known Tensor ranges and three allocator-workspace ranges. Both coupled runs produce 66,697 GPU cycles, 5,290,064 instructions, 40,970 translated accesses, zero unmapped accesses, 2,176 completed parents/children, one Ramulator2 and zero outstanding.
+- Only the recaptured Attention Norm range-rebase Artifact is `request_cycle_ready=true`. The legacy coupled Artifacts must remain identity-untranslated, Global-PA-not-ready, replay-unsafe and performance-ineligible; readiness is not inferred by operator similarity.
+- The remote LM Head double qualification passed exactly: 23,193,593 GPU cycles, 476,608,000 instructions, 4,096,686 completed parents and 4,097,138 completed children in each leg, with one Ramulator2 and zero outstanding. The sector-mask bridge now normalizes any contiguous selected 32-byte sector span whose byte count equals the request size.
+- The strict identity-untranslated coupled catalog now covers 12 real GPU operators and conserves 6,993,530 parents / 6,996,227 children. This remains a set of independent per-operator qualifications, not a Prefill end-to-end timeline.
+- Qualification details are in `docs/qualification/p15e_streaming_and_range_rebase.md` and `docs/qualification/p15d_remaining_prefill_ctx16.md`.
+
+## 2026-08-29 — v0.19.0
+
+- Design contract: v1.18. P15d adds shape-locked RTX 3070 SM86 source Artifacts for Output Projection, MLP Norm, Gate/Up Projection, SiLU Multiply, Down Projection, Final Norm, LM Head and Sampling. Together with P15a, the strict source catalog registers all 13 operators selected for full Value traffic.
+- Final Norm, LM Head and Sampling explicitly bind overall Context=16 with `q_len=1`; the layer-local operators bind `q_len=16`. Artifact lookup uses `source_q_len` for the overall request context while retaining the true operator Q length.
+- A one-layer BS=1/Context=16 run now lowers all Value transactions for 13/20 tasks and bounded samples for 7/20 tasks. Two runs exactly match across eight core files, including the 2,335,336,970-byte request trace.
+- One live Ramulator2 completes 3,462,738 parents/children (3,462,673 full, 65 sampled; 3,444,241 reads, 18,497 writes), advances 10,401,594 DRAM cycles and exits with zero outstanding. The global GPU clock is 31,204,782 cycles and the makespan is 26,003,985,000,000 fs.
+- Seven new traces have deterministic identity-untranslated instruction-to-memory coupled qualifications: Output Projection, MLP Norm, Gate/Up Projection, SiLU Multiply, Down Projection, Final Norm and Sampling. Together with P15c, the strict catalog covers 11 GPU operators and conserves 2,896,844 parents / 2,899,089 children. The two LM Head qualification legs are running concurrently in isolated directories on the remote validation host.
+- The 13-operator Value-traffic timeline still uses the unqualified tiled compute contract and is not the sum of independent Accel-Sim runs. All coupled Artifacts remain `global_pa_binding_ready=false`, `request_cycle_ready=false`, `replay_safe=false` and performance-ineligible.
+- Qualification details are in `docs/qualification/p15d_remaining_prefill_ctx16.md`; the deterministic record is `/opt/gpu-atlas/qualification/p15d/thirteen-full-traffic-final/qualification_record.json`.
+
+## 2026-08-28 — v0.18.0
+
+- Design contract: v1.17. P15c identity-untranslated instruction-to-memory coupling now covers all four non-empty first-batch GPU traces: Attention Norm, QKV Projection, RoPE and Causal Attention.
+- Deterministic double-run cycles are 66,653 / 2,170,258 / 135,833 / 43,500. The four qualifications collectively accept 383,260 GPU parents and complete 383,286 internal children; every run has exactly one Ramulator2, zero ATLAS requests and zero outstanding.
+- QKV exercises real Parent-to-Child expansion: 376,212 parents become 376,238 aligned 64B children. Parent completion, child completion and durable completion are checked independently.
+- The strict P15c catalog has 4/4 `compute_memory_coupled=true` coverage and 0/4 `request_cycle_ready` coverage. All paths remain `identity_untranslated`, `global_pa_binding_ready=false`, `replay_safe=false` and performance-ineligible.
+- Artifact matching now includes Batch and Context in addition to model/operator/phase/layer/Q/KV/dtype, closing an overly permissive full-traffic selection path.
+- The final summary is `/opt/gpu-atlas/qualification/p15c/four-operator-final/qualification_record.json`. These independent coupled runs are still not the one-layer Prefill global timeline and must not be added to P15b Value-traffic time.
+
+## 2026-08-28 — v0.17.0
+
+- Design contract: v1.16. P15c adds the first shape-locked real instruction-to-shared-memory cycle qualification for TinyLlama Prefill RMSNorm.
+- The existing Accel-Sim external-memory patch retains each `mem_fetch` until the layered request link, Logic-Die gateway, all internal children, Ramulator2 and the response link complete. Both fixed runs produce 66,653 GPU cycles and 5,290,064 instructions.
+- One in-process Ramulator2 accepts and completes 2,176 GPU parents / 2,176 children with zero ATLAS parents and zero outstanding. The two full external-memory statistics objects are identical.
+- Artifact readiness is now explicitly split: `compute_memory_coupled=true` records the real stall/resume evidence, while `global_pa_binding_ready=false` records that the online bridge still forwards the identity-untranslated trace address. Consequently `request_cycle_ready=false` and performance eligibility remains false.
+- The coupled RMSNorm process is not yet embedded in the one-layer Prefill global scheduler. P15b remains the Value-level full-traffic path and must not be added to the P15c cycle count.
+
+## 2026-08-28 — v0.16.0
+
+- Design contract: v1.15. P15 first-batch artifact production, strict compatibility binding and selective full-value traffic are implemented for one-layer TinyLlama Prefill at BS=1, Context=16.
+- The versioned artifact catalog covers `attention_norm`, `qkv_projection`, `rope`, `kv_append` and `causal_attention`. It validates checkpoint/shape/dtype/address semantics and all referenced file hashes. Registration is 5/5; request-cycle trace readiness remains 0/5.
+- Four non-empty RTX 3070 SM86 traces pass deterministic Accel-Sim 2.0 double runs: RMSNorm 58,736 cycles; QKV 95,151; RoPE 127,094; Causal Attention 34,923. `replay_safety_qualified=false` for every trace.
+- KV Append is correctly classified as a zero-Kernel CUDA state-copy operation and registered as `runtime_state`, not a fabricated GPU compute trace.
+- The generated 16-core ATLAS QKV bundle (`M=16,K=2048,N=2560`, tile `8x128x8`) passes native double-run qualification at 150,932 cycles and 42,024,960 memory-access bytes.
+- Strict `operator_event` binding executes 4/20 one-layer tasks with exact shape-locked Accel-Sim traces and leaves 16 analytical fallbacks; trace coverage is 20% and performance claims remain disabled.
+- Selective full-traffic Prefill lowers all Value reads/writes for the five first-batch tasks into 175,936 real 64B parents. Fifteen remaining tasks contribute 234 sampled parents. One Ramulator2 completes all 176,170 parents with zero outstanding; two output roots are byte-identical for core artifacts.
+- This does not yet combine the instruction-level Accel-Sim compute state and live Ramulator2 requests in one per-operator stall/resume loop. Prefill compute in the selective-full-traffic run remains the unqualified tiled contract; Context=1024 and all-operator full traffic are not qualified.
+
 ## 2026-08-28 — v0.15.0
 
 - Design contract: v1.14. P10b-B through P14 are implemented as a deterministic Prefill deployment path.
@@ -105,17 +170,21 @@
 /opt/gpu-atlas/qualification/p10b-a-online-dispatch-run1/step2_model1_operator_event_probe/80a6088fc4a6a530cab86c6957a33ff79bedc21746505750cad94889bde4f1bb/online_dispatch.json
 /opt/gpu-atlas/qualification/p10b-a-online-dispatch-run2/step2_model1_operator_event_probe/80a6088fc4a6a530cab86c6957a33ff79bedc21746505750cad94889bde4f1bb/online_dispatch.json
 /opt/gpu-atlas/qualification/prefill-p10b-to-p14-final/
+/opt/gpu-atlas/qualification/p15b/first-batch-final/qualification_record.json
+/opt/gpu-atlas/qualification/p15c/four-operator-final/qualification_record.json
+/opt/gpu-atlas/qualification/p15d/thirteen-full-traffic-final/qualification_record.json
 ```
 
 ### Remaining gaps
 
-1. Replace the P11 tiled compute contracts and sampled traffic, operator by operator, with shape-matched Accel-Sim instruction traces and complete ATLAS compiler/runtime artifacts; only then calibrate and qualify Prefill latency.
-2. Extend the same strict materialized/request-cycle path to one-layer and 22-layer Decode, including full KV traffic and a real single-token loop.
-3. Connect Continuous/Ragged multi-Batch scheduling to real fused/batched cycle artifacts and validate admission, padding and shared-kernel shapes.
-4. Add longer mixed GPU/ATLAS placement cases, full unsampled read/write traffic, fairness/QoS and deadlock/liveness stress tests.
-5. Activate and qualify ATLAS BookSim2 with an explicit NoC topology/configuration, real Packet traffic, cycle/packet/flit conservation, backpressure, deadlock checks and deterministic double runs.
-6. Complete Model 2 PCIe DMA and Model 4 CXL.mem cycle paths, then calibrate RTX 3070 and target link/3D-DRAM parameters. Deferred items remain live TraceVA→Global-PA translation, MMU/TLB and configurable/XOR mapping.
+1. Extend the qualified one-layer Context=16 P15h path to multi-layer execution while validating cross-layer KV lifetime, Global PA capacity, workspace reuse and deterministic long-run behavior. Do not linearly multiply the one-layer timing.
+2. Replace or qualify the eight remaining analytical/runtime control, KV-management and residual tasks before making an end-to-end cycle-accurate claim.
+3. Calibrate GPU, shared 3D-DRAM and link parameters against measured hardware or another trusted reference before enabling performance claims.
+3. Extend the same strict materialized/request-cycle path to one-layer and 22-layer Decode, including full KV traffic and a real single-token loop.
+4. Connect Continuous/Ragged multi-Batch scheduling to real fused/batched cycle artifacts and validate admission, padding and shared-kernel shapes.
+5. Add longer mixed GPU/ATLAS placement cases, fairness/QoS and deadlock/liveness stress tests; activate and qualify ATLAS BookSim2.
+6. Complete Model 2 PCIe DMA and Model 4 CXL.mem cycle paths, then calibrate RTX 3070 and target link/3D-DRAM parameters. Deferred items remain MMU/TLB and configurable/XOR mapping.
 
 ### Claim boundary
 
-The evidence includes a qualified shape-matched single-operator comparison, real Accel-Sim/full-ATLAS-Chip contention, strict single placement/versioned residency, and a P10b-B–P14 causal Prefill deployment through one live shared-memory owner. P14 covers a full 22-layer BS=1 Context=1024 graph, but its compute is a tiled contract and its memory traffic is sampled. It is not measured hardware, calibrated TinyLlama latency, instruction-trace coverage for every operator, complete ATLAS compilation, multi-Batch throughput, virtual-memory modeling or proof that a fixed trace is safe for arbitrary memory configurations. `performance_claim_allowed=false` remains mandatory.
+The evidence includes a qualified shape-matched Decode Q projection, real Accel-Sim/full-ATLAS-Chip contention, strict single placement/versioned residency, a P10b-B–P14 causal Prefill deployment, P15d 13-operator full Value traffic, twelve independent instruction-to-Ramulator2 stall/resume qualifications, and a P15h one-layer timeline in which all twelve recaptured range-rebase GPU operators execute as real Accel-Sim backends with runtime Global PA and version causality. P15h validates 84 non-overlapping Global PA ranges, 56 private workspaces, 12 request bindings and 18 completion-time version commits. Eight control, KV-management and residual tasks remain analytical/runtime models. P14 still uses tiled compute and sampled traffic at Context=1024; P15d uses tiled compute and mixed full/sampled traffic at Context=16. None of these paths is measured hardware or calibrated end-to-end TinyLlama latency. `performance_claim_allowed=false` remains mandatory.

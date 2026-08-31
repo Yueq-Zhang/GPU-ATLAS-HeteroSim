@@ -1,0 +1,32 @@
+{
+  "artifacts": [
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_shared_hbdram_range_rebase.json",
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_shared_hbdram_range_rebase.json",
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_rope_sm86_shared_hbdram_range_rebase.json",
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_shared_hbdram_range_rebase.json",
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_output_projection_sm86_shared_hbdram_range_rebase.json",
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_shared_hbdram_range_rebase.json",
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_shared_hbdram_range_rebase.json",
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_shared_hbdram_range_rebase.json",
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_down_projection_sm86_shared_hbdram_range_rebase.json",
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_final_norm_sm86_shared_hbdram_range_rebase.json",
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_lm_head_sm86_shared_hbdram_range_rebase.json",
+    "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_sampling_sm86_shared_hbdram_range_rebase.json"
+  ],
+  "required_operators": [
+    "attention_norm",
+    "qkv_projection",
+    "rope",
+    "causal_attention",
+    "output_projection",
+    "mlp_norm",
+    "gate_up_projection",
+    "silu_multiply",
+    "down_projection",
+    "final_norm",
+    "lm_head",
+    "sampling"
+  ],
+  "schema_version": "hetero-operator-artifact-catalog/v1",
+  "zero_fallback_required": true
+}

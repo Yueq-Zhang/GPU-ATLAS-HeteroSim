@@ -1,0 +1,19 @@
+{
+  "schema_version": "hetero-operator-artifact-catalog/v1",
+  "required_operators": [
+    "attention_norm",
+    "qkv_projection",
+    "rope",
+    "kv_append",
+    "causal_attention"
+  ],
+  "zero_fallback_required": true,
+  "artifacts": [
+    "tinyllama_prefill_bs1_ctx16_attention_norm_sm86.json",
+    "tinyllama_prefill_bs1_ctx16_qkv_projection_sm86.json",
+    "tinyllama_prefill_bs1_ctx16_rope_sm86.json",
+    "tinyllama_prefill_bs1_ctx16_kv_append_sm86.json",
+    "tinyllama_prefill_bs1_ctx16_causal_attention_sm86.json",
+    "tinyllama_prefill_bs1_ctx16_qkv_projection_atlas.json"
+  ]
+}

@@ -98,6 +98,13 @@ g++ -std=c++20 -O2 \
 
 g++ -std=c++20 -O2 \
   -I"$BRIDGE_SOURCE" \
+  "$BRIDGE_SOURCE/address_translation_smoke.cpp" \
+  -L"$BRIDGE_OUT" -lramulator_gpgpusim_bridge \
+  -Wl,-rpath,"$BRIDGE_OUT" \
+  -o "$BRIDGE_OUT/address_translation_smoke"
+
+g++ -std=c++20 -O2 \
+  -I"$BRIDGE_SOURCE" \
   -I"$ATLAS_ROOT/simulator/src" \
   -I"$SOURCE_YAML_INCLUDE" \
   "$BRIDGE_SOURCE/atlas_hb_port.cpp" \
@@ -113,6 +120,11 @@ HETEROSIM_DRAM_CLOCK_HZ=400000000 \
 "$BRIDGE_OUT/ramulator_bridge_smoke" \
   "$PROJECT_ROOT/configs/hetero/memory/ramulator2_hbdram_edge_16ch_gpu_only.yaml" \
   | tee "$BRIDGE_OUT/smoke.log"
+
+HETEROSIM_GPU_ADDRESS_BINDINGS=\
+"$PROJECT_ROOT/configs/hetero/tests/address_bindings_smoke.tsv" \
+"$BRIDGE_OUT/address_translation_smoke" \
+  | tee "$BRIDGE_OUT/address_translation_smoke.log"
 
 HETEROSIM_GPU_CLOCK_HZ=1200000000 \
 HETEROSIM_LINK_CLOCK_HZ=400000000 \

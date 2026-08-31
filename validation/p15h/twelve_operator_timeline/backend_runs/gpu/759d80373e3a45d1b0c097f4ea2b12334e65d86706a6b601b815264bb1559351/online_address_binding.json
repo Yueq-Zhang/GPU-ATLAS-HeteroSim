@@ -1,0 +1,58 @@
+{
+  "allocated_bytes": 2097152,
+  "allocation_owner": "prefill_global_timeline",
+  "bindings": [
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 351551488,
+      "size_bytes": 64000,
+      "tensor_id": "tinyllama.layer0.sampling.logits",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 351615552,
+      "size_bytes": 32,
+      "tensor_id": "tinyllama.layer0.sampling.token",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 448262912,
+      "size_bytes": 1233408,
+      "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_0",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 449496320,
+      "size_bytes": 65504,
+      "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_1",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 449561856,
+      "size_bytes": 734208,
+      "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_2",
+      "tensor_offset_bytes": 0
+    }
+  ],
+  "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+  "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+  "policy": {
+    "alignment_bytes": 256,
+    "capacity_bytes": 4294967296,
+    "memory_space_id": "shared0.dram3d",
+    "mode": "range_rebase_packed_manifest",
+    "physical_base_bytes": 0,
+    "require_nonzero_translations": true
+  },
+  "range_count": 5,
+  "schema_version": "hetero-online-address-binding/v1",
+  "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/759d80373e3a45d1b0c097f4ea2b12334e65d86706a6b601b815264bb1559351/online_address_bindings.tsv",
+  "table_sha256": "11b53cde6ed3d0f4b9588086b0ba6c765a2753cd8f399b5068418d22bf2478b3",
+  "tensor_count": 5,
+  "trace_key": "bd5a921285901acd9eaf5d682bbd1f76d10247e181da691e8893ef9eb13c3d57",
+  "translation_point": "mem_fetch_before_gpu_cache_lookup"
+}

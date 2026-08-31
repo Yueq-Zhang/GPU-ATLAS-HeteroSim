@@ -1,0 +1,17 @@
+{
+  "schema_version": "hetero-coupled-qualification-map/v1",
+  "records": {
+    "attention_norm": "/opt/gpu-atlas/qualification/p15c/accel-sim-rtx3070-attention-norm-shared-hbdram-identity/qualification_record.json",
+    "qkv_projection": "/opt/gpu-atlas/qualification/p15c/accel-sim-rtx3070-qkv-shared-hbdram-identity/qualification_record.json",
+    "rope": "/opt/gpu-atlas/qualification/p15c/accel-sim-rtx3070-rope-shared-hbdram-identity/qualification_record.json",
+    "causal_attention": "/opt/gpu-atlas/qualification/p15c/accel-sim-rtx3070-causal-attention-shared-hbdram-identity/qualification_record.json",
+    "output_projection": "/opt/gpu-atlas/qualification/p15d/coupled/accel-sim-rtx3070-output-projection-shared-hbdram-identity/qualification_record.json",
+    "mlp_norm": "/opt/gpu-atlas/qualification/p15d/coupled/accel-sim-rtx3070-mlp-norm-shared-hbdram-identity/qualification_record.json",
+    "gate_up_projection": "/opt/gpu-atlas/qualification/p15d/coupled/accel-sim-rtx3070-gate-up-projection-shared-hbdram-identity/qualification_record.json",
+    "silu_multiply": "/opt/gpu-atlas/qualification/p15d/coupled/accel-sim-rtx3070-silu-multiply-shared-hbdram-identity/qualification_record.json",
+    "down_projection": "/opt/gpu-atlas/qualification/p15d/coupled/accel-sim-rtx3070-down-projection-shared-hbdram-identity/qualification_record.json",
+    "final_norm": "/opt/gpu-atlas/qualification/p15d/coupled/accel-sim-rtx3070-final-norm-shared-hbdram-identity/qualification_record.json",
+    "lm_head": "/opt/gpu-atlas/qualification/p15d/coupled/accel-sim-rtx3070-lm-head-shared-hbdram-identity-sector-fix2-remote/qualification_record.json",
+    "sampling": "/opt/gpu-atlas/qualification/p15d/coupled/accel-sim-rtx3070-sampling-shared-hbdram-identity/qualification_record.json"
+  }
+}

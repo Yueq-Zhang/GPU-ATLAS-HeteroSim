@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Mapping, Sequence
 
 from .analytical import estimate_node_cost
 from .backends import (
@@ -18,13 +18,48 @@ from .backends import (
     TimingOwnershipRegistry,
     resolve_timing_contract,
 )
+from .global_memory_map import GlobalAllocation
 from .ir import ModelNode
 from .model_graph import ModelSpec
-from .trace_manifest import TraceManifest
+from .operator_artifact import OperatorArtifactManifest
+from .trace_manifest import SimulationBufferBinding, TraceManifest
 
 
 class OperatorEventError(RuntimeError):
     """Raised when an operator-event Backend cannot produce a valid duration."""
+
+
+def _align_up(value: int, alignment: int) -> int:
+    return ((value + alignment - 1) // alignment) * alignment
+
+
+def _reserved_allocation_extents(
+    allocations: Mapping[str, GlobalAllocation], capacity_bytes: int
+) -> dict[str, int]:
+    """Return logical allocations plus their safe alignment padding."""
+
+    ordered = sorted(allocations.values(), key=lambda item: item.base_address)
+    reserved: dict[str, int] = {}
+    for index, allocation in enumerate(ordered):
+        reservation_end = (
+            ordered[index + 1].base_address
+            if index + 1 < len(ordered)
+            else capacity_bytes
+        )
+        if reservation_end < allocation.end_address_exclusive:
+            raise OperatorEventError(
+                f"Global PA allocations overlap at {allocation.value_id}"
+            )
+        reserved[allocation.value_id] = reservation_end - allocation.base_address
+    return reserved
+
+
+@dataclass(frozen=True, slots=True)
+class TensorValueBinding:
+    tensor_id: str
+    source: str
+    index: int
+    value_offset_bytes: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,6 +67,9 @@ class TraceBinding:
     selector: Mapping[str, object]
     manifest: TraceManifest
     compatibility: str
+    operator_artifact: OperatorArtifactManifest | None = None
+    value_bindings: tuple[TensorValueBinding, ...] = ()
+    contract_overrides: Mapping[str, object] = field(default_factory=dict)
 
     def matches(self, node: ModelNode) -> bool:
         actual = {
@@ -43,6 +81,35 @@ class TraceBinding:
             "operator_group": node.attributes.get("operator_group"),
         }
         return all(actual.get(key) == value for key, value in self.selector.items())
+
+    def validate_exact_contract(self, node: ModelNode, model: ModelSpec) -> None:
+        if self.compatibility != "exact_operator" or self.operator_artifact is None:
+            return
+        key = self.operator_artifact.compatibility_key
+        actual_phase = (
+            "decode_step" if node.phase.value == "decode" else node.phase.value
+        )
+        actual = {
+            "model_spec_name": model.name,
+            "operator": node.op,
+            "phase": actual_phase,
+            "layer_id": node.layer_id,
+            "q_len": int(node.attributes.get("q_len", 1)),
+            "kv_length": int(node.attributes.get("attention_kv_len", 1)),
+            "dtype": model.dtype,
+        }
+        actual.update(self.contract_overrides)
+        expected = key.to_dict()
+        mismatches = {
+            field: (expected[field], value)
+            for field, value in actual.items()
+            if expected[field] != value
+        }
+        if mismatches:
+            raise OperatorEventError(
+                f"shape-locked operator artifact mismatch for {node.node_id}: "
+                f"{mismatches}"
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -101,6 +168,9 @@ class OperatorEventDispatcher:
         self._atlas_bindings: list[AtlasArtifactBinding] = []
         self._used_traces: dict[str, dict[str, object]] = {}
         self._used_atlas_artifacts: dict[str, dict[str, object]] = {}
+        self._require_request_cycle_ready = False
+        self._runtime_bindings: dict[str, tuple[SimulationBufferBinding, ...]] = {}
+        self._runtime_binding_records: dict[str, dict[str, object]] = {}
         self._prepare_gpu_backend()
         self._prepare_atlas_backend()
 
@@ -126,13 +196,23 @@ class OperatorEventDispatcher:
                 "and cannot be used by the single-placement operator-event dispatcher"
             )
         self._accel_sim = AccelSimBackend(backend_config)
+        self._require_request_cycle_ready = bool(
+            gpu.get("require_request_cycle_ready", False)
+        )
         raw_bindings = gpu.get("trace_bindings")
         if not isinstance(raw_bindings, list) or not raw_bindings:
             raise OperatorEventError("accel_sim GPU backend requires trace_bindings")
         for index, raw in enumerate(raw_bindings):
             if not isinstance(raw, Mapping):
                 raise OperatorEventError(f"trace_bindings[{index}] must be an object")
-            allowed = {"selector", "trace_manifest", "compatibility"}
+            allowed = {
+                "selector",
+                "trace_manifest",
+                "operator_artifact",
+                "compatibility",
+                "value_bindings",
+                "contract_overrides",
+            }
             unknown = set(raw) - allowed
             if unknown:
                 raise OperatorEventError(
@@ -153,19 +233,137 @@ class OperatorEventDispatcher:
             }
             if set(selector) - allowed_selector:
                 raise OperatorEventError(
-                    f"unknown trace selector fields: {sorted(set(selector) - allowed_selector)}"
+                    "unknown trace selector fields: "
+                    f"{sorted(set(selector) - allowed_selector)}"
                 )
             compatibility = str(raw.get("compatibility", "exact_operator"))
             if compatibility not in {"exact_operator", "surrogate_plumbing_probe"}:
                 raise OperatorEventError(
                     f"invalid trace binding compatibility: {compatibility}"
                 )
+            raw_contract_overrides = raw.get("contract_overrides", {})
+            if not isinstance(raw_contract_overrides, Mapping):
+                raise OperatorEventError("contract_overrides must be an object")
+            allowed_contract_overrides = {"layer_id"}
+            unknown_contract_overrides = (
+                set(raw_contract_overrides) - allowed_contract_overrides
+            )
+            if unknown_contract_overrides:
+                raise OperatorEventError(
+                    "unknown contract override fields: "
+                    f"{sorted(unknown_contract_overrides)}"
+                )
+            if "layer_id" in raw_contract_overrides:
+                layer_id_override = raw_contract_overrides["layer_id"]
+                if (
+                    not isinstance(layer_id_override, int)
+                    or isinstance(layer_id_override, bool)
+                    or layer_id_override < 0
+                ):
+                    raise OperatorEventError(
+                        "contract_overrides.layer_id must be an unsigned integer"
+                    )
             manifest_path = _resolve_path(raw.get("trace_manifest"), self.project_root)
+            trace_manifest = TraceManifest.load(manifest_path)
+            artifact_value = raw.get("operator_artifact")
+            operator_artifact = (
+                OperatorArtifactManifest.load(
+                    _resolve_path(artifact_value, self.project_root)
+                )
+                if artifact_value is not None
+                else None
+            )
+            if operator_artifact is not None:
+                artifact_backend = operator_artifact.payload["backend"]
+                assert isinstance(artifact_backend, Mapping)
+                if artifact_backend.get("kind") != "accel_sim":
+                    raise OperatorEventError(
+                        "GPU trace binding operator_artifact must use accel_sim"
+                    )
+                if not (
+                    operator_artifact.artifact_id == trace_manifest.trace_id
+                    or operator_artifact.artifact_id.startswith(
+                        trace_manifest.trace_id + "."
+                    )
+                ):
+                    raise OperatorEventError(
+                        "operator_artifact artifact_id must equal or be a qualified "
+                        "derivative of trace_manifest trace_id"
+                    )
+                if self._require_request_cycle_ready:
+                    execution = operator_artifact.payload["execution_contract"]
+                    address = operator_artifact.payload["address_contract"]
+                    qualification = operator_artifact.payload["qualification"]
+                    assert isinstance(execution, Mapping)
+                    assert isinstance(address, Mapping)
+                    assert isinstance(qualification, Mapping)
+                    if not operator_artifact.request_cycle_ready:
+                        raise OperatorEventError(
+                            "request-cycle timeline rejects non-ready operator artifact"
+                        )
+                    if address.get("virtual_memory_mode") != "range_rebase":
+                        raise OperatorEventError(
+                            "request-cycle timeline requires range_rebase address mode"
+                        )
+                    if qualification.get("performance_eligible") is not False:
+                        raise OperatorEventError(
+                            "request-cycle integration remains performance-ineligible"
+                        )
+            raw_value_bindings = raw.get("value_bindings", [])
+            if not isinstance(raw_value_bindings, list):
+                raise OperatorEventError("value_bindings must be an array")
+            value_bindings: list[TensorValueBinding] = []
+            for value_index, value_raw in enumerate(raw_value_bindings):
+                if not isinstance(value_raw, Mapping):
+                    raise OperatorEventError(
+                        f"value_bindings[{value_index}] must be an object"
+                    )
+                required = {"tensor_id", "source", "index", "value_offset_bytes"}
+                if set(value_raw) != required:
+                    raise OperatorEventError(
+                        f"value_bindings[{value_index}] fields must be "
+                        f"{sorted(required)}"
+                    )
+                source = str(value_raw["source"])
+                index_value = value_raw["index"]
+                offset_value = value_raw["value_offset_bytes"]
+                if source not in {"input", "output"}:
+                    raise OperatorEventError(
+                        "value binding source must be input or output"
+                    )
+                if (
+                    not isinstance(index_value, int)
+                    or isinstance(index_value, bool)
+                    or index_value < 0
+                    or not isinstance(offset_value, int)
+                    or isinstance(offset_value, bool)
+                    or offset_value < 0
+                ):
+                    raise OperatorEventError(
+                        "value binding index and offset must be unsigned integers"
+                    )
+                value_bindings.append(
+                    TensorValueBinding(
+                        tensor_id=str(value_raw["tensor_id"]),
+                        source=source,
+                        index=index_value,
+                        value_offset_bytes=offset_value,
+                    )
+                )
+            if self._require_request_cycle_ready and not value_bindings:
+                raise OperatorEventError(
+                    "request-cycle trace binding requires explicit value_bindings"
+                )
+            if len({item.tensor_id for item in value_bindings}) != len(value_bindings):
+                raise OperatorEventError("value_bindings contain duplicate tensor IDs")
             self._trace_bindings.append(
                 TraceBinding(
                     selector=dict(selector),
-                    manifest=TraceManifest.load(manifest_path),
+                    manifest=trace_manifest,
                     compatibility=compatibility,
+                    operator_artifact=operator_artifact,
+                    value_bindings=tuple(value_bindings),
+                    contract_overrides=dict(raw_contract_overrides),
                 )
             )
         resources = gpu.get("resource_bindings")
@@ -174,7 +372,9 @@ class OperatorEventDispatcher:
                 "accel_sim GPU backend requires explicit resource_bindings"
             )
         requested_mode = str(gpu.get("requested_timing_mode", "total"))
-        replay_safe = all(binding.manifest.replay_safe for binding in self._trace_bindings)
+        replay_safe = all(
+            binding.manifest.replay_safe for binding in self._trace_bindings
+        )
         self._gpu_contract = resolve_timing_contract(
             self._accel_sim.descriptor(),
             requested_mode,
@@ -183,6 +383,182 @@ class OperatorEventDispatcher:
             replay_safe=replay_safe,
         )
         self.ownership.register(self._gpu_contract)
+
+    @property
+    def requires_global_pa_bindings(self) -> bool:
+        return self._require_request_cycle_ready
+
+    def configure_global_pa_bindings(
+        self,
+        allocations: Mapping[str, GlobalAllocation],
+        dispatch_specs: Mapping[str, object],
+        global_memory_map: dict[str, object],
+        *,
+        capacity_bytes: int,
+        alignment_bytes: int,
+    ) -> None:
+        """Bind graph Values and private workspaces before any Backend launch."""
+
+        if not self._require_request_cycle_ready:
+            return
+        memory_space_id = str(global_memory_map["memory_space_id"])
+        cursor = _align_up(int(global_memory_map["allocated_bytes"]), alignment_bytes)
+        reserved_extents = _reserved_allocation_extents(allocations, capacity_bytes)
+        workspace_ranges: list[dict[str, object]] = []
+        binding_records: list[dict[str, object]] = []
+        for task_id, spec in sorted(dispatch_specs.items()):
+            node = spec.node
+            model = spec.model
+            binding = self._matching_trace(node, model)
+            if binding is None:
+                continue
+            if not binding.value_bindings:
+                raise OperatorEventError(
+                    f"request-cycle task {task_id} has no graph Value bindings"
+                )
+            inputs = tuple(spec.input_values)
+            outputs = tuple(spec.output_values)
+            extents: dict[str, int] = {}
+            alignments: dict[str, int] = {}
+            for item in binding.manifest.address_ranges:
+                extents[item.tensor_id] = max(
+                    extents.get(item.tensor_id, 0),
+                    item.tensor_offset_bytes + item.size_bytes,
+                )
+                alignments[item.tensor_id] = max(
+                    alignments.get(item.tensor_id, 1), item.alignment_bytes
+                )
+            runtime: list[SimulationBufferBinding] = []
+            mapped_ids: set[str] = set()
+            semantic_records: list[dict[str, object]] = []
+            for value_binding in binding.value_bindings:
+                if value_binding.tensor_id not in extents:
+                    raise OperatorEventError(
+                        f"unknown manifest tensor {value_binding.tensor_id} "
+                        f"for {task_id}"
+                    )
+                values = inputs if value_binding.source == "input" else outputs
+                if value_binding.index >= len(values):
+                    raise OperatorEventError(
+                        f"value binding index escapes {value_binding.source}s "
+                        f"for {task_id}"
+                    )
+                value = values[value_binding.index]
+                if not isinstance(value, Mapping):
+                    raise OperatorEventError("dispatch Value must be an object")
+                value_id = str(value["value_id"])
+                allocation = allocations.get(value_id)
+                extent = extents[value_binding.tensor_id]
+                if allocation is None or (
+                    value_binding.value_offset_bytes + extent
+                    > reserved_extents.get(value_id, 0)
+                ):
+                    raise OperatorEventError(
+                        f"Global PA allocation cannot cover {value_binding.tensor_id}"
+                    )
+                physical = allocation.base_address + value_binding.value_offset_bytes
+                runtime.append(
+                    SimulationBufferBinding(
+                        tensor_id=value_binding.tensor_id,
+                        tensor_offset_bytes=0,
+                        size_bytes=extent,
+                        memory_space_id=memory_space_id,
+                        physical_offset_bytes=physical,
+                    )
+                )
+                mapped_ids.add(value_binding.tensor_id)
+                semantic_records.append(
+                    {
+                        "tensor_id": value_binding.tensor_id,
+                        "value_id": value_id,
+                        "value_version": int(value["version"]),
+                        "source": value_binding.source,
+                        "value_index": value_binding.index,
+                        "value_offset_bytes": value_binding.value_offset_bytes,
+                        "global_pa_base": physical,
+                        "size_bytes": extent,
+                        "logical_value_size_bytes": allocation.size_bytes,
+                    }
+                )
+            private_records: list[dict[str, object]] = []
+            for tensor_id in sorted(set(extents) - mapped_ids):
+                alignment = max(alignment_bytes, alignments[tensor_id])
+                cursor = _align_up(cursor, alignment)
+                extent = extents[tensor_id]
+                if cursor + extent > capacity_bytes:
+                    raise OperatorEventError(
+                        "Global PA workspace capacity exceeded by "
+                        f"{task_id}:{tensor_id}"
+                    )
+                runtime.append(
+                    SimulationBufferBinding(
+                        tensor_id=tensor_id,
+                        tensor_offset_bytes=0,
+                        size_bytes=extent,
+                        memory_space_id=memory_space_id,
+                        physical_offset_bytes=cursor,
+                    )
+                )
+                record = {
+                    "value_id": f"workspace:{task_id}:{tensor_id}",
+                    "memory_space_id": memory_space_id,
+                    "base_address": cursor,
+                    "end_address_exclusive": cursor + extent,
+                    "size_bytes": extent,
+                    "alignment_bytes": alignment,
+                    "storage_class": "operator_workspace",
+                    "dtype": "opaque",
+                }
+                workspace_ranges.append(record)
+                private_records.append(
+                    {
+                        "tensor_id": tensor_id,
+                        "global_pa_base": cursor,
+                        "size_bytes": extent,
+                    }
+                )
+                cursor += extent
+            ordered = tuple(
+                sorted(runtime, key=lambda item: item.physical_offset_bytes)
+            )
+            for left, right in zip(ordered, ordered[1:]):
+                if left.physical_end > right.physical_offset_bytes:
+                    raise OperatorEventError(
+                        f"runtime Global PA overlap for {task_id}: "
+                        f"{left.tensor_id} and {right.tensor_id}"
+                    )
+            self._runtime_bindings[task_id] = ordered
+            record = {
+                "task_id": task_id,
+                "trace_id": binding.manifest.trace_id,
+                "operator_artifact_id": binding.operator_artifact.artifact_id
+                if binding.operator_artifact
+                else None,
+                "request_cycle_ready": True,
+                "contract_overrides": dict(binding.contract_overrides),
+                "semantic_bindings": semantic_records,
+                "private_bindings": private_records,
+            }
+            self._runtime_binding_records[task_id] = record
+            binding_records.append(record)
+        if not self._runtime_bindings:
+            raise OperatorEventError(
+                "no request-cycle-ready trace was bound to Global PA"
+            )
+        ranges = global_memory_map.get("ranges")
+        if not isinstance(ranges, list):
+            raise OperatorEventError("global memory map ranges must be an array")
+        ranges.extend(workspace_ranges)
+        ranges.sort(key=lambda item: int(item["base_address"]))
+        global_memory_map.update(
+            {
+                "address_semantics": "allocated_global_pa_range_rebased",
+                "allocated_bytes": cursor,
+                "allocation_count": len(ranges),
+                "operator_workspace_count": len(workspace_ranges),
+                "request_cycle_bindings": binding_records,
+            }
+        )
 
     def _prepare_atlas_backend(self) -> None:
         atlas = self._backend_config("atlas")
@@ -199,7 +575,9 @@ class OperatorEventDispatcher:
             raise OperatorEventError("atlasim backend requires artifact_bindings")
         for index, raw in enumerate(raw_bindings):
             if not isinstance(raw, Mapping):
-                raise OperatorEventError(f"artifact_bindings[{index}] must be an object")
+                raise OperatorEventError(
+                    f"artifact_bindings[{index}] must be an object"
+                )
             allowed = {
                 "selector",
                 "chip_config",
@@ -238,7 +616,9 @@ class OperatorEventDispatcher:
             self._atlas_bindings.append(
                 AtlasArtifactBinding(
                     selector=dict(selector),
-                    chip_config=_resolve_path(raw.get("chip_config"), self.project_root),
+                    chip_config=_resolve_path(
+                        raw.get("chip_config"), self.project_root
+                    ),
                     artifact=AtlasArtifact(
                         operator_list=_resolve_path(
                             raw.get("operator_list"), self.project_root
@@ -264,17 +644,19 @@ class OperatorEventDispatcher:
         )
         self.ownership.register(self._atlas_contract)
 
-    def _matching_trace(self, node: ModelNode) -> TraceBinding | None:
+    def _matching_trace(self, node: ModelNode, model: ModelSpec) -> TraceBinding | None:
         matches = [binding for binding in self._trace_bindings if binding.matches(node)]
         if len(matches) > 1:
             raise OperatorEventError(
-                f"multiple GPU traces match node {node.node_id}; selectors must be unique"
+                f"multiple GPU traces match node {node.node_id}; "
+                "selectors must be unique"
             )
-        return matches[0] if matches else None
+        if not matches:
+            return None
+        matches[0].validate_exact_contract(node, model)
+        return matches[0]
 
-    def _matching_atlas_artifact(
-        self, node: ModelNode
-    ) -> AtlasArtifactBinding | None:
+    def _matching_atlas_artifact(self, node: ModelNode) -> AtlasArtifactBinding | None:
         matches = [binding for binding in self._atlas_bindings if binding.matches(node)]
         if len(matches) > 1:
             raise OperatorEventError(
@@ -322,7 +704,10 @@ class OperatorEventDispatcher:
             timing_contract=contract,
             fidelity=fidelity,
             statistics={"analytical_cost": cost.to_dict()},
-            artifact={"kind": "analytical", "parameter_source": backend.get("parameter_source")},
+            artifact={
+                "kind": "analytical",
+                "parameter_source": backend.get("parameter_source"),
+            },
         )
 
     def _run_accel_sim(
@@ -330,9 +715,19 @@ class OperatorEventDispatcher:
         binding: TraceBinding,
         node: ModelNode,
         device_id: str,
+        task_id: str | None = None,
     ) -> BackendTaskResult:
         assert self._accel_sim is not None and self._gpu_contract is not None
-        simulation_key = self._accel_sim.simulation_key(binding.manifest)
+        simulation_bindings = (
+            self._runtime_bindings.get(task_id) if task_id is not None else None
+        )
+        if self._require_request_cycle_ready and simulation_bindings is None:
+            raise OperatorEventError(
+                f"request-cycle task {task_id or node.node_id} lacks runtime Global PA"
+            )
+        simulation_key = self._accel_sim.simulation_key(
+            binding.manifest, simulation_bindings
+        )
         output = self.output_root / "gpu" / simulation_key
         stats_path = output / "stats.json"
         cache_hit = stats_path.is_file()
@@ -343,7 +738,7 @@ class OperatorEventDispatcher:
             duration_fs = int(stats["duration_fs"])
             external_memory_stats = stats.get("external_memory_stats")
         else:
-            result = self._accel_sim.run(binding.manifest, output)
+            result = self._accel_sim.run(binding.manifest, output, simulation_bindings)
             cycles = result.cycles
             instructions = result.instructions
             duration_fs = result.duration_fs
@@ -366,6 +761,19 @@ class OperatorEventDispatcher:
         assert isinstance(task_ids, list)
         task_ids.append(node.node_id)
         exact = binding.compatibility == "exact_operator"
+        address_binding_path = output / "online_address_binding.json"
+        address_binding = (
+            json.loads(address_binding_path.read_text(encoding="utf-8"))
+            if address_binding_path.is_file()
+            else None
+        )
+        qualified_performance = exact
+        if binding.operator_artifact is not None:
+            qualification = binding.operator_artifact.payload["qualification"]
+            assert isinstance(qualification, Mapping)
+            qualified_performance = bool(
+                qualification.get("performance_eligible", False)
+            )
         return BackendTaskResult(
             backend_id=self._accel_sim.config.backend_id,
             duration_fs=duration_fs,
@@ -382,7 +790,7 @@ class OperatorEventDispatcher:
                 "scheduler_fidelity": "event_modeled",
                 "extrapolated_fraction": 0.0 if exact else 1.0,
                 "trace_coverage": 1.0,
-                "performance_eligible": exact,
+                "performance_eligible": qualified_performance,
             },
             statistics={
                 "cycles": cycles,
@@ -390,6 +798,7 @@ class OperatorEventDispatcher:
                 "duration_fs": duration_fs,
                 "cache_hit": cache_hit,
                 "external_memory_stats": external_memory_stats,
+                "runtime_global_pa_binding": address_binding,
             },
             artifact={
                 "kind": "accel_sim_trace",
@@ -398,6 +807,12 @@ class OperatorEventDispatcher:
                 "simulation_key": simulation_key,
                 "compatibility": binding.compatibility,
                 "output_directory": str(output),
+                "operator_artifact_id": binding.operator_artifact.artifact_id
+                if binding.operator_artifact
+                else None,
+                "request_cycle_ready": binding.operator_artifact.request_cycle_ready
+                if binding.operator_artifact
+                else False,
             },
         )
 
@@ -421,9 +836,7 @@ class OperatorEventDispatcher:
             energy_j = float(normalized["energy_j"])
             native_stats = normalized.get("native_stats", {})
         else:
-            result = self._atlas.run(
-                binding.chip_config, binding.artifact, output
-            )
+            result = self._atlas.run(binding.chip_config, binding.artifact, output)
             cycles = result.cycles
             duration_fs = result.duration_fs
             energy_j = result.energy_j
@@ -494,17 +907,19 @@ class OperatorEventDispatcher:
         node: ModelNode,
         model: ModelSpec,
         device_id: str,
+        task_id: str | None = None,
     ) -> BackendTaskResult:
         backend = self._backend_config(backend_key)
         kind = str(backend.get("kind"))
         if backend_key == "gpu" and kind == "accel_sim":
-            binding = self._matching_trace(node)
+            binding = self._matching_trace(node, model)
             if binding is not None:
-                return self._run_accel_sim(binding, node, device_id)
+                return self._run_accel_sim(binding, node, device_id, task_id)
             fallback = backend.get("fallback_kind", "none")
             if fallback != "analytical":
                 raise OperatorEventError(
-                    f"GPU node {node.node_id} has no matching trace and no analytical fallback"
+                    f"GPU node {node.node_id} has no matching trace and no "
+                    "analytical fallback"
                 )
             return self._analytical(
                 backend_key,
@@ -558,4 +973,6 @@ class OperatorEventDispatcher:
             "atlas_timing_contract": self._atlas_contract.to_dict()
             if self._atlas_contract
             else None,
+            "request_cycle_ready_required": self._require_request_cycle_ready,
+            "runtime_global_pa_bindings": list(self._runtime_binding_records.values()),
         }

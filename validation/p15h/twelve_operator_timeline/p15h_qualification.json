@@ -1,0 +1,187 @@
+{
+  "claim_boundary": "twelve real request-cycle GPU operators share one logical Prefill timeline; runtime/control operators remain analytical",
+  "dependency_causality": {
+    "all_dependencies_complete_before_start": true
+  },
+  "global_pa_causality": {
+    "all_semantic_bindings_derive_from_graph_value_pa": true,
+    "range_count": 84,
+    "request_binding_count": 12,
+    "semantic_binding_count": 38
+  },
+  "performance_eligible": false,
+  "ready_operator_count": 12,
+  "ready_timeline": [
+    {
+      "completion_time_fs": 58881625445,
+      "operator": "attention_norm",
+      "start_time_fs": 3,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention"
+    },
+    {
+      "completion_time_fs": 1981901060074,
+      "operator": "qkv_projection",
+      "start_time_fs": 58881625445,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection"
+    },
+    {
+      "completion_time_fs": 2101873674915,
+      "operator": "rope",
+      "start_time_fs": 1981901060074,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope"
+    },
+    {
+      "completion_time_fs": 2140606528021,
+      "operator": "causal_attention",
+      "start_time_fs": 2102202817773,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core"
+    },
+    {
+      "completion_time_fs": 3685737270071,
+      "operator": "output_projection",
+      "start_time_fs": 2140606528021,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output"
+    },
+    {
+      "completion_time_fs": 3744909700158,
+      "operator": "mlp_norm",
+      "start_time_fs": 3686029841500,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm"
+    },
+    {
+      "completion_time_fs": 11091832845035,
+      "operator": "gate_up_projection",
+      "start_time_fs": 3744909700158,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up"
+    },
+    {
+      "completion_time_fs": 11158508640089,
+      "operator": "silu_multiply",
+      "start_time_fs": 11091832845035,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation"
+    },
+    {
+      "completion_time_fs": 14834801042916,
+      "operator": "down_projection",
+      "start_time_fs": 11158508640089,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down"
+    },
+    {
+      "completion_time_fs": 14878864815759,
+      "operator": "final_norm",
+      "start_time_fs": 14835093614345,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm"
+    },
+    {
+      "completion_time_fs": 35373491140848,
+      "operator": "lm_head",
+      "start_time_fs": 14878864815759,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head"
+    },
+    {
+      "completion_time_fs": 35390378066644,
+      "operator": "sampling",
+      "start_time_fs": 35373491140848,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling"
+    }
+  ],
+  "request_completion": {
+    "attention_norm": {
+      "children": 2176,
+      "cycles": 66654,
+      "outstanding": 0,
+      "parents": 2176,
+      "translated": 40970
+    },
+    "causal_attention": {
+      "children": 2560,
+      "cycles": 43473,
+      "outstanding": 0,
+      "parents": 2560,
+      "translated": 16448
+    },
+    "down_projection": {
+      "children": 727488,
+      "cycles": 4161563,
+      "outstanding": 0,
+      "parents": 727488,
+      "translated": 933888
+    },
+    "final_norm": {
+      "children": 257,
+      "cycles": 49549,
+      "outstanding": 0,
+      "parents": 257,
+      "translated": 2617
+    },
+    "gate_up_projection": {
+      "children": 1465792,
+      "cycles": 8316717,
+      "outstanding": 0,
+      "parents": 1463410,
+      "translated": 2004992
+    },
+    "lm_head": {
+      "children": 4097609,
+      "cycles": 23199917,
+      "outstanding": 0,
+      "parents": 4097155,
+      "translated": 800060777
+    },
+    "mlp_norm": {
+      "children": 2176,
+      "cycles": 66652,
+      "outstanding": 0,
+      "parents": 2176,
+      "translated": 40976
+    },
+    "output_projection": {
+      "children": 307840,
+      "cycles": 1749088,
+      "outstanding": 0,
+      "parents": 307840,
+      "translated": 609152
+    },
+    "qkv_projection": {
+      "children": 376572,
+      "cycles": 2176858,
+      "outstanding": 0,
+      "parents": 376535,
+      "translated": 736837
+    },
+    "rope": {
+      "children": 2312,
+      "cycles": 135809,
+      "outstanding": 0,
+      "parents": 2312,
+      "translated": 30764
+    },
+    "sampling": {
+      "children": 2000,
+      "cycles": 19116,
+      "outstanding": 0,
+      "parents": 2000,
+      "translated": 2001
+    },
+    "silu_multiply": {
+      "children": 11264,
+      "cycles": 75477,
+      "outstanding": 0,
+      "parents": 11264,
+      "translated": 33459
+    }
+  },
+  "resource_causality": {
+    "all_gpu_tasks_non_overlapping": true,
+    "resource_id": "gpu0"
+  },
+  "run_dir": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\validation\\p15h\\twelve_operator_timeline",
+  "schema_version": "hetero-p15h-prefill-timeline-qualification/v1",
+  "simulator_revision": "8c58dbb1a2209829198451cbfd8fb6c95c16c53c-dirty",
+  "status": "passed",
+  "version_causality": {
+    "commit_count": 18,
+    "ready_operator_commits_at_completion": true,
+    "ready_operator_inputs_validated": true
+  }
+}

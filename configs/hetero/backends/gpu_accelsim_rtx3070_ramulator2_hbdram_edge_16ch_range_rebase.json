@@ -1,0 +1,73 @@
+{
+  "schema_version": "hetero-accel-sim-backend/v1",
+  "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+  "executable": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-ramulator2/gpu-simulator/build-ramulator2/accel-sim.out",
+  "gpgpu_config": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-ramulator2/gpu-simulator/gpgpu-sim/configs/tested-cfgs/SM86_RTX3070/gpgpusim.config",
+  "trace_config": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/backends/rtx3070_ramulator2.trace.config",
+  "target_gpu": "RTX 3070 SM86 compute complex with range-rebased ATLAS-style 3D-DRAM",
+  "target_sm": 86,
+  "core_frequency_hz": 1132000000,
+  "timeout_seconds": 43200,
+  "dependency_commits": {
+    "accel_sim_framework": "64653015f85fb5664c84a10f48527e8897d289d0",
+    "gpgpu_sim_distribution": "e10018b67a4b668e7b43f89280cf67624f1df4ff",
+    "ramulator2": "3996362187d7f8314936e5ad7560d93b66b6a215"
+  },
+  "environment": {},
+  "external_memory": {
+    "kind": "ramulator2_in_process",
+    "config_file": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/memory/ramulator2_hbdram_edge_16ch_shared.yaml",
+    "bridge_library": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-ramulator2/ramulator2_bridge/libramulator_gpgpusim_bridge.so",
+    "timing_owner": "shared3d.ramulator2",
+    "expected_instances": 1,
+    "require_nonzero_requests": true,
+    "address_translation": {
+      "mode": "range_rebase_packed_manifest",
+      "memory_space_id": "shared0.dram3d",
+      "physical_base_bytes": 0,
+      "capacity_bytes": 4294967296,
+      "alignment_bytes": 256,
+      "require_nonzero_translations": true
+    },
+    "bandwidth_contract": {
+      "schema_version": "hetero-bandwidth-contract/v1",
+      "external_link": {
+        "protocol": "direct_memory_phy",
+        "request_payload_bandwidth_Bps": 12800000000,
+        "response_payload_bandwidth_Bps": 12800000000,
+        "request_header_bytes": 16,
+        "response_header_bytes": 16,
+        "flit_bytes": 32,
+        "propagation_latency_fs": 10000000,
+        "queue_depth_transactions": 64,
+        "credits": 64,
+        "duplex_mode": "full_duplex",
+        "clock_hz": 400000000
+      },
+      "logic_die_gateway": {
+        "clock_hz": 400000000,
+        "ingress_queue_depth": 128,
+        "parent_table_entries": 256,
+        "split_width_per_cycle": 4,
+        "issue_width_per_cycle": 4,
+        "completion_width_per_cycle": 4,
+        "ordering_policy": "ordering_domain_fifo",
+        "write_ack_policy": "durable"
+      },
+      "internal_dram": {
+        "implementation": "HBDRAM",
+        "channel_count": 16,
+        "pseudochannels_per_channel": 1,
+        "dq_bits_per_channel": 512,
+        "channel_width_bits": 512,
+        "transfers_per_clock": 1,
+        "rate_MTps": 400,
+        "nBL_cycles": 1,
+        "tCK_ps": 2500,
+        "internal_prefetch_size": 1,
+        "transaction_bytes": 64,
+        "peak_payload_bandwidth_Bps": 409600000000
+      }
+    }
+  }
+}

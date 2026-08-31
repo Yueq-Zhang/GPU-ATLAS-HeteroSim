@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping, Sequence
+from typing import Iterator, Mapping, Sequence
 
 
 class GlobalMemoryMapError(ValueError):
@@ -142,12 +142,39 @@ def sampled_requests_for_values(
     operation: str,
     transaction_bytes: int,
     max_samples_per_value: int,
+    *,
+    full_traffic: bool = False,
 ) -> list[dict[str, object]]:
+    return list(
+        iter_requests_for_values(
+            task_id,
+            device_id,
+            values,
+            allocations,
+            operation,
+            transaction_bytes,
+            max_samples_per_value,
+            full_traffic=full_traffic,
+        )
+    )
+
+
+def iter_requests_for_values(
+    task_id: str,
+    device_id: str,
+    values: Sequence[Mapping[str, object]],
+    allocations: Mapping[str, GlobalAllocation],
+    operation: str,
+    transaction_bytes: int,
+    max_samples_per_value: int,
+    *,
+    full_traffic: bool = False,
+) -> Iterator[dict[str, object]]:
+    """Yield request records lazily, including full-value traffic."""
     if operation not in {"read", "write"}:
         raise GlobalMemoryMapError("sample operation must be read or write")
     if transaction_bytes <= 0 or max_samples_per_value <= 0:
         raise GlobalMemoryMapError("sample geometry must be positive")
-    requests: list[dict[str, object]] = []
     for raw in values:
         value_id = str(raw["value_id"])
         version = int(raw["version"])
@@ -156,37 +183,51 @@ def sampled_requests_for_values(
         if allocation is None or logical_size > allocation.size_bytes:
             raise GlobalMemoryMapError(f"missing Global-PA range for {value_id}")
         available_transactions = max(1, _align_up(logical_size, transaction_bytes) // transaction_bytes)
-        sample_count = min(max_samples_per_value, available_transactions)
-        indices = (
-            [0]
-            if sample_count == 1
-            else [
-                (index * (available_transactions - 1)) // (sample_count - 1)
-                for index in range(sample_count)
-            ]
+        sample_count = (
+            available_transactions
+            if full_traffic
+            else min(max_samples_per_value, available_transactions)
         )
-        unique_indices = list(dict.fromkeys(indices))
-        base_share, remainder = divmod(logical_size, len(unique_indices))
-        for sample_index, transaction_index in enumerate(unique_indices):
+        indices = (
+            range(available_transactions)
+            if full_traffic
+            else (
+                [0]
+                if sample_count == 1
+                else [
+                    (index * (available_transactions - 1)) // (sample_count - 1)
+                    for index in range(sample_count)
+                ]
+            )
+        )
+        if full_traffic:
+            request_indices = indices
+            request_count = available_transactions
+        else:
+            request_indices = tuple(dict.fromkeys(indices))
+            request_count = len(request_indices)
+        base_share, remainder = divmod(logical_size, request_count)
+        for sample_index, transaction_index in enumerate(request_indices):
             offset = transaction_index * transaction_bytes
             address = allocation.base_address + offset
-            actual_bytes = min(transaction_bytes, allocation.end_address_exclusive - address)
+            actual_bytes = min(transaction_bytes, logical_size - offset)
             if actual_bytes <= 0:
                 raise GlobalMemoryMapError(f"sample escaped allocation {value_id}")
-            requests.append(
-                {
-                    "task_id": task_id,
-                    "device_id": device_id,
-                    "value_id": value_id,
-                    "version": version,
-                    "operation": operation,
-                    "global_address": address,
-                    "size_bytes": actual_bytes,
-                    "represented_bytes": base_share
-                    + (1 if sample_index < remainder else 0),
-                    "sample_index": sample_index,
-                    "sample_count": len(unique_indices),
-                    "logical_value_bytes": logical_size,
-                }
-            )
-    return requests
+            yield {
+                "task_id": task_id,
+                "device_id": device_id,
+                "value_id": value_id,
+                "version": version,
+                "operation": operation,
+                "global_address": address,
+                "size_bytes": actual_bytes,
+                "represented_bytes": (
+                    actual_bytes
+                    if full_traffic
+                    else base_share + (1 if sample_index < remainder else 0)
+                ),
+                "sample_index": sample_index,
+                "sample_count": request_count,
+                "logical_value_bytes": logical_size,
+                "traffic_mode": "full" if full_traffic else "sampled",
+            }

@@ -1,0 +1,27 @@
+{
+  "fidelity": {
+    "artifact_coverage": 0.0,
+    "compute_fidelity": "mixed",
+    "extrapolated_fraction": 0.4,
+    "link_fidelity": "not_applicable",
+    "memory_fidelity": "mixed",
+    "scheduler_fidelity": "event_modeled",
+    "trace_coverage": 0.6
+  },
+  "makespan_fs": 35390378066646,
+  "performance_claim_allowed": false,
+  "requests": [
+    {
+      "e2e_user_fs": 35390378066644,
+      "final_committed_kv_len": 16,
+      "generated_length": 1,
+      "itl_fs": [],
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "retire_latency_fs": 35390378066646,
+      "tpot_fs": null,
+      "ttft_fs": 35390378066644
+    }
+  ],
+  "run_status": "operator_event",
+  "schema_version": "hetero-metrics/v1"
+}

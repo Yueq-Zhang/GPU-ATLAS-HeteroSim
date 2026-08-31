@@ -1,0 +1,12 @@
+{
+  "schema_version": "hetero-operator-artifact-catalog/v1",
+  "required_operators": [
+    "attention_norm",
+    "qkv_projection"
+  ],
+  "zero_fallback_required": true,
+  "artifacts": [
+    "../p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_shared_hbdram_range_rebase.json",
+    "tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_shared_hbdram_range_rebase.json"
+  ]
+}

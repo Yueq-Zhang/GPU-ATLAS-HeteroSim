@@ -8,6 +8,7 @@ import pytest
 from frontend.hetero.backends.accel_sim import (
     AccelSimBackend,
     AccelSimBackendConfig,
+    AccelSimBackendError,
     parse_atlas_full_chip_runtime_stats,
     parse_accel_sim_stats,
     parse_ramulator2_stats,
@@ -66,7 +67,9 @@ def test_checked_in_backend_configs_pin_accel_sim_v2() -> None:
         "gpu_accelsim_qv100.json",
         "gpu_accelsim_rtx3070.json",
         "gpu_accelsim_qv100_ramulator2_hbm3.json",
+        "gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
         "gpu_accelsim_rtx3070_full_atlas_chip_shared_hbdram_edge_16ch.json",
+        "gpu_accelsim_rtx3070_full_atlas_chip_shared_hbdram_edge_16ch_range_rebase.json",
     ):
         payload = json.loads(
             (repository / "configs" / "hetero" / "backends" / filename).read_text(
@@ -211,6 +214,41 @@ def test_external_memory_descriptor_is_cycle_coupled(tmp_path) -> None:
     assert "gpu_local_dram" not in descriptor.ownable_resource_kinds
 
 
+def test_external_memory_address_translation_enters_simulation_key(
+    tmp_path,
+) -> None:
+    config_path, manifest = _files(tmp_path)
+    payload = json.loads(config_path.read_text(encoding="utf-8"))
+    for filename in ("hbm3.yaml", "bridge.so"):
+        (tmp_path / filename).write_text("test\n", encoding="utf-8")
+    external = {
+        "kind": "ramulator2_in_process",
+        "config_file": "hbm3.yaml",
+        "bridge_library": "bridge.so",
+        "timing_owner": "shared3d.ramulator2",
+        "expected_instances": 1,
+        "require_nonzero_requests": True,
+        "bandwidth_contract": _valid_bandwidth_contract(),
+    }
+    payload["external_memory"] = external
+    config_path.write_text(json.dumps(payload), encoding="utf-8")
+    identity = AccelSimBackend(AccelSimBackendConfig.load(config_path))
+    identity_key = identity.simulation_key(manifest)
+    external["address_translation"] = {
+        "mode": "range_rebase_packed_manifest",
+        "memory_space_id": "shared0.dram3d",
+        "physical_base_bytes": 0,
+        "capacity_bytes": 4096,
+        "alignment_bytes": 64,
+        "require_nonzero_translations": True,
+    }
+    config_path.write_text(json.dumps(payload), encoding="utf-8")
+    translated = AccelSimBackend(AccelSimBackendConfig.load(config_path))
+    assert translated.simulation_key(manifest) != identity_key
+    assert translated.config.external_memory is not None
+    assert translated.config.external_memory.address_translation is not None
+
+
 def test_co_resident_atlas_requires_external_memory_and_owns_logic_die(
     tmp_path,
 ) -> None:
@@ -283,3 +321,111 @@ def test_qualification_requires_exact_native_adapter_match(tmp_path) -> None:
         (tmp_path / "qualification" / "adapter" / "stats.json").read_text()
     )
     assert stats["duration_fs"] == math.ceil(1132 * 10**15 / 1_132_000_000)
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX test executable")
+def test_qualification_resumes_two_completed_same_key_runs(
+    tmp_path, monkeypatch
+) -> None:
+    config_path, manifest = _files(tmp_path)
+    backend = AccelSimBackend(AccelSimBackendConfig.load(config_path))
+    output = tmp_path / "qualification"
+    backend.qualify(manifest, output)
+
+    def unexpected_run(*args, **kwargs):
+        raise AssertionError("completed qualification runs must be reused")
+
+    monkeypatch.setattr(AccelSimBackend, "run", unexpected_run)
+    record_path = backend.qualify(
+        manifest, output, resume_completed_runs=True
+    )
+    record = json.loads(record_path.read_text(encoding="utf-8"))
+    assert record["status"] == "passed"
+    assert record["provenance"]["resume_completed_runs"] == {
+        "enabled": True,
+        "native_baseline_reused": True,
+        "adapter_reused": True,
+    }
+
+
+def test_resume_revalidates_external_memory_conservation(tmp_path) -> None:
+    config_path, manifest = _files(tmp_path)
+    payload = json.loads(config_path.read_text(encoding="utf-8"))
+    for filename in ("hbm3.yaml", "bridge.so"):
+        (tmp_path / filename).write_text("test\n", encoding="utf-8")
+    payload["external_memory"] = {
+        "kind": "ramulator2_in_process",
+        "config_file": "hbm3.yaml",
+        "bridge_library": "bridge.so",
+        "timing_owner": "shared3d.ramulator2",
+        "expected_instances": 1,
+        "require_nonzero_requests": True,
+        "bandwidth_contract": _valid_bandwidth_contract(),
+    }
+    config_path.write_text(json.dumps(payload), encoding="utf-8")
+    backend = AccelSimBackend(AccelSimBackendConfig.load(config_path))
+    output = tmp_path / "qualification"
+    simulation_key = backend.simulation_key(manifest)
+    command = list(backend.command(manifest))
+    for name in ("native_baseline", "adapter"):
+        run = output / name
+        run.mkdir(parents=True)
+        (run / "command.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": "hetero-command/v1",
+                    "argv": command,
+                    "backend_id": backend.config.backend_id,
+                    "environment_overrides": {},
+                    "simulation_key": simulation_key,
+                }
+            ),
+            encoding="utf-8",
+        )
+        (run / "stats.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": "hetero-accel-sim-stats/v1",
+                    "backend_id": backend.config.backend_id,
+                    "simulation_key": simulation_key,
+                    "cycles": 1132,
+                    "instructions": 4096,
+                    "duration_fs": math.ceil(
+                        1132 * 10**15 / backend.config.core_frequency_hz
+                    ),
+                    "core_frequency_hz": backend.config.core_frequency_hz,
+                    "raw_stats": {
+                        "gpu_tot_sim_cycle": 1132,
+                        "gpu_tot_sim_insn": 4096,
+                    },
+                    "external_memory_stats": {
+                        "instances": 99,
+                        "outstanding": 9,
+                        "reads": 0,
+                        "writes": 0,
+                        "completed": 0,
+                    },
+                    "atlas_runtime_stats": None,
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    with pytest.raises(AccelSimBackendError, match="instance count"):
+        backend.qualify(manifest, output, resume_completed_runs=True)
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX test executable")
+def test_failed_rerun_removes_stale_stats(tmp_path) -> None:
+    config_path, manifest = _files(tmp_path)
+    backend = AccelSimBackend(AccelSimBackendConfig.load(config_path))
+    output = tmp_path / "run"
+    output.mkdir()
+    stale = output / "stats.json"
+    stale.write_text('{"stale": true}\n', encoding="utf-8")
+    backend.config.executable.write_text("#!/usr/bin/env sh\nexit 7\n", encoding="utf-8")
+
+    with pytest.raises(AccelSimBackendError, match="returned 7"):
+        backend.run(manifest, output)
+
+    assert not stale.exists()

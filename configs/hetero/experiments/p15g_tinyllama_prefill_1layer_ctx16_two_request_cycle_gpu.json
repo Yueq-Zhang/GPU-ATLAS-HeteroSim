@@ -1,0 +1,78 @@
+{
+  "schema_version": "hetero-sim/v1",
+  "experiment": {
+    "name": "p15g_tinyllama_prefill_1layer_ctx16_two_request_cycle_gpu",
+    "seed": 1,
+    "generation_mode": "trace_locked"
+  },
+  "simulation": {
+    "coupling": "operator_event",
+    "execution_mode": "operator_event",
+    "validation_policy": "required"
+  },
+  "system": {
+    "profile": "model3_gpu_native_3ddram",
+    "links": {
+      "shared3d.explicit_noncoherent": {
+        "wire_bandwidth_Bps": 12800000000,
+        "latency_fs": 10000000,
+        "header_bytes": 16,
+        "resource_id": "unused.p15g.gpu_only",
+        "parameter_source": "unused_no_cross_device_route"
+      }
+    }
+  },
+  "backends": {
+    "gpu": {
+      "kind": "accel_sim",
+      "requested_timing_mode": "coupled",
+      "config_ref": "configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+      "require_request_cycle_ready": true,
+      "resource_bindings": {
+        "gpu_core": "gpu0.core",
+        "gpu_l1": "gpu0.l1",
+        "gpu_l2": "gpu0.l2",
+        "gpu_noc": "gpu0.noc",
+        "shared_3d_dram": "shared0.dram3d"
+      },
+      "trace_bindings": [
+        {
+          "selector": {"phase": "prefill", "op": "attention_norm", "layer_id": 0, "step_id": 0},
+          "trace_manifest": "configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
+          "operator_artifact": "configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_shared_hbdram_range_rebase.json",
+          "compatibility": "exact_operator",
+          "value_bindings": [
+            {"tensor_id": "tinyllama.layer0.attention_norm.input", "source": "input", "index": 0, "value_offset_bytes": 0},
+            {"tensor_id": "tinyllama.layer0.attention_norm.weight", "source": "input", "index": 1, "value_offset_bytes": 0},
+            {"tensor_id": "tinyllama.layer0.attention_norm.output", "source": "output", "index": 0, "value_offset_bytes": 0}
+          ]
+        },
+        {
+          "selector": {"phase": "prefill", "op": "qkv_projection", "layer_id": 0, "step_id": 0},
+          "trace_manifest": "configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
+          "operator_artifact": "configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_shared_hbdram_range_rebase.json",
+          "compatibility": "exact_operator",
+          "value_bindings": [
+            {"tensor_id": "tinyllama.layer0.qkv_projection.input", "source": "input", "index": 0, "value_offset_bytes": 0},
+            {"tensor_id": "tinyllama.layer0.qkv_projection.q_weight", "source": "input", "index": 1, "value_offset_bytes": 0},
+            {"tensor_id": "tinyllama.layer0.qkv_projection.k_weight", "source": "input", "index": 1, "value_offset_bytes": 8388608},
+            {"tensor_id": "tinyllama.layer0.qkv_projection.v_weight", "source": "input", "index": 1, "value_offset_bytes": 9437184},
+            {"tensor_id": "tinyllama.layer0.qkv_projection.output", "source": "output", "index": 0, "value_offset_bytes": 0}
+          ]
+        }
+      ],
+      "fallback_kind": "analytical",
+      "effective_compute_flops_per_s": 81300000000000,
+      "effective_memory_bandwidth_Bps": 448000000000,
+      "parameter_source": "RTX3070_analytical_fallback_for_remaining_ten_operators"
+    },
+    "atlas": {"kind": "none"},
+    "host": {"kind": "none"}
+  },
+  "model": {"ref": "configs/hetero/models/tinyllama_1_1b_prefill_1layer_fp16.json"},
+  "workload": {"ref": "configs/hetero/workloads/tinyllama11b_bs1_ctx16_prefill.json"},
+  "scheduling": {"ref": "configs/hetero/schedulers/prefill_bs1_ctx16.json"},
+  "placement": {"ref": "configs/hetero/placements/prefill_gpu_only.json"},
+  "address": {"ref": "configs/hetero/addresses/tinyllama11b_prefill_global_pa.json"},
+  "metrics": {"ref": "configs/hetero/metrics/e2e_validation.json"}
+}

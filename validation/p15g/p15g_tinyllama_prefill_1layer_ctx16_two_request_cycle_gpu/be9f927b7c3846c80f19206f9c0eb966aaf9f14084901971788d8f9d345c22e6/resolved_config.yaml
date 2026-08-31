@@ -1,0 +1,209 @@
+{
+  "address": {
+    "address_mapping": {
+      "channel_lowest_bit": 0,
+      "dram_mapper": "OneLevelInterleave",
+      "virtual_memory_mode": "identity_untranslated"
+    },
+    "allocation_alignment_bytes": 64,
+    "allocator": "first_fit",
+    "global_pa_capacity_bytes": 4294967296,
+    "kv_capacity_bytes": 1073741824,
+    "page_tokens": 16
+  },
+  "backends": {
+    "atlas": {
+      "kind": "none"
+    },
+    "gpu": {
+      "config_ref": "configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+      "effective_compute_flops_per_s": 81300000000000,
+      "effective_memory_bandwidth_Bps": 448000000000,
+      "fallback_kind": "analytical",
+      "kind": "accel_sim",
+      "parameter_source": "RTX3070_analytical_fallback_for_remaining_ten_operators",
+      "requested_timing_mode": "coupled",
+      "require_request_cycle_ready": true,
+      "resource_bindings": {
+        "gpu_core": "gpu0.core",
+        "gpu_l1": "gpu0.l1",
+        "gpu_l2": "gpu0.l2",
+        "gpu_noc": "gpu0.noc",
+        "shared_3d_dram": "shared0.dram3d"
+      },
+      "trace_bindings": [
+        {
+          "compatibility": "exact_operator",
+          "operator_artifact": "configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_shared_hbdram_range_rebase.json",
+          "selector": {
+            "layer_id": 0,
+            "op": "attention_norm",
+            "phase": "prefill",
+            "step_id": 0
+          },
+          "trace_manifest": "configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
+          "value_bindings": [
+            {
+              "index": 0,
+              "source": "input",
+              "tensor_id": "tinyllama.layer0.attention_norm.input",
+              "value_offset_bytes": 0
+            },
+            {
+              "index": 1,
+              "source": "input",
+              "tensor_id": "tinyllama.layer0.attention_norm.weight",
+              "value_offset_bytes": 0
+            },
+            {
+              "index": 0,
+              "source": "output",
+              "tensor_id": "tinyllama.layer0.attention_norm.output",
+              "value_offset_bytes": 0
+            }
+          ]
+        },
+        {
+          "compatibility": "exact_operator",
+          "operator_artifact": "configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_shared_hbdram_range_rebase.json",
+          "selector": {
+            "layer_id": 0,
+            "op": "qkv_projection",
+            "phase": "prefill",
+            "step_id": 0
+          },
+          "trace_manifest": "configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
+          "value_bindings": [
+            {
+              "index": 0,
+              "source": "input",
+              "tensor_id": "tinyllama.layer0.qkv_projection.input",
+              "value_offset_bytes": 0
+            },
+            {
+              "index": 1,
+              "source": "input",
+              "tensor_id": "tinyllama.layer0.qkv_projection.q_weight",
+              "value_offset_bytes": 0
+            },
+            {
+              "index": 1,
+              "source": "input",
+              "tensor_id": "tinyllama.layer0.qkv_projection.k_weight",
+              "value_offset_bytes": 8388608
+            },
+            {
+              "index": 1,
+              "source": "input",
+              "tensor_id": "tinyllama.layer0.qkv_projection.v_weight",
+              "value_offset_bytes": 9437184
+            },
+            {
+              "index": 0,
+              "source": "output",
+              "tensor_id": "tinyllama.layer0.qkv_projection.output",
+              "value_offset_bytes": 0
+            }
+          ]
+        }
+      ]
+    },
+    "host": {
+      "kind": "none"
+    }
+  },
+  "experiment": {
+    "generation_mode": "trace_locked",
+    "name": "p15g_tinyllama_prefill_1layer_ctx16_two_request_cycle_gpu",
+    "seed": 1
+  },
+  "metrics": {
+    "request": [
+      "ttft",
+      "tpot",
+      "e2e_user",
+      "retire_latency"
+    ]
+  },
+  "model": {
+    "architecture": "llama",
+    "bytes_per_element": 2,
+    "dtype": "fp16",
+    "head_dim": 64,
+    "hidden_size": 2048,
+    "input_embedding_mode": "token_ids",
+    "intermediate_size": 5632,
+    "materialize_parameters": true,
+    "mlp_type": "swiglu",
+    "name": "TinyLlama-1.1B",
+    "num_attention_heads": 32,
+    "num_kv_heads": 4,
+    "num_layers": 1,
+    "position_encoding": "rope",
+    "tied_embeddings": false,
+    "vocab_size": 32000
+  },
+  "placement": {
+    "data": {
+      "activations": {
+        "home": "shared0.dram3d"
+      },
+      "kv_cache": {
+        "home": "shared0.dram3d",
+        "layout": "paged",
+        "page_tokens": 16
+      },
+      "weights": {
+        "home": "shared0.dram3d"
+      }
+    },
+    "default_target": "gpu0",
+    "mode": "manual",
+    "rules": [],
+    "unit": "operator"
+  },
+  "scheduling": {
+    "admission": "fcfs",
+    "decode_priority": true,
+    "epoch_duration_fs": 1000,
+    "epoch_mode": "token_step_barrier",
+    "kv_reservation_mode": "full_request",
+    "max_batched_tokens": 16,
+    "max_num_sequences": 1,
+    "max_prefill_wait_epochs": 8,
+    "mode": "static_ragged",
+    "prefill_aging": true,
+    "prefill_chunk_tokens": 16
+  },
+  "schema_version": "hetero-sim/v1",
+  "simulation": {
+    "coupling": "operator_event",
+    "execution_mode": "operator_event",
+    "validation_policy": "required"
+  },
+  "system": {
+    "links": {
+      "shared3d.explicit_noncoherent": {
+        "header_bytes": 16,
+        "latency_fs": 10000000,
+        "parameter_source": "unused_no_cross_device_route",
+        "resource_id": "unused.p15g.gpu_only",
+        "wire_bandwidth_Bps": 12800000000
+      }
+    },
+    "profile": "model3_gpu_native_3ddram"
+  },
+  "workload": {
+    "requests": [
+      {
+        "arrival_time_fs": 0,
+        "execution_scope": "full_request",
+        "initial_kv_length": 0,
+        "output_length": 1,
+        "priority": 0,
+        "prompt_length": 16,
+        "request_id": "TINYLLAMA11B-PREFILL-R0"
+      }
+    ]
+  }
+}

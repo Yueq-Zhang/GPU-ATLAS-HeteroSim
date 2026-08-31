@@ -1,0 +1,79 @@
+{
+  "allocated_bytes": 31588352,
+  "allocation_owner": "prefill_global_timeline",
+  "bindings": [
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 69218304,
+      "size_bytes": 8388608,
+      "tensor_id": "tinyllama.layer0.output_projection.weight",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 350322688,
+      "size_bytes": 65536,
+      "tensor_id": "tinyllama.layer0.output_projection.input",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 350453760,
+      "size_bytes": 65536,
+      "tensor_id": "tinyllama.layer0.output_projection.output",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 355666688,
+      "size_bytes": 8388608,
+      "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_0",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 364055296,
+      "size_bytes": 4194304,
+      "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_1",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 368249600,
+      "size_bytes": 1233408,
+      "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_2",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 369483008,
+      "size_bytes": 732672,
+      "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_3",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 370215680,
+      "size_bytes": 8519680,
+      "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_4",
+      "tensor_offset_bytes": 0
+    }
+  ],
+  "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+  "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+  "policy": {
+    "alignment_bytes": 256,
+    "capacity_bytes": 4294967296,
+    "memory_space_id": "shared0.dram3d",
+    "mode": "range_rebase_packed_manifest",
+    "physical_base_bytes": 0,
+    "require_nonzero_translations": true
+  },
+  "range_count": 8,
+  "schema_version": "hetero-online-address-binding/v1",
+  "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/495ec5b8df02dcf735a6932338b912af37f39a4d5288e2097f437fc1cb94fcc8/online_address_bindings.tsv",
+  "table_sha256": "67820b290813c3100e56dc168f23df568c41dd43cf764da9ce2029ad6359fb7a",
+  "tensor_count": 8,
+  "trace_key": "b7511b68bcdfff880f714faf7e2ad413ec26f3a85133dacbcc22a619debef07a",
+  "translation_point": "mem_fetch_before_gpu_cache_lookup"
+}

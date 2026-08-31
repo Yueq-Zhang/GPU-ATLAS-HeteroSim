@@ -1,0 +1,5 @@
+HETEROSIM_ADDRESS_BINDINGS_V1
+trace_key	smoke
+memory_space	shared0.dram3d
+range_count	1
+range	4096	4352	512	768

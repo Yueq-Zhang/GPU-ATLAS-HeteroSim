@@ -28,6 +28,12 @@ enum heterosim_send_result {
   HETEROSIM_SEND_ACCEPTED = 1,
 };
 
+enum heterosim_address_translation_result {
+  HETEROSIM_ADDRESS_INVALID = -1,
+  HETEROSIM_ADDRESS_IDENTITY = 0,
+  HETEROSIM_ADDRESS_TRANSLATED = 1,
+};
+
 enum heterosim_memory_initiator {
   HETEROSIM_INITIATOR_GPU = 0,
   HETEROSIM_INITIATOR_ATLAS_LOGIC_DIE = 1,
@@ -64,6 +70,20 @@ typedef struct heterosim_parent_completion_v2 {
   uint32_t initiator;
   void *payload;
 } heterosim_parent_completion_v2;
+
+/*
+ * Translate a captured GPU address before L1/L2 lookup.  With no binding file
+ * configured this is an explicit identity operation.  A configured table is
+ * strict: the whole request must lie in exactly one capture or already-global
+ * range, otherwise HETEROSIM_ADDRESS_INVALID is returned.
+ */
+int heterosim_translate_gpu_address(uint64_t trace_address,
+                                    uint32_t size_bytes,
+                                    uint64_t *global_address);
+uint64_t heterosim_address_translated_requests(void);
+uint64_t heterosim_address_already_global_requests(void);
+uint64_t heterosim_address_unmapped_requests(void);
+uint64_t heterosim_address_binding_ranges(void);
 
 heterosim_ramulator_handle heterosim_ramulator_create(
     const char *config_path, unsigned partition_id, unsigned partition_count);

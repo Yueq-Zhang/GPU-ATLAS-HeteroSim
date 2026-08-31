@@ -1,0 +1,32 @@
+{
+  "schema_version": "hetero-operator-artifact-catalog/v1",
+  "required_operators": [
+    "attention_norm",
+    "qkv_projection",
+    "rope",
+    "causal_attention",
+    "output_projection",
+    "mlp_norm",
+    "gate_up_projection",
+    "silu_multiply",
+    "down_projection",
+    "final_norm",
+    "lm_head",
+    "sampling"
+  ],
+  "zero_fallback_required": true,
+  "artifacts": [
+    "../p15c/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_shared_hbdram_identity.json",
+    "../p15c/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_shared_hbdram_identity.json",
+    "../p15c/tinyllama_prefill_bs1_ctx16_rope_sm86_shared_hbdram_identity.json",
+    "../p15c/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_shared_hbdram_identity.json",
+    "tinyllama_prefill_bs1_ctx16_output_projection_sm86_shared_hbdram_identity.json",
+    "tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_shared_hbdram_identity.json",
+    "tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_shared_hbdram_identity.json",
+    "tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_shared_hbdram_identity.json",
+    "tinyllama_prefill_bs1_ctx16_down_projection_sm86_shared_hbdram_identity.json",
+    "tinyllama_prefill_bs1_ctx16_final_norm_sm86_shared_hbdram_identity.json",
+    "tinyllama_prefill_bs1_ctx16_lm_head_sm86_shared_hbdram_identity.json",
+    "tinyllama_prefill_bs1_ctx16_sampling_sm86_shared_hbdram_identity.json"
+  ]
+}

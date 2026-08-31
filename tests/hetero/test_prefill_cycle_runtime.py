@@ -33,6 +33,10 @@ class _Dispatcher:
             "analytical_fallback_tasks": 0,
         }
 
+    def memory_traffic_mode(self, task_id: str) -> str:
+        assert task_id in self.plans
+        return "sampled"
+
 
 class _Bridge:
     def __init__(self) -> None:

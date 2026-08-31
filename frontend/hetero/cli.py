@@ -69,6 +69,11 @@ def _build_parser() -> argparse.ArgumentParser:
     qualify_gpu.add_argument("--backend-config", required=True, type=Path)
     qualify_gpu.add_argument("--trace-manifest", required=True, type=Path)
     qualify_gpu.add_argument("--output", required=True, type=Path)
+    qualify_gpu.add_argument(
+        "--resume-completed-runs",
+        action="store_true",
+        help="reuse same-key native/adapter runs after an interrupted qualification",
+    )
     qualify_atlas = subparsers.add_parser(
         "qualify-atlas", help="check deterministic ATLAS adapter equivalence"
     )
@@ -86,7 +91,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             backend_config = AccelSimBackendConfig.load(args.backend_config)
             manifest = TraceManifest.load(args.trace_manifest)
-            record = AccelSimBackend(backend_config).qualify(manifest, args.output)
+            record = AccelSimBackend(backend_config).qualify(
+                manifest,
+                args.output,
+                resume_completed_runs=args.resume_completed_runs,
+            )
         except (AccelSimBackendError, TraceManifestError) as error:
             print(f"GPU qualification error: {error}")
             return 5
