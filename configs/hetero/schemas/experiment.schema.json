@@ -309,6 +309,12 @@
     "scheduling": {"oneOf": [{"$ref": "#/$defs/ref"}, {"$ref": "#/$defs/scheduler"}]},
     "placement": {"oneOf": [{"$ref": "#/$defs/ref"}, {"$ref": "#/$defs/placement"}]},
     "address": {"oneOf": [{"$ref": "#/$defs/ref"}, {"$ref": "#/$defs/address"}]},
-    "metrics": {"oneOf": [{"$ref": "#/$defs/ref"}, {"$ref": "#/$defs/metrics"}]}
+    "metrics": {"oneOf": [{"$ref": "#/$defs/ref"}, {"$ref": "#/$defs/metrics"}]},
+    "calibration": {
+      "oneOf": [
+        {"$ref": "#/$defs/ref"},
+        {"$ref": "performance_calibration.schema.json"}
+      ]
+    }
   }
 }

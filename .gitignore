@@ -12,3 +12,7 @@ validation/**/perf_counter*.csv.gz
 *.log
 *.so
 *.pyd
+validation/p17/native_rtx3070/*.exe
+validation/p17/native_rtx3070/*.exp
+validation/p17/native_rtx3070/*.lib
+validation/p17/native_rtx3070/nvcc_build.txt

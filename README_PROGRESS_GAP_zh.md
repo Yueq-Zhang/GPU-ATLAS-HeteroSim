@@ -1,8 +1,8 @@
 # GPU-ATLAS-HeteroSim 当前完成情况与计划差距
 
 评估日期：2026-08-31
-当前版本：`0.24.0`
-规范基线：`hetero-sim/v1`、设计合同v1.24
+当前版本：`0.25.0`
+规范基线：`hetero-sim/v1`、设计合同v1.25
 
 ## 1. 当前结论
 
@@ -19,6 +19,8 @@ P10b-B至P14进一步完成了请求级Prefill部署：任务按读完成、计�
 P15e已完成Context=16一层Prefill大型请求轨迹的流式gzip双跑、Attention Norm在线Range-Rebase以及LM Head长时双遍资格；P15f完成QKV Projection的Allocator Segment Range-Rebase；P15g首先验证两个Ready算子的全局时间线。P15h现已完成其余10个GPU算子的重捕获、双遍资格与统一接入：12个`request_cycle_ready=true`真实Accel-Sim算子共享同一Prefill时间线，并通过依赖、GPU资源互斥、Global PA、唯一Ramulator2、Parent/Child/durable守恒、零在途和版本提交因果验证。其余8个控制、KV管理与残差任务仍为分析/运行时模型，性能资格保持关闭。
 
 P16已完成固定Shape的全任务请求周期建模：能力Catalog精确覆盖19种算子/20个实例；14种GPU算子覆盖15个真实Accel-Sim Trace实例；KV Allocate/Append/Release把精确Global PA请求经外部Link送入唯一live Ramulator2；Request Start/Finish作为主机控制边界参与因果时间线但排除在设备性能边界之外。两遍完整运行均完成517个KV运行时Parent、31次版本检查和18次版本提交，全部零在途。17/19种算子类型为`request_cycle_ready=true`，性能资格仍为0/19。
+
+P17已完成性能校准基础设施和第一批本机参考测量：机器合同把GPU Kernel、Copy Engine、Runtime、外部Link、Logic-Die Gateway和3D-DRAM拆成6个独立校准组件，核验配置与测量SHA-256、可信证据类型、必需指标、误差阈值和适用Shape。RTX 3070原生本地显存基准已完成50次Warmup和500次测量；但它没有同拓扑模拟对照，也不能代表外接3D-DRAM，所以GPU/Copy/Runtime仅为`measured_unvalidated`，其余3项为`specified_only`，整机性能资格仍为0/6。P16两遍确定性已由P17审计复核，`performance_claim_allowed=false`保持不变。
 
 内存与片上网络的当前状态必须分开表述：Ramulator2已经是`prefill_cycle`和既有耦合资格路径的实时内存时序所有者；BookSim2源码已随ATLAS固定版本并编译进`libatlasim-lib.so`，但当前P9a/P9b Chip配置没有`architecture.noc`，P14也未调用ATLAS完整Chip，因此BookSim2尚未在当前主实验中激活，状态保持`adapter_pending_qualification`。
 
@@ -109,7 +111,7 @@ P16已完成固定Shape的全任务请求周期建模：能力Catalog精确覆�
 
 ## 6. 下一步顺序
 
-1. 启动P17性能校准：测量或引用可信的GPU Kernel、Copy Engine、Runtime、外部Link和3D-DRAM参考点，形成逐参数来源、误差和适用Shape记录；校准完成前保持`performance_claim_allowed=false`。
+1. 继续P17性能校准：为14类GPU Kernel补齐同拓扑原生显存Accel-Sim对照；为Copy Engine和Runtime补齐语义匹配的框架测量；为外部Link、Logic-Die Gateway和3D-DRAM引入独立硬件或可信参考模拟器点。禁止用本地显存结果替代外接3D-DRAM校准。
 2. 构建一层TinyLlama Decode，再扩展到22层单Token Decode；逐层核对依赖、KV生命周期、内存容量、任务数和请求守恒。
 3. 将P16从一层Context=16扩展到多层模型图，验证跨层KV生命周期、Global PA容量、Workspace复用和长时间运行确定性；不得按层数线性外推现有周期。
 4. 增加多Batch Continuous/Ragged周期运行，使用真实Batched/Fused Kernel而不是复制单请求延迟。

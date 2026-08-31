@@ -5,12 +5,20 @@ from .operator_capability import (
     OperatorCapabilityCatalog,
     OperatorCapabilityError,
 )
+from .performance_calibration import (
+    PerformanceCalibration,
+    PerformanceCalibrationError,
+    evaluate_performance_gate,
+)
 
-__version__ = "0.24.0"
+__version__ = "0.25.0"
 
 __all__ = [
     "BandwidthContract",
     "BandwidthContractError",
     "OperatorCapabilityCatalog",
     "OperatorCapabilityError",
+    "PerformanceCalibration",
+    "PerformanceCalibrationError",
+    "evaluate_performance_gate",
 ]

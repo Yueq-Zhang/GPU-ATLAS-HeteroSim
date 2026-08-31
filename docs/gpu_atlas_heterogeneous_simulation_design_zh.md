@@ -2784,6 +2784,16 @@ Global PA分配包含87个不重叠范围、58个算子Workspace，总占用450,
 
 P16的35.450 ms只用于功能因果和双遍确定性。Copy Engine、Runtime、GPU、Link和3D-DRAM参数没有统一硬件校准，因此`performance_claim_allowed=false`不可关闭，也不得发布为端到端Latency、Token/s或加速比。后续性能校准必须形成逐参数来源、误差和适用Shape记录；校准不能用调整单一常数去强行匹配总时间。
 
+### 25.7 P17独立性能校准门禁
+
+P17引入`hetero-performance-calibration/v1`，把请求周期正确性与性能真实性拆为两个连续但不可互相替代的资格层。记录必须分别覆盖GPU Kernel、Copy Engine、Runtime Control、外部Link、Logic-Die Gateway和3D-DRAM。每个组件至少保存：唯一Timing Owner、实际配置参数及其内容哈希、证据来源与类别、参考指标、实测值、模拟值、重复次数、统计方法、允许的相对/绝对误差和适用Shape Key；每个参考点还必须通过`source_id`绑定到哈希已核验的测量或参考模拟Artifact。
+
+只有硬件测量或独立可信参考模拟器可作为验证证据。实现配置、厂商峰值或论文中的理论带宽可以解释参数来源，但不能单独把组件标为`validated`。全局门禁采用AND语义：六个必需组件全部通过，并且每个纳入设备性能的任务都满足`performance_eligible=true`时，`performance_claim_allowed`才可能打开。显式主机控制边界允许排除，但排除事件不得掩盖GPU、Copy、Link或内存校准缺口。
+
+校准必须保持拓扑和语义匹配。RTX 3070本地显存Kernel或D2D Copy不能校准GPU经12.8 GB/s外部Link访问3D-DRAM的路径；空Kernel同步时延不能直接替代框架Request Start/Finish；3D-DRAM理论峰值也不能替代Row-hit、Row-miss和混合流量参考。任何跨拓扑结果只能记录为`measured_unvalidated`，不得计算为正式误差点。
+
+P17首批本机测量固定RTX 3070、SM86、CUDA 11.6、50次Warmup和500次测量，覆盖Context=16的Embedding、Residual、32 KiB本地D2D Copy及空Kernel事件/同步时延。测量产物、源码和可执行文件均有SHA-256。由于尚缺少完整14类Kernel的同拓扑Accel-Sim对照，以及外部Link、Gateway和3D-DRAM独立参考，当前审计必须返回`audit_complete_blocked`并保持`performance_claim_allowed=false`。
+
 ---
 
 ## 26. 风险与控制
@@ -2881,3 +2891,4 @@ P16的35.450 ms只用于功能因果和双遍确定性。Copy Engine、Runtime�
 | 1.22 | 2026-08-31 | 完成其余10个GPU算子的Range-Rebase重捕获和双遍资格，建立12算子Ready Catalog并全部嵌入同一Prefill全局时间线；验证84个Global PA区间、唯一Ramulator2、请求守恒、GPU互斥和18次版本提交因果，同时保持端到端性能资格关闭 |
 | 1.23 | 2026-08-31 | 启动P16全任务建模：增加19类/20实例能力Catalog、实际图一致性检查、精确模型与Shape门禁、5类控制/KV运行时周期合同，以及Embedding/Residual轻量捕获流程；所有新增合同在双跑和校准前保持性能未资格 |
 | 1.24 | 2026-08-31 | 完成P16固定Shape全任务请求周期闭环：15个GPU Trace实例、3个KV live Ramulator2实例和2个主机控制边界双遍通过；增加顶部输入宽度Shadow、20任务因果与性能边界自动资格记录，同时保持整机性能未校准 |
+| 1.25 | 2026-08-31 | 启动P17独立性能校准：增加六组件机器合同、配置/测量哈希、证据/Shape/误差fail-closed门禁和全局任务资格AND规则；完成RTX 3070首批原生测量并明确本地显存不可外推外接3D-DRAM |

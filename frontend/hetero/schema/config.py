@@ -7,12 +7,17 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Mapping
 
+from ..performance_calibration import (
+    PerformanceCalibration,
+    PerformanceCalibrationError,
+)
+
 
 class ConfigError(ValueError):
     """Raised when a configuration violates the frozen v1 contract."""
 
 
-_TOP_LEVEL_KEYS = {
+_TOP_LEVEL_REQUIRED = {
     "schema_version",
     "experiment",
     "simulation",
@@ -25,6 +30,7 @@ _TOP_LEVEL_KEYS = {
     "address",
     "metrics",
 }
+_TOP_LEVEL_OPTIONAL = {"calibration"}
 
 _PROFILES = {
     "model1_atlas_native",
@@ -97,14 +103,21 @@ def validate_config(config: Mapping[str, Any]) -> None:
         raise ConfigError("configuration root must be an object")
 
     actual = set(config)
-    missing = _TOP_LEVEL_KEYS - actual
-    unknown = actual - _TOP_LEVEL_KEYS
+    missing = _TOP_LEVEL_REQUIRED - actual
+    unknown = actual - _TOP_LEVEL_REQUIRED - _TOP_LEVEL_OPTIONAL
     if missing:
         raise ConfigError(f"missing top-level fields: {sorted(missing)}")
     if unknown:
         raise ConfigError(f"unknown top-level fields: {sorted(unknown)}")
     if config["schema_version"] != "hetero-sim/v1":
         raise ConfigError("schema_version must be hetero-sim/v1")
+    if "calibration" in config:
+        try:
+            PerformanceCalibration.from_payload(
+                _mapping(config, "calibration"), "<experiment.calibration>"
+            )
+        except PerformanceCalibrationError as error:
+            raise ConfigError(f"invalid calibration: {error}") from error
 
     experiment = _mapping(config, "experiment")
     if not isinstance(experiment.get("name"), str) or not experiment["name"].strip():
@@ -215,7 +228,9 @@ def validate_config(config: Mapping[str, Any]) -> None:
             )
             source = backend.get("parameter_source")
             if not isinstance(source, str) or not source:
-                raise ConfigError(f"backends.{backend_name}.parameter_source is required")
+                raise ConfigError(
+                    f"backends.{backend_name}.parameter_source is required"
+                )
 
         if execution_mode == "operator_event":
             if coupling != "operator_event":
@@ -292,9 +307,10 @@ def validate_config(config: Mapping[str, Any]) -> None:
                     raise ConfigError(
                         f"prefill_cycle requires {backend_name} kind=cycle_replay or none"
                     )
-                if not isinstance(backend.get("cycle_artifact_ref"), str) or not backend[
-                    "cycle_artifact_ref"
-                ]:
+                if (
+                    not isinstance(backend.get("cycle_artifact_ref"), str)
+                    or not backend["cycle_artifact_ref"]
+                ):
                     raise ConfigError(
                         f"backends.{backend_name}.cycle_artifact_ref is required"
                     )
@@ -341,7 +357,11 @@ def validate_config(config: Mapping[str, Any]) -> None:
         if not isinstance(links, Mapping) or not links:
             raise ConfigError("system.links must be a non-empty object")
         for link_id, link in links.items():
-            if not isinstance(link_id, str) or not link_id or not isinstance(link, Mapping):
+            if (
+                not isinstance(link_id, str)
+                or not link_id
+                or not isinstance(link, Mapping)
+            ):
                 raise ConfigError("system.links entries must be named objects")
             _reject_unknown(
                 link,
@@ -363,8 +383,12 @@ def validate_config(config: Mapping[str, Any]) -> None:
                 link.get("wire_bandwidth_Bps"),
                 f"system.links.{link_id}.wire_bandwidth_Bps",
             )
-            _unsigned_int(link.get("latency_fs", 0), f"system.links.{link_id}.latency_fs")
-            _unsigned_int(link.get("header_bytes", 0), f"system.links.{link_id}.header_bytes")
+            _unsigned_int(
+                link.get("latency_fs", 0), f"system.links.{link_id}.latency_fs"
+            )
+            _unsigned_int(
+                link.get("header_bytes", 0), f"system.links.{link_id}.header_bytes"
+            )
             for field in ("resource_id", "parameter_source"):
                 if not isinstance(link.get(field), str) or not link[field]:
                     raise ConfigError(f"system.links.{link_id}.{field} is required")
@@ -373,8 +397,14 @@ def validate_config(config: Mapping[str, Any]) -> None:
         if not isinstance(memory_services, Mapping):
             raise ConfigError("system.memory_services must be an object")
         for memory_id, memory in memory_services.items():
-            if not isinstance(memory_id, str) or not memory_id or not isinstance(memory, Mapping):
-                raise ConfigError("system.memory_services entries must be named objects")
+            if (
+                not isinstance(memory_id, str)
+                or not memory_id
+                or not isinstance(memory, Mapping)
+            ):
+                raise ConfigError(
+                    "system.memory_services entries must be named objects"
+                )
             _reject_unknown(
                 memory,
                 {
@@ -442,8 +472,10 @@ def validate_config(config: Mapping[str, Any]) -> None:
                     f"system.memory_services.{memory_id}.bank_busy_time_fs",
                 )
                 initiators = memory.get("initiator_order")
-                if not isinstance(initiators, list) or not initiators or any(
-                    not isinstance(item, str) or not item for item in initiators
+                if (
+                    not isinstance(initiators, list)
+                    or not initiators
+                    or any(not isinstance(item, str) or not item for item in initiators)
                 ):
                     raise ConfigError(
                         f"system.memory_services.{memory_id}.initiator_order is required"
@@ -458,16 +490,18 @@ def validate_config(config: Mapping[str, Any]) -> None:
                         "requires initiator_order=['gpu0']"
                     )
             else:
-                if not isinstance(memory.get("config_ref"), str) or not memory[
-                    "config_ref"
-                ]:
+                if (
+                    not isinstance(memory.get("config_ref"), str)
+                    or not memory["config_ref"]
+                ):
                     raise ConfigError(
                         f"system.memory_services.{memory_id}.config_ref is required"
                     )
                 if execution_mode == "prefill_cycle":
-                    if not isinstance(memory.get("bridge_library"), str) or not memory[
-                        "bridge_library"
-                    ]:
+                    if (
+                        not isinstance(memory.get("bridge_library"), str)
+                        or not memory["bridge_library"]
+                    ):
                         raise ConfigError(
                             f"system.memory_services.{memory_id}.bridge_library is required"
                         )
@@ -584,9 +618,13 @@ def validate_config(config: Mapping[str, Any]) -> None:
         raise ConfigError("model.checkpoint_revision must be a non-empty string")
     if execution_mode == "prefill_cycle":
         if model.get("input_embedding_mode") != "token_ids":
-            raise ConfigError("prefill_cycle requires model.input_embedding_mode=token_ids")
+            raise ConfigError(
+                "prefill_cycle requires model.input_embedding_mode=token_ids"
+            )
         if model.get("materialize_parameters") is not True:
-            raise ConfigError("prefill_cycle requires model.materialize_parameters=true")
+            raise ConfigError(
+                "prefill_cycle requires model.materialize_parameters=true"
+            )
 
     scheduling = _mapping(config, "scheduling")
     _reject_unknown(
@@ -609,9 +647,7 @@ def validate_config(config: Mapping[str, Any]) -> None:
     max_tokens = _positive_int(
         scheduling.get("max_batched_tokens"), "scheduling.max_batched_tokens"
     )
-    _positive_int(
-        scheduling.get("max_num_sequences"), "scheduling.max_num_sequences"
-    )
+    _positive_int(scheduling.get("max_num_sequences"), "scheduling.max_num_sequences")
     chunk = _positive_int(
         scheduling.get("prefill_chunk_tokens", 512),
         "scheduling.prefill_chunk_tokens",
@@ -764,12 +800,22 @@ def load_and_validate_config(path: str | Path) -> dict[str, Any]:
         try:
             loaded = json.loads(ref_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as error:
-            raise ConfigError(f"failed to expand {section}.ref {ref_path}: {error}") from error
+            raise ConfigError(
+                f"failed to expand {section}.ref {ref_path}: {error}"
+            ) from error
         if not isinstance(loaded, dict):
             raise ConfigError(f"{section}.ref must resolve to an object")
         resolved[section] = loaded
 
-    for section in ("model", "workload", "scheduling", "placement", "address", "metrics"):
+    for section in (
+        "model",
+        "workload",
+        "scheduling",
+        "placement",
+        "address",
+        "metrics",
+        "calibration",
+    ):
         expand(section)
     validate_config(resolved)
     return resolved

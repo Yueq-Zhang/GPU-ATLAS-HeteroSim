@@ -1,0 +1,296 @@
+{
+  "schema_version": "hetero-performance-calibration/v1",
+  "calibration_id": "p17.tinyllama.prefill.layer0.bs1.ctx16.rtx3070.shared3d.v1",
+  "target_system": {
+    "gpu": "RTX 3070 SM86",
+    "memory_topology": "GPU external direct-memory PHY to ATLAS-style 16-channel HBDRAM",
+    "profile": "model3_gpu_native_3ddram",
+    "calibration_state": "configuration_inventory_only"
+  },
+  "scope": {
+    "model_spec_name": "TinyLlama-1.1B",
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "dtype": "fp16",
+    "layer_id": 0,
+    "batch_size": 1,
+    "context_length": 16,
+    "execution_mode": "operator_event",
+    "source_simulation_key": "d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a"
+  },
+  "qualification_policy": {
+    "required_shape_key": "tinyllama.1_1b.prefill.layer0.fp16.bs1.ctx16",
+    "required_components": [
+      "gpu_kernel",
+      "copy_engine",
+      "runtime_control",
+      "external_link",
+      "logic_die_gateway",
+      "dram3d"
+    ],
+    "required_metrics": {
+      "gpu_kernel": ["kernel_latency_fs"],
+      "copy_engine": ["copy_latency_fs", "copy_bandwidth_Bps"],
+      "runtime_control": ["launch_latency_fs"],
+      "external_link": ["link_bandwidth_Bps", "round_trip_latency_fs"],
+      "logic_die_gateway": ["gateway_latency_fs", "gateway_throughput_requests_per_s"],
+      "dram3d": ["read_latency_fs", "sustained_bandwidth_Bps"]
+    },
+    "allowed_validation_evidence": [
+      "hardware_measurement",
+      "trusted_reference_simulator"
+    ],
+    "minimum_reference_points_per_component": 1
+  },
+  "configuration_sources": [
+    {
+      "source_id": "p16_experiment",
+      "path": "configs/hetero/experiments/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu.json",
+      "sha256": "4c11629e1a17216a641bca52f6ec0d4c46aa1c60f8c2c6f0f45c4a07f0a00933"
+    },
+    {
+      "source_id": "gpu_backend",
+      "path": "configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+      "sha256": "da41dc6c68070d01dc44a1f6d7b6009d8fb1a2167868eb1f7bb34cd88ad9b8df"
+    },
+    {
+      "source_id": "runtime_model",
+      "path": "configs/hetero/runtime_tasks/tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json",
+      "sha256": "3595efe544a708e7d7e74431c7c2f0cbf465fbe256c1e23514fa77e5d0dbb8cb"
+    },
+    {
+      "source_id": "dram_config",
+      "path": "configs/hetero/memory/ramulator2_hbdram_edge_16ch_shared.yaml",
+      "sha256": "448442cba5b8edbe053cd166353954a97b675f837b958cd88c626f4ba55c2a16"
+    }
+  ],
+  "components": {
+    "gpu_kernel": {
+      "required": true,
+      "status": "measured_unvalidated",
+      "timing_owner": "accel_sim.sm86.compute_and_cache",
+      "parameter_bindings": [
+        {
+          "name": "core_frequency_hz",
+          "configured_value": 1132000000,
+          "unit": "Hz",
+          "configuration_source_id": "gpu_backend"
+        }
+      ],
+      "sources": [
+        {
+          "source_id": "gpu_backend_configuration",
+          "evidence_class": "implementation_configuration",
+          "locator": "configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+          "description": "Configured Accel-Sim SM86 core frequency; not a latency measurement"
+        },
+        {
+          "source_id": "rtx3070_native_simple_kernels",
+          "evidence_class": "hardware_measurement",
+          "locator": "validation/p17/native_rtx3070/native_measurements.json",
+          "description": "500-iteration CUDA-event measurements for exact Context-16 embedding and residual kernels on the local RTX 3070",
+          "artifact_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+          "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram"
+        }
+      ],
+      "reference_points": [],
+      "applicable_shape_keys": [],
+      "notes": "Requires per-kernel native RTX 3070 latency measurements matched to the 14 exact operator shapes."
+    },
+    "copy_engine": {
+      "required": true,
+      "status": "measured_unvalidated",
+      "timing_owner": "python.runtime_task_memory.kv_copy_engine",
+      "parameter_bindings": [
+        {
+          "name": "clock_hz",
+          "configured_value": 1500000000,
+          "unit": "Hz",
+          "configuration_source_id": "runtime_model"
+        },
+        {
+          "name": "transaction_bytes",
+          "configured_value": 64,
+          "unit": "B",
+          "configuration_source_id": "runtime_model"
+        },
+        {
+          "name": "cycles_per_transaction",
+          "configured_value": 1,
+          "unit": "cycle/transaction",
+          "configuration_source_id": "runtime_model"
+        }
+      ],
+      "sources": [
+        {
+          "source_id": "runtime_copy_contract",
+          "evidence_class": "implementation_configuration",
+          "locator": "configs/hetero/runtime_tasks/tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json",
+          "description": "Deterministic KV copy contract; explicitly not hardware calibrated"
+        },
+        {
+          "source_id": "rtx3070_native_d2d_copy",
+          "evidence_class": "hardware_measurement",
+          "locator": "validation/p17/native_rtx3070/native_measurements.json",
+          "description": "500-iteration 32 KiB native local-VRAM D2D copy measurement; not equivalent to the modeled external 3D-DRAM copy path",
+          "artifact_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+          "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram"
+        }
+      ],
+      "reference_points": [],
+      "applicable_shape_keys": [],
+      "notes": "Requires small and large D2M/M2D-equivalent copy latency and sustained-bandwidth measurements."
+    },
+    "runtime_control": {
+      "required": true,
+      "status": "measured_unvalidated",
+      "timing_owner": "python.online_operator_runtime.host_control",
+      "parameter_bindings": [
+        {
+          "name": "request_start_fixed_cycles",
+          "configured_value": 1,
+          "unit": "cycle",
+          "configuration_source_id": "runtime_model"
+        },
+        {
+          "name": "request_finish_fixed_cycles",
+          "configured_value": 1,
+          "unit": "cycle",
+          "configuration_source_id": "runtime_model"
+        }
+      ],
+      "sources": [
+        {
+          "source_id": "runtime_control_contract",
+          "evidence_class": "implementation_configuration",
+          "locator": "configs/hetero/runtime_tasks/tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json",
+          "description": "Causal boundary placeholders excluded from the P16 device-performance boundary"
+        },
+        {
+          "source_id": "rtx3070_synchronized_empty_launch",
+          "evidence_class": "hardware_measurement",
+          "locator": "validation/p17/native_rtx3070/native_measurements.json",
+          "description": "500-iteration host steady-clock measurement of an empty CUDA kernel plus device synchronization; not equivalent to request-start/request-finish framework overhead",
+          "artifact_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+          "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram"
+        }
+      ],
+      "reference_points": [],
+      "applicable_shape_keys": [],
+      "notes": "Requires framework launch and request-boundary measurements with a stated synchronization policy."
+    },
+    "external_link": {
+      "required": true,
+      "status": "specified_only",
+      "timing_owner": "shared3d.external_link",
+      "parameter_bindings": [
+        {
+          "name": "request_payload_bandwidth_Bps",
+          "configured_value": 12800000000,
+          "unit": "B/s",
+          "configuration_source_id": "gpu_backend"
+        },
+        {
+          "name": "response_payload_bandwidth_Bps",
+          "configured_value": 12800000000,
+          "unit": "B/s",
+          "configuration_source_id": "gpu_backend"
+        },
+        {
+          "name": "propagation_latency_fs",
+          "configured_value": 10000000,
+          "unit": "fs",
+          "configuration_source_id": "gpu_backend"
+        }
+      ],
+      "sources": [
+        {
+          "source_id": "external_link_configuration",
+          "evidence_class": "implementation_configuration",
+          "locator": "configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+          "description": "12.8 GB/s direct-memory link assumption; not a measured board or protocol endpoint"
+        }
+      ],
+      "reference_points": [],
+      "applicable_shape_keys": [],
+      "notes": "Requires payload-size sweep, one-way serialization and round-trip response measurements."
+    },
+    "logic_die_gateway": {
+      "required": true,
+      "status": "specified_only",
+      "timing_owner": "shared3d.logic_die_gateway",
+      "parameter_bindings": [
+        {
+          "name": "clock_hz",
+          "configured_value": 400000000,
+          "unit": "Hz",
+          "configuration_source_id": "gpu_backend"
+        },
+        {
+          "name": "issue_width_per_cycle",
+          "configured_value": 4,
+          "unit": "request/cycle",
+          "configuration_source_id": "gpu_backend"
+        },
+        {
+          "name": "parent_table_entries",
+          "configured_value": 256,
+          "unit": "entry",
+          "configuration_source_id": "gpu_backend"
+        }
+      ],
+      "sources": [
+        {
+          "source_id": "gateway_configuration",
+          "evidence_class": "implementation_configuration",
+          "locator": "configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+          "description": "Logic-die queue and issue-width implementation assumptions"
+        }
+      ],
+      "reference_points": [],
+      "applicable_shape_keys": [],
+      "notes": "Requires isolated split/join latency and saturation-throughput reference points."
+    },
+    "dram3d": {
+      "required": true,
+      "status": "specified_only",
+      "timing_owner": "shared3d.ramulator2",
+      "parameter_bindings": [
+        {
+          "name": "channel_count",
+          "configured_value": 16,
+          "unit": "channel",
+          "configuration_source_id": "gpu_backend"
+        },
+        {
+          "name": "rate_MTps",
+          "configured_value": 400,
+          "unit": "MT/s",
+          "configuration_source_id": "gpu_backend"
+        },
+        {
+          "name": "peak_payload_bandwidth_Bps",
+          "configured_value": 409600000000,
+          "unit": "B/s",
+          "configuration_source_id": "gpu_backend"
+        },
+        {
+          "name": "ramulator2_timing_config",
+          "configured_value": "ramulator2_hbdram_edge_16ch_shared.yaml",
+          "unit": "configuration",
+          "configuration_source_id": "dram_config"
+        }
+      ],
+      "sources": [
+        {
+          "source_id": "dram_configuration",
+          "evidence_class": "implementation_configuration",
+          "locator": "configs/hetero/memory/ramulator2_hbdram_edge_16ch_shared.yaml",
+          "description": "Ramulator2 HBDRAM organization and timing input; not silicon-correlated"
+        }
+      ],
+      "reference_points": [],
+      "applicable_shape_keys": [],
+      "notes": "Requires row-hit, row-miss and sustained mixed-stream references for the same organization."
+    }
+  }
+}

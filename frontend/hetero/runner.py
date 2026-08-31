@@ -32,6 +32,10 @@ from .online_operator_runtime import (
 )
 from .operator_event import OperatorEventDispatcher
 from .placement import place_nodes
+from .performance_calibration import (
+    PerformanceCalibration,
+    evaluate_performance_gate,
+)
 from .prefill_cycle_artifact import PrefillCycleDispatcher
 from .prefill_cycle_runtime import run_prefill_cycle_dag
 from .runtime_bridge import allocate_paged_kv, run_task_dag, simulate_token_barrier
@@ -770,6 +774,23 @@ def execute_run(
         metrics = _timed_metrics(
             runtime_result, execution_graph, request_configs, execution_mode
         )
+        calibration_payload = config.get("calibration")
+        if isinstance(calibration_payload, Mapping):
+            calibration = PerformanceCalibration.from_payload(
+                calibration_payload, "<resolved_config.calibration>"
+            )
+            task_records = [
+                task
+                for task in execution_graph["tasks"]  # type: ignore[index]
+                if isinstance(task, Mapping)
+            ]
+            performance_gate = evaluate_performance_gate(
+                calibration, task_records, project_root
+            )
+            metrics["performance_calibration"] = performance_gate
+            metrics["performance_claim_allowed"] = performance_gate[
+                "performance_claim_allowed"
+            ]
         timing_by_id = {
             str(item["task_id"]): item
             for item in runtime_result["tasks"]  # type: ignore[index]

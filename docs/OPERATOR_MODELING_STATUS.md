@@ -47,6 +47,8 @@
 - **请求周期 Ready**：GPU Trace必须满足精确Shape/Revision、SM86双跑、地址零漏配、唯一Ramulator2、Parent/Child/durable守恒和零在途；非SM的KV任务必须满足精确Global PA事务、唯一Ramulator2和相同守恒。纯主机控制事件不产生设备请求，因此只获得因果资格。
 - **性能可用**：还需整机参数校准和所有关键任务覆盖；当前数量为 0。
 
+P17已经为性能可用增加独立机器门禁。除本表的逐任务`performance_eligible`外，还必须同时通过GPU Kernel、Copy Engine、Runtime、外部Link、Logic-Die Gateway和3D-DRAM六项校准。当前RTX 3070本地显存原生测量只构成`measured_unvalidated`证据，不能校准外接3D-DRAM，因此本表19种算子的性能可用数量仍为0。
+
 ## 规模变化的处理原则
 
 算子名称相同不代表周期可复用。Batch、Context、隐藏维度、中间维度、词表、Attention/KV Head、dtype 或 checkpoint 改变，可能同时改变 Kernel 选择与融合、Grid/Block、Tensor Core 指令数、访存事务、缓存命中、Workspace、Global PA 容量和 DRAM Bank/Row 分布。Attention 随序列长度通常包含二次项，GEMM 和 KV 流量也按各自维度变化，因此不得用一个统一比例线性缩放现有周期。

@@ -2,7 +2,7 @@
 
 GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端到端 LLM 联合仿真工程。工程把完整 Prefill/Decode 请求图、算子放置、跨设备数据移动、Paged KV Cache 和全局事件调度连接到同一条可复现运行路径。
 
-> 当前版本为 `0.24.0`，P16固定Shape的全任务请求周期建模已完成。20个任务无分析回退地进入同一因果时间线：15个GPU Trace实例和3个KV运行时实例具备请求周期资格，2个主机控制事件被显式排除在设备性能边界之外。硬件参数仍未校准，继续禁止把当前结果作为端到端性能结论。
+> 当前版本为 `0.25.0`。P16固定Shape的全任务请求周期建模已经完成；P17现已增加独立的性能校准合同、配置/测量哈希、逐组件误差门禁和RTX 3070原生参考测量。GPU本地显存测量尚未与同拓扑模拟对齐，外部Link、Logic-Die Gateway和3D-DRAM也没有可信参考点，因此继续禁止把当前结果作为端到端性能结论。
 
 长时间资格验证可以部署到`192.168.0.197`并把两个确定性Leg绑定到不同CPU并行执行；密码不进入仓库或日志。远端路径、GPT‑5.6 Luna `xhigh`编排约定、单轮入口和完成后严格合并方法见[远端验证规范](docs/REMOTE_VALIDATION.md)。
 
@@ -20,8 +20,9 @@ GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端�
 - 真实 Accel-Sim v2 与完整 `atlasim.Chip` 可同进程、多时钟推进；GPU 与 ATLAS 可争用同一套 Channel/Bank，并由唯一 Ramulator2 负责 3D-DRAM 时序；
 - 真实 GPU 算子 Artifact 流程：SM86 Trace 采集、Trace Manifest、Range-Rebase 到 Global PA、Accel-Sim 双遍资格验证与 `request_cycle_ready` Catalog；未合格算子只能显式使用分析回退；
 - 可审计的[算子建模与测试状态表](docs/OPERATOR_MODELING_STATUS.md)：机器可读 Catalog 固定模型 Revision、Batch、Context、Q/KV 长度、dtype 与模型维度，并分别记录“已建模、已测试、请求周期 Ready、性能可用”；
+- Fail-closed性能校准门禁：分别跟踪GPU Kernel、Copy Engine、Runtime、外部Link、Logic-Die Gateway和3D-DRAM的参数绑定、证据类型、参考点、误差阈值与适用Shape；只有全部组件和全部设备任务同时通过才允许打开性能声明；
 - 可复现的实验与 DSE：配置/产物内容哈希、Simulation Key、运行缓存、依赖锁、Fidelity 标签、候选搜索和规范化报告；
-- 当前验证边界：P16已双遍验证固定TinyLlama Layer-0、FP16、BS=1、Context=16的20任务时间线；每遍完成7,003,497个GPU Parent和517个KV运行时Parent，依赖、资源、Global PA、唯一Ramulator2、请求守恒和18次版本提交全部通过。运行时与整机参数仍未校准，因此暂不给出端到端性能结论。
+- 当前验证边界：P16已双遍验证固定TinyLlama Layer-0、FP16、BS=1、Context=16的20任务时间线；P17已在本机RTX 3070上完成500次Embedding、Residual、32 KiB D2D Copy和同步空Kernel Launch测量，并自动确认P16双遍确定性。该测量只适用于GPU本地显存，不能校准外接3D-DRAM，当前6个必需组件的完整性能资格仍为0/6。
 
 ## 2. 目录结构
 
@@ -114,7 +115,30 @@ ctest --test-dir simulator/build --output-on-failure
 .venv/bin/python -m pytest tests/hetero -q
 ```
 
-当前基线通过 9 个 C++ 测试和 90 个 Python 测试。测试数量会随实现推进增加；判断成功应以“0 failed”为准，而不是永久依赖固定数量。
+当前基线通过 9 个 C++ 测试；Python测试数量会随实现推进增加，判断成功应以“0 failed”为准，而不是永久依赖固定数量。
+
+### 5.1 P17性能校准审计
+
+Windows本机RTX 3070原生参考测量：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_p17_rtx3070_native_calibration.ps1 `
+  -OutputRoot validation/p17/native_rtx3070 -Warmup 50 -Iterations 500
+```
+
+对P16双遍结果执行校准门禁审计：
+
+```powershell
+$key = "d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a"
+.venv/Scripts/python.exe scripts/audit_p17_performance_calibration.py `
+  configs/hetero/calibration/p17_tinyllama_prefill_layer0_ctx16_incomplete.json `
+  "validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/$key" `
+  "validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/$key" `
+  --project-root . `
+  --output validation/p17/p16_layer0_ctx16/performance_calibration_audit.json
+```
+
+当前预期状态是`audit_complete_blocked`，而不是`qualified`。详细边界见[P17性能校准状态](docs/qualification/p17_performance_calibration.md)。
 
 强制重新编译已有目标：
 

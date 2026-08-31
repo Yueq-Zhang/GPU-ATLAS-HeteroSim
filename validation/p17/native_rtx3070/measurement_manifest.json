@@ -1,0 +1,14 @@
+{
+  "schema_version": "hetero-p17-native-calibration-manifest/v1",
+  "measured_at_utc": "2026-08-31T12:34:14.3513135Z",
+  "source": "workloads/cuda/p17_rtx3070_calibration.cu",
+  "source_sha256": "5c940026e847f3f434bb8330e05fd027fc67d73ead20fdf7586d49250976323f",
+  "executable_sha256": "471cb7c9cf9fab98ed8421b61646fd90814c608695a3b91d1d78edc39200ebee",
+  "measurement_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+  "nvcc": "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.6\\bin\\nvcc.exe",
+  "gpu_identity": "NVIDIA GeForce RTX 3070, 591.86, 8192 MiB",
+  "warmup_iterations": 50,
+  "measured_iterations": 500,
+  "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram",
+  "performance_eligible": false
+}

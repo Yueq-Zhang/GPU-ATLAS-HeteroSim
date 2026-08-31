@@ -1,5 +1,14 @@
 # Implementation status
 
+## 2026-08-31 — v0.25.0 / P17 performance-calibration gate and first native measurements
+
+- Added a machine-readable calibration contract and fail-closed audit for GPU kernels, Copy Engine, runtime control, external Link, Logic-Die Gateway and 3D-DRAM. Configuration artifacts and measurement artifacts are content-hashed; validated status additionally requires accepted evidence classes, required metrics, matched Shape scope and reference errors within tolerance.
+- Connected the calibration record to the experiment schema and global runner gate. A performance claim now requires both full component calibration and `performance_eligible=true` for every included device task; host control events may be explicitly excluded but cannot silently qualify device timing.
+- Added and ran an RTX 3070 SM86 native CUDA calibration workload with 50 warmups and 500 measured iterations. It records exact-shape Context-16 Embedding and Residual kernels, a 32 KiB local-VRAM D2D copy, an empty-kernel CUDA event and synchronized host launch latency together with source/binary/result hashes.
+- The native measurements are deliberately `measured_unvalidated`: they use the local RTX 3070 VRAM path and do not calibrate P16's 12.8 GB/s external Link, Logic-Die Gateway or 409.6 GB/s internal 3D-DRAM. They also lack a matched native-memory Accel-Sim run for the complete 14-kernel set.
+- The P17 audit rechecks both P16 legs, confirms identical Simulation Key, makespan and request metrics, validates all four configuration hashes and the native measurement hash, and returns `audit_complete_blocked`. All six required components remain incomplete, so `performance_claim_allowed=false` is mandatory.
+- Detailed results and reproduction commands are in `docs/qualification/p17_performance_calibration.md`.
+
 ## 2026-08-31 — v0.24.0 / P16 complete for fixed-shape request-cycle causality
 
 - Added an auditable operator capability catalog for all 19 operator types / 20 task instances in the fixed TinyLlama Layer-0 BS=1 Context=16 Prefill graph. The catalog separates implementation, test, request-cycle readiness and performance eligibility and is regression-checked against the materialized graph.

@@ -1,0 +1,16 @@
+{
+  "schema_version": "hetero-p17-native-calibration/v1",
+  "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram",
+  "gpu": {"name": "NVIDIA GeForce RTX 3070", "compute_capability": "8.6", "multiprocessors": 46, "clock_rate_khz": 1815000, "memory_clock_rate_khz": 7001000, "memory_bus_width_bits": 256, "global_memory_bytes": 8589410304},
+  "software": {"cuda_driver_version": 13010, "cuda_runtime_version": 11060, "cudart_compile_version": 11060},
+  "protocol": {"warmup_iterations": 50, "measured_iterations": 500, "kernel_statistic": "cuda_event_per_iteration", "host_statistic": "steady_clock_kernel_plus_synchronize"},
+  "measurements": {
+    "empty_kernel_event": {"min_fs":2880000044,"p10_fs":3776000114,"median_fs":8960000239,"p90_fs":9216000326,"max_fs":59103999287,"mean_fs":9502016065},
+    "synchronized_launch": {"min_fs":7500000000,"p10_fs":8500000000,"median_fs":8600000000,"p90_fs":8900000000,"max_fs":40800000000,"mean_fs":9405200000},
+    "token_embedding_ctx16_hidden2048": {"min_fs":3072000109,"p10_fs":9216000326,"median_fs":9216000326,"p90_fs":10239999741,"max_fs":203776001930,"mean_fs":10331712160},
+    "residual_add_ctx16_hidden2048": {"min_fs":3072000109,"p10_fs":9119999595,"median_fs":9216000326,"p90_fs":9983999655,"max_fs":41983999312,"mean_fs":9592000194},
+    "d2d_copy_32768B": {"min_fs":3072000109,"p10_fs":5055999849,"median_fs":9216000326,"p90_fs":16383999959,"max_fs":199456006289,"mean_fs":10906816135},
+    "d2d_copy_32768B_median_bandwidth_Bps": 7111110860
+  },
+  "performance_qualification": {"eligible": false, "reason": "native local-VRAM measurements require matched native-memory simulation and do not calibrate the external link, logic-die gateway or 3D-DRAM"}
+}

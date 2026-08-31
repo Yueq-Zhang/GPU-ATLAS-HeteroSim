@@ -1,0 +1,348 @@
+{
+  "blockers": [
+    "component:copy_engine:status=measured_unvalidated",
+    "component:copy_engine:insufficient_reference_points",
+    "component:copy_engine:missing_metrics=copy_bandwidth_Bps,copy_latency_fs",
+    "component:copy_engine:shape_not_covered",
+    "component:dram3d:status=specified_only",
+    "component:dram3d:no_validating_source",
+    "component:dram3d:insufficient_reference_points",
+    "component:dram3d:missing_metrics=read_latency_fs,sustained_bandwidth_Bps",
+    "component:dram3d:shape_not_covered",
+    "component:external_link:status=specified_only",
+    "component:external_link:no_validating_source",
+    "component:external_link:insufficient_reference_points",
+    "component:external_link:missing_metrics=link_bandwidth_Bps,round_trip_latency_fs",
+    "component:external_link:shape_not_covered",
+    "component:gpu_kernel:status=measured_unvalidated",
+    "component:gpu_kernel:insufficient_reference_points",
+    "component:gpu_kernel:missing_metrics=kernel_latency_fs",
+    "component:gpu_kernel:shape_not_covered",
+    "component:logic_die_gateway:status=specified_only",
+    "component:logic_die_gateway:no_validating_source",
+    "component:logic_die_gateway:insufficient_reference_points",
+    "component:logic_die_gateway:missing_metrics=gateway_latency_fs,gateway_throughput_requests_per_s",
+    "component:logic_die_gateway:shape_not_covered",
+    "component:runtime_control:status=measured_unvalidated",
+    "component:runtime_control:insufficient_reference_points",
+    "component:runtime_control:missing_metrics=launch_latency_fs",
+    "component:runtime_control:shape_not_covered",
+    "runs:performance_boundary_still_closed"
+  ],
+  "calibration_audit": {
+    "blockers": [
+      "component:copy_engine:status=measured_unvalidated",
+      "component:copy_engine:insufficient_reference_points",
+      "component:copy_engine:missing_metrics=copy_bandwidth_Bps,copy_latency_fs",
+      "component:copy_engine:shape_not_covered",
+      "component:dram3d:status=specified_only",
+      "component:dram3d:no_validating_source",
+      "component:dram3d:insufficient_reference_points",
+      "component:dram3d:missing_metrics=read_latency_fs,sustained_bandwidth_Bps",
+      "component:dram3d:shape_not_covered",
+      "component:external_link:status=specified_only",
+      "component:external_link:no_validating_source",
+      "component:external_link:insufficient_reference_points",
+      "component:external_link:missing_metrics=link_bandwidth_Bps,round_trip_latency_fs",
+      "component:external_link:shape_not_covered",
+      "component:gpu_kernel:status=measured_unvalidated",
+      "component:gpu_kernel:insufficient_reference_points",
+      "component:gpu_kernel:missing_metrics=kernel_latency_fs",
+      "component:gpu_kernel:shape_not_covered",
+      "component:logic_die_gateway:status=specified_only",
+      "component:logic_die_gateway:no_validating_source",
+      "component:logic_die_gateway:insufficient_reference_points",
+      "component:logic_die_gateway:missing_metrics=gateway_latency_fs,gateway_throughput_requests_per_s",
+      "component:logic_die_gateway:shape_not_covered",
+      "component:runtime_control:status=measured_unvalidated",
+      "component:runtime_control:insufficient_reference_points",
+      "component:runtime_control:missing_metrics=launch_latency_fs",
+      "component:runtime_control:shape_not_covered"
+    ],
+    "calibration_id": "p17.tinyllama.prefill.layer0.bs1.ctx16.rtx3070.shared3d.v1",
+    "components": {
+      "copy_engine": {
+        "applicable_shape_keys": [],
+        "blockers": [
+          "status=measured_unvalidated",
+          "insufficient_reference_points",
+          "missing_metrics=copy_bandwidth_Bps,copy_latency_fs",
+          "shape_not_covered"
+        ],
+        "missing_metrics": [
+          "copy_bandwidth_Bps",
+          "copy_latency_fs"
+        ],
+        "observed_metrics": [],
+        "parameter_binding_count": 3,
+        "qualified": false,
+        "reference_points": [],
+        "required": true,
+        "required_metrics": [
+          "copy_latency_fs",
+          "copy_bandwidth_Bps"
+        ],
+        "source_artifacts": [
+          {
+            "actual_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+            "exists": true,
+            "expected_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+            "locator": "validation/p17/native_rtx3070/native_measurements.json",
+            "matched": true,
+            "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram",
+            "source_id": "rtx3070_native_d2d_copy"
+          }
+        ],
+        "status": "measured_unvalidated",
+        "timing_owner": "python.runtime_task_memory.kv_copy_engine",
+        "validating_source_count": 1,
+        "validating_sources": [
+          "rtx3070_native_d2d_copy"
+        ]
+      },
+      "dram3d": {
+        "applicable_shape_keys": [],
+        "blockers": [
+          "status=specified_only",
+          "no_validating_source",
+          "insufficient_reference_points",
+          "missing_metrics=read_latency_fs,sustained_bandwidth_Bps",
+          "shape_not_covered"
+        ],
+        "missing_metrics": [
+          "read_latency_fs",
+          "sustained_bandwidth_Bps"
+        ],
+        "observed_metrics": [],
+        "parameter_binding_count": 4,
+        "qualified": false,
+        "reference_points": [],
+        "required": true,
+        "required_metrics": [
+          "read_latency_fs",
+          "sustained_bandwidth_Bps"
+        ],
+        "source_artifacts": [],
+        "status": "specified_only",
+        "timing_owner": "shared3d.ramulator2",
+        "validating_source_count": 0,
+        "validating_sources": []
+      },
+      "external_link": {
+        "applicable_shape_keys": [],
+        "blockers": [
+          "status=specified_only",
+          "no_validating_source",
+          "insufficient_reference_points",
+          "missing_metrics=link_bandwidth_Bps,round_trip_latency_fs",
+          "shape_not_covered"
+        ],
+        "missing_metrics": [
+          "link_bandwidth_Bps",
+          "round_trip_latency_fs"
+        ],
+        "observed_metrics": [],
+        "parameter_binding_count": 3,
+        "qualified": false,
+        "reference_points": [],
+        "required": true,
+        "required_metrics": [
+          "link_bandwidth_Bps",
+          "round_trip_latency_fs"
+        ],
+        "source_artifacts": [],
+        "status": "specified_only",
+        "timing_owner": "shared3d.external_link",
+        "validating_source_count": 0,
+        "validating_sources": []
+      },
+      "gpu_kernel": {
+        "applicable_shape_keys": [],
+        "blockers": [
+          "status=measured_unvalidated",
+          "insufficient_reference_points",
+          "missing_metrics=kernel_latency_fs",
+          "shape_not_covered"
+        ],
+        "missing_metrics": [
+          "kernel_latency_fs"
+        ],
+        "observed_metrics": [],
+        "parameter_binding_count": 1,
+        "qualified": false,
+        "reference_points": [],
+        "required": true,
+        "required_metrics": [
+          "kernel_latency_fs"
+        ],
+        "source_artifacts": [
+          {
+            "actual_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+            "exists": true,
+            "expected_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+            "locator": "validation/p17/native_rtx3070/native_measurements.json",
+            "matched": true,
+            "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram",
+            "source_id": "rtx3070_native_simple_kernels"
+          }
+        ],
+        "status": "measured_unvalidated",
+        "timing_owner": "accel_sim.sm86.compute_and_cache",
+        "validating_source_count": 1,
+        "validating_sources": [
+          "rtx3070_native_simple_kernels"
+        ]
+      },
+      "logic_die_gateway": {
+        "applicable_shape_keys": [],
+        "blockers": [
+          "status=specified_only",
+          "no_validating_source",
+          "insufficient_reference_points",
+          "missing_metrics=gateway_latency_fs,gateway_throughput_requests_per_s",
+          "shape_not_covered"
+        ],
+        "missing_metrics": [
+          "gateway_latency_fs",
+          "gateway_throughput_requests_per_s"
+        ],
+        "observed_metrics": [],
+        "parameter_binding_count": 3,
+        "qualified": false,
+        "reference_points": [],
+        "required": true,
+        "required_metrics": [
+          "gateway_latency_fs",
+          "gateway_throughput_requests_per_s"
+        ],
+        "source_artifacts": [],
+        "status": "specified_only",
+        "timing_owner": "shared3d.logic_die_gateway",
+        "validating_source_count": 0,
+        "validating_sources": []
+      },
+      "runtime_control": {
+        "applicable_shape_keys": [],
+        "blockers": [
+          "status=measured_unvalidated",
+          "insufficient_reference_points",
+          "missing_metrics=launch_latency_fs",
+          "shape_not_covered"
+        ],
+        "missing_metrics": [
+          "launch_latency_fs"
+        ],
+        "observed_metrics": [],
+        "parameter_binding_count": 2,
+        "qualified": false,
+        "reference_points": [],
+        "required": true,
+        "required_metrics": [
+          "launch_latency_fs"
+        ],
+        "source_artifacts": [
+          {
+            "actual_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+            "exists": true,
+            "expected_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+            "locator": "validation/p17/native_rtx3070/native_measurements.json",
+            "matched": true,
+            "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram",
+            "source_id": "rtx3070_synchronized_empty_launch"
+          }
+        ],
+        "status": "measured_unvalidated",
+        "timing_owner": "python.online_operator_runtime.host_control",
+        "validating_source_count": 1,
+        "validating_sources": [
+          "rtx3070_synchronized_empty_launch"
+        ]
+      }
+    },
+    "configuration_sources": [
+      {
+        "actual_sha256": "4c11629e1a17216a641bca52f6ec0d4c46aa1c60f8c2c6f0f45c4a07f0a00933",
+        "exists": true,
+        "expected_sha256": "4c11629e1a17216a641bca52f6ec0d4c46aa1c60f8c2c6f0f45c4a07f0a00933",
+        "matched": true,
+        "path": "configs/hetero/experiments/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu.json",
+        "source_id": "p16_experiment"
+      },
+      {
+        "actual_sha256": "da41dc6c68070d01dc44a1f6d7b6009d8fb1a2167868eb1f7bb34cd88ad9b8df",
+        "exists": true,
+        "expected_sha256": "da41dc6c68070d01dc44a1f6d7b6009d8fb1a2167868eb1f7bb34cd88ad9b8df",
+        "matched": true,
+        "path": "configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+        "source_id": "gpu_backend"
+      },
+      {
+        "actual_sha256": "3595efe544a708e7d7e74431c7c2f0cbf465fbe256c1e23514fa77e5d0dbb8cb",
+        "exists": true,
+        "expected_sha256": "3595efe544a708e7d7e74431c7c2f0cbf465fbe256c1e23514fa77e5d0dbb8cb",
+        "matched": true,
+        "path": "configs/hetero/runtime_tasks/tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json",
+        "source_id": "runtime_model"
+      },
+      {
+        "actual_sha256": "448442cba5b8edbe053cd166353954a97b675f837b958cd88c626f4ba55c2a16",
+        "exists": true,
+        "expected_sha256": "448442cba5b8edbe053cd166353954a97b675f837b958cd88c626f4ba55c2a16",
+        "matched": true,
+        "path": "configs/hetero/memory/ramulator2_hbdram_edge_16ch_shared.yaml",
+        "source_id": "dram_config"
+      }
+    ],
+    "performance_claim_allowed": false,
+    "qualified_component_count": 0,
+    "required_component_count": 6,
+    "required_shape_key": "tinyllama.1_1b.prefill.layer0.fp16.bs1.ctx16",
+    "schema_version": "hetero-performance-calibration-audit/v1"
+  },
+  "calibration_record": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\calibration\\p17_tinyllama_prefill_layer0_ctx16_incomplete.json",
+  "deterministic_runs": true,
+  "performance_claim_allowed": false,
+  "run_count": 2,
+  "runs": [
+    {
+      "makespan_fs": 35450346739701,
+      "path": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\validation\\p16\\leg1\\p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu\\d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
+      "performance_claim_allowed": false,
+      "requests": [
+        {
+          "e2e_user_fs": 35450246249713,
+          "final_committed_kv_len": 16,
+          "generated_length": 1,
+          "itl_fs": [],
+          "request_id": "TINYLLAMA11B-PREFILL-R0",
+          "retire_latency_fs": 35450346739701,
+          "tpot_fs": null,
+          "ttft_fs": 35450246249713
+        }
+      ],
+      "run_status": "operator_event",
+      "simulation_input_key": "d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a"
+    },
+    {
+      "makespan_fs": 35450346739701,
+      "path": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\validation\\p16\\leg2\\p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu\\d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
+      "performance_claim_allowed": false,
+      "requests": [
+        {
+          "e2e_user_fs": 35450246249713,
+          "final_committed_kv_len": 16,
+          "generated_length": 1,
+          "itl_fs": [],
+          "request_id": "TINYLLAMA11B-PREFILL-R0",
+          "retire_latency_fs": 35450346739701,
+          "tpot_fs": null,
+          "ttft_fs": 35450246249713
+        }
+      ],
+      "run_status": "operator_event",
+      "simulation_input_key": "d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a"
+    }
+  ],
+  "schema_version": "hetero-p17-performance-calibration-qualification/v1",
+  "status": "audit_complete_blocked"
+}
