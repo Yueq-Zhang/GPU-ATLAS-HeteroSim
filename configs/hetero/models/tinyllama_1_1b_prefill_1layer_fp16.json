@@ -14,5 +14,6 @@
   "position_encoding": "rope",
   "tied_embeddings": false,
   "input_embedding_mode": "token_ids",
-  "materialize_parameters": true
+  "materialize_parameters": true,
+  "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6"
 }

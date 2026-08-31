@@ -5,10 +5,10 @@
 | 字段 | 内容 |
 | --- | --- |
 | 状态 | 已冻结的实现基线 |
-| 版本 | 1.21 |
-| 日期 | 2026-08-30 |
+| 版本 | 1.24 |
+| 日期 | 2026-08-31 |
 | 适用工程 | ATLAS-MICRO-2026 |
-| 当前基线提交 | 8c58dbb1a2209829198451cbfd8fb6c95c16c53c |
+| 当前基线提交 | 96202b410b9c26702e6b6b60f280ecb80914b927 |
 | 主要目标 | GPU 与 3D-DRAM Compute Die/ATLAS 的端到端 LLM 联合仿真 |
 
 本文档是后续实现、代码评审、配置设计和实验解释的主规范。后续工作如果与本文档冲突，应先修改本文档并记录原因，再修改代码。不能在实现中静默改变本文档已经冻结的拓扑语义、地址语义、计时所有权或端到端 Token 语义。
@@ -2766,9 +2766,23 @@ P15h最终完成全部10个新增算子的重捕获和双遍资格，并与既�
 
 该时间线输出35,390.378 µs的模拟makespan，但`performance_claim_allowed=false`仍是强制门禁：20个任务中只有12个GPU算子采用真实请求周期Backend，Request Start/Finish、KV Allocate/Append/Release、Token Embedding和两次Residual Add仍为分析或运行时模型；GPU、3D-DRAM与互联参数也尚未用实测系统校准。因此P15h关闭的是“12算子统一地址—请求—调度—版本因果”门槛，而不是可发布的端到端延迟门槛。
 
-LM Head identity-untranslated双遍必须精确一致：23,193,593 GPU cycles、476,608,000条指令、4,096,686个Parent与4,097,138个Child，唯一Ramulator2且零在途。SM86请求掩码归一化允许任意连续的已选32B Sector区间，但仅当`sector_count × 32 == request_size`；归一化后的地址、Byte Mask和Sector Mask必须继续满足父子请求与字节守恒。
+### 25.6 P16全任务建模与规模兼容合同
 
-新增Trace的耦合资格可以在稳定Global PA工作解除冻结前逐算子推进，但正式Artifact只能在双跑GPU周期、指令数和完整外部内存统计一致，且Parent、Child、durable completion、单Ramulator2、零ATLAS请求和零在途全部满足时标记`compute_memory_coupled=true`。大型Gate/Up和LM Head虽已完成identity-untranslated耦合资格，仍不得因源Artifact或计算—内存耦合证据存在而提升Global PA Ready状态。
+P16为固定一层TinyLlama Prefill建立独立的算子能力Catalog。Catalog必须逐类记录参考图实例数、Backend类型、实现状态、测试状态、周期保真度、`request_cycle_ready`、`performance_eligible`、Shape合同和Artifact引用。测试必须从实际物化ModelGraph统计算子及实例数并与Catalog精确相等，禁止依靠人工表格声称覆盖完整。
+
+非SM任务分为三类：Request Start/Finish采用显式主机控制边界；KV Allocate/Release采用元数据读写事务；KV Append采用K/V读写字节、事务粒度和Copy Engine周期合同。合同必须固定Model Revision、Batch和Context，并输出读写字节、事务数、公式、时钟和参数来源。KV任务只有在精确Global PA请求实际经过外部Link和唯一live Ramulator2，且双遍证明Parent/Child/durable守恒、零ATLAS请求和零在途后，才允许设为`request_cycle_ready=true`。硬件未校准不撤销请求周期资格，但必须保持`performance_eligible=false`。Request Start/Finish不产生设备内存请求，只获得因果资格，并从设备性能边界排除。
+
+Token Embedding与Residual Add必须拥有各自的非空SM86 Trace。捕获器允许对没有不透明Workspace的简单算子关闭Allocator全历史，但Manifest仍必须完整记录所有实际输入、参数和输出地址范围；任何Trace访问未被这些范围覆盖时，Range-Rebase资格必须失败。Residual Add的两个图实例只有在Model/Shape/实现完全相同且各自的运行期Value绑定正确时才允许共享同一源Trace；全局时间线中仍是两个独立Dispatch。
+
+Artifact兼容身份至少包含：模型规格名、Checkpoint Revision、隐藏维度、中间维度、Attention/KV Head数、Head Dim、词表、dtype、Phase、Layer、Batch、Context、Q长度和KV长度。任一字段变化时必须在Dispatch前拒绝旧Artifact。原因是规模变化可能同时改变Kernel选择与Fusion、Grid/Block、Tensor Core指令、访存事务、Cache/NoC行为、Allocator Workspace、Global PA容量以及DRAM Channel/Bank/Row分布；这些变化通常非线性，尤其Attention包含序列长度二次项，禁止按Token数、Batch或参数量直接缩放旧周期。
+
+新Shape必须执行：生成Model/Shape Contract → 编译或选择实现 → 捕获Trace与Allocator范围 → 构建内容寻址Artifact → Range-Rebase双跑请求周期资格 → 重新接入全局时间线并验证依赖、资源、地址、请求与版本因果。只有全部步骤通过后，能力Catalog才能增加新的已测试Shape；不得覆盖已有记录或把一个Shape的Ready状态外推到另一个Shape。
+
+P16最终时间线不允许分析回退。14种GPU算子覆盖15个Trace实例；KV Allocate、KV Append和KV Release分别产生3、512和2个64 B Parent；Request Start/Finish为两个主机控制边界。两遍运行的Simulation Key、40,125,102 GPU cycles、692,663,026条指令、7,003,497个GPU Parent、7,006,370个GPU Child、804,530,289次地址重绑定、517个KV运行时Parent、31次输入版本检查、18次输出版本提交和35,450,346,739,701 fs因果makespan全部一致。每个请求周期Backend只有一个Ramulator2，地址漏配、ATLAS请求和退出在途均为0。
+
+Global PA分配包含87个不重叠范围、58个算子Workspace，总占用450,296,512 B / 4 GiB。真实Embedding Kernel使用64-bit Token ID，而通用ModelGraph的外部输入仍按模型元素宽度记账；P16不得静默改变已资格算子的低地址。实现必须从地址空间顶部保留一个显式`external_input_widened_shadow`，把真实128 B Token ID输入绑定到该范围，并把模式、大小和保留空间写入Global PA清单。该适配不是VA→PA翻译，不得据此声明MMU/TLB已实现。
+
+P16的35.450 ms只用于功能因果和双遍确定性。Copy Engine、Runtime、GPU、Link和3D-DRAM参数没有统一硬件校准，因此`performance_claim_allowed=false`不可关闭，也不得发布为端到端Latency、Token/s或加速比。后续性能校准必须形成逐参数来源、误差和适用Shape记录；校准不能用调整单一常数去强行匹配总时间。
 
 ---
 
@@ -2865,3 +2879,5 @@ LM Head identity-untranslated双遍必须精确一致：23,193,593 GPU cycles、
 | 1.20 | 2026-08-30 | 将Range-Rebase捕获扩展为目标窗口分配加目标Tensor Backing Segment；完成QKV Projection远端双遍资格、双算子Ready Catalog和严格地址/父子请求守恒汇总；继续冻结未重捕获Artifact与Prefill全局时间线声明边界 |
 | 1.21 | 2026-08-30 | 将Attention Norm与QKV Projection两个Ready Accel-Sim后端嵌入同一Prefill全局时间线；加入调用方Global PA绑定、资源互斥、请求完成和完成时版本提交门禁；启动其余10算子P15h重捕获与远端资格流程 |
 | 1.22 | 2026-08-31 | 完成其余10个GPU算子的Range-Rebase重捕获和双遍资格，建立12算子Ready Catalog并全部嵌入同一Prefill全局时间线；验证84个Global PA区间、唯一Ramulator2、请求守恒、GPU互斥和18次版本提交因果，同时保持端到端性能资格关闭 |
+| 1.23 | 2026-08-31 | 启动P16全任务建模：增加19类/20实例能力Catalog、实际图一致性检查、精确模型与Shape门禁、5类控制/KV运行时周期合同，以及Embedding/Residual轻量捕获流程；所有新增合同在双跑和校准前保持性能未资格 |
+| 1.24 | 2026-08-31 | 完成P16固定Shape全任务请求周期闭环：15个GPU Trace实例、3个KV live Ramulator2实例和2个主机控制边界双遍通过；增加顶部输入宽度Shadow、20任务因果与性能边界自动资格记录，同时保持整机性能未校准 |

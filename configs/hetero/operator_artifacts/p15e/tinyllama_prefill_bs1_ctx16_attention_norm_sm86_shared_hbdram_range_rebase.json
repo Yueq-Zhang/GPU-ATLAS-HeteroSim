@@ -92,8 +92,8 @@
     {
       "kind": "accel_sim_trace_manifest",
       "path": "tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
-      "sha256": "265090ffaeafe0d0e13ee5ec9e74774d9f6677c78be913d9110cd7d9ddb3a796",
-      "size_bytes": 4120
+      "sha256": "64785c8ff333a2c0eae25af7ac47cd2427b2a6f9a7768b5806dbdd3c00e6228c",
+      "size_bytes": 4119
     },
     {
       "kind": "standalone_operator_artifact",

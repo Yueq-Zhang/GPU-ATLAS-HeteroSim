@@ -22,6 +22,13 @@ from .global_memory_map import GlobalAllocation
 from .ir import ModelNode
 from .model_graph import ModelSpec
 from .operator_artifact import OperatorArtifactManifest
+from .runtime_task_model import RuntimeTaskModelCatalog, RuntimeTaskModelError
+from .runtime_task_memory import (
+    RuntimeTaskAddressBinding,
+    RuntimeTaskMemoryError,
+    plan_runtime_task_requests,
+    run_runtime_task_memory,
+)
 from .trace_manifest import SimulationBufferBinding, TraceManifest
 
 
@@ -60,6 +67,7 @@ class TensorValueBinding:
     source: str
     index: int
     value_offset_bytes: int
+    binding_mode: str = "semantic_value"
 
 
 @dataclass(frozen=True, slots=True)
@@ -94,10 +102,19 @@ class TraceBinding:
             "operator": node.op,
             "phase": actual_phase,
             "layer_id": node.layer_id,
+            "batch_size": int(node.attributes.get("batch_size", 1)),
+            "context_length": int(
+                node.attributes.get(
+                    "context_length",
+                    node.attributes.get("source_q_len", node.attributes.get("q_len", 1)),
+                )
+            ),
             "q_len": int(node.attributes.get("q_len", 1)),
             "kv_length": int(node.attributes.get("attention_kv_len", 1)),
             "dtype": model.dtype,
         }
+        if model.checkpoint_revision is not None:
+            actual["checkpoint_revision"] = model.checkpoint_revision
         actual.update(self.contract_overrides)
         expected = key.to_dict()
         mismatches = {
@@ -169,8 +186,15 @@ class OperatorEventDispatcher:
         self._used_traces: dict[str, dict[str, object]] = {}
         self._used_atlas_artifacts: dict[str, dict[str, object]] = {}
         self._require_request_cycle_ready = False
+        self._runtime_task_models: RuntimeTaskModelCatalog | None = None
+        self._runtime_task_operators: frozenset[str] = frozenset()
         self._runtime_bindings: dict[str, tuple[SimulationBufferBinding, ...]] = {}
         self._runtime_binding_records: dict[str, dict[str, object]] = {}
+        self._runtime_task_address_bindings: dict[
+            str, RuntimeTaskAddressBinding
+        ] = {}
+        self._global_allocations: dict[str, GlobalAllocation] = {}
+        self._runtime_task_runs: list[dict[str, object]] = []
         self._prepare_gpu_backend()
         self._prepare_atlas_backend()
 
@@ -196,6 +220,25 @@ class OperatorEventDispatcher:
                 "and cannot be used by the single-placement operator-event dispatcher"
             )
         self._accel_sim = AccelSimBackend(backend_config)
+        runtime_task_model_ref = gpu.get("runtime_task_model_ref")
+        if runtime_task_model_ref is not None:
+            if not isinstance(runtime_task_model_ref, str) or not runtime_task_model_ref:
+                raise OperatorEventError("runtime_task_model_ref must be a path")
+            self._runtime_task_models = RuntimeTaskModelCatalog.load(
+                _resolve_path(runtime_task_model_ref, self.project_root)
+            )
+        raw_runtime_operators = gpu.get("runtime_task_operators", [])
+        if not isinstance(raw_runtime_operators, list) or any(
+            not isinstance(item, str) or not item for item in raw_runtime_operators
+        ):
+            raise OperatorEventError("runtime_task_operators must be a string array")
+        if len(set(raw_runtime_operators)) != len(raw_runtime_operators):
+            raise OperatorEventError("runtime_task_operators must be unique")
+        self._runtime_task_operators = frozenset(raw_runtime_operators)
+        if self._runtime_task_operators and self._runtime_task_models is None:
+            raise OperatorEventError(
+                "runtime_task_operators requires runtime_task_model_ref"
+            )
         self._require_request_cycle_ready = bool(
             gpu.get("require_request_cycle_ready", False)
         )
@@ -319,10 +362,13 @@ class OperatorEventDispatcher:
                         f"value_bindings[{value_index}] must be an object"
                     )
                 required = {"tensor_id", "source", "index", "value_offset_bytes"}
-                if set(value_raw) != required:
+                optional = {"binding_mode"}
+                if not required.issubset(value_raw) or set(value_raw) - (
+                    required | optional
+                ):
                     raise OperatorEventError(
-                        f"value_bindings[{value_index}] fields must be "
-                        f"{sorted(required)}"
+                        f"value_bindings[{value_index}] fields must contain "
+                        f"{sorted(required)} with optional binding_mode"
                     )
                 source = str(value_raw["source"])
                 index_value = value_raw["index"]
@@ -330,6 +376,18 @@ class OperatorEventDispatcher:
                 if source not in {"input", "output"}:
                     raise OperatorEventError(
                         "value binding source must be input or output"
+                    )
+                binding_mode = str(
+                    value_raw.get("binding_mode", "semantic_value")
+                )
+                if binding_mode not in {
+                    "semantic_value",
+                    "external_input_widened_shadow",
+                }:
+                    raise OperatorEventError("unsupported value binding_mode")
+                if binding_mode == "external_input_widened_shadow" and source != "input":
+                    raise OperatorEventError(
+                        "external input shadow is valid only for input Values"
                     )
                 if (
                     not isinstance(index_value, int)
@@ -348,6 +406,7 @@ class OperatorEventDispatcher:
                         source=source,
                         index=index_value,
                         value_offset_bytes=offset_value,
+                        binding_mode=binding_mode,
                     )
                 )
             if self._require_request_cycle_ready and not value_bindings:
@@ -401,10 +460,13 @@ class OperatorEventDispatcher:
 
         if not self._require_request_cycle_ready:
             return
+        self._global_allocations = dict(allocations)
         memory_space_id = str(global_memory_map["memory_space_id"])
         cursor = _align_up(int(global_memory_map["allocated_bytes"]), alignment_bytes)
+        shadow_cursor = capacity_bytes
         reserved_extents = _reserved_allocation_extents(allocations, capacity_bytes)
         workspace_ranges: list[dict[str, object]] = []
+        shadow_ranges: list[dict[str, object]] = []
         binding_records: list[dict[str, object]] = []
         for task_id, spec in sorted(dispatch_specs.items()):
             node = spec.node
@@ -449,14 +511,48 @@ class OperatorEventDispatcher:
                 value_id = str(value["value_id"])
                 allocation = allocations.get(value_id)
                 extent = extents[value_binding.tensor_id]
-                if allocation is None or (
-                    value_binding.value_offset_bytes + extent
-                    > reserved_extents.get(value_id, 0)
-                ):
+                if allocation is None:
                     raise OperatorEventError(
-                        f"Global PA allocation cannot cover {value_binding.tensor_id}"
+                        f"Global PA allocation is missing for {value_id}"
                     )
-                physical = allocation.base_address + value_binding.value_offset_bytes
+                if value_binding.binding_mode == "external_input_widened_shadow":
+                    alignment = max(
+                        alignment_bytes, alignments[value_binding.tensor_id]
+                    )
+                    shadow_cursor = (
+                        (shadow_cursor - extent) // alignment
+                    ) * alignment
+                    if shadow_cursor < 0:
+                        raise OperatorEventError(
+                            "Global PA shadow allocation underflow"
+                        )
+                    physical = shadow_cursor
+                    shadow_ranges.append(
+                        {
+                            "value_id": (
+                                f"shadow:{task_id}:{value_binding.tensor_id}"
+                            ),
+                            "source_value_id": value_id,
+                            "memory_space_id": memory_space_id,
+                            "base_address": physical,
+                            "end_address_exclusive": physical + extent,
+                            "size_bytes": extent,
+                            "alignment_bytes": alignment,
+                            "storage_class": "external_input_widened_shadow",
+                            "dtype": "implementation_specific",
+                        }
+                    )
+                else:
+                    if (
+                        value_binding.value_offset_bytes + extent
+                        > reserved_extents.get(value_id, 0)
+                    ):
+                        raise OperatorEventError(
+                            f"Global PA allocation cannot cover {value_binding.tensor_id}"
+                        )
+                    physical = (
+                        allocation.base_address + value_binding.value_offset_bytes
+                    )
                 runtime.append(
                     SimulationBufferBinding(
                         tensor_id=value_binding.tensor_id,
@@ -475,6 +571,7 @@ class OperatorEventDispatcher:
                         "source": value_binding.source,
                         "value_index": value_binding.index,
                         "value_offset_bytes": value_binding.value_offset_bytes,
+                        "binding_mode": value_binding.binding_mode,
                         "global_pa_base": physical,
                         "size_bytes": extent,
                         "logical_value_size_bytes": allocation.size_bytes,
@@ -541,6 +638,80 @@ class OperatorEventDispatcher:
             }
             self._runtime_binding_records[task_id] = record
             binding_records.append(record)
+        runtime_task_binding_records: list[dict[str, object]] = []
+        if self._runtime_task_models is not None:
+            for task_id, spec in sorted(dispatch_specs.items()):
+                node = spec.node
+                if node.op not in self._runtime_task_operators:
+                    continue
+                try:
+                    contract = self._runtime_task_models.contract_for(node)
+                    estimate = self._runtime_task_models.estimate(node, spec.model)
+                except RuntimeTaskModelError as error:
+                    raise OperatorEventError(str(error)) from error
+                metadata_size = (
+                    max(
+                        contract.metadata_read_bytes,
+                        contract.metadata_write_bytes,
+                    )
+                    if contract.model_kind == "metadata_state"
+                    else 0
+                )
+                metadata_base: int | None = None
+                if metadata_size:
+                    cursor = _align_up(cursor, alignment_bytes)
+                    metadata_base = cursor
+                    if cursor + metadata_size > capacity_bytes:
+                        raise OperatorEventError(
+                            f"Global PA capacity exceeded by {task_id}:metadata"
+                        )
+                    workspace_ranges.append(
+                        {
+                            "value_id": f"workspace:{task_id}:metadata",
+                            "memory_space_id": memory_space_id,
+                            "base_address": cursor,
+                            "end_address_exclusive": cursor + metadata_size,
+                            "size_bytes": metadata_size,
+                            "alignment_bytes": alignment_bytes,
+                            "storage_class": "runtime_metadata",
+                            "dtype": "opaque",
+                        }
+                    )
+                    cursor += metadata_size
+                runtime_binding = RuntimeTaskAddressBinding(
+                    task_id=task_id,
+                    input_values=tuple(dict(item) for item in spec.input_values),
+                    output_values=tuple(dict(item) for item in spec.output_values),
+                    metadata_base_address=metadata_base,
+                    metadata_size_bytes=metadata_size,
+                )
+                self._runtime_task_address_bindings[task_id] = runtime_binding
+                try:
+                    requests = plan_runtime_task_requests(
+                        node,
+                        spec.model,
+                        contract,
+                        estimate,
+                        runtime_binding,
+                        allocations,
+                    )
+                except RuntimeTaskMemoryError as error:
+                    raise OperatorEventError(str(error)) from error
+                runtime_record = {
+                    "task_id": task_id,
+                    "operator": node.op,
+                    "model_kind": contract.model_kind,
+                    "memory_space_id": memory_space_id,
+                    "metadata_global_pa_base": metadata_base,
+                    "metadata_size_bytes": metadata_size,
+                    "planned_parent_requests": len(requests),
+                    "planned_read_bytes": estimate.memory_read_bytes,
+                    "planned_write_bytes": estimate.memory_write_bytes,
+                    "request_cycle_ready": bool(requests),
+                    "host_control_excluded": not requests,
+                }
+                runtime_task_binding_records.append(runtime_record)
+                self._runtime_binding_records[task_id] = runtime_record
         if not self._runtime_bindings:
             raise OperatorEventError(
                 "no request-cycle-ready trace was bound to Global PA"
@@ -548,17 +719,62 @@ class OperatorEventDispatcher:
         ranges = global_memory_map.get("ranges")
         if not isinstance(ranges, list):
             raise OperatorEventError("global memory map ranges must be an array")
+        if cursor > shadow_cursor:
+            raise OperatorEventError(
+                "low Global PA allocations overlap high external-input shadows"
+            )
         ranges.extend(workspace_ranges)
+        ranges.extend(shadow_ranges)
         ranges.sort(key=lambda item: int(item["base_address"]))
+        for left, right in zip(ranges, ranges[1:]):
+            if int(left["end_address_exclusive"]) > int(right["base_address"]):
+                raise OperatorEventError("final Global PA ranges overlap")
         global_memory_map.update(
             {
                 "address_semantics": "allocated_global_pa_range_rebased",
-                "allocated_bytes": cursor,
+                "allocated_bytes": cursor + (capacity_bytes - shadow_cursor),
+                "low_address_watermark_bytes": cursor,
+                "high_address_reserved_bytes": capacity_bytes - shadow_cursor,
                 "allocation_count": len(ranges),
                 "operator_workspace_count": len(workspace_ranges),
+                "external_input_shadow_count": len(shadow_ranges),
                 "request_cycle_bindings": binding_records,
+                "runtime_task_bindings": runtime_task_binding_records,
             }
         )
+
+    def _runtime_bridge_config(self) -> dict[str, object]:
+        if self._accel_sim is None or self._accel_sim.config.external_memory is None:
+            raise OperatorEventError(
+                "live runtime tasks require the Accel-Sim external Ramulator2 config"
+            )
+        external = self._accel_sim.config.external_memory
+        contract = external.bandwidth_contract
+        link = contract.external_link
+        gateway = contract.logic_die_gateway
+        dram = contract.internal_dram
+        return {
+            "bridge_library": str(external.bridge_library),
+            "config_ref": str(external.config_file),
+            "transaction_bytes": dram.transaction_bytes,
+            "gateway_ingress_queue_depth": gateway.ingress_queue_depth,
+            "gateway_parent_table_entries": gateway.parent_table_entries,
+            "gateway_issue_width": gateway.issue_width_per_cycle,
+            "write_ack_policy": gateway.write_ack_policy,
+            "gpu_clock_hz": self._accel_sim.config.core_frequency_hz,
+            "link_clock_hz": link.clock_hz,
+            "gateway_clock_hz": gateway.clock_hz,
+            "dram_clock_hz": int(dram.clock_hz),
+            "request_bandwidth_Bps": link.request_payload_bandwidth_Bps,
+            "response_bandwidth_Bps": link.response_payload_bandwidth_Bps,
+            "request_header_bytes": link.request_header_bytes,
+            "response_header_bytes": link.response_header_bytes,
+            "flit_bytes": link.flit_bytes,
+            "propagation_latency_fs": link.propagation_latency_fs,
+            "external_queue_depth": link.queue_depth_transactions,
+            "external_credits": link.credits,
+            "duplex_mode": link.duplex_mode,
+        }
 
     def _prepare_atlas_backend(self) -> None:
         atlas = self._backend_config("atlas")
@@ -816,6 +1032,179 @@ class OperatorEventDispatcher:
             },
         )
 
+    def _run_runtime_task_model(
+        self,
+        node: ModelNode,
+        model: ModelSpec,
+        device_id: str,
+        task_id: str | None = None,
+    ) -> BackendTaskResult:
+        if self._runtime_task_models is None:
+            raise OperatorEventError("runtime task model is not configured")
+        try:
+            estimate = self._runtime_task_models.estimate(node, model)
+        except RuntimeTaskModelError as error:
+            raise OperatorEventError(str(error)) from error
+        catalog = self._runtime_task_models
+        contract = catalog.contract_for(node)
+        binding = (
+            self._runtime_task_address_bindings.get(task_id)
+            if task_id is not None
+            else None
+        )
+        if self._require_request_cycle_ready and binding is None:
+            raise OperatorEventError(
+                f"runtime task {task_id or node.node_id} lacks Global PA bindings"
+            )
+        requests: tuple[Mapping[str, object], ...] = tuple()
+        memory_result = None
+        execution_clock_hz = catalog.clock_hz
+        if binding is not None:
+            try:
+                requests = plan_runtime_task_requests(
+                    node,
+                    model,
+                    contract,
+                    estimate,
+                    binding,
+                    self._global_allocations,
+                )
+                bridge_config = self._runtime_bridge_config()
+                execution_clock_hz = int(bridge_config["gpu_clock_hz"])
+                memory_result = run_runtime_task_memory(
+                    self.project_root,
+                    bridge_config,
+                    contract,
+                    estimate,
+                    requests,
+                )
+            except RuntimeTaskMemoryError as error:
+                raise OperatorEventError(str(error)) from error
+        duration_fs = (
+            memory_result.duration_fs if memory_result is not None else estimate.duration_fs
+        )
+        live_memory = bool(requests)
+        host_control = contract.model_kind == "fixed_control"
+        memory_statistics = (
+            dict(memory_result.statistics) if memory_result is not None else {}
+        )
+        execution_cycles = (
+            int(memory_statistics["gpu_cycles"]) + contract.fixed_cycles
+            if live_memory
+            else estimate.cycles
+        )
+        runtime_output: Path | None = None
+        if task_id is not None and memory_result is not None:
+            runtime_output = self.output_root / "runtime" / task_id
+            runtime_output.mkdir(parents=True, exist_ok=True)
+            audit = {
+                "schema_version": "hetero-runtime-task-request-audit/v1",
+                "task_id": task_id,
+                "operator": node.op,
+                "model_kind": contract.model_kind,
+                "duration_fs": duration_fs,
+                "contract_cycles": estimate.cycles,
+                "contract_duration_fs": estimate.duration_fs,
+                "requests": list(memory_result.requests),
+                "completions": list(memory_result.completions),
+                "memory_statistics": memory_statistics,
+            }
+            (runtime_output / "runtime_request_audit.json").write_text(
+                json.dumps(audit, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            self._runtime_task_runs.append(
+                {
+                    "task_id": task_id,
+                    "operator": node.op,
+                    "output_directory": str(runtime_output),
+                    "request_count": len(requests),
+                    "duration_fs": duration_fs,
+                }
+            )
+        return BackendTaskResult(
+            backend_id=(
+                f"gpu.runtime_task_live_ramulator2.{catalog.catalog_id}"
+                if live_memory
+                else f"host.control_event.{catalog.catalog_id}"
+                if host_control
+                else f"gpu.runtime_task_model.{catalog.catalog_id}"
+            ),
+            duration_fs=duration_fs,
+            resource_id=device_id,
+            timing_contract={
+                "backend_id": (
+                    f"gpu.runtime_task_live_ramulator2.{catalog.catalog_id}"
+                    if live_memory
+                    else f"host.control_event.{catalog.catalog_id}"
+                ),
+                "duration_semantics": "total",
+                "owns": (
+                    [device_id, "shared3d.ramulator2"]
+                    if live_memory
+                    else ["host.control"]
+                ),
+                "exports": [],
+                "supports_stall_resume": False,
+                "trace_semantics": "none",
+                "replay_safe": False,
+            },
+            fidelity={
+                "compute_fidelity": (
+                    "runtime_copy_engine_contract_uncalibrated"
+                    if contract.model_kind == "kv_copy_engine"
+                    else "runtime_metadata_contract_uncalibrated"
+                    if live_memory
+                    else "host_control_boundary_uncalibrated"
+                ),
+                "memory_fidelity": (
+                    "cycle_simulated_external_ramulator2"
+                    if live_memory
+                    else "not_applicable"
+                ),
+                "link_fidelity": (
+                    "cycle_simulated_external_link"
+                    if live_memory
+                    else "not_applicable"
+                ),
+                "scheduler_fidelity": "event_modeled",
+                "extrapolated_fraction": 0.0 if live_memory else 1.0,
+                "trace_coverage": 0.0,
+                "performance_eligible": False,
+                "device_performance_included": not host_control,
+            },
+            statistics={
+                "cycles": execution_cycles,
+                "contract_cycles": estimate.cycles,
+                "duration_fs": duration_fs,
+                "contract_duration_fs": estimate.duration_fs,
+                "memory_read_bytes": estimate.memory_read_bytes,
+                "memory_write_bytes": estimate.memory_write_bytes,
+                "memory_transactions": estimate.memory_transactions,
+                "formula": estimate.formula,
+                "clock_hz": execution_clock_hz,
+                "contract_clock_hz": catalog.clock_hz,
+                "live_memory_statistics": memory_statistics,
+            },
+            artifact={
+                "kind": (
+                    "runtime_live_ramulator2"
+                    if live_memory
+                    else "host_control_event"
+                ),
+                "catalog_id": catalog.catalog_id,
+                "source": str(catalog.source_path),
+                "parameter_source": catalog.parameter_source,
+                "calibrated": catalog.calibrated,
+                "request_cycle_ready": live_memory,
+                "causal_timeline_ready": True,
+                "device_performance_included": not host_control,
+                "output_directory": str(runtime_output)
+                if runtime_output is not None
+                else None,
+            },
+        )
+
     def _run_atlas(
         self,
         binding: AtlasArtifactBinding,
@@ -915,7 +1304,15 @@ class OperatorEventDispatcher:
             binding = self._matching_trace(node, model)
             if binding is not None:
                 return self._run_accel_sim(binding, node, device_id, task_id)
+            if node.op in self._runtime_task_operators:
+                return self._run_runtime_task_model(
+                    node, model, device_id, task_id
+                )
             fallback = backend.get("fallback_kind", "none")
+            if fallback == "runtime_cycle":
+                return self._run_runtime_task_model(
+                    node, model, device_id, task_id
+                )
             if fallback != "analytical":
                 raise OperatorEventError(
                     f"GPU node {node.node_id} has no matching trace and no "
@@ -974,5 +1371,7 @@ class OperatorEventDispatcher:
             if self._atlas_contract
             else None,
             "request_cycle_ready_required": self._require_request_cycle_ready,
+            "runtime_task_operators": sorted(self._runtime_task_operators),
             "runtime_global_pa_bindings": list(self._runtime_binding_records.values()),
+            "runtime_task_runs": list(self._runtime_task_runs),
         }

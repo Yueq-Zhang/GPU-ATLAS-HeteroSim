@@ -177,6 +177,8 @@ def run_online_operator_dag(
     makespan = 0
     backend_dispatch_count = 0
     version_commits: list[dict[str, object]] = []
+    performance_included_intervals: list[tuple[int, int, str]] = []
+    performance_excluded_duration_fs = 0
 
     while events:
         time_fs, priority, _sequence, kind, task_id = heapq.heappop(events)
@@ -237,6 +239,12 @@ def run_online_operator_dag(
                     }
                 )
                 duration_fs = result.duration_fs
+                if bool(result.fidelity.get("device_performance_included", True)):
+                    performance_included_intervals.append(
+                        (start_time, start_time + duration_fs, task_id)
+                    )
+                else:
+                    performance_excluded_duration_fs += duration_fs
                 backend_dispatch_count += 1
                 launch_log.append(
                     {
@@ -346,6 +354,16 @@ def run_online_operator_dag(
             "Backend dispatch conservation failed: "
             f"expected={len(device_ids)}, actual={backend_dispatch_count}"
         )
+    device_boundary_start = (
+        min(item[0] for item in performance_included_intervals)
+        if performance_included_intervals
+        else None
+    )
+    device_boundary_end = (
+        max(item[1] for item in performance_included_intervals)
+        if performance_included_intervals
+        else None
+    )
     return {
         "schema_version": "hetero-online-operator-runtime/v1",
         "makespan_fs": makespan,
@@ -355,4 +373,20 @@ def run_online_operator_dag(
         "launch_log": launch_log,
         "version_commits": version_commits,
         "final_versions": dict(sorted(latest_version.items())),
+        "performance_boundary": {
+            "schema_version": "hetero-performance-boundary/v1",
+            "causal_makespan_fs": makespan,
+            "device_boundary_start_fs": device_boundary_start,
+            "device_boundary_end_fs": device_boundary_end,
+            "device_boundary_span_fs": (
+                device_boundary_end - device_boundary_start
+                if device_boundary_start is not None
+                and device_boundary_end is not None
+                else None
+            ),
+            "excluded_control_duration_fs": performance_excluded_duration_fs,
+            "included_task_count": len(performance_included_intervals),
+            "excluded_task_count": len(device_ids)
+            - len(performance_included_intervals),
+        },
     }

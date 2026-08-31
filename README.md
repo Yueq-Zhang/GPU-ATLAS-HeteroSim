@@ -2,7 +2,7 @@
 
 GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端到端 LLM 联合仿真工程。工程把完整 Prefill/Decode 请求图、算子放置、跨设备数据移动、Paged KV Cache 和全局事件调度连接到同一条可复现运行路径。
 
-> 当前版本为 `0.22.0`。P15h已经将12个`request_cycle_ready=true`的真实Accel-Sim GPU算子嵌入同一个TinyLlama一层Prefill全局时间线，并通过依赖、`gpu0`互斥、Global PA、唯一Ramulator2、请求守恒、零在途和版本提交因果验证。控制、KV管理与残差等8个任务仍为分析/运行时模型，因此继续禁止把当前结果作为校准后的端到端性能结论。
+> 当前版本为 `0.24.0`，P16固定Shape的全任务请求周期建模已完成。20个任务无分析回退地进入同一因果时间线：15个GPU Trace实例和3个KV运行时实例具备请求周期资格，2个主机控制事件被显式排除在设备性能边界之外。硬件参数仍未校准，继续禁止把当前结果作为端到端性能结论。
 
 长时间资格验证可以部署到`192.168.0.197`并把两个确定性Leg绑定到不同CPU并行执行；密码不进入仓库或日志。远端路径、GPT‑5.6 Luna `xhigh`编排约定、单轮入口和完成后严格合并方法见[远端验证规范](docs/REMOTE_VALIDATION.md)。
 
@@ -19,8 +19,9 @@ GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端�
 - GPU–3D-DRAM 周期级请求链路：外部 PCIe/CXL/Direct Link、Logic-Die Gateway、内部 Hybrid-Bond 和 DRAM 可使用独立时钟/带宽，Parent 按字节掩码拆为 64 B Child，全部 durable 完成后才返回响应；
 - 真实 Accel-Sim v2 与完整 `atlasim.Chip` 可同进程、多时钟推进；GPU 与 ATLAS 可争用同一套 Channel/Bank，并由唯一 Ramulator2 负责 3D-DRAM 时序；
 - 真实 GPU 算子 Artifact 流程：SM86 Trace 采集、Trace Manifest、Range-Rebase 到 Global PA、Accel-Sim 双遍资格验证与 `request_cycle_ready` Catalog；未合格算子只能显式使用分析回退；
+- 可审计的[算子建模与测试状态表](docs/OPERATOR_MODELING_STATUS.md)：机器可读 Catalog 固定模型 Revision、Batch、Context、Q/KV 长度、dtype 与模型维度，并分别记录“已建模、已测试、请求周期 Ready、性能可用”；
 - 可复现的实验与 DSE：配置/产物内容哈希、Simulation Key、运行缓存、依赖锁、Fidelity 标签、候选搜索和规范化报告；
-- 当前验证边界：12个真实 `request_cycle_ready` GPU算子已进入同一层Prefill全局时间线并通过因果验证；其余8个控制、KV管理与残差任务仍为分析/运行时模型，因此暂不给出校准后的端到端性能结论。
+- 当前验证边界：P16已双遍验证固定TinyLlama Layer-0、FP16、BS=1、Context=16的20任务时间线；每遍完成7,003,497个GPU Parent和517个KV运行时Parent，依赖、资源、Global PA、唯一Ramulator2、请求守恒和18次版本提交全部通过。运行时与整机参数仍未校准，因此暂不给出端到端性能结论。
 
 ## 2. 目录结构
 
@@ -407,6 +408,8 @@ allocated_bytes        = 16384
 num_attention_heads × head_dim = hidden_size
 ```
 
+真实周期 Artifact 不是按算子名称通用复用的。修改 `hidden_size`、`intermediate_size`、Head 数、`head_dim`、`vocab_size`、dtype 或 checkpoint revision 后，即使算子名称不变，也必须生成新的 Shape/Model Contract、重新编译或捕获 Trace、执行 Range-Rebase 双跑资格，并重新验证全局时间线。当前代码会在模型合同不一致时拒绝旧 Artifact。
+
 ### 9.2 多 Batch / 多请求
 
 复制 `configs/hetero/workloads/tiny_e2e_single.json`，在 `requests` 中加入多个请求：
@@ -433,6 +436,8 @@ num_attention_heads × head_dim = hidden_size
 ```
 
 把实验的 `workload.ref` 指向新文件。`scheduler_validation` 会验证 admission、Prefill chunk 和 Decode priority；`analytical_preview` 会尊重请求到达时间，并让不同请求在相同设备/链路资源上排队。当前 M2 尚未把动态 Token-Step Batch 聚合为共享 Kernel，因此它是“多请求资源争用预览”，不是完整动态批处理性能模型。
+
+Batch 或 Context 改变会改变 Grid/Block、Tensor Core 指令、内存事务、缓存命中、Workspace、KV 容量和 DRAM 地址分布；Attention 还包含随序列长度增长的二次项。因此禁止直接按 Token 数、Batch 或参数量缩放现有周期。只有 [算子状态表](docs/OPERATOR_MODELING_STATUS.md) 中列出的精确 Shape 可复用当前资格结果，其他 Shape 必须重新捕获和验证。
 
 ### 9.3 决定算子运行在 GPU 还是 ATLAS
 
@@ -978,3 +983,20 @@ P15h使用`scripts/run_p15h_remaining_range_rebase.sh`串行处理RoPE、Causal 
 P15h已完成其余10个算子的SM86 Range-Rebase重捕获和远端双遍资格，并与既有Attention Norm、QKV Projection合并为12算子Ready Catalog。统一时间线使用`configs/hetero/experiments/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu.json`，12个真实GPU算子共执行40,060,873 GPU cycles，完成6,995,173个Parent和6,998,046个Child，804,512,881次地址转换全部命中，所有算子均由唯一Ramulator2服务并以零在途退出。
 
 最终资格验证确认：全部DAG依赖在消费者启动前完成，所有`gpu0`区间互不重叠；Global PA包含84个不重叠区间、56个算子私有Workspace和12条请求周期绑定，38条语义Tensor绑定均由图Value的Global PA派生；18次输出版本提交均发生在对应Backend完成时。时间线报告的35,390.378 µs makespan仍标记`performance_claim_allowed=false`，因为20个任务中只有12个真实GPU算子进入请求周期Backend，其余控制、KV管理和残差任务仍是分析/运行时模型，且尚未完成硬件校准。精确结果和复现边界见[P15h资格记录](docs/qualification/p15h_twelve_operator_prefill_timeline.md)。
+
+### 14.17 P16 全任务显式建模与Shape门禁
+
+P16新增[算子建模与测试状态表](docs/OPERATOR_MODELING_STATUS.md)及其机器可读Catalog。Token Embedding和Residual Add采用Shape锁定的独立CUDA参考实现，分别产生27,648和16,384条NVBit动态指令；Range-Rebase双跑分别稳定为6,691和28,772 GPU cycles，地址漏配、ATLAS请求和退出在途均为0。Residual Add的同一源Trace在一层图中通过不同Value绑定Dispatch两次。
+
+在RTX 3070 / SM86采集主机上可用`P16_PHASE=capture bash scripts/run_p16_simple_operator_qualification.sh`生成两类Trace；将Trace目录和源Artifact同步到资格主机后，使用`P16_PHASE=qualify bash scripts/run_p16_simple_operator_qualification.sh`完成双跑并重建耦合Artifact。脚本支持`P16_CAPTURE_ROOT`、`P16_QUALIFICATION_ROOT`、`P16_ARTIFACT_ROOT`和`HETEROSIM_PYTHON`覆盖，且不会包含远端凭据。
+
+`configs/hetero/experiments/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu.json`不允许隐式分析回退：14种真实GPU Trace覆盖15个实例；KV Allocate/Append/Release分别生成3、512和2个精确64 B Parent，经外部Link进入各自唯一的live Ramulator2；Request Start/Finish是零内存请求的主机控制边界。两遍20任务运行在同一Simulation Key下得到相同的35,450,346,739,701 fs因果makespan、31次输入版本检查和18次完成时版本提交。该时间不是硬件校准结果，`performance_claim_allowed=false`保持不变。精确边界见[P16资格状态](docs/qualification/p16_full_task_modeling_status.md)。
+
+完整双遍复现入口为：
+
+```bash
+HETEROSIM_PYTHON=.venv/bin/python \
+  bash scripts/run_p16_full_task_qualification.sh
+```
+
+可用`P16_CONFIG`和`P16_RUN_ROOT`覆盖配置及输出根目录。脚本要求每遍返回相同Simulation Key，随后自动执行20任务依赖、资源、地址、请求、版本和两遍一致性资格检查。

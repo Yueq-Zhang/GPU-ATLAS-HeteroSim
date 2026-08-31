@@ -1,0 +1,1160 @@
+{
+  "address_owner": "python.GlobalPhysicalAddressAllocator",
+  "backend_dispatch": {
+    "atlas_timing_contract": null,
+    "gpu_timing_contract": {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "duration_semantics": "coupled",
+      "exports": [],
+      "owns": [
+        "gpu0.core",
+        "gpu0.l1",
+        "gpu0.l2",
+        "gpu0.noc",
+        "shared0.dram3d"
+      ],
+      "replay_safe": false,
+      "supports_stall_resume": true,
+      "trace_semantics": "functional"
+    },
+    "request_cycle_ready_required": true,
+    "runtime_global_pa_bindings": [
+      {
+        "contract_overrides": {
+          "layer_id": 0
+        },
+        "operator_artifact_id": "tinyllama.1_1b.layer0.token_embedding.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "external_input_widened_shadow",
+            "global_pa_base": 4294967040,
+            "logical_value_size_bytes": 32,
+            "size_bytes": 128,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.token_embedding.token_ids",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 219164672,
+            "logical_value_size_bytes": 131072000,
+            "size_bytes": 131072000,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.token_embedding.weight",
+            "value_id": "model.tok_embeddings.weight",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350253056,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.token_embedding.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+        "trace_id": "tinyllama.1_1b.layer0.token_embedding.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {
+          "layer_id": 0
+        },
+        "operator_artifact_id": "tinyllama.1_1b.layer0.final_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 351615744,
+            "size_bytes": 1228800,
+            "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 352844544,
+            "size_bytes": 4608,
+            "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 352849152,
+            "size_bytes": 57344,
+            "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_2"
+          },
+          {
+            "global_pa_base": 352906496,
+            "size_bytes": 794112,
+            "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_3"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 351481856,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 4096,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.final_norm.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+            "value_index": 0,
+            "value_offset_bytes": 61440,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 0,
+            "logical_value_size_bytes": 4096,
+            "size_bytes": 4096,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.final_norm.weight",
+            "value_id": "model.final_norm.weight",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350318592,
+            "logical_value_size_bytes": 4096,
+            "size_bytes": 4096,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.final_norm.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+        "trace_id": "tinyllama.1_1b.layer0.final_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {},
+        "operator_artifact_id": "tinyllama.1_1b.layer0.causal_attention.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 353700608,
+            "size_bytes": 65536,
+            "tensor_id": "tinyllama.layer0.causal_attention.key"
+          },
+          {
+            "global_pa_base": 353766144,
+            "size_bytes": 1233408,
+            "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 354999552,
+            "size_bytes": 16384,
+            "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 355015936,
+            "size_bytes": 585216,
+            "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_2"
+          },
+          {
+            "global_pa_base": 355601152,
+            "size_bytes": 65536,
+            "tensor_id": "tinyllama.layer0.causal_attention.value"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350388224,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.causal_attention.query",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350322688,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.causal_attention.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+        "trace_id": "tinyllama.1_1b.layer0.causal_attention.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {},
+        "operator_artifact_id": "tinyllama.1_1b.layer0.output_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 355666688,
+            "size_bytes": 8388608,
+            "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 364055296,
+            "size_bytes": 4194304,
+            "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 368249600,
+            "size_bytes": 1233408,
+            "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_2"
+          },
+          {
+            "global_pa_base": 369483008,
+            "size_bytes": 732672,
+            "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_3"
+          },
+          {
+            "global_pa_base": 370215680,
+            "size_bytes": 8519680,
+            "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_4"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350322688,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.output_projection.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 69218304,
+            "logical_value_size_bytes": 8388608,
+            "size_bytes": 8388608,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.output_projection.weight",
+            "value_id": "model.layers.0.output.weight",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350453760,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.output_projection.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+        "trace_id": "tinyllama.1_1b.layer0.output_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {},
+        "operator_artifact_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 378735360,
+            "size_bytes": 8192,
+            "tensor_id": "tinyllama.layer0.qkv_projection.key"
+          },
+          {
+            "global_pa_base": 378743552,
+            "size_bytes": 12582912,
+            "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 391326464,
+            "size_bytes": 1233408,
+            "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 392559872,
+            "size_bytes": 634368,
+            "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_2"
+          },
+          {
+            "global_pa_base": 393194240,
+            "size_bytes": 8519680,
+            "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_3"
+          },
+          {
+            "global_pa_base": 401713920,
+            "size_bytes": 65536,
+            "tensor_id": "tinyllama.layer0.qkv_projection.query"
+          },
+          {
+            "global_pa_base": 401779456,
+            "size_bytes": 8192,
+            "tensor_id": "tinyllama.layer0.qkv_projection.value"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 351485952,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.qkv_projection.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 77606912,
+            "logical_value_size_bytes": 10485760,
+            "size_bytes": 8388608,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.qkv_projection.q_weight",
+            "value_id": "model.layers.0.qkv.weight",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 85995520,
+            "logical_value_size_bytes": 10485760,
+            "size_bytes": 1048576,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.qkv_projection.k_weight",
+            "value_id": "model.layers.0.qkv.weight",
+            "value_index": 1,
+            "value_offset_bytes": 8388608,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 87044096,
+            "logical_value_size_bytes": 10485760,
+            "size_bytes": 1048576,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.qkv_projection.v_weight",
+            "value_id": "model.layers.0.qkv.weight",
+            "value_index": 1,
+            "value_offset_bytes": 9437184,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350519296,
+            "logical_value_size_bytes": 81920,
+            "size_bytes": 81920,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.qkv_projection.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+        "trace_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {},
+        "operator_artifact_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350253056,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.residual_add.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350453760,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.residual_add.residual",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350601216,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.residual_add.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+        "trace_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {},
+        "operator_artifact_id": "tinyllama.1_1b.layer0.rope.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 401787648,
+            "size_bytes": 2048,
+            "tensor_id": "tinyllama.layer0.rope.cos"
+          },
+          {
+            "global_pa_base": 401789696,
+            "size_bytes": 1233408,
+            "tensor_id": "tinyllama.layer0.rope.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 403023104,
+            "size_bytes": 53248,
+            "tensor_id": "tinyllama.layer0.rope.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 403076352,
+            "size_bytes": 8192,
+            "tensor_id": "tinyllama.layer0.rope.opaque_workspace_2"
+          },
+          {
+            "global_pa_base": 403084544,
+            "size_bytes": 65920,
+            "tensor_id": "tinyllama.layer0.rope.opaque_workspace_3"
+          },
+          {
+            "global_pa_base": 403150592,
+            "size_bytes": 584704,
+            "tensor_id": "tinyllama.layer0.rope.opaque_workspace_4"
+          },
+          {
+            "global_pa_base": 403735296,
+            "size_bytes": 8519680,
+            "tensor_id": "tinyllama.layer0.rope.opaque_workspace_5"
+          },
+          {
+            "global_pa_base": 412254976,
+            "size_bytes": 128,
+            "tensor_id": "tinyllama.layer0.rope.position_ids"
+          },
+          {
+            "global_pa_base": 412255232,
+            "size_bytes": 2048,
+            "tensor_id": "tinyllama.layer0.rope.sin"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350519296,
+            "logical_value_size_bytes": 81920,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.rope.query",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350584832,
+            "logical_value_size_bytes": 81920,
+            "size_bytes": 8192,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.rope.key",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+            "value_index": 0,
+            "value_offset_bytes": 65536,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350666752,
+            "logical_value_size_bytes": 81920,
+            "size_bytes": 65536,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.rope.query_output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350732288,
+            "logical_value_size_bytes": 81920,
+            "size_bytes": 8192,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.rope.key_output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+            "value_index": 0,
+            "value_offset_bytes": 65536,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+        "trace_id": "tinyllama.1_1b.layer0.rope.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {},
+        "operator_artifact_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 412257280,
+            "size_bytes": 1298944,
+            "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 413556224,
+            "size_bytes": 180224,
+            "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 413736448,
+            "size_bytes": 77312,
+            "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_2"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350994432,
+            "logical_value_size_bytes": 360448,
+            "size_bytes": 180224,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.silu_multiply.gate",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 351174656,
+            "logical_value_size_bytes": 360448,
+            "size_bytes": 180224,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.silu_multiply.up",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+            "value_index": 0,
+            "value_offset_bytes": 180224,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350748672,
+            "logical_value_size_bytes": 180224,
+            "size_bytes": 180224,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.silu_multiply.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+        "trace_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {},
+        "operator_artifact_id": "tinyllama.1_1b.layer0.down_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 413813760,
+            "size_bytes": 1233408,
+            "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 415047168,
+            "size_bytes": 617984,
+            "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 415665152,
+            "size_bytes": 8519680,
+            "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_2"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350748672,
+            "logical_value_size_bytes": 180224,
+            "size_bytes": 180224,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.down_projection.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 8192,
+            "logical_value_size_bytes": 23068672,
+            "size_bytes": 23068672,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.down_projection.weight",
+            "value_id": "model.layers.0.down.weight",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350928896,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.down_projection.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+        "trace_id": "tinyllama.1_1b.layer0.down_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {},
+        "operator_artifact_id": "tinyllama.1_1b.layer0.gate_up_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 424184832,
+            "size_bytes": 180224,
+            "tensor_id": "tinyllama.layer0.gate_up_projection.gate"
+          },
+          {
+            "global_pa_base": 424365056,
+            "size_bytes": 1233408,
+            "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 425598464,
+            "size_bytes": 77312,
+            "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 425675776,
+            "size_bytes": 8519680,
+            "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_2"
+          },
+          {
+            "global_pa_base": 434195456,
+            "size_bytes": 180224,
+            "tensor_id": "tinyllama.layer0.gate_up_projection.up"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 351354880,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.gate_up_projection.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 23076864,
+            "logical_value_size_bytes": 46137344,
+            "size_bytes": 23068672,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.gate_up_projection.gate_weight",
+            "value_id": "model.layers.0.gate_up.weight",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 46145536,
+            "logical_value_size_bytes": 46137344,
+            "size_bytes": 23068672,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.gate_up_projection.up_weight",
+            "value_id": "model.layers.0.gate_up.weight",
+            "value_index": 1,
+            "value_offset_bytes": 23068672,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350994432,
+            "logical_value_size_bytes": 360448,
+            "size_bytes": 360448,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.gate_up_projection.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+        "trace_id": "tinyllama.1_1b.layer0.gate_up_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {},
+        "operator_artifact_id": "tinyllama.1_1b.layer0.mlp_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 434375680,
+            "size_bytes": 4096,
+            "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 434379776,
+            "size_bytes": 1225216,
+            "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 435604992,
+            "size_bytes": 65536,
+            "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_2"
+          },
+          {
+            "global_pa_base": 435670528,
+            "size_bytes": 667136,
+            "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_3"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350601216,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.mlp_norm.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 69214208,
+            "logical_value_size_bytes": 4096,
+            "size_bytes": 4096,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.mlp_norm.weight",
+            "value_id": "model.layers.0.mlp_norm.weight",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 351354880,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.mlp_norm.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+        "trace_id": "tinyllama.1_1b.layer0.mlp_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {},
+        "operator_artifact_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350601216,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.residual_add.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350928896,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.residual_add.residual",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 351420416,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.residual_add.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+        "trace_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {},
+        "operator_artifact_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 436337664,
+            "size_bytes": 65536,
+            "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 436403200,
+            "size_bytes": 131136,
+            "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 436534528,
+            "size_bytes": 131072,
+            "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_2"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350253056,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.attention_norm.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 4096,
+            "logical_value_size_bytes": 4096,
+            "size_bytes": 4096,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.attention_norm.weight",
+            "value_id": "model.layers.0.attention_norm.weight",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 351485952,
+            "logical_value_size_bytes": 65536,
+            "size_bytes": 65536,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.attention_norm.output",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+        "trace_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {
+          "layer_id": 0
+        },
+        "operator_artifact_id": "tinyllama.1_1b.layer0.lm_head.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 436665600,
+            "size_bytes": 1233408,
+            "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 437899008,
+            "size_bytes": 1536,
+            "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 437900544,
+            "size_bytes": 794112,
+            "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_2"
+          },
+          {
+            "global_pa_base": 438694656,
+            "size_bytes": 1048576,
+            "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_3"
+          },
+          {
+            "global_pa_base": 439743232,
+            "size_bytes": 8519680,
+            "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_4"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 350318592,
+            "logical_value_size_bytes": 4096,
+            "size_bytes": 4096,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.lm_head.input",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 88092672,
+            "logical_value_size_bytes": 131072000,
+            "size_bytes": 131072000,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.lm_head.weight",
+            "value_id": "model.lm_head.weight",
+            "value_index": 1,
+            "value_offset_bytes": 0,
+            "value_version": 0
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 351551488,
+            "logical_value_size_bytes": 64000,
+            "size_bytes": 64000,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.lm_head.logits",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+        "trace_id": "tinyllama.1_1b.layer0.lm_head.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "contract_overrides": {
+          "layer_id": 0
+        },
+        "operator_artifact_id": "tinyllama.1_1b.layer0.sampling.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "private_bindings": [
+          {
+            "global_pa_base": 448262912,
+            "size_bytes": 1233408,
+            "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_0"
+          },
+          {
+            "global_pa_base": 449496320,
+            "size_bytes": 65504,
+            "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_1"
+          },
+          {
+            "global_pa_base": 449561856,
+            "size_bytes": 734208,
+            "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_2"
+          }
+        ],
+        "request_cycle_ready": true,
+        "semantic_bindings": [
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 351551488,
+            "logical_value_size_bytes": 64000,
+            "size_bytes": 64000,
+            "source": "input",
+            "tensor_id": "tinyllama.layer0.sampling.logits",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          },
+          {
+            "binding_mode": "semantic_value",
+            "global_pa_base": 351615552,
+            "logical_value_size_bytes": 2,
+            "size_bytes": 32,
+            "source": "output",
+            "tensor_id": "tinyllama.layer0.sampling.token",
+            "value_id": "TINYLLAMA11B-PREFILL-R0.token.0",
+            "value_index": 0,
+            "value_offset_bytes": 0,
+            "value_version": 1
+          }
+        ],
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+        "trace_id": "tinyllama.1_1b.layer0.sampling.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+      },
+      {
+        "host_control_excluded": false,
+        "memory_space_id": "shared0.dram3d",
+        "metadata_global_pa_base": 450296064,
+        "metadata_size_bytes": 128,
+        "model_kind": "metadata_state",
+        "operator": "kv_allocate",
+        "planned_parent_requests": 3,
+        "planned_read_bytes": 64,
+        "planned_write_bytes": 128,
+        "request_cycle_ready": true,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate"
+      },
+      {
+        "host_control_excluded": false,
+        "memory_space_id": "shared0.dram3d",
+        "metadata_global_pa_base": 450296192,
+        "metadata_size_bytes": 64,
+        "model_kind": "metadata_state",
+        "operator": "kv_release",
+        "planned_parent_requests": 2,
+        "planned_read_bytes": 64,
+        "planned_write_bytes": 64,
+        "request_cycle_ready": true,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release"
+      },
+      {
+        "host_control_excluded": false,
+        "memory_space_id": "shared0.dram3d",
+        "metadata_global_pa_base": null,
+        "metadata_size_bytes": 0,
+        "model_kind": "kv_copy_engine",
+        "operator": "kv_append",
+        "planned_parent_requests": 512,
+        "planned_read_bytes": 16384,
+        "planned_write_bytes": 16384,
+        "request_cycle_ready": true,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append"
+      },
+      {
+        "host_control_excluded": true,
+        "memory_space_id": "shared0.dram3d",
+        "metadata_global_pa_base": null,
+        "metadata_size_bytes": 0,
+        "model_kind": "fixed_control",
+        "operator": "request_finish",
+        "planned_parent_requests": 0,
+        "planned_read_bytes": 0,
+        "planned_write_bytes": 0,
+        "request_cycle_ready": false,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_finish"
+      },
+      {
+        "host_control_excluded": true,
+        "memory_space_id": "shared0.dram3d",
+        "metadata_global_pa_base": null,
+        "metadata_size_bytes": 0,
+        "model_kind": "fixed_control",
+        "operator": "request_start",
+        "planned_parent_requests": 0,
+        "planned_read_bytes": 0,
+        "planned_write_bytes": 0,
+        "request_cycle_ready": false,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_start"
+      }
+    ],
+    "runtime_task_operators": [
+      "kv_allocate",
+      "kv_append",
+      "kv_release",
+      "request_finish",
+      "request_start"
+    ],
+    "runtime_task_runs": [
+      {
+        "duration_fs": 666667,
+        "operator": "request_start",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.request_start",
+        "request_count": 0,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_start"
+      },
+      {
+        "duration_fs": 124558304,
+        "operator": "kv_allocate",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.kv_allocate",
+        "request_count": 3,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate"
+      },
+      {
+        "duration_fs": 3917844523,
+        "operator": "kv_append",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "request_count": 512,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append"
+      },
+      {
+        "duration_fs": 666667,
+        "operator": "request_finish",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.request_finish",
+        "request_count": 0,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_finish"
+      },
+      {
+        "duration_fs": 99823321,
+        "operator": "kv_release",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.kv_release",
+        "request_count": 2,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release"
+      }
+    ],
+    "timing_owners": {
+      "gpu0.core": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "gpu0.l1": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "gpu0.l2": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "gpu0.noc": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "shared0.dram3d": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0"
+    }
+  },
+  "memory_timing_owner": "shared3d.per_operator_in_process_ramulator2",
+  "prefill_cycle": null,
+  "runtime_owner": "python.OnlineOperatorRuntime",
+  "schema_version": "hetero-provenance/v1",
+  "simulation_input_key": "d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
+  "simulator_revision": "f8a95b2824698232a41c2b6ad49576fe034feb4a-dirty"
+}

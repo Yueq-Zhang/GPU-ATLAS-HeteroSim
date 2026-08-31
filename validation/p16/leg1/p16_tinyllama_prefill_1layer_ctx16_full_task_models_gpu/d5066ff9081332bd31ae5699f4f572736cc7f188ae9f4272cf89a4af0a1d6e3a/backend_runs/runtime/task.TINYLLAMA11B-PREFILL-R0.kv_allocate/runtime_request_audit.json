@@ -1,0 +1,115 @@
+{
+  "completions": [
+    {
+      "completion_cycle": 60,
+      "completion_time_fs": 53003533,
+      "initiator": 0,
+      "operation_code": 0,
+      "parent_id": 1,
+      "total_children": 1
+    },
+    {
+      "completion_cycle": 97,
+      "completion_time_fs": 85689045,
+      "initiator": 0,
+      "operation_code": 1,
+      "parent_id": 2,
+      "total_children": 1
+    },
+    {
+      "completion_cycle": 125,
+      "completion_time_fs": 110424028,
+      "initiator": 0,
+      "operation_code": 1,
+      "parent_id": 3,
+      "total_children": 1
+    }
+  ],
+  "contract_cycles": 19,
+  "contract_duration_fs": 12666667,
+  "duration_fs": 124558304,
+  "memory_statistics": {
+    "accepted_parent_ids": 3,
+    "children_completed": 3,
+    "children_sent": 3,
+    "clock": 44,
+    "completed": 3,
+    "durable_completed": 3,
+    "gateway_cycles": 44,
+    "global_time_fs": 110424028,
+    "gpu_cycles": 125,
+    "initiators": {
+      "atlas0.compute": {
+        "children": 0,
+        "completed": 0,
+        "parents": 0
+      },
+      "gpu0": {
+        "children": 3,
+        "completed": 3,
+        "parents": 3
+      }
+    },
+    "instances": 1,
+    "internal_bytes": 192,
+    "link_cycles": 44,
+    "logical_bytes": 192,
+    "observed_completion_ids": 3,
+    "outstanding": 0,
+    "read_request_count": 1,
+    "reads": 1,
+    "rejected": 0,
+    "request_count": 3,
+    "request_payload_bytes": 128,
+    "request_wire_bytes": 224,
+    "response_payload_bytes": 64,
+    "response_wire_bytes": 160,
+    "runtime_fixed_cycles": 16,
+    "runtime_fixed_duration_fs": 14134276,
+    "schema_version": "hetero-live-ramulator2-statistics/v1",
+    "write_request_count": 2,
+    "writes": 2
+  },
+  "model_kind": "metadata_state",
+  "operator": "kv_allocate",
+  "requests": [
+    {
+      "global_address": 450296064,
+      "issue_cycle": 0,
+      "issue_time_fs": 0,
+      "operation": "read",
+      "parent_id": 1,
+      "semantic": "kv_allocate.metadata_read",
+      "size_bytes": 64,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.kv_allocate:metadata",
+      "value_version": 0
+    },
+    {
+      "global_address": 450296064,
+      "issue_cycle": 60,
+      "issue_time_fs": 53003533,
+      "operation": "write",
+      "parent_id": 2,
+      "semantic": "kv_allocate.metadata_write",
+      "size_bytes": 64,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.kv_allocate:metadata",
+      "value_version": 1
+    },
+    {
+      "global_address": 450296128,
+      "issue_cycle": 61,
+      "issue_time_fs": 53886925,
+      "operation": "write",
+      "parent_id": 3,
+      "semantic": "kv_allocate.metadata_write",
+      "size_bytes": 64,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.kv_allocate:metadata",
+      "value_version": 1
+    }
+  ],
+  "schema_version": "hetero-runtime-task-request-audit/v1",
+  "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate"
+}

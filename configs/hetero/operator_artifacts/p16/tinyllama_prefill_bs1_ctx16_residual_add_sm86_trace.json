@@ -1,0 +1,85 @@
+{
+  "address_ranges": [
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.residual_add.input.capture0",
+      "capture_allocation_id": "tinyllama.layer0.residual_add.input.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        1,
+        16,
+        2048
+      ],
+      "size_bytes": 65536,
+      "tensor_id": "tinyllama.layer0.residual_add.input",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47286583296,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.residual_add.residual.capture0",
+      "capture_allocation_id": "tinyllama.layer0.residual_add.residual.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        1,
+        16,
+        2048
+      ],
+      "size_bytes": 65536,
+      "tensor_id": "tinyllama.layer0.residual_add.residual",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47286648832,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.residual_add.output.capture0",
+      "capture_allocation_id": "tinyllama.layer0.residual_add.output.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        1,
+        16,
+        2048
+      ],
+      "size_bytes": 65536,
+      "tensor_id": "tinyllama.layer0.residual_add.output",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47286714368,
+      "view_offset_bytes": 0
+    }
+  ],
+  "capture": {
+    "dtype": "fp16",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "operator": "residual_add",
+    "phase": "prefill",
+    "scope": "shape_and_implementation_locked_operator_not_framework_overhead",
+    "shape": {
+      "batch_size": 1,
+      "context_length": 16,
+      "kv_length": 16,
+      "q_len": 16
+    },
+    "source": "P15 shape-locked operator capture",
+    "tool": "NVBit",
+    "version": "1.8"
+  },
+  "compilation": {
+    "compiler": "nvcc",
+    "cuda_toolkit": "11.8",
+    "framework": "standalone_cuda",
+    "implementation": "heterosim_cuda_reference_residual_add_v1",
+    "target_sm": 86
+  },
+  "kernels_list": "/opt/gpu-atlas/qualification/p16-cuda-reference-v3/tinyllama-prefill-bs1-ctx16-residual-add/traces/kernelslist.g",
+  "qualification_record": null,
+  "replay_safe": false,
+  "schema_version": "hetero-trace-manifest/v1",
+  "trace_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+  "trace_semantics": "functional"
+}

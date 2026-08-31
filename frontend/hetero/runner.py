@@ -708,6 +708,7 @@ def execute_run(
                 "launch_log": runtime_result["launch_log"],
                 "version_commits": runtime_result["version_commits"],
                 "final_versions": runtime_result["final_versions"],
+                "performance_boundary": runtime_result["performance_boundary"],
             }
         elif execution_mode == "prefill_cycle":
             if (

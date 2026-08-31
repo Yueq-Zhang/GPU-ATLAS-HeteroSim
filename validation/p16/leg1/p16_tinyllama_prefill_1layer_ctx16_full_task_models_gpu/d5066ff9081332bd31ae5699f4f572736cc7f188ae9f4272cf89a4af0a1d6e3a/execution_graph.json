@@ -1,0 +1,4901 @@
+{
+  "placement_contract": {
+    "backend_dispatch_count": 20,
+    "each_logical_node_exactly_once": true,
+    "logical_node_count": 20,
+    "materialized_device_task_count": 20,
+    "online_dispatch_gate": {
+      "backend_launches_after_dependencies": true,
+      "launch_count": 20,
+      "schema_version": "hetero-online-operator-runtime/v1",
+      "version_checks": 31
+    },
+    "requests": [
+      {
+        "each_logical_node_exactly_once": true,
+        "logical_node_count": 20,
+        "placement_decision_count": 20,
+        "planned_device_task_count": 20,
+        "request_id": "TINYLLAMA11B-PREFILL-R0",
+        "unique_logical_node_count": 20
+      }
+    ],
+    "schema_version": "hetero-single-placement/v1",
+    "semantics": "one_logical_node_one_device_one_backend_dispatch"
+  },
+  "residency_plan": {
+    "coherence": "explicit_noncoherent",
+    "events": [
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 0,
+        "size_bytes": 32,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 1,
+        "size_bytes": 32,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 2,
+        "size_bytes": 131072000,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+        "value_id": "model.tok_embeddings.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 3,
+        "size_bytes": 131072000,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+        "value_id": "model.tok_embeddings.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 4,
+        "size_bytes": 65536,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 5,
+        "size_bytes": 65536,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 6,
+        "size_bytes": 4096,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+        "value_id": "model.layers.0.attention_norm.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 7,
+        "size_bytes": 4096,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+        "value_id": "model.layers.0.attention_norm.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 8,
+        "size_bytes": 65536,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 9,
+        "size_bytes": 65536,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 10,
+        "size_bytes": 10485760,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+        "value_id": "model.layers.0.qkv.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 11,
+        "size_bytes": 10485760,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+        "value_id": "model.layers.0.qkv.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 12,
+        "size_bytes": 81920,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 13,
+        "size_bytes": 81920,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 14,
+        "size_bytes": 81920,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 15,
+        "size_bytes": 81920,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 16,
+        "size_bytes": 8192,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 17,
+        "size_bytes": 8192,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 18,
+        "size_bytes": 8192,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 19,
+        "size_bytes": 8192,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 20,
+        "size_bytes": 65536,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 21,
+        "size_bytes": 8192,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 22,
+        "size_bytes": 8192,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 23,
+        "size_bytes": 65536,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 24,
+        "size_bytes": 8192,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 25,
+        "size_bytes": 8192,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 26,
+        "size_bytes": 65536,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 27,
+        "size_bytes": 65536,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 28,
+        "size_bytes": 8388608,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+        "value_id": "model.layers.0.output.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 29,
+        "size_bytes": 8388608,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+        "value_id": "model.layers.0.output.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 30,
+        "size_bytes": 65536,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 31,
+        "size_bytes": 65536,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 32,
+        "size_bytes": 65536,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 33,
+        "size_bytes": 65536,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 34,
+        "size_bytes": 65536,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 35,
+        "size_bytes": 4096,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+        "value_id": "model.layers.0.mlp_norm.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 36,
+        "size_bytes": 4096,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+        "value_id": "model.layers.0.mlp_norm.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 37,
+        "size_bytes": 65536,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 38,
+        "size_bytes": 65536,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 39,
+        "size_bytes": 46137344,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+        "value_id": "model.layers.0.gate_up.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 40,
+        "size_bytes": 46137344,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+        "value_id": "model.layers.0.gate_up.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 41,
+        "size_bytes": 360448,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 42,
+        "size_bytes": 360448,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 43,
+        "size_bytes": 180224,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 44,
+        "size_bytes": 180224,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 45,
+        "size_bytes": 23068672,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+        "value_id": "model.layers.0.down.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 46,
+        "size_bytes": 23068672,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+        "value_id": "model.layers.0.down.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 47,
+        "size_bytes": 65536,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 48,
+        "size_bytes": 65536,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 49,
+        "size_bytes": 65536,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 50,
+        "size_bytes": 65536,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 51,
+        "size_bytes": 65536,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 52,
+        "size_bytes": 4096,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+        "value_id": "model.final_norm.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 53,
+        "size_bytes": 4096,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+        "value_id": "model.final_norm.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 54,
+        "size_bytes": 4096,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 55,
+        "size_bytes": 4096,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "register_external_input",
+        "initialization_policy": "first_consumer_binding",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 56,
+        "size_bytes": 131072000,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+        "value_id": "model.lm_head.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 57,
+        "size_bytes": 131072000,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+        "value_id": "model.lm_head.weight",
+        "version": 0
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 58,
+        "size_bytes": 64000,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "read",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 59,
+        "size_bytes": 64000,
+        "trigger": "task_start",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+        "version": 1
+      },
+      {
+        "device_id": "gpu0",
+        "event": "write",
+        "memory_space_id": "shared0.dram3d",
+        "sequence": 60,
+        "size_bytes": 2,
+        "trigger": "task_completion",
+        "trigger_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.token.0",
+        "version": 1
+      }
+    ],
+    "final_records": [
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": null,
+        "state": "exclusive_clean",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids",
+        "version": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+        "state": "exclusive_dirty",
+        "value_id": "TINYLLAMA11B-PREFILL-R0.token.0",
+        "version": 1
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": null,
+        "state": "exclusive_clean",
+        "value_id": "model.final_norm.weight",
+        "version": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": null,
+        "state": "exclusive_clean",
+        "value_id": "model.layers.0.attention_norm.weight",
+        "version": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": null,
+        "state": "exclusive_clean",
+        "value_id": "model.layers.0.down.weight",
+        "version": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": null,
+        "state": "exclusive_clean",
+        "value_id": "model.layers.0.gate_up.weight",
+        "version": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": null,
+        "state": "exclusive_clean",
+        "value_id": "model.layers.0.mlp_norm.weight",
+        "version": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": null,
+        "state": "exclusive_clean",
+        "value_id": "model.layers.0.output.weight",
+        "version": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": null,
+        "state": "exclusive_clean",
+        "value_id": "model.layers.0.qkv.weight",
+        "version": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": null,
+        "state": "exclusive_clean",
+        "value_id": "model.lm_head.weight",
+        "version": 0
+      },
+      {
+        "memory_space_id": "shared0.dram3d",
+        "owner_device": "gpu0",
+        "producer_task_id": null,
+        "state": "exclusive_clean",
+        "value_id": "model.tok_embeddings.weight",
+        "version": 0
+      }
+    ],
+    "initialization_policy": "first_consumer_binding",
+    "schema_version": "hetero-residency-plan/v1"
+  },
+  "routes": [],
+  "schema_version": "hetero-execution-graph/v1",
+  "tasks": [
+    {
+      "backend_id": "host.control_event.tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+      "backend_launch_time_fs": 0,
+      "backend_statistics": {
+        "clock_hz": 1132000000,
+        "contract_clock_hz": 1500000000,
+        "contract_cycles": 1,
+        "contract_duration_fs": 666667,
+        "cycles": 1,
+        "duration_fs": 666667,
+        "formula": "fixed_control",
+        "live_memory_statistics": {
+          "accepted_parent_ids": 0,
+          "host_control_only": true,
+          "instances": 0,
+          "observed_completion_ids": 0,
+          "outstanding": 0
+        },
+        "memory_read_bytes": 0,
+        "memory_transactions": 0,
+        "memory_write_bytes": 0
+      },
+      "compiled_artifact": {
+        "calibrated": false,
+        "catalog_id": "tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+        "causal_timeline_ready": true,
+        "device_performance_included": false,
+        "kind": "host_control_event",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.request_start",
+        "parameter_source": "deterministic_implementation_contract_not_hardware_calibrated",
+        "request_cycle_ready": false,
+        "source": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/runtime_tasks/tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json"
+      },
+      "dependencies": [],
+      "device_id": "gpu0",
+      "duration_fs": 666667,
+      "effective_duration_fs": 666667,
+      "fidelity": {
+        "compute_fidelity": "host_control_boundary_uncalibrated",
+        "device_performance_included": false,
+        "extrapolated_fraction": 1.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "not_applicable",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 0.0
+      },
+      "input_values": [],
+      "layer_id": null,
+      "op": "request_start",
+      "operator_group": null,
+      "output_values": [],
+      "phase": "control",
+      "read_values": [],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_start",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.request_start",
+      "timing": {
+        "completion_time_fs": 666667,
+        "ready_time_fs": 0,
+        "resource_id": "gpu0",
+        "start_time_fs": 0,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_start"
+      },
+      "timing_contract": {
+        "backend_id": "host.control_event.tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+        "duration_semantics": "total",
+        "exports": [],
+        "owns": [
+          "host.control"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": false,
+        "trace_semantics": "none"
+      },
+      "validated_input_versions": [],
+      "write_values": []
+    },
+    {
+      "backend_id": "gpu.runtime_task_live_ramulator2.tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+      "backend_launch_time_fs": 666667,
+      "backend_statistics": {
+        "clock_hz": 1132000000,
+        "contract_clock_hz": 1500000000,
+        "contract_cycles": 19,
+        "contract_duration_fs": 12666667,
+        "cycles": 141,
+        "duration_fs": 124558304,
+        "formula": "metadata_state",
+        "live_memory_statistics": {
+          "accepted_parent_ids": 3,
+          "children_completed": 3,
+          "children_sent": 3,
+          "clock": 44,
+          "completed": 3,
+          "durable_completed": 3,
+          "gateway_cycles": 44,
+          "global_time_fs": 110424028,
+          "gpu_cycles": 125,
+          "initiators": {
+            "atlas0.compute": {
+              "children": 0,
+              "completed": 0,
+              "parents": 0
+            },
+            "gpu0": {
+              "children": 3,
+              "completed": 3,
+              "parents": 3
+            }
+          },
+          "instances": 1,
+          "internal_bytes": 192,
+          "link_cycles": 44,
+          "logical_bytes": 192,
+          "observed_completion_ids": 3,
+          "outstanding": 0,
+          "read_request_count": 1,
+          "reads": 1,
+          "rejected": 0,
+          "request_count": 3,
+          "request_payload_bytes": 128,
+          "request_wire_bytes": 224,
+          "response_payload_bytes": 64,
+          "response_wire_bytes": 160,
+          "runtime_fixed_cycles": 16,
+          "runtime_fixed_duration_fs": 14134276,
+          "schema_version": "hetero-live-ramulator2-statistics/v1",
+          "write_request_count": 2,
+          "writes": 2
+        },
+        "memory_read_bytes": 64,
+        "memory_transactions": 3,
+        "memory_write_bytes": 128
+      },
+      "compiled_artifact": {
+        "calibrated": false,
+        "catalog_id": "tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+        "causal_timeline_ready": true,
+        "device_performance_included": true,
+        "kind": "runtime_live_ramulator2",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.kv_allocate",
+        "parameter_source": "deterministic_implementation_contract_not_hardware_calibrated",
+        "request_cycle_ready": true,
+        "source": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/runtime_tasks/tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.request_start"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 124558304,
+      "effective_duration_fs": 124558304,
+      "fidelity": {
+        "compute_fidelity": "runtime_metadata_contract_uncalibrated",
+        "device_performance_included": true,
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "cycle_simulated_external_link",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 0.0
+      },
+      "input_values": [],
+      "layer_id": null,
+      "op": "kv_allocate",
+      "operator_group": null,
+      "output_values": [],
+      "phase": "control",
+      "read_values": [],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.kv_allocate",
+      "timing": {
+        "completion_time_fs": 125224971,
+        "ready_time_fs": 666667,
+        "resource_id": "gpu0",
+        "start_time_fs": 666667,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.runtime_task_live_ramulator2.tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+        "duration_semantics": "total",
+        "exports": [],
+        "owns": [
+          "gpu0",
+          "shared3d.ramulator2"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": false,
+        "trace_semantics": "none"
+      },
+      "validated_input_versions": [],
+      "write_values": []
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 125224971,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 6685,
+        "duration_fs": 5905477032,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 3,
+          "address_translated": 5120,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 132,
+          "children_sent": 132,
+          "completed": 132,
+          "cycles": 2362,
+          "durable_completed": 132,
+          "gateway_cycles": 2362,
+          "global_time_fs": 5905477031,
+          "gpu_children": 132,
+          "gpu_completed": 132,
+          "gpu_cycles": 6685,
+          "gpu_parents": 132,
+          "instances": 1,
+          "internal_bytes": 8448,
+          "link_cycles": 2362,
+          "logical_bytes": 4224,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 132,
+          "rejected": 9984,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 4224,
+          "response_payload_bytes": 4224,
+          "response_wire_bytes": 8448,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 851968,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 131137664,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 219164672,
+              "size_bytes": 131072000,
+              "tensor_id": "tinyllama.layer0.token_embedding.weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350253056,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.token_embedding.output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 4294967040,
+              "size_bytes": 128,
+              "tensor_id": "tinyllama.layer0.token_embedding.token_ids",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 3,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/979abfa9876ba41fd3847d7621092e36966b0a609e990c7b326fedc7aeebcebd/online_address_bindings.tsv",
+          "table_sha256": "219e8a866b9ea2ff5d710481d4243ce44afbf711731492730d96a2c7c3dff89b",
+          "tensor_count": 3,
+          "trace_key": "f16eda8cc2caf58f69d4d90dbdc86cd569b7a384a80c97e4c8fbf2387be42aa0",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.token_embedding.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/979abfa9876ba41fd3847d7621092e36966b0a609e990c7b326fedc7aeebcebd",
+        "request_cycle_ready": true,
+        "simulation_key": "979abfa9876ba41fd3847d7621092e36966b0a609e990c7b326fedc7aeebcebd",
+        "trace_id": "tinyllama.1_1b.layer0.token_embedding.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "f16eda8cc2caf58f69d4d90dbdc86cd569b7a384a80c97e4c8fbf2387be42aa0"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.kv_allocate"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 5905477032,
+      "effective_duration_fs": 5905477032,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "int32",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 32,
+          "storage_class": "metadata",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids",
+          "version": 0
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 131072000,
+          "storage_class": "parameter",
+          "value_id": "model.tok_embeddings.weight",
+          "version": 0
+        }
+      ],
+      "layer_id": null,
+      "op": "token_embedding",
+      "operator_group": "embedding",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prompt_token_ids",
+        "model.tok_embeddings.weight"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+      "timing": {
+        "completion_time_fs": 6030702003,
+        "ready_time_fs": 125224971,
+        "resource_id": "gpu0",
+        "start_time_fs": 125224971,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids",
+          "version": 0
+        },
+        {
+          "value_id": "model.tok_embeddings.weight",
+          "version": 0
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 6030702003,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 66654,
+        "duration_fs": 58881625442,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 6,
+          "address_translated": 40970,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 2176,
+          "children_sent": 2176,
+          "completed": 2176,
+          "cycles": 23552,
+          "durable_completed": 2176,
+          "gateway_cycles": 23552,
+          "global_time_fs": 58881625441,
+          "gpu_children": 2176,
+          "gpu_completed": 2176,
+          "gpu_cycles": 66654,
+          "gpu_parents": 2176,
+          "instances": 1,
+          "internal_bytes": 139264,
+          "link_cycles": 23552,
+          "logical_bytes": 69632,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 2176,
+          "rejected": 272819,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 69632,
+          "response_payload_bytes": 69632,
+          "response_wire_bytes": 139264,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 5290064,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 462912,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 4096,
+              "size_bytes": 4096,
+              "tensor_id": "tinyllama.layer0.attention_norm.weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350253056,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.attention_norm.input",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 351485952,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.attention_norm.output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 436337664,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 436403200,
+              "size_bytes": 131136,
+              "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 436534528,
+              "size_bytes": 131072,
+              "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 6,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/6d47348ea253e009d3b77a5139ba13f727ec150c7c67752421c21089945eb302/online_address_bindings.tsv",
+          "table_sha256": "088f84683196eaceba9a7c429475aab1e050ef1d9829fa450d4b9961a7e6cfff",
+          "tensor_count": 6,
+          "trace_key": "aa1f5c3757dbc7b7f739986be64762862d6b7889c15e756da13684251f4e37c8",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/6d47348ea253e009d3b77a5139ba13f727ec150c7c67752421c21089945eb302",
+        "request_cycle_ready": true,
+        "simulation_key": "6d47348ea253e009d3b77a5139ba13f727ec150c7c67752421c21089945eb302",
+        "trace_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "aa1f5c3757dbc7b7f739986be64762862d6b7889c15e756da13684251f4e37c8"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 58881625442,
+      "effective_duration_fs": 58881625442,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 4096,
+          "storage_class": "parameter",
+          "value_id": "model.layers.0.attention_norm.weight",
+          "version": 0
+        }
+      ],
+      "layer_id": 0,
+      "op": "attention_norm",
+      "operator_group": "norm",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+        "model.layers.0.attention_norm.weight"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+      "timing": {
+        "completion_time_fs": 64912327445,
+        "ready_time_fs": 6030702003,
+        "resource_id": "gpu0",
+        "start_time_fs": 6030702003,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.attention_norm.weight",
+          "version": 0
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 64912327445,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 2176858,
+        "duration_fs": 1923019434629,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 12,
+          "address_translated": 736837,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 376572,
+          "children_sent": 376572,
+          "completed": 376535,
+          "cycles": 769207,
+          "durable_completed": 376535,
+          "gateway_cycles": 769207,
+          "global_time_fs": 1923019434628,
+          "gpu_children": 376572,
+          "gpu_completed": 376535,
+          "gpu_cycles": 2176858,
+          "gpu_parents": 376535,
+          "instances": 1,
+          "internal_bytes": 24100608,
+          "link_cycles": 769207,
+          "logical_bytes": 12052672,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 376498,
+          "rejected": 55366506,
+          "request_payload_bytes": 4736,
+          "request_wire_bytes": 12053856,
+          "response_payload_bytes": 12047936,
+          "response_wire_bytes": 24097056,
+          "transaction_bytes": 64,
+          "writes": 37
+        },
+        "instructions": 34943066,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 33685504,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 77606912,
+              "size_bytes": 8388608,
+              "tensor_id": "tinyllama.layer0.qkv_projection.q_weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 85995520,
+              "size_bytes": 1048576,
+              "tensor_id": "tinyllama.layer0.qkv_projection.k_weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 87044096,
+              "size_bytes": 1048576,
+              "tensor_id": "tinyllama.layer0.qkv_projection.v_weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350519296,
+              "size_bytes": 81920,
+              "tensor_id": "tinyllama.layer0.qkv_projection.output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 351485952,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.qkv_projection.input",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 378735360,
+              "size_bytes": 8192,
+              "tensor_id": "tinyllama.layer0.qkv_projection.key",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 378743552,
+              "size_bytes": 12582912,
+              "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 391326464,
+              "size_bytes": 1233408,
+              "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 392559872,
+              "size_bytes": 634368,
+              "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 393194240,
+              "size_bytes": 8519680,
+              "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_3",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 401713920,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.qkv_projection.query",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 401779456,
+              "size_bytes": 8192,
+              "tensor_id": "tinyllama.layer0.qkv_projection.value",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 12,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/e94455ffc6e73d63e9bc4a1f83773e99e081289c59ed5383812f6c2cec6d4dbd/online_address_bindings.tsv",
+          "table_sha256": "90d76b8700acc3ca7e50f607800ea5e159ce28575810f80a5d98c9fc55ad046a",
+          "tensor_count": 12,
+          "trace_key": "aa34cdec22c0dc5230e8c16b45a16b365694969902dbf0a7e3f722f6f865bcee",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/e94455ffc6e73d63e9bc4a1f83773e99e081289c59ed5383812f6c2cec6d4dbd",
+        "request_cycle_ready": true,
+        "simulation_key": "e94455ffc6e73d63e9bc4a1f83773e99e081289c59ed5383812f6c2cec6d4dbd",
+        "trace_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "aa34cdec22c0dc5230e8c16b45a16b365694969902dbf0a7e3f722f6f865bcee"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 1923019434629,
+      "effective_duration_fs": 1923019434629,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 10485760,
+          "storage_class": "parameter",
+          "value_id": "model.layers.0.qkv.weight",
+          "version": 0
+        }
+      ],
+      "layer_id": 0,
+      "op": "qkv_projection",
+      "operator_group": "attention",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 81920,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+        "model.layers.0.qkv.weight"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+      "timing": {
+        "completion_time_fs": 1987931762074,
+        "ready_time_fs": 64912327445,
+        "resource_id": "gpu0",
+        "start_time_fs": 64912327445,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.qkv.weight",
+          "version": 0
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 1987931762074,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 135809,
+        "duration_fs": 119972614841,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 13,
+          "address_translated": 30764,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 2312,
+          "children_sent": 2312,
+          "completed": 2312,
+          "cycles": 47989,
+          "durable_completed": 2312,
+          "gateway_cycles": 47989,
+          "global_time_fs": 119972614840,
+          "gpu_children": 2312,
+          "gpu_completed": 2312,
+          "gpu_cycles": 135809,
+          "gpu_parents": 2312,
+          "instances": 1,
+          "internal_bytes": 147968,
+          "link_cycles": 47989,
+          "logical_bytes": 73984,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 2312,
+          "rejected": 257697,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 73984,
+          "response_payload_bytes": 73984,
+          "response_wire_bytes": 147968,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 12589812,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 10616832,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350519296,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.rope.query",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350584832,
+              "size_bytes": 8192,
+              "tensor_id": "tinyllama.layer0.rope.key",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350666752,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.rope.query_output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350732288,
+              "size_bytes": 8192,
+              "tensor_id": "tinyllama.layer0.rope.key_output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 401787648,
+              "size_bytes": 2048,
+              "tensor_id": "tinyllama.layer0.rope.cos",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 401789696,
+              "size_bytes": 1233408,
+              "tensor_id": "tinyllama.layer0.rope.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 403023104,
+              "size_bytes": 53248,
+              "tensor_id": "tinyllama.layer0.rope.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 403076352,
+              "size_bytes": 8192,
+              "tensor_id": "tinyllama.layer0.rope.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 403084544,
+              "size_bytes": 65920,
+              "tensor_id": "tinyllama.layer0.rope.opaque_workspace_3",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 403150592,
+              "size_bytes": 584704,
+              "tensor_id": "tinyllama.layer0.rope.opaque_workspace_4",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 403735296,
+              "size_bytes": 8519680,
+              "tensor_id": "tinyllama.layer0.rope.opaque_workspace_5",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 412254976,
+              "size_bytes": 128,
+              "tensor_id": "tinyllama.layer0.rope.position_ids",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 412255232,
+              "size_bytes": 2048,
+              "tensor_id": "tinyllama.layer0.rope.sin",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 13,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/385a967f94cdbeef74900f70ca53a248f2ec10a913c631221794c0ec5c5c0013/online_address_bindings.tsv",
+          "table_sha256": "34c34861429d4432e0fd173457cb09f801a48e4b9a02c27c44295ab754fab9bb",
+          "tensor_count": 13,
+          "trace_key": "1ac595e158c7dc0ebdcde7f7995acc2a974dae4b0f740762cfb2e34d0b2a74ec",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.rope.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/385a967f94cdbeef74900f70ca53a248f2ec10a913c631221794c0ec5c5c0013",
+        "request_cycle_ready": true,
+        "simulation_key": "385a967f94cdbeef74900f70ca53a248f2ec10a913c631221794c0ec5c5c0013",
+        "trace_id": "tinyllama.1_1b.layer0.rope.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "1ac595e158c7dc0ebdcde7f7995acc2a974dae4b0f740762cfb2e34d0b2a74ec"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 119972614841,
+      "effective_duration_fs": 119972614841,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 81920,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+          "version": 1
+        }
+      ],
+      "layer_id": 0,
+      "op": "rope",
+      "operator_group": "attention",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 81920,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+      "timing": {
+        "completion_time_fs": 2107904376915,
+        "ready_time_fs": 1987931762074,
+        "resource_id": "gpu0",
+        "start_time_fs": 1987931762074,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+          "version": 1
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.runtime_task_live_ramulator2.tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+      "backend_launch_time_fs": 2107904376915,
+      "backend_statistics": {
+        "clock_hz": 1132000000,
+        "contract_clock_hz": 1500000000,
+        "contract_cycles": 520,
+        "contract_duration_fs": 346666667,
+        "cycles": 4435,
+        "duration_fs": 3917844523,
+        "formula": "fixed_cycles + ceil((K_read+V_read+K_write+V_write)/transaction_bytes)*cycles_per_transaction",
+        "live_memory_statistics": {
+          "accepted_parent_ids": 512,
+          "children_completed": 512,
+          "children_sent": 512,
+          "clock": 1564,
+          "completed": 512,
+          "durable_completed": 512,
+          "gateway_cycles": 1564,
+          "global_time_fs": 3910777385,
+          "gpu_cycles": 4427,
+          "initiators": {
+            "atlas0.compute": {
+              "children": 0,
+              "completed": 0,
+              "parents": 0
+            },
+            "gpu0": {
+              "children": 512,
+              "completed": 512,
+              "parents": 512
+            }
+          },
+          "instances": 1,
+          "internal_bytes": 32768,
+          "link_cycles": 1564,
+          "logical_bytes": 32768,
+          "observed_completion_ids": 512,
+          "outstanding": 0,
+          "read_request_count": 256,
+          "reads": 256,
+          "rejected": 383,
+          "request_count": 512,
+          "request_payload_bytes": 16384,
+          "request_wire_bytes": 32768,
+          "response_payload_bytes": 16384,
+          "response_wire_bytes": 32768,
+          "runtime_fixed_cycles": 8,
+          "runtime_fixed_duration_fs": 7067138,
+          "schema_version": "hetero-live-ramulator2-statistics/v1",
+          "write_request_count": 256,
+          "writes": 256
+        },
+        "memory_read_bytes": 16384,
+        "memory_transactions": 512,
+        "memory_write_bytes": 16384
+      },
+      "compiled_artifact": {
+        "calibrated": false,
+        "catalog_id": "tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+        "causal_timeline_ready": true,
+        "device_performance_included": true,
+        "kind": "runtime_live_ramulator2",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "parameter_source": "deterministic_implementation_contract_not_hardware_calibrated",
+        "request_cycle_ready": true,
+        "source": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/runtime_tasks/tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 3917844523,
+      "effective_duration_fs": 3917844523,
+      "fidelity": {
+        "compute_fidelity": "runtime_copy_engine_contract_uncalibrated",
+        "device_performance_included": true,
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "cycle_simulated_external_link",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 0.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 81920,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 8192,
+          "storage_class": "kv_cache",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+          "version": 0
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 8192,
+          "storage_class": "kv_cache",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+          "version": 0
+        }
+      ],
+      "layer_id": 0,
+      "op": "kv_append",
+      "operator_group": "attention",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+          "version": 1
+        },
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 8192,
+          "storage_class": "kv_cache",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+          "version": 1
+        },
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 8192,
+          "storage_class": "kv_cache",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+        "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+        "TINYLLAMA11B-PREFILL-R0.kv.l0.v"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+      "timing": {
+        "completion_time_fs": 2111822221438,
+        "ready_time_fs": 2107904376915,
+        "resource_id": "gpu0",
+        "start_time_fs": 2107904376915,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.runtime_task_live_ramulator2.tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+        "duration_semantics": "total",
+        "exports": [],
+        "owns": [
+          "gpu0",
+          "shared3d.ramulator2"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": false,
+        "trace_semantics": "none"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+          "version": 1
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+          "version": 0
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+          "version": 0
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+        "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+        "TINYLLAMA11B-PREFILL-R0.kv.l0.v"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 2111822221438,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 43473,
+        "duration_fs": 38403710248,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 7,
+          "address_translated": 16448,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 2560,
+          "children_sent": 2560,
+          "completed": 2560,
+          "cycles": 15361,
+          "durable_completed": 2560,
+          "gateway_cycles": 15361,
+          "global_time_fs": 38403710247,
+          "gpu_children": 2560,
+          "gpu_completed": 2560,
+          "gpu_cycles": 43473,
+          "gpu_parents": 2560,
+          "instances": 1,
+          "internal_bytes": 163840,
+          "link_cycles": 15361,
+          "logical_bytes": 81920,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 2560,
+          "rejected": 295020,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 81920,
+          "response_payload_bytes": 81920,
+          "response_wire_bytes": 163840,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 11962112,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 2097152,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350322688,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.causal_attention.output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350388224,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.causal_attention.query",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 353700608,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.causal_attention.key",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 353766144,
+              "size_bytes": 1233408,
+              "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 354999552,
+              "size_bytes": 16384,
+              "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 355015936,
+              "size_bytes": 585216,
+              "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 355601152,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.causal_attention.value",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 7,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/f8d24381e11f1b7d5cee58a712b98a4c3f2abe797ac4a46d437b786b5f5389c9/online_address_bindings.tsv",
+          "table_sha256": "0e07f06ec9f13e836a89d26a5cfbcc860600b8ec5372f3834152c93bea21098a",
+          "tensor_count": 7,
+          "trace_key": "a9c33cb91e7bf3e956b72f784ae0e5a7ce49d27ec67a627078b99d38551de5a6",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.causal_attention.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/f8d24381e11f1b7d5cee58a712b98a4c3f2abe797ac4a46d437b786b5f5389c9",
+        "request_cycle_ready": true,
+        "simulation_key": "f8d24381e11f1b7d5cee58a712b98a4c3f2abe797ac4a46d437b786b5f5389c9",
+        "trace_id": "tinyllama.1_1b.layer0.causal_attention.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "a9c33cb91e7bf3e956b72f784ae0e5a7ce49d27ec67a627078b99d38551de5a6"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 38403710248,
+      "effective_duration_fs": 38403710248,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 8192,
+          "storage_class": "kv_cache",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 8192,
+          "storage_class": "kv_cache",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+          "version": 1
+        }
+      ],
+      "layer_id": 0,
+      "op": "causal_attention",
+      "operator_group": "attention",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+        "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+        "TINYLLAMA11B-PREFILL-R0.kv.l0.v"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+      "timing": {
+        "completion_time_fs": 2150225931686,
+        "ready_time_fs": 2111822221438,
+        "resource_id": "gpu0",
+        "start_time_fs": 2111822221438,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+          "version": 1
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k",
+          "version": 1
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v",
+          "version": 1
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 2150225931686,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 1749088,
+        "duration_fs": 1545130742050,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 8,
+          "address_translated": 609152,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 307840,
+          "children_sent": 307840,
+          "completed": 307840,
+          "cycles": 618052,
+          "durable_completed": 307840,
+          "gateway_cycles": 618052,
+          "global_time_fs": 1545130742049,
+          "gpu_children": 307840,
+          "gpu_completed": 307840,
+          "gpu_cycles": 1749088,
+          "gpu_parents": 307840,
+          "instances": 1,
+          "internal_bytes": 19701760,
+          "link_cycles": 618052,
+          "logical_bytes": 9850880,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 307840,
+          "rejected": 45331014,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 9850880,
+          "response_payload_bytes": 9850880,
+          "response_wire_bytes": 19701760,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 20140032,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 31588352,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 69218304,
+              "size_bytes": 8388608,
+              "tensor_id": "tinyllama.layer0.output_projection.weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350322688,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.output_projection.input",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350453760,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.output_projection.output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 355666688,
+              "size_bytes": 8388608,
+              "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 364055296,
+              "size_bytes": 4194304,
+              "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 368249600,
+              "size_bytes": 1233408,
+              "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 369483008,
+              "size_bytes": 732672,
+              "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_3",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 370215680,
+              "size_bytes": 8519680,
+              "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_4",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 8,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/495ec5b8df02dcf735a6932338b912af37f39a4d5288e2097f437fc1cb94fcc8/online_address_bindings.tsv",
+          "table_sha256": "67820b290813c3100e56dc168f23df568c41dd43cf764da9ce2029ad6359fb7a",
+          "tensor_count": 8,
+          "trace_key": "b7511b68bcdfff880f714faf7e2ad413ec26f3a85133dacbcc22a619debef07a",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.output_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/495ec5b8df02dcf735a6932338b912af37f39a4d5288e2097f437fc1cb94fcc8",
+        "request_cycle_ready": true,
+        "simulation_key": "495ec5b8df02dcf735a6932338b912af37f39a4d5288e2097f437fc1cb94fcc8",
+        "trace_id": "tinyllama.1_1b.layer0.output_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "b7511b68bcdfff880f714faf7e2ad413ec26f3a85133dacbcc22a619debef07a"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 1545130742050,
+      "effective_duration_fs": 1545130742050,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 8388608,
+          "storage_class": "parameter",
+          "value_id": "model.layers.0.output.weight",
+          "version": 0
+        }
+      ],
+      "layer_id": 0,
+      "op": "output_projection",
+      "operator_group": "attention",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+        "model.layers.0.output.weight"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+      "timing": {
+        "completion_time_fs": 3695356673736,
+        "ready_time_fs": 2150225931686,
+        "resource_id": "gpu0",
+        "start_time_fs": 2150225931686,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.output.weight",
+          "version": 0
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 3695356673736,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 28772,
+        "duration_fs": 25416961131,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 3,
+          "address_translated": 6144,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 4096,
+          "children_sent": 4096,
+          "completed": 4096,
+          "cycles": 10166,
+          "durable_completed": 4096,
+          "gateway_cycles": 10166,
+          "global_time_fs": 25416961130,
+          "gpu_children": 4096,
+          "gpu_completed": 4096,
+          "gpu_cycles": 28772,
+          "gpu_parents": 4096,
+          "instances": 1,
+          "internal_bytes": 262144,
+          "link_cycles": 10166,
+          "logical_bytes": 131072,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 4096,
+          "rejected": 597725,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 131072,
+          "response_payload_bytes": 131072,
+          "response_wire_bytes": 262144,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 491520,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 196608,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350253056,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.residual_add.input",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350453760,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.residual_add.residual",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350601216,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.residual_add.output",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 3,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/83df714ef4e774cf087d5b19d8a139c2b69bf7ca26a8c35354e615ebeb1dfe58/online_address_bindings.tsv",
+          "table_sha256": "7af96599d528e5cadba8d1463a675929fba58865c6d19a783ff58ea9af3a9492",
+          "tensor_count": 3,
+          "trace_key": "eca972dce9dcce192deb7b07c4400b262d0370a20a88c1c8de2a4067eb3363e4",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/83df714ef4e774cf087d5b19d8a139c2b69bf7ca26a8c35354e615ebeb1dfe58",
+        "request_cycle_ready": true,
+        "simulation_key": "83df714ef4e774cf087d5b19d8a139c2b69bf7ca26a8c35354e615ebeb1dfe58",
+        "trace_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "eca972dce9dcce192deb7b07c4400b262d0370a20a88c1c8de2a4067eb3363e4"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 25416961131,
+      "effective_duration_fs": 25416961131,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+          "version": 1
+        }
+      ],
+      "layer_id": 0,
+      "op": "residual_add",
+      "operator_group": "attention",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+      "timing": {
+        "completion_time_fs": 3720773634867,
+        "ready_time_fs": 3695356673736,
+        "resource_id": "gpu0",
+        "start_time_fs": 3695356673736,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+          "version": 1
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+          "version": 1
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 3720773634867,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 66652,
+        "duration_fs": 58879858658,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 7,
+          "address_translated": 40976,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 2176,
+          "children_sent": 2176,
+          "completed": 2176,
+          "cycles": 23551,
+          "durable_completed": 2176,
+          "gateway_cycles": 23551,
+          "global_time_fs": 58879858657,
+          "gpu_children": 2176,
+          "gpu_completed": 2176,
+          "gpu_cycles": 66652,
+          "gpu_parents": 2176,
+          "instances": 1,
+          "internal_bytes": 139264,
+          "link_cycles": 23551,
+          "logical_bytes": 69632,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 2176,
+          "rejected": 272701,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 69632,
+          "response_payload_bytes": 69632,
+          "response_wire_bytes": 139264,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 5290064,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 2097152,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 69214208,
+              "size_bytes": 4096,
+              "tensor_id": "tinyllama.layer0.mlp_norm.weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350601216,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.mlp_norm.input",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 351354880,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.mlp_norm.output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 434375680,
+              "size_bytes": 4096,
+              "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 434379776,
+              "size_bytes": 1225216,
+              "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 435604992,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 435670528,
+              "size_bytes": 667136,
+              "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_3",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 7,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/d32dc5586f29a8dac88f770961c15ac1990f712486cde120d55a7039554efd2a/online_address_bindings.tsv",
+          "table_sha256": "d2ea1c0f45e33a60e632cef53dd3ceb68d34e94dd0e0d83ab299734ccac42278",
+          "tensor_count": 7,
+          "trace_key": "e66722c1d79bb2abf149cccc91844e197d104bf417d620777a91648c5e2fe9a3",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.mlp_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/d32dc5586f29a8dac88f770961c15ac1990f712486cde120d55a7039554efd2a",
+        "request_cycle_ready": true,
+        "simulation_key": "d32dc5586f29a8dac88f770961c15ac1990f712486cde120d55a7039554efd2a",
+        "trace_id": "tinyllama.1_1b.layer0.mlp_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "e66722c1d79bb2abf149cccc91844e197d104bf417d620777a91648c5e2fe9a3"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 58879858658,
+      "effective_duration_fs": 58879858658,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 4096,
+          "storage_class": "parameter",
+          "value_id": "model.layers.0.mlp_norm.weight",
+          "version": 0
+        }
+      ],
+      "layer_id": 0,
+      "op": "mlp_norm",
+      "operator_group": "mlp",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+        "model.layers.0.mlp_norm.weight"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+      "timing": {
+        "completion_time_fs": 3779653493525,
+        "ready_time_fs": 3720773634867,
+        "resource_id": "gpu0",
+        "start_time_fs": 3720773634867,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.mlp_norm.weight",
+          "version": 0
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 3779653493525,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 8316717,
+        "duration_fs": 7346923144877,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 9,
+          "address_translated": 2004992,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 1465792,
+          "children_sent": 1465792,
+          "completed": 1463410,
+          "cycles": 2938769,
+          "durable_completed": 1463410,
+          "gateway_cycles": 2938769,
+          "global_time_fs": 7346923144876,
+          "gpu_children": 1465792,
+          "gpu_completed": 1463410,
+          "gpu_cycles": 8316717,
+          "gpu_parents": 1463410,
+          "instances": 1,
+          "internal_bytes": 93810688,
+          "link_cycles": 2938769,
+          "logical_bytes": 47057792,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 1461028,
+          "rejected": 215321969,
+          "request_payload_bytes": 304896,
+          "request_wire_bytes": 47134016,
+          "response_payload_bytes": 46752896,
+          "response_wire_bytes": 93582016,
+          "transaction_bytes": 64,
+          "writes": 2382
+        },
+        "instructions": 86599740,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 56754176,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 23076864,
+              "size_bytes": 23068672,
+              "tensor_id": "tinyllama.layer0.gate_up_projection.gate_weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 46145536,
+              "size_bytes": 23068672,
+              "tensor_id": "tinyllama.layer0.gate_up_projection.up_weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350994432,
+              "size_bytes": 360448,
+              "tensor_id": "tinyllama.layer0.gate_up_projection.output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 351354880,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.gate_up_projection.input",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 424184832,
+              "size_bytes": 180224,
+              "tensor_id": "tinyllama.layer0.gate_up_projection.gate",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 424365056,
+              "size_bytes": 1233408,
+              "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 425598464,
+              "size_bytes": 77312,
+              "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 425675776,
+              "size_bytes": 8519680,
+              "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 434195456,
+              "size_bytes": 180224,
+              "tensor_id": "tinyllama.layer0.gate_up_projection.up",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 9,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/343e6eb3b1ef1f26a42848e5bc2c9c4ff48f4f958c454632887e4898fedc6688/online_address_bindings.tsv",
+          "table_sha256": "6d3357c28fd7764a8d967ad0139c27224c2128422e4735f3e4db68b3f10e1eb4",
+          "tensor_count": 9,
+          "trace_key": "9df8a83fa8e9081a0ed02705b7399e661f115e6760f222f82b23d106b3e13544",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.gate_up_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/343e6eb3b1ef1f26a42848e5bc2c9c4ff48f4f958c454632887e4898fedc6688",
+        "request_cycle_ready": true,
+        "simulation_key": "343e6eb3b1ef1f26a42848e5bc2c9c4ff48f4f958c454632887e4898fedc6688",
+        "trace_id": "tinyllama.1_1b.layer0.gate_up_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "9df8a83fa8e9081a0ed02705b7399e661f115e6760f222f82b23d106b3e13544"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 7346923144877,
+      "effective_duration_fs": 7346923144877,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 46137344,
+          "storage_class": "parameter",
+          "value_id": "model.layers.0.gate_up.weight",
+          "version": 0
+        }
+      ],
+      "layer_id": 0,
+      "op": "gate_up_projection",
+      "operator_group": "mlp",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 360448,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+        "model.layers.0.gate_up.weight"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+      "timing": {
+        "completion_time_fs": 11126576638402,
+        "ready_time_fs": 3779653493525,
+        "resource_id": "gpu0",
+        "start_time_fs": 3779653493525,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.gate_up.weight",
+          "version": 0
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 11126576638402,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 75477,
+        "duration_fs": 66675795054,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 6,
+          "address_translated": 33459,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 11264,
+          "children_sent": 11264,
+          "completed": 11264,
+          "cycles": 26670,
+          "durable_completed": 11264,
+          "gateway_cycles": 26670,
+          "global_time_fs": 66675795053,
+          "gpu_children": 11264,
+          "gpu_completed": 11264,
+          "gpu_cycles": 75477,
+          "gpu_parents": 11264,
+          "instances": 1,
+          "internal_bytes": 720896,
+          "link_cycles": 26670,
+          "logical_bytes": 360448,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 11264,
+          "rejected": 1647312,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 360448,
+          "response_payload_bytes": 360448,
+          "response_wire_bytes": 720896,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 3020750,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 2097152,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350748672,
+              "size_bytes": 180224,
+              "tensor_id": "tinyllama.layer0.silu_multiply.output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350994432,
+              "size_bytes": 180224,
+              "tensor_id": "tinyllama.layer0.silu_multiply.gate",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 351174656,
+              "size_bytes": 180224,
+              "tensor_id": "tinyllama.layer0.silu_multiply.up",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 412257280,
+              "size_bytes": 1298944,
+              "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 413556224,
+              "size_bytes": 180224,
+              "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 413736448,
+              "size_bytes": 77312,
+              "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 6,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/456bc82e039c89b658dbbee1b0cf20fca7b64bb298f49f1bec2ffd9977516336/online_address_bindings.tsv",
+          "table_sha256": "ac79dd40868e8c466f23b284792812600fd60711f8f58e0e348bb5d7a5153bd4",
+          "tensor_count": 6,
+          "trace_key": "acf1961387fe6a979e8ad474df64196bdcae9937e8a032d30e761e3ac897b605",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/456bc82e039c89b658dbbee1b0cf20fca7b64bb298f49f1bec2ffd9977516336",
+        "request_cycle_ready": true,
+        "simulation_key": "456bc82e039c89b658dbbee1b0cf20fca7b64bb298f49f1bec2ffd9977516336",
+        "trace_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "acf1961387fe6a979e8ad474df64196bdcae9937e8a032d30e761e3ac897b605"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 66675795054,
+      "effective_duration_fs": 66675795054,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 360448,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+          "version": 1
+        }
+      ],
+      "layer_id": 0,
+      "op": "silu_multiply",
+      "operator_group": "mlp",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 180224,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+      "timing": {
+        "completion_time_fs": 11193252433456,
+        "ready_time_fs": 11126576638402,
+        "resource_id": "gpu0",
+        "start_time_fs": 11126576638402,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+          "version": 1
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 11193252433456,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 4161563,
+        "duration_fs": 3676292402827,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 6,
+          "address_translated": 933888,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 727488,
+          "children_sent": 727488,
+          "completed": 727488,
+          "cycles": 1470516,
+          "durable_completed": 727488,
+          "gateway_cycles": 1470516,
+          "global_time_fs": 3676292402826,
+          "gpu_children": 727488,
+          "gpu_completed": 727488,
+          "gpu_cycles": 4161563,
+          "gpu_parents": 727488,
+          "instances": 1,
+          "internal_bytes": 46559232,
+          "link_cycles": 1470516,
+          "logical_bytes": 23279616,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 727488,
+          "rejected": 108000903,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 23279616,
+          "response_payload_bytes": 23279616,
+          "response_wire_bytes": 46559232,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 33361920,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 33685504,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 8192,
+              "size_bytes": 23068672,
+              "tensor_id": "tinyllama.layer0.down_projection.weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350748672,
+              "size_bytes": 180224,
+              "tensor_id": "tinyllama.layer0.down_projection.input",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350928896,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.down_projection.output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 413813760,
+              "size_bytes": 1233408,
+              "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 415047168,
+              "size_bytes": 617984,
+              "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 415665152,
+              "size_bytes": 8519680,
+              "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 6,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/d79bf993c4af265a0f44e14e9d629bda58c6700d9fa7e588222abedf5f8a7c11/online_address_bindings.tsv",
+          "table_sha256": "9457b2ad0b5e30f8f62a488e4dc0bbbdbf409b9c9ddb3ba7ab0417a5c2fda8b0",
+          "tensor_count": 6,
+          "trace_key": "790893f4eddf548d32f950cb924cb985e1fb88d5e1294a0647c015f3545f8677",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.down_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/d79bf993c4af265a0f44e14e9d629bda58c6700d9fa7e588222abedf5f8a7c11",
+        "request_cycle_ready": true,
+        "simulation_key": "d79bf993c4af265a0f44e14e9d629bda58c6700d9fa7e588222abedf5f8a7c11",
+        "trace_id": "tinyllama.1_1b.layer0.down_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "790893f4eddf548d32f950cb924cb985e1fb88d5e1294a0647c015f3545f8677"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 3676292402827,
+      "effective_duration_fs": 3676292402827,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 180224,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 23068672,
+          "storage_class": "parameter",
+          "value_id": "model.layers.0.down.weight",
+          "version": 0
+        }
+      ],
+      "layer_id": 0,
+      "op": "down_projection",
+      "operator_group": "mlp",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+        "model.layers.0.down.weight"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+      "timing": {
+        "completion_time_fs": 14869544836283,
+        "ready_time_fs": 11193252433456,
+        "resource_id": "gpu0",
+        "start_time_fs": 11193252433456,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.down.weight",
+          "version": 0
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 14869544836283,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 28772,
+        "duration_fs": 25416961131,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 3,
+          "address_translated": 6144,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 4096,
+          "children_sent": 4096,
+          "completed": 4096,
+          "cycles": 10166,
+          "durable_completed": 4096,
+          "gateway_cycles": 10166,
+          "global_time_fs": 25416961130,
+          "gpu_children": 4096,
+          "gpu_completed": 4096,
+          "gpu_cycles": 28772,
+          "gpu_parents": 4096,
+          "instances": 1,
+          "internal_bytes": 262144,
+          "link_cycles": 10166,
+          "logical_bytes": 131072,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 4096,
+          "rejected": 596472,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 131072,
+          "response_payload_bytes": 131072,
+          "response_wire_bytes": 262144,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 491520,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 196608,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350601216,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.residual_add.input",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350928896,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.residual_add.residual",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 351420416,
+              "size_bytes": 65536,
+              "tensor_id": "tinyllama.layer0.residual_add.output",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 3,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/5dda6b444e8120912ac04f9b15cc8a877aaa41d46a7359353289ccfe6d64f13a/online_address_bindings.tsv",
+          "table_sha256": "c400b91f8acef95861f6e403c29510b331f192e6303dd91673ba48461f77e326",
+          "tensor_count": 3,
+          "trace_key": "eca972dce9dcce192deb7b07c4400b262d0370a20a88c1c8de2a4067eb3363e4",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/5dda6b444e8120912ac04f9b15cc8a877aaa41d46a7359353289ccfe6d64f13a",
+        "request_cycle_ready": true,
+        "simulation_key": "5dda6b444e8120912ac04f9b15cc8a877aaa41d46a7359353289ccfe6d64f13a",
+        "trace_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "eca972dce9dcce192deb7b07c4400b262d0370a20a88c1c8de2a4067eb3363e4"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 25416961131,
+      "effective_duration_fs": 25416961131,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+          "version": 1
+        }
+      ],
+      "layer_id": 0,
+      "op": "residual_add",
+      "operator_group": "mlp",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+      "timing": {
+        "completion_time_fs": 14894961797414,
+        "ready_time_fs": 14869544836283,
+        "resource_id": "gpu0",
+        "start_time_fs": 14869544836283,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+          "version": 1
+        },
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+          "version": 1
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 14894961797414,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 49549,
+        "duration_fs": 43771201414,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 7,
+          "address_translated": 2617,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 257,
+          "children_sent": 257,
+          "completed": 257,
+          "cycles": 17508,
+          "durable_completed": 257,
+          "gateway_cycles": 17508,
+          "global_time_fs": 43771201413,
+          "gpu_children": 257,
+          "gpu_completed": 257,
+          "gpu_cycles": 49549,
+          "gpu_parents": 257,
+          "instances": 1,
+          "internal_bytes": 16448,
+          "link_cycles": 17508,
+          "logical_bytes": 8224,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 257,
+          "rejected": 5752,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 8224,
+          "response_payload_bytes": 8224,
+          "response_wire_bytes": 16448,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 318253,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 2097152,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 0,
+              "size_bytes": 4096,
+              "tensor_id": "tinyllama.layer0.final_norm.weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350318592,
+              "size_bytes": 4096,
+              "tensor_id": "tinyllama.layer0.final_norm.output",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 351481856,
+              "size_bytes": 4096,
+              "tensor_id": "tinyllama.layer0.final_norm.input",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 351615744,
+              "size_bytes": 1228800,
+              "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 352844544,
+              "size_bytes": 4608,
+              "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 352849152,
+              "size_bytes": 57344,
+              "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 352906496,
+              "size_bytes": 794112,
+              "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_3",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 7,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/3d18934fb517d44638758142021cf240ccba11c96330f61ecf2863cdb0c719ac/online_address_bindings.tsv",
+          "table_sha256": "7d533ac253ef5ca67f8a394daab57b10b233e0f0fa1446d0dd227859eedf20f2",
+          "tensor_count": 7,
+          "trace_key": "3a46baa580c5cb9e1a43c3812ef4267f5b6b902d5b9d393b79cf6b2038bdf7eb",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.final_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/3d18934fb517d44638758142021cf240ccba11c96330f61ecf2863cdb0c719ac",
+        "request_cycle_ready": true,
+        "simulation_key": "3d18934fb517d44638758142021cf240ccba11c96330f61ecf2863cdb0c719ac",
+        "trace_id": "tinyllama.1_1b.layer0.final_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "3a46baa580c5cb9e1a43c3812ef4267f5b6b902d5b9d393b79cf6b2038bdf7eb"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 43771201414,
+      "effective_duration_fs": 43771201414,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 65536,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 4096,
+          "storage_class": "parameter",
+          "value_id": "model.final_norm.weight",
+          "version": 0
+        }
+      ],
+      "layer_id": null,
+      "op": "final_norm",
+      "operator_group": "finalize",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 4096,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+        "model.final_norm.weight"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+      "timing": {
+        "completion_time_fs": 14938732998828,
+        "ready_time_fs": 14894961797414,
+        "resource_id": "gpu0",
+        "start_time_fs": 14894961797414,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.final_norm.weight",
+          "version": 0
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 14938732998828,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 23199917,
+        "duration_fs": 20494626325089,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 8,
+          "address_translated": 800060777,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 4097609,
+          "children_sent": 4097609,
+          "completed": 4097155,
+          "cycles": 8197850,
+          "durable_completed": 4097155,
+          "gateway_cycles": 8197850,
+          "global_time_fs": 20494626325088,
+          "gpu_children": 4097609,
+          "gpu_completed": 4097155,
+          "gpu_cycles": 23199917,
+          "gpu_parents": 4097155,
+          "instances": 1,
+          "internal_bytes": 262246976,
+          "link_cycles": 8197850,
+          "logical_bytes": 131152576,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 4096692,
+          "rejected": 602438753,
+          "request_payload_bytes": 58432,
+          "request_wire_bytes": 131167392,
+          "response_payload_bytes": 131094144,
+          "response_wire_bytes": 262203104,
+          "transaction_bytes": 64,
+          "writes": 463
+        },
+        "instructions": 476608000,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 142737408,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 88092672,
+              "size_bytes": 131072000,
+              "tensor_id": "tinyllama.layer0.lm_head.weight",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 350318592,
+              "size_bytes": 4096,
+              "tensor_id": "tinyllama.layer0.lm_head.input",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 351551488,
+              "size_bytes": 64000,
+              "tensor_id": "tinyllama.layer0.lm_head.logits",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 436665600,
+              "size_bytes": 1233408,
+              "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 437899008,
+              "size_bytes": 1536,
+              "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 437900544,
+              "size_bytes": 794112,
+              "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 438694656,
+              "size_bytes": 1048576,
+              "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_3",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 439743232,
+              "size_bytes": 8519680,
+              "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_4",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 8,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/ca75e4ee3b114000180a9047aa43c4cc273c830145713c0e124c38409e8cb94b/online_address_bindings.tsv",
+          "table_sha256": "c157528f0052f4f26f81bec646e75109e2b0a12e8909bfe4bd877565e3f779b8",
+          "tensor_count": 8,
+          "trace_key": "314986f99600b971e8667d0d7796c1502d5590213d470a7940639ea31b144f40",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.lm_head.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/ca75e4ee3b114000180a9047aa43c4cc273c830145713c0e124c38409e8cb94b",
+        "request_cycle_ready": true,
+        "simulation_key": "ca75e4ee3b114000180a9047aa43c4cc273c830145713c0e124c38409e8cb94b",
+        "trace_id": "tinyllama.1_1b.layer0.lm_head.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "314986f99600b971e8667d0d7796c1502d5590213d470a7940639ea31b144f40"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 20494626325089,
+      "effective_duration_fs": 20494626325089,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 4096,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+          "version": 1
+        },
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 131072000,
+          "storage_class": "parameter",
+          "value_id": "model.lm_head.weight",
+          "version": 0
+        }
+      ],
+      "layer_id": null,
+      "op": "lm_head",
+      "operator_group": "finalize",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 64000,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+        "model.lm_head.weight"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+      "timing": {
+        "completion_time_fs": 35433359323917,
+        "ready_time_fs": 14938732998828,
+        "resource_id": "gpu0",
+        "start_time_fs": 14938732998828,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+          "version": 1
+        },
+        {
+          "value_id": "model.lm_head.weight",
+          "version": 0
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits"
+      ]
+    },
+    {
+      "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+      "backend_launch_time_fs": 35433359323917,
+      "backend_statistics": {
+        "cache_hit": true,
+        "cycles": 19116,
+        "duration_fs": 16886925796,
+        "external_memory_stats": {
+          "address_already_global": 0,
+          "address_binding_ranges": 5,
+          "address_translated": 2001,
+          "address_unmapped": 0,
+          "atlas_children": 0,
+          "atlas_completed": 0,
+          "atlas_parents": 0,
+          "child_retries": 0,
+          "children_completed": 2000,
+          "children_sent": 2000,
+          "completed": 2000,
+          "cycles": 6754,
+          "durable_completed": 2000,
+          "gateway_cycles": 6754,
+          "global_time_fs": 16886925795,
+          "gpu_children": 2000,
+          "gpu_completed": 2000,
+          "gpu_cycles": 19116,
+          "gpu_parents": 2000,
+          "instances": 1,
+          "internal_bytes": 128000,
+          "link_cycles": 6754,
+          "logical_bytes": 64000,
+          "outstanding": 0,
+          "partitions": 16,
+          "reads": 2000,
+          "rejected": 4523,
+          "request_payload_bytes": 0,
+          "request_wire_bytes": 64000,
+          "response_payload_bytes": 64000,
+          "response_wire_bytes": 128000,
+          "transaction_bytes": 64,
+          "writes": 0
+        },
+        "instructions": 704205,
+        "runtime_global_pa_binding": {
+          "allocated_bytes": 2097152,
+          "allocation_owner": "prefill_global_timeline",
+          "bindings": [
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 351551488,
+              "size_bytes": 64000,
+              "tensor_id": "tinyllama.layer0.sampling.logits",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 351615552,
+              "size_bytes": 32,
+              "tensor_id": "tinyllama.layer0.sampling.token",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 448262912,
+              "size_bytes": 1233408,
+              "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_0",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 449496320,
+              "size_bytes": 65504,
+              "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_1",
+              "tensor_offset_bytes": 0
+            },
+            {
+              "memory_space_id": "shared0.dram3d",
+              "physical_offset_bytes": 449561856,
+              "size_bytes": 734208,
+              "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_2",
+              "tensor_offset_bytes": 0
+            }
+          ],
+          "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+          "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+          "policy": {
+            "alignment_bytes": 256,
+            "capacity_bytes": 4294967296,
+            "memory_space_id": "shared0.dram3d",
+            "mode": "range_rebase_packed_manifest",
+            "physical_base_bytes": 0,
+            "require_nonzero_translations": true
+          },
+          "range_count": 5,
+          "schema_version": "hetero-online-address-binding/v1",
+          "table_path": "/opt/gpu-atlas/qualification/p15h-twelve-operator-timeline/p15h_tinyllama_prefill_1layer_ctx16_twelve_request_cycle_gpu/e680717b02cce7eabdd76926147da8eb5d760c156e91f8360ccf36301dbe0413/backend_runs/gpu/759d80373e3a45d1b0c097f4ea2b12334e65d86706a6b601b815264bb1559351/online_address_bindings.tsv",
+          "table_sha256": "11b53cde6ed3d0f4b9588086b0ba6c765a2753cd8f399b5068418d22bf2478b3",
+          "tensor_count": 5,
+          "trace_key": "bd5a921285901acd9eaf5d682bbd1f76d10247e181da691e8893ef9eb13c3d57",
+          "translation_point": "mem_fetch_before_gpu_cache_lookup"
+        }
+      },
+      "compiled_artifact": {
+        "compatibility": "exact_operator",
+        "kind": "accel_sim_trace",
+        "operator_artifact_id": "tinyllama.1_1b.layer0.sampling.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/gpu/759d80373e3a45d1b0c097f4ea2b12334e65d86706a6b601b815264bb1559351",
+        "request_cycle_ready": true,
+        "simulation_key": "759d80373e3a45d1b0c097f4ea2b12334e65d86706a6b601b815264bb1559351",
+        "trace_id": "tinyllama.1_1b.layer0.sampling.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+        "trace_key": "bd5a921285901acd9eaf5d682bbd1f76d10247e181da691e8893ef9eb13c3d57"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 16886925796,
+      "effective_duration_fs": 16886925796,
+      "fidelity": {
+        "compute_fidelity": "cycle_simulated",
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 1.0
+      },
+      "input_values": [
+        {
+          "access_mode": "read",
+          "dtype": "fp16",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 64000,
+          "storage_class": "activation",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+          "version": 1
+        }
+      ],
+      "layer_id": null,
+      "op": "sampling",
+      "operator_group": "finalize",
+      "output_values": [
+        {
+          "access_mode": "write",
+          "dtype": "int32",
+          "memory_space_id": "shared0.dram3d",
+          "offset_bytes": 0,
+          "size_bytes": 2,
+          "storage_class": "metadata",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.token.0",
+          "version": 1
+        }
+      ],
+      "phase": "prefill",
+      "read_values": [
+        "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits"
+      ],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 0,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+      "timing": {
+        "completion_time_fs": 35450246249713,
+        "ready_time_fs": 35433359323917,
+        "resource_id": "gpu0",
+        "start_time_fs": 35433359323917,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+        "duration_semantics": "coupled",
+        "exports": [],
+        "owns": [
+          "gpu0.core",
+          "gpu0.l1",
+          "gpu0.l2",
+          "gpu0.noc",
+          "shared0.dram3d"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": true,
+        "trace_semantics": "functional"
+      },
+      "validated_input_versions": [
+        {
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+          "version": 1
+        }
+      ],
+      "write_values": [
+        "TINYLLAMA11B-PREFILL-R0.token.0"
+      ]
+    },
+    {
+      "backend_id": "host.control_event.tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+      "backend_launch_time_fs": 35450246249713,
+      "backend_statistics": {
+        "clock_hz": 1132000000,
+        "contract_clock_hz": 1500000000,
+        "contract_cycles": 1,
+        "contract_duration_fs": 666667,
+        "cycles": 1,
+        "duration_fs": 666667,
+        "formula": "fixed_control",
+        "live_memory_statistics": {
+          "accepted_parent_ids": 0,
+          "host_control_only": true,
+          "instances": 0,
+          "observed_completion_ids": 0,
+          "outstanding": 0
+        },
+        "memory_read_bytes": 0,
+        "memory_transactions": 0,
+        "memory_write_bytes": 0
+      },
+      "compiled_artifact": {
+        "calibrated": false,
+        "catalog_id": "tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+        "causal_timeline_ready": true,
+        "device_performance_included": false,
+        "kind": "host_control_event",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.request_finish",
+        "parameter_source": "deterministic_implementation_contract_not_hardware_calibrated",
+        "request_cycle_ready": false,
+        "source": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/runtime_tasks/tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 666667,
+      "effective_duration_fs": 666667,
+      "fidelity": {
+        "compute_fidelity": "host_control_boundary_uncalibrated",
+        "device_performance_included": false,
+        "extrapolated_fraction": 1.0,
+        "link_fidelity": "not_applicable",
+        "memory_fidelity": "not_applicable",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 0.0
+      },
+      "input_values": [],
+      "layer_id": null,
+      "op": "request_finish",
+      "operator_group": null,
+      "output_values": [],
+      "phase": "control",
+      "read_values": [],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 1,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_finish",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.request_finish",
+      "timing": {
+        "completion_time_fs": 35450246916380,
+        "ready_time_fs": 35450246249713,
+        "resource_id": "gpu0",
+        "start_time_fs": 35450246249713,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_finish"
+      },
+      "timing_contract": {
+        "backend_id": "host.control_event.tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+        "duration_semantics": "total",
+        "exports": [],
+        "owns": [
+          "host.control"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": false,
+        "trace_semantics": "none"
+      },
+      "validated_input_versions": [],
+      "write_values": []
+    },
+    {
+      "backend_id": "gpu.runtime_task_live_ramulator2.tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+      "backend_launch_time_fs": 35450246916380,
+      "backend_statistics": {
+        "clock_hz": 1132000000,
+        "contract_clock_hz": 1500000000,
+        "contract_cycles": 18,
+        "contract_duration_fs": 12000000,
+        "cycles": 113,
+        "duration_fs": 99823321,
+        "formula": "metadata_state",
+        "live_memory_statistics": {
+          "accepted_parent_ids": 2,
+          "children_completed": 2,
+          "children_sent": 2,
+          "clock": 34,
+          "completed": 2,
+          "durable_completed": 2,
+          "gateway_cycles": 34,
+          "global_time_fs": 85689045,
+          "gpu_cycles": 97,
+          "initiators": {
+            "atlas0.compute": {
+              "children": 0,
+              "completed": 0,
+              "parents": 0
+            },
+            "gpu0": {
+              "children": 2,
+              "completed": 2,
+              "parents": 2
+            }
+          },
+          "instances": 1,
+          "internal_bytes": 128,
+          "link_cycles": 34,
+          "logical_bytes": 128,
+          "observed_completion_ids": 2,
+          "outstanding": 0,
+          "read_request_count": 1,
+          "reads": 1,
+          "rejected": 0,
+          "request_count": 2,
+          "request_payload_bytes": 64,
+          "request_wire_bytes": 128,
+          "response_payload_bytes": 64,
+          "response_wire_bytes": 128,
+          "runtime_fixed_cycles": 16,
+          "runtime_fixed_duration_fs": 14134276,
+          "schema_version": "hetero-live-ramulator2-statistics/v1",
+          "write_request_count": 1,
+          "writes": 1
+        },
+        "memory_read_bytes": 64,
+        "memory_transactions": 2,
+        "memory_write_bytes": 64
+      },
+      "compiled_artifact": {
+        "calibrated": false,
+        "catalog_id": "tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+        "causal_timeline_ready": true,
+        "device_performance_included": true,
+        "kind": "runtime_live_ramulator2",
+        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.kv_release",
+        "parameter_source": "deterministic_implementation_contract_not_hardware_calibrated",
+        "request_cycle_ready": true,
+        "source": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/runtime_tasks/tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json"
+      },
+      "dependencies": [
+        "task.TINYLLAMA11B-PREFILL-R0.request_finish"
+      ],
+      "device_id": "gpu0",
+      "duration_fs": 99823321,
+      "effective_duration_fs": 99823321,
+      "fidelity": {
+        "compute_fidelity": "runtime_metadata_contract_uncalibrated",
+        "device_performance_included": true,
+        "extrapolated_fraction": 0.0,
+        "link_fidelity": "cycle_simulated_external_link",
+        "memory_fidelity": "cycle_simulated_external_ramulator2",
+        "performance_eligible": false,
+        "scheduler_fidelity": "event_modeled",
+        "trace_coverage": 0.0
+      },
+      "input_values": [],
+      "layer_id": null,
+      "op": "kv_release",
+      "operator_group": null,
+      "output_values": [],
+      "phase": "control",
+      "read_values": [],
+      "release_time_fs": 0,
+      "request_id": "TINYLLAMA11B-PREFILL-R0",
+      "resource_id": "gpu0",
+      "step_id": 1,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release",
+      "task_kind": "device",
+      "template_node_id": "TINYLLAMA11B-PREFILL-R0.kv_release",
+      "timing": {
+        "completion_time_fs": 35450346739701,
+        "ready_time_fs": 35450246916380,
+        "resource_id": "gpu0",
+        "start_time_fs": 35450246916380,
+        "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release"
+      },
+      "timing_contract": {
+        "backend_id": "gpu.runtime_task_live_ramulator2.tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+        "duration_semantics": "total",
+        "exports": [],
+        "owns": [
+          "gpu0",
+          "shared3d.ramulator2"
+        ],
+        "replay_safe": false,
+        "supports_stall_resume": false,
+        "trace_semantics": "none"
+      },
+      "validated_input_versions": [],
+      "write_values": []
+    }
+  ]
+}

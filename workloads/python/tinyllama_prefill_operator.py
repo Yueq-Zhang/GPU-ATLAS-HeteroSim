@@ -33,6 +33,7 @@ from frontend.hetero.capture_allocation_ranges import (
 
 
 SUPPORTED_OPERATORS = (
+    "token_embedding",
     "attention_norm",
     "qkv_projection",
     "rope",
@@ -46,9 +47,11 @@ SUPPORTED_OPERATORS = (
     "final_norm",
     "lm_head",
     "sampling",
+    "residual_add",
 )
 
 FINAL_POSITION_OPERATORS = frozenset(("final_norm", "lm_head", "sampling"))
+LIGHTWEIGHT_OPERATORS = frozenset(("token_embedding", "residual_add"))
 
 
 @dataclass(frozen=True)
@@ -76,6 +79,62 @@ def _host_random(shape: tuple[int, ...], seed: int) -> torch.Tensor:
     generator = torch.Generator(device="cpu")
     generator.manual_seed(seed)
     return torch.randn(shape, generator=generator, dtype=torch.float16).cuda()
+
+
+def _lightweight_target(
+    name: str,
+    model_path: Path,
+    context: int,
+    batch_size: int,
+) -> Target:
+    """Load only tensors required by simple operators.
+
+    Loading the complete 1.1B checkpoint under NVBit adds minutes of unrelated
+    module initialization and can force host swapping.  Embedding needs only
+    the exact checkpoint table; residual add needs no checkpoint tensor.
+    """
+
+    config = json.loads((model_path / "config.json").read_text(encoding="utf-8"))
+    hidden_size = int(config["hidden_size"])
+    if name == "token_embedding":
+        from safetensors import safe_open
+
+        with safe_open(
+            str(model_path / "model.safetensors"), framework="pt", device="cpu"
+        ) as checkpoint:
+            weight = checkpoint.get_tensor("model.embed_tokens.weight").cuda()
+        token_ids = (
+            torch.arange(context, dtype=torch.long)
+            .remainder(int(config["vocab_size"]))
+            .unsqueeze(0)
+        )
+        if batch_size > 1:
+            token_ids = token_ids.expand(batch_size, -1).contiguous()
+        token_ids = token_ids.cuda()
+
+        def run_embedding() -> dict[str, torch.Tensor]:
+            return {"output": F.embedding(token_ids, weight)}
+
+        return Target(
+            run_embedding,
+            {"token_ids": token_ids},
+            {"weight": weight},
+            "safetensors_exact_checkpoint_embedding_gather",
+        )
+    if name == "residual_add":
+        hidden = _host_random((batch_size, context, hidden_size), 11)
+        residual = _host_random((batch_size, context, hidden_size), 12)
+
+        def run_residual_add() -> dict[str, torch.Tensor]:
+            return {"output": hidden + residual}
+
+        return Target(
+            run_residual_add,
+            {"input": hidden, "residual": residual},
+            {},
+            "torch.elementwise_residual_add",
+        )
+    raise AssertionError(f"not a lightweight operator: {name}")
 
 
 def _target(
@@ -343,12 +402,17 @@ def main() -> None:
     if args.warmup < 0:
         raise ValueError("warmup must be unsigned")
 
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model,
-        local_files_only=True,
-        dtype=torch.float16,
-    ).cuda().eval()
-    target = _target(args.operator, model, args.context, args.batch_size)
+    if args.operator in LIGHTWEIGHT_OPERATORS:
+        target = _lightweight_target(
+            args.operator, args.model, args.context, args.batch_size
+        )
+    else:
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model,
+            local_files_only=True,
+            dtype=torch.float16,
+        ).cuda().eval()
+        target = _target(args.operator, model, args.context, args.batch_size)
     profiler = ctypes.CDLL("libcuda.so.1") if args.driver_profiler else None
 
     with torch.inference_mode():
@@ -419,6 +483,15 @@ def main() -> None:
         "kv_length": args.context,
         "dtype": "fp16",
         "implementation": target.implementation,
+        "compilation": {
+            "framework": "pytorch",
+            "pytorch": torch.__version__,
+            "cuda_runtime": torch.version.cuda,
+            "target_sm": (
+                torch.cuda.get_device_capability()[0] * 10
+                + torch.cuda.get_device_capability()[1]
+            ),
+        },
         "warmup_iterations": args.warmup,
         "capture_selector": (
             "cuda_driver_profiler_range" if args.driver_profiler else "process_target_only"

@@ -1,0 +1,1970 @@
+{
+  "address_semantics": "allocated_global_pa_range_rebased",
+  "alignment_bytes": 64,
+  "allocated_bytes": 450296512,
+  "allocation_count": 87,
+  "capacity_bytes": 4294967296,
+  "external_input_shadow_count": 1,
+  "high_address_reserved_bytes": 256,
+  "low_address_watermark_bytes": 450296256,
+  "memory_space_id": "shared0.dram3d",
+  "non_overlapping": true,
+  "operator_workspace_count": 58,
+  "ranges": [
+    {
+      "alignment_bytes": 64,
+      "base_address": 0,
+      "dtype": "fp16",
+      "end_address_exclusive": 4096,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "parameter",
+      "value_id": "model.final_norm.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 4096,
+      "dtype": "fp16",
+      "end_address_exclusive": 8192,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.attention_norm.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 8192,
+      "dtype": "fp16",
+      "end_address_exclusive": 23076864,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 23068672,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.down.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 23076864,
+      "dtype": "fp16",
+      "end_address_exclusive": 69214208,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 46137344,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.gate_up.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 69214208,
+      "dtype": "fp16",
+      "end_address_exclusive": 69218304,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.mlp_norm.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 69218304,
+      "dtype": "fp16",
+      "end_address_exclusive": 77606912,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8388608,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.output.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 77606912,
+      "dtype": "fp16",
+      "end_address_exclusive": 88092672,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 10485760,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.qkv.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 88092672,
+      "dtype": "fp16",
+      "end_address_exclusive": 219164672,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 131072000,
+      "storage_class": "parameter",
+      "value_id": "model.lm_head.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 219164672,
+      "dtype": "fp16",
+      "end_address_exclusive": 350236672,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 131072000,
+      "storage_class": "parameter",
+      "value_id": "model.tok_embeddings.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350236672,
+      "dtype": "fp16",
+      "end_address_exclusive": 350244864,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "kv_cache",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.k"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350244864,
+      "dtype": "fp16",
+      "end_address_exclusive": 350253056,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "kv_cache",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.kv.l0.v"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350253056,
+      "dtype": "fp16",
+      "end_address_exclusive": 350318592,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350318592,
+      "dtype": "fp16",
+      "end_address_exclusive": 350322688,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350322688,
+      "dtype": "fp16",
+      "end_address_exclusive": 350388224,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350388224,
+      "dtype": "fp16",
+      "end_address_exclusive": 350453760,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350453760,
+      "dtype": "fp16",
+      "end_address_exclusive": 350519296,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350519296,
+      "dtype": "fp16",
+      "end_address_exclusive": 350601216,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 81920,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350601216,
+      "dtype": "fp16",
+      "end_address_exclusive": 350666752,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350666752,
+      "dtype": "fp16",
+      "end_address_exclusive": 350748672,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 81920,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350748672,
+      "dtype": "fp16",
+      "end_address_exclusive": 350928896,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 180224,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350928896,
+      "dtype": "fp16",
+      "end_address_exclusive": 350994432,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350994432,
+      "dtype": "fp16",
+      "end_address_exclusive": 351354880,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 360448,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351354880,
+      "dtype": "fp16",
+      "end_address_exclusive": 351420416,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351420416,
+      "dtype": "fp16",
+      "end_address_exclusive": 351485952,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351485952,
+      "dtype": "fp16",
+      "end_address_exclusive": 351551488,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351551488,
+      "dtype": "fp16",
+      "end_address_exclusive": 351615488,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 64000,
+      "storage_class": "activation",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351615488,
+      "dtype": "int32",
+      "end_address_exclusive": 351615520,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 32,
+      "storage_class": "metadata",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 351615552,
+      "dtype": "int32",
+      "end_address_exclusive": 351615554,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 2,
+      "storage_class": "metadata",
+      "value_id": "TINYLLAMA11B-PREFILL-R0.token.0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 351615744,
+      "dtype": "opaque",
+      "end_address_exclusive": 352844544,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1228800,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm:tinyllama.layer0.final_norm.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 352844544,
+      "dtype": "opaque",
+      "end_address_exclusive": 352849152,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4608,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm:tinyllama.layer0.final_norm.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 352849152,
+      "dtype": "opaque",
+      "end_address_exclusive": 352906496,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 57344,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm:tinyllama.layer0.final_norm.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 352906496,
+      "dtype": "opaque",
+      "end_address_exclusive": 353700608,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 794112,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm:tinyllama.layer0.final_norm.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 353700608,
+      "dtype": "opaque",
+      "end_address_exclusive": 353766144,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core:tinyllama.layer0.causal_attention.key"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 353766144,
+      "dtype": "opaque",
+      "end_address_exclusive": 354999552,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core:tinyllama.layer0.causal_attention.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 354999552,
+      "dtype": "opaque",
+      "end_address_exclusive": 355015936,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 16384,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core:tinyllama.layer0.causal_attention.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 355015936,
+      "dtype": "opaque",
+      "end_address_exclusive": 355601152,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 585216,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core:tinyllama.layer0.causal_attention.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 355601152,
+      "dtype": "opaque",
+      "end_address_exclusive": 355666688,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core:tinyllama.layer0.causal_attention.value"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 355666688,
+      "dtype": "opaque",
+      "end_address_exclusive": 364055296,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8388608,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output:tinyllama.layer0.output_projection.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 364055296,
+      "dtype": "opaque",
+      "end_address_exclusive": 368249600,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4194304,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output:tinyllama.layer0.output_projection.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 368249600,
+      "dtype": "opaque",
+      "end_address_exclusive": 369483008,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output:tinyllama.layer0.output_projection.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 369483008,
+      "dtype": "opaque",
+      "end_address_exclusive": 370215680,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 732672,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output:tinyllama.layer0.output_projection.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 370215680,
+      "dtype": "opaque",
+      "end_address_exclusive": 378735360,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output:tinyllama.layer0.output_projection.opaque_workspace_4"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 378735360,
+      "dtype": "opaque",
+      "end_address_exclusive": 378743552,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.key"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 378743552,
+      "dtype": "opaque",
+      "end_address_exclusive": 391326464,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 12582912,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 391326464,
+      "dtype": "opaque",
+      "end_address_exclusive": 392559872,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 392559872,
+      "dtype": "opaque",
+      "end_address_exclusive": 393194240,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 634368,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 393194240,
+      "dtype": "opaque",
+      "end_address_exclusive": 401713920,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 401713920,
+      "dtype": "opaque",
+      "end_address_exclusive": 401779456,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.query"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 401779456,
+      "dtype": "opaque",
+      "end_address_exclusive": 401787648,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection:tinyllama.layer0.qkv_projection.value"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 401787648,
+      "dtype": "opaque",
+      "end_address_exclusive": 401789696,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 2048,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope:tinyllama.layer0.rope.cos"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 401789696,
+      "dtype": "opaque",
+      "end_address_exclusive": 403023104,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope:tinyllama.layer0.rope.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 403023104,
+      "dtype": "opaque",
+      "end_address_exclusive": 403076352,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 53248,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope:tinyllama.layer0.rope.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 403076352,
+      "dtype": "opaque",
+      "end_address_exclusive": 403084544,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope:tinyllama.layer0.rope.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 128,
+      "base_address": 403084544,
+      "dtype": "opaque",
+      "end_address_exclusive": 403150464,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65920,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope:tinyllama.layer0.rope.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 403150592,
+      "dtype": "opaque",
+      "end_address_exclusive": 403735296,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 584704,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope:tinyllama.layer0.rope.opaque_workspace_4"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 403735296,
+      "dtype": "opaque",
+      "end_address_exclusive": 412254976,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope:tinyllama.layer0.rope.opaque_workspace_5"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 412254976,
+      "dtype": "opaque",
+      "end_address_exclusive": 412255104,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 128,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope:tinyllama.layer0.rope.position_ids"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 412255232,
+      "dtype": "opaque",
+      "end_address_exclusive": 412257280,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 2048,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope:tinyllama.layer0.rope.sin"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 412257280,
+      "dtype": "opaque",
+      "end_address_exclusive": 413556224,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1298944,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation:tinyllama.layer0.silu_multiply.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 413556224,
+      "dtype": "opaque",
+      "end_address_exclusive": 413736448,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 180224,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation:tinyllama.layer0.silu_multiply.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 413736448,
+      "dtype": "opaque",
+      "end_address_exclusive": 413813760,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 77312,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation:tinyllama.layer0.silu_multiply.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 413813760,
+      "dtype": "opaque",
+      "end_address_exclusive": 415047168,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down:tinyllama.layer0.down_projection.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 415047168,
+      "dtype": "opaque",
+      "end_address_exclusive": 415665152,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 617984,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down:tinyllama.layer0.down_projection.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 415665152,
+      "dtype": "opaque",
+      "end_address_exclusive": 424184832,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down:tinyllama.layer0.down_projection.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 424184832,
+      "dtype": "opaque",
+      "end_address_exclusive": 424365056,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 180224,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up:tinyllama.layer0.gate_up_projection.gate"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 424365056,
+      "dtype": "opaque",
+      "end_address_exclusive": 425598464,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up:tinyllama.layer0.gate_up_projection.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 425598464,
+      "dtype": "opaque",
+      "end_address_exclusive": 425675776,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 77312,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up:tinyllama.layer0.gate_up_projection.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 425675776,
+      "dtype": "opaque",
+      "end_address_exclusive": 434195456,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up:tinyllama.layer0.gate_up_projection.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 434195456,
+      "dtype": "opaque",
+      "end_address_exclusive": 434375680,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 180224,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up:tinyllama.layer0.gate_up_projection.up"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 434375680,
+      "dtype": "opaque",
+      "end_address_exclusive": 434379776,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm:tinyllama.layer0.mlp_norm.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 434379776,
+      "dtype": "opaque",
+      "end_address_exclusive": 435604992,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1225216,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm:tinyllama.layer0.mlp_norm.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 435604992,
+      "dtype": "opaque",
+      "end_address_exclusive": 435670528,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm:tinyllama.layer0.mlp_norm.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 435670528,
+      "dtype": "opaque",
+      "end_address_exclusive": 436337664,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 667136,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm:tinyllama.layer0.mlp_norm.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 436337664,
+      "dtype": "opaque",
+      "end_address_exclusive": 436403200,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65536,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention:tinyllama.layer0.attention_norm.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 436403200,
+      "dtype": "opaque",
+      "end_address_exclusive": 436534336,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 131136,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention:tinyllama.layer0.attention_norm.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 436534528,
+      "dtype": "opaque",
+      "end_address_exclusive": 436665600,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 131072,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention:tinyllama.layer0.attention_norm.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 436665600,
+      "dtype": "opaque",
+      "end_address_exclusive": 437899008,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head:tinyllama.layer0.lm_head.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 437899008,
+      "dtype": "opaque",
+      "end_address_exclusive": 437900544,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1536,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head:tinyllama.layer0.lm_head.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 437900544,
+      "dtype": "opaque",
+      "end_address_exclusive": 438694656,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 794112,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head:tinyllama.layer0.lm_head.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 438694656,
+      "dtype": "opaque",
+      "end_address_exclusive": 439743232,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1048576,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head:tinyllama.layer0.lm_head.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 439743232,
+      "dtype": "opaque",
+      "end_address_exclusive": 448262912,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head:tinyllama.layer0.lm_head.opaque_workspace_4"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 448262912,
+      "dtype": "opaque",
+      "end_address_exclusive": 449496320,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling:tinyllama.layer0.sampling.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 449496320,
+      "dtype": "opaque",
+      "end_address_exclusive": 449561824,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 65504,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling:tinyllama.layer0.sampling.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 449561856,
+      "dtype": "opaque",
+      "end_address_exclusive": 450296064,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 734208,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling:tinyllama.layer0.sampling.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 450296064,
+      "dtype": "opaque",
+      "end_address_exclusive": 450296192,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 128,
+      "storage_class": "runtime_metadata",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.kv_allocate:metadata"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 450296192,
+      "dtype": "opaque",
+      "end_address_exclusive": 450296256,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 64,
+      "storage_class": "runtime_metadata",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.kv_release:metadata"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 4294967040,
+      "dtype": "implementation_specific",
+      "end_address_exclusive": 4294967168,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 128,
+      "source_value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids",
+      "storage_class": "external_input_widened_shadow",
+      "value_id": "shadow:task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding:tinyllama.layer0.token_embedding.token_ids"
+    }
+  ],
+  "request_cycle_bindings": [
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.token_embedding.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "external_input_widened_shadow",
+          "global_pa_base": 4294967040,
+          "logical_value_size_bytes": 32,
+          "size_bytes": 128,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.token_embedding.token_ids",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prompt_token_ids",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 219164672,
+          "logical_value_size_bytes": 131072000,
+          "size_bytes": 131072000,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.token_embedding.weight",
+          "value_id": "model.tok_embeddings.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350253056,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.token_embedding.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+      "trace_id": "tinyllama.1_1b.layer0.token_embedding.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.final_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 351615744,
+          "size_bytes": 1228800,
+          "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 352844544,
+          "size_bytes": 4608,
+          "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 352849152,
+          "size_bytes": 57344,
+          "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 352906496,
+          "size_bytes": 794112,
+          "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_3"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 351481856,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 4096,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.final_norm.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+          "value_index": 0,
+          "value_offset_bytes": 61440,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 0,
+          "logical_value_size_bytes": 4096,
+          "size_bytes": 4096,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.final_norm.weight",
+          "value_id": "model.final_norm.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350318592,
+          "logical_value_size_bytes": 4096,
+          "size_bytes": 4096,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.final_norm.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+      "trace_id": "tinyllama.1_1b.layer0.final_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {},
+      "operator_artifact_id": "tinyllama.1_1b.layer0.causal_attention.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 353700608,
+          "size_bytes": 65536,
+          "tensor_id": "tinyllama.layer0.causal_attention.key"
+        },
+        {
+          "global_pa_base": 353766144,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 354999552,
+          "size_bytes": 16384,
+          "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 355015936,
+          "size_bytes": 585216,
+          "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 355601152,
+          "size_bytes": 65536,
+          "tensor_id": "tinyllama.layer0.causal_attention.value"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350388224,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.causal_attention.query",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350322688,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.causal_attention.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+      "trace_id": "tinyllama.1_1b.layer0.causal_attention.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {},
+      "operator_artifact_id": "tinyllama.1_1b.layer0.output_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 355666688,
+          "size_bytes": 8388608,
+          "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 364055296,
+          "size_bytes": 4194304,
+          "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 368249600,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 369483008,
+          "size_bytes": 732672,
+          "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_3"
+        },
+        {
+          "global_pa_base": 370215680,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_4"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350322688,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.output_projection.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 69218304,
+          "logical_value_size_bytes": 8388608,
+          "size_bytes": 8388608,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.output_projection.weight",
+          "value_id": "model.layers.0.output.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350453760,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.output_projection.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+      "trace_id": "tinyllama.1_1b.layer0.output_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {},
+      "operator_artifact_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 378735360,
+          "size_bytes": 8192,
+          "tensor_id": "tinyllama.layer0.qkv_projection.key"
+        },
+        {
+          "global_pa_base": 378743552,
+          "size_bytes": 12582912,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 391326464,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 392559872,
+          "size_bytes": 634368,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 393194240,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_3"
+        },
+        {
+          "global_pa_base": 401713920,
+          "size_bytes": 65536,
+          "tensor_id": "tinyllama.layer0.qkv_projection.query"
+        },
+        {
+          "global_pa_base": 401779456,
+          "size_bytes": 8192,
+          "tensor_id": "tinyllama.layer0.qkv_projection.value"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 351485952,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.qkv_projection.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 77606912,
+          "logical_value_size_bytes": 10485760,
+          "size_bytes": 8388608,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.qkv_projection.q_weight",
+          "value_id": "model.layers.0.qkv.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 85995520,
+          "logical_value_size_bytes": 10485760,
+          "size_bytes": 1048576,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.qkv_projection.k_weight",
+          "value_id": "model.layers.0.qkv.weight",
+          "value_index": 1,
+          "value_offset_bytes": 8388608,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 87044096,
+          "logical_value_size_bytes": 10485760,
+          "size_bytes": 1048576,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.qkv_projection.v_weight",
+          "value_id": "model.layers.0.qkv.weight",
+          "value_index": 1,
+          "value_offset_bytes": 9437184,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350519296,
+          "logical_value_size_bytes": 81920,
+          "size_bytes": 81920,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.qkv_projection.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+      "trace_id": "tinyllama.1_1b.layer0.qkv_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {},
+      "operator_artifact_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350253056,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.residual_add.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350453760,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.residual_add.residual",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output.out",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350601216,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.residual_add.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+      "trace_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {},
+      "operator_artifact_id": "tinyllama.1_1b.layer0.rope.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 401787648,
+          "size_bytes": 2048,
+          "tensor_id": "tinyllama.layer0.rope.cos"
+        },
+        {
+          "global_pa_base": 401789696,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 403023104,
+          "size_bytes": 53248,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 403076352,
+          "size_bytes": 8192,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 403084544,
+          "size_bytes": 65920,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_3"
+        },
+        {
+          "global_pa_base": 403150592,
+          "size_bytes": 584704,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_4"
+        },
+        {
+          "global_pa_base": 403735296,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_5"
+        },
+        {
+          "global_pa_base": 412254976,
+          "size_bytes": 128,
+          "tensor_id": "tinyllama.layer0.rope.position_ids"
+        },
+        {
+          "global_pa_base": 412255232,
+          "size_bytes": 2048,
+          "tensor_id": "tinyllama.layer0.rope.sin"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350519296,
+          "logical_value_size_bytes": 81920,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.rope.query",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350584832,
+          "logical_value_size_bytes": 81920,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.rope.key",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection.out",
+          "value_index": 0,
+          "value_offset_bytes": 65536,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350666752,
+          "logical_value_size_bytes": 81920,
+          "size_bytes": 65536,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.rope.query_output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350732288,
+          "logical_value_size_bytes": 81920,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.rope.key_output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope.out",
+          "value_index": 0,
+          "value_offset_bytes": 65536,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+      "trace_id": "tinyllama.1_1b.layer0.rope.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {},
+      "operator_artifact_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 412257280,
+          "size_bytes": 1298944,
+          "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 413556224,
+          "size_bytes": 180224,
+          "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 413736448,
+          "size_bytes": 77312,
+          "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350994432,
+          "logical_value_size_bytes": 360448,
+          "size_bytes": 180224,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.silu_multiply.gate",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 351174656,
+          "logical_value_size_bytes": 360448,
+          "size_bytes": 180224,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.silu_multiply.up",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+          "value_index": 0,
+          "value_offset_bytes": 180224,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350748672,
+          "logical_value_size_bytes": 180224,
+          "size_bytes": 180224,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.silu_multiply.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+      "trace_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {},
+      "operator_artifact_id": "tinyllama.1_1b.layer0.down_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 413813760,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 415047168,
+          "size_bytes": 617984,
+          "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 415665152,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350748672,
+          "logical_value_size_bytes": 180224,
+          "size_bytes": 180224,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.down_projection.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 8192,
+          "logical_value_size_bytes": 23068672,
+          "size_bytes": 23068672,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.down_projection.weight",
+          "value_id": "model.layers.0.down.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350928896,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.down_projection.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+      "trace_id": "tinyllama.1_1b.layer0.down_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {},
+      "operator_artifact_id": "tinyllama.1_1b.layer0.gate_up_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 424184832,
+          "size_bytes": 180224,
+          "tensor_id": "tinyllama.layer0.gate_up_projection.gate"
+        },
+        {
+          "global_pa_base": 424365056,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 425598464,
+          "size_bytes": 77312,
+          "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 425675776,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 434195456,
+          "size_bytes": 180224,
+          "tensor_id": "tinyllama.layer0.gate_up_projection.up"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 351354880,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.gate_up_projection.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 23076864,
+          "logical_value_size_bytes": 46137344,
+          "size_bytes": 23068672,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.gate_up_projection.gate_weight",
+          "value_id": "model.layers.0.gate_up.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 46145536,
+          "logical_value_size_bytes": 46137344,
+          "size_bytes": 23068672,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.gate_up_projection.up_weight",
+          "value_id": "model.layers.0.gate_up.weight",
+          "value_index": 1,
+          "value_offset_bytes": 23068672,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350994432,
+          "logical_value_size_bytes": 360448,
+          "size_bytes": 360448,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.gate_up_projection.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+      "trace_id": "tinyllama.1_1b.layer0.gate_up_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {},
+      "operator_artifact_id": "tinyllama.1_1b.layer0.mlp_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 434375680,
+          "size_bytes": 4096,
+          "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 434379776,
+          "size_bytes": 1225216,
+          "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 435604992,
+          "size_bytes": 65536,
+          "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 435670528,
+          "size_bytes": 667136,
+          "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_3"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350601216,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.mlp_norm.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 69214208,
+          "logical_value_size_bytes": 4096,
+          "size_bytes": 4096,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.mlp_norm.weight",
+          "value_id": "model.layers.0.mlp_norm.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 351354880,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.mlp_norm.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+      "trace_id": "tinyllama.1_1b.layer0.mlp_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {},
+      "operator_artifact_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350601216,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.residual_add.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350928896,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.residual_add.residual",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down.out",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 351420416,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.residual_add.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+      "trace_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {},
+      "operator_artifact_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 436337664,
+          "size_bytes": 65536,
+          "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 436403200,
+          "size_bytes": 131136,
+          "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 436534528,
+          "size_bytes": 131072,
+          "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350253056,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.attention_norm.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 4096,
+          "logical_value_size_bytes": 4096,
+          "size_bytes": 4096,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.attention_norm.weight",
+          "value_id": "model.layers.0.attention_norm.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 351485952,
+          "logical_value_size_bytes": 65536,
+          "size_bytes": 65536,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.attention_norm.output",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+      "trace_id": "tinyllama.1_1b.layer0.attention_norm.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.lm_head.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 436665600,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 437899008,
+          "size_bytes": 1536,
+          "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 437900544,
+          "size_bytes": 794112,
+          "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 438694656,
+          "size_bytes": 1048576,
+          "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_3"
+        },
+        {
+          "global_pa_base": 439743232,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_4"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350318592,
+          "logical_value_size_bytes": 4096,
+          "size_bytes": 4096,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.lm_head.input",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm.out",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 88092672,
+          "logical_value_size_bytes": 131072000,
+          "size_bytes": 131072000,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.lm_head.weight",
+          "value_id": "model.lm_head.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 351551488,
+          "logical_value_size_bytes": 64000,
+          "size_bytes": 64000,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.lm_head.logits",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+      "trace_id": "tinyllama.1_1b.layer0.lm_head.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.sampling.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 448262912,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 449496320,
+          "size_bytes": 65504,
+          "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 449561856,
+          "size_bytes": 734208,
+          "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 351551488,
+          "logical_value_size_bytes": 64000,
+          "size_bytes": 64000,
+          "source": "input",
+          "tensor_id": "tinyllama.layer0.sampling.logits",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.prefill.s0.logits",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 351615552,
+          "logical_value_size_bytes": 2,
+          "size_bytes": 32,
+          "source": "output",
+          "tensor_id": "tinyllama.layer0.sampling.token",
+          "value_id": "TINYLLAMA11B-PREFILL-R0.token.0",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+      "trace_id": "tinyllama.1_1b.layer0.sampling.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2"
+    }
+  ],
+  "runtime_task_bindings": [
+    {
+      "host_control_excluded": false,
+      "memory_space_id": "shared0.dram3d",
+      "metadata_global_pa_base": 450296064,
+      "metadata_size_bytes": 128,
+      "model_kind": "metadata_state",
+      "operator": "kv_allocate",
+      "planned_parent_requests": 3,
+      "planned_read_bytes": 64,
+      "planned_write_bytes": 128,
+      "request_cycle_ready": true,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate"
+    },
+    {
+      "host_control_excluded": false,
+      "memory_space_id": "shared0.dram3d",
+      "metadata_global_pa_base": 450296192,
+      "metadata_size_bytes": 64,
+      "model_kind": "metadata_state",
+      "operator": "kv_release",
+      "planned_parent_requests": 2,
+      "planned_read_bytes": 64,
+      "planned_write_bytes": 64,
+      "request_cycle_ready": true,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release"
+    },
+    {
+      "host_control_excluded": false,
+      "memory_space_id": "shared0.dram3d",
+      "metadata_global_pa_base": null,
+      "metadata_size_bytes": 0,
+      "model_kind": "kv_copy_engine",
+      "operator": "kv_append",
+      "planned_parent_requests": 512,
+      "planned_read_bytes": 16384,
+      "planned_write_bytes": 16384,
+      "request_cycle_ready": true,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append"
+    },
+    {
+      "host_control_excluded": true,
+      "memory_space_id": "shared0.dram3d",
+      "metadata_global_pa_base": null,
+      "metadata_size_bytes": 0,
+      "model_kind": "fixed_control",
+      "operator": "request_finish",
+      "planned_parent_requests": 0,
+      "planned_read_bytes": 0,
+      "planned_write_bytes": 0,
+      "request_cycle_ready": false,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_finish"
+    },
+    {
+      "host_control_excluded": true,
+      "memory_space_id": "shared0.dram3d",
+      "metadata_global_pa_base": null,
+      "metadata_size_bytes": 0,
+      "model_kind": "fixed_control",
+      "operator": "request_start",
+      "planned_parent_requests": 0,
+      "planned_read_bytes": 0,
+      "planned_write_bytes": 0,
+      "request_cycle_ready": false,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_start"
+    }
+  ],
+  "schema_version": "hetero-global-memory-map/v1"
+}

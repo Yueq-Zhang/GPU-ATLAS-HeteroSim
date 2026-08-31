@@ -63,6 +63,7 @@ _MODEL_OPTIONAL = {
     "tied_embeddings",
     "input_embedding_mode",
     "materialize_parameters",
+    "checkpoint_revision",
 }
 
 
@@ -171,6 +172,8 @@ def validate_config(config: Mapping[str, Any]) -> None:
                 "operator_artifact_catalog_ref",
                 "artifact_use_mode",
                 "full_traffic_operators",
+                "runtime_task_model_ref",
+                "runtime_task_operators",
             },
             f"backends.{backend_name}",
         )
@@ -229,8 +232,41 @@ def validate_config(config: Mapping[str, Any]) -> None:
                 resources = gpu.get("resource_bindings")
                 if not isinstance(resources, Mapping) or not resources:
                     raise ConfigError("backends.gpu.resource_bindings is required")
-                if gpu.get("fallback_kind", "none") not in {"none", "analytical"}:
+                if gpu.get("fallback_kind", "none") not in {
+                    "none",
+                    "analytical",
+                    "runtime_cycle",
+                }:
                     raise ConfigError("invalid backends.gpu.fallback_kind")
+                if gpu.get("fallback_kind") == "runtime_cycle" and (
+                    not isinstance(gpu.get("runtime_task_model_ref"), str)
+                    or not gpu["runtime_task_model_ref"]
+                ):
+                    raise ConfigError(
+                        "runtime_cycle fallback requires runtime_task_model_ref"
+                    )
+                runtime_operators = gpu.get("runtime_task_operators")
+                if runtime_operators is not None:
+                    if (
+                        not isinstance(runtime_operators, list)
+                        or not runtime_operators
+                        or any(
+                            not isinstance(item, str) or not item
+                            for item in runtime_operators
+                        )
+                        or len(set(runtime_operators)) != len(runtime_operators)
+                    ):
+                        raise ConfigError(
+                            "backends.gpu.runtime_task_operators must be a "
+                            "non-empty unique string array"
+                        )
+                    if (
+                        not isinstance(gpu.get("runtime_task_model_ref"), str)
+                        or not gpu["runtime_task_model_ref"]
+                    ):
+                        raise ConfigError(
+                            "runtime_task_operators requires runtime_task_model_ref"
+                        )
             if atlas.get("kind") == "atlasim":
                 for field in ("config_ref", "requested_timing_mode"):
                     if not isinstance(atlas.get(field), str) or not atlas[field]:
@@ -541,6 +577,11 @@ def validate_config(config: Mapping[str, Any]) -> None:
         raise ConfigError("invalid model.input_embedding_mode")
     if not isinstance(model.get("materialize_parameters", False), bool):
         raise ConfigError("model.materialize_parameters must be a boolean")
+    checkpoint_revision = model.get("checkpoint_revision")
+    if checkpoint_revision is not None and (
+        not isinstance(checkpoint_revision, str) or not checkpoint_revision
+    ):
+        raise ConfigError("model.checkpoint_revision must be a non-empty string")
     if execution_mode == "prefill_cycle":
         if model.get("input_embedding_mode") != "token_ids":
             raise ConfigError("prefill_cycle requires model.input_embedding_mode=token_ids")

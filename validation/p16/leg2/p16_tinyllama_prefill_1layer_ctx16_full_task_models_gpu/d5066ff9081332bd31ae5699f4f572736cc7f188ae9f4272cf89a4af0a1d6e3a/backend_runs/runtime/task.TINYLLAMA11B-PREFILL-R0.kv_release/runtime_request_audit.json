@@ -1,0 +1,95 @@
+{
+  "completions": [
+    {
+      "completion_cycle": 60,
+      "completion_time_fs": 53003533,
+      "initiator": 0,
+      "operation_code": 0,
+      "parent_id": 1,
+      "total_children": 1
+    },
+    {
+      "completion_cycle": 97,
+      "completion_time_fs": 85689045,
+      "initiator": 0,
+      "operation_code": 1,
+      "parent_id": 2,
+      "total_children": 1
+    }
+  ],
+  "contract_cycles": 18,
+  "contract_duration_fs": 12000000,
+  "duration_fs": 99823321,
+  "memory_statistics": {
+    "accepted_parent_ids": 2,
+    "children_completed": 2,
+    "children_sent": 2,
+    "clock": 34,
+    "completed": 2,
+    "durable_completed": 2,
+    "gateway_cycles": 34,
+    "global_time_fs": 85689045,
+    "gpu_cycles": 97,
+    "initiators": {
+      "atlas0.compute": {
+        "children": 0,
+        "completed": 0,
+        "parents": 0
+      },
+      "gpu0": {
+        "children": 2,
+        "completed": 2,
+        "parents": 2
+      }
+    },
+    "instances": 1,
+    "internal_bytes": 128,
+    "link_cycles": 34,
+    "logical_bytes": 128,
+    "observed_completion_ids": 2,
+    "outstanding": 0,
+    "read_request_count": 1,
+    "reads": 1,
+    "rejected": 0,
+    "request_count": 2,
+    "request_payload_bytes": 64,
+    "request_wire_bytes": 128,
+    "response_payload_bytes": 64,
+    "response_wire_bytes": 128,
+    "runtime_fixed_cycles": 16,
+    "runtime_fixed_duration_fs": 14134276,
+    "schema_version": "hetero-live-ramulator2-statistics/v1",
+    "write_request_count": 1,
+    "writes": 1
+  },
+  "model_kind": "metadata_state",
+  "operator": "kv_release",
+  "requests": [
+    {
+      "global_address": 450296192,
+      "issue_cycle": 0,
+      "issue_time_fs": 0,
+      "operation": "read",
+      "parent_id": 1,
+      "semantic": "kv_release.metadata_read",
+      "size_bytes": 64,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.kv_release:metadata",
+      "value_version": 0
+    },
+    {
+      "global_address": 450296192,
+      "issue_cycle": 60,
+      "issue_time_fs": 53003533,
+      "operation": "write",
+      "parent_id": 2,
+      "semantic": "kv_release.metadata_write",
+      "size_bytes": 64,
+      "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release",
+      "value_id": "workspace:task.TINYLLAMA11B-PREFILL-R0.kv_release:metadata",
+      "value_version": 1
+    }
+  ],
+  "schema_version": "hetero-runtime-task-request-audit/v1",
+  "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release"
+}

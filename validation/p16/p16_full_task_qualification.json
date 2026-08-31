@@ -1,0 +1,609 @@
+{
+  "claim_boundary": "all 20 fixed TinyLlama Prefill tasks are causally modeled and double-run deterministic; 15 GPU Trace instances and three runtime memory tasks are request-cycle ready, while two uncalibrated host-control events are excluded from the device performance boundary; no end-to-end performance claim is allowed",
+  "double_run_deterministic": true,
+  "fixed_scope": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "layer_count": 1,
+    "model": "TinyLlama-1.1B",
+    "phase": "prefill"
+  },
+  "legs": [
+    {
+      "backend_dispatch_count": 20,
+      "dependency_causality": {
+        "all_dependencies_complete_before_start": true
+      },
+      "global_pa": {
+        "allocated_bytes": 450296512,
+        "allocation_count": 87,
+        "capacity_bytes": 4294967296,
+        "external_input_shadow_count": 1,
+        "non_overlapping": true,
+        "operator_workspace_count": 58,
+        "request_cycle_binding_count": 15,
+        "runtime_task_binding_count": 5
+      },
+      "gpu_request_cycle": [
+        {
+          "children": 132,
+          "cycles": 6685,
+          "duration_fs": 5905477032,
+          "instructions": 851968,
+          "operator": "token_embedding",
+          "outstanding": 0,
+          "parents": 132,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+          "translated": 5120
+        },
+        {
+          "children": 257,
+          "cycles": 49549,
+          "duration_fs": 43771201414,
+          "instructions": 318253,
+          "operator": "final_norm",
+          "outstanding": 0,
+          "parents": 257,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+          "translated": 2617
+        },
+        {
+          "children": 2560,
+          "cycles": 43473,
+          "duration_fs": 38403710248,
+          "instructions": 11962112,
+          "operator": "causal_attention",
+          "outstanding": 0,
+          "parents": 2560,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+          "translated": 16448
+        },
+        {
+          "children": 307840,
+          "cycles": 1749088,
+          "duration_fs": 1545130742050,
+          "instructions": 20140032,
+          "operator": "output_projection",
+          "outstanding": 0,
+          "parents": 307840,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+          "translated": 609152
+        },
+        {
+          "children": 376572,
+          "cycles": 2176858,
+          "duration_fs": 1923019434629,
+          "instructions": 34943066,
+          "operator": "qkv_projection",
+          "outstanding": 0,
+          "parents": 376535,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+          "translated": 736837
+        },
+        {
+          "children": 4096,
+          "cycles": 28772,
+          "duration_fs": 25416961131,
+          "instructions": 491520,
+          "operator": "residual_add",
+          "outstanding": 0,
+          "parents": 4096,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+          "translated": 6144
+        },
+        {
+          "children": 2312,
+          "cycles": 135809,
+          "duration_fs": 119972614841,
+          "instructions": 12589812,
+          "operator": "rope",
+          "outstanding": 0,
+          "parents": 2312,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+          "translated": 30764
+        },
+        {
+          "children": 11264,
+          "cycles": 75477,
+          "duration_fs": 66675795054,
+          "instructions": 3020750,
+          "operator": "silu_multiply",
+          "outstanding": 0,
+          "parents": 11264,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+          "translated": 33459
+        },
+        {
+          "children": 727488,
+          "cycles": 4161563,
+          "duration_fs": 3676292402827,
+          "instructions": 33361920,
+          "operator": "down_projection",
+          "outstanding": 0,
+          "parents": 727488,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+          "translated": 933888
+        },
+        {
+          "children": 1465792,
+          "cycles": 8316717,
+          "duration_fs": 7346923144877,
+          "instructions": 86599740,
+          "operator": "gate_up_projection",
+          "outstanding": 0,
+          "parents": 1463410,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+          "translated": 2004992
+        },
+        {
+          "children": 2176,
+          "cycles": 66652,
+          "duration_fs": 58879858658,
+          "instructions": 5290064,
+          "operator": "mlp_norm",
+          "outstanding": 0,
+          "parents": 2176,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+          "translated": 40976
+        },
+        {
+          "children": 4096,
+          "cycles": 28772,
+          "duration_fs": 25416961131,
+          "instructions": 491520,
+          "operator": "residual_add",
+          "outstanding": 0,
+          "parents": 4096,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+          "translated": 6144
+        },
+        {
+          "children": 2176,
+          "cycles": 66654,
+          "duration_fs": 58881625442,
+          "instructions": 5290064,
+          "operator": "attention_norm",
+          "outstanding": 0,
+          "parents": 2176,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+          "translated": 40970
+        },
+        {
+          "children": 4097609,
+          "cycles": 23199917,
+          "duration_fs": 20494626325089,
+          "instructions": 476608000,
+          "operator": "lm_head",
+          "outstanding": 0,
+          "parents": 4097155,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+          "translated": 800060777
+        },
+        {
+          "children": 2000,
+          "cycles": 19116,
+          "duration_fs": 16886925796,
+          "instructions": 704205,
+          "operator": "sampling",
+          "outstanding": 0,
+          "parents": 2000,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+          "translated": 2001
+        }
+      ],
+      "host_control": {
+        "request_finish": {
+          "calibrated": false,
+          "causal_timeline_ready": true,
+          "device_performance_included": false,
+          "duration_fs": 666667,
+          "memory_model": "not_applicable",
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_finish"
+        },
+        "request_start": {
+          "calibrated": false,
+          "causal_timeline_ready": true,
+          "device_performance_included": false,
+          "duration_fs": 666667,
+          "memory_model": "not_applicable",
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_start"
+        }
+      },
+      "makespan_fs": 35450346739701,
+      "operator_type_count": 19,
+      "performance_boundary": {
+        "causal_makespan_fs": 35450346739701,
+        "device_boundary_end_fs": 35450346739701,
+        "device_boundary_span_fs": 35450346073034,
+        "device_boundary_start_fs": 666667,
+        "excluded_control_duration_fs": 1333334,
+        "excluded_task_count": 2,
+        "included_task_count": 18,
+        "schema_version": "hetero-performance-boundary/v1"
+      },
+      "resource_causality": {
+        "all_tasks_non_overlapping": true,
+        "resource_id": "gpu0"
+      },
+      "run_dir": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
+      "runtime_memory": {
+        "kv_allocate": {
+          "children": 3,
+          "completion_time_fs": 125224971,
+          "contract_cycles": 19,
+          "duration_fs": 124558304,
+          "execution_clock_hz": 1132000000,
+          "execution_cycles": 141,
+          "logical_bytes": 192,
+          "outstanding": 0,
+          "ramulator2_instances": 1,
+          "reads": 1,
+          "rejected_admission_attempts": 0,
+          "requests": 3,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate",
+          "writes": 2
+        },
+        "kv_append": {
+          "children": 512,
+          "completion_time_fs": 2111822221438,
+          "contract_cycles": 520,
+          "duration_fs": 3917844523,
+          "execution_clock_hz": 1132000000,
+          "execution_cycles": 4435,
+          "logical_bytes": 32768,
+          "outstanding": 0,
+          "ramulator2_instances": 1,
+          "reads": 256,
+          "rejected_admission_attempts": 383,
+          "requests": 512,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+          "writes": 256
+        },
+        "kv_release": {
+          "children": 2,
+          "completion_time_fs": 35450346739701,
+          "contract_cycles": 18,
+          "duration_fs": 99823321,
+          "execution_clock_hz": 1132000000,
+          "execution_cycles": 113,
+          "logical_bytes": 128,
+          "outstanding": 0,
+          "ramulator2_instances": 1,
+          "reads": 1,
+          "rejected_admission_attempts": 0,
+          "requests": 2,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release",
+          "writes": 1
+        }
+      },
+      "simulation_input_key": "d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
+      "simulator_revision": "f8a95b2824698232a41c2b6ad49576fe034feb4a-dirty",
+      "task_count": 20,
+      "version_causality": {
+        "all_inputs_validated": true,
+        "all_outputs_committed_at_backend_completion": true,
+        "completion_time_commits": 18,
+        "input_version_checks": 31
+      }
+    },
+    {
+      "backend_dispatch_count": 20,
+      "dependency_causality": {
+        "all_dependencies_complete_before_start": true
+      },
+      "global_pa": {
+        "allocated_bytes": 450296512,
+        "allocation_count": 87,
+        "capacity_bytes": 4294967296,
+        "external_input_shadow_count": 1,
+        "non_overlapping": true,
+        "operator_workspace_count": 58,
+        "request_cycle_binding_count": 15,
+        "runtime_task_binding_count": 5
+      },
+      "gpu_request_cycle": [
+        {
+          "children": 132,
+          "cycles": 6685,
+          "duration_fs": 5905477032,
+          "instructions": 851968,
+          "operator": "token_embedding",
+          "outstanding": 0,
+          "parents": 132,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.embedding",
+          "translated": 5120
+        },
+        {
+          "children": 257,
+          "cycles": 49549,
+          "duration_fs": 43771201414,
+          "instructions": 318253,
+          "operator": "final_norm",
+          "outstanding": 0,
+          "parents": 257,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.final_norm",
+          "translated": 2617
+        },
+        {
+          "children": 2560,
+          "cycles": 43473,
+          "duration_fs": 38403710248,
+          "instructions": 11962112,
+          "operator": "causal_attention",
+          "outstanding": 0,
+          "parents": 2560,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.core",
+          "translated": 16448
+        },
+        {
+          "children": 307840,
+          "cycles": 1749088,
+          "duration_fs": 1545130742050,
+          "instructions": 20140032,
+          "operator": "output_projection",
+          "outstanding": 0,
+          "parents": 307840,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.output",
+          "translated": 609152
+        },
+        {
+          "children": 376572,
+          "cycles": 2176858,
+          "duration_fs": 1923019434629,
+          "instructions": 34943066,
+          "operator": "qkv_projection",
+          "outstanding": 0,
+          "parents": 376535,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.projection",
+          "translated": 736837
+        },
+        {
+          "children": 4096,
+          "cycles": 28772,
+          "duration_fs": 25416961131,
+          "instructions": 491520,
+          "operator": "residual_add",
+          "outstanding": 0,
+          "parents": 4096,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.residual",
+          "translated": 6144
+        },
+        {
+          "children": 2312,
+          "cycles": 135809,
+          "duration_fs": 119972614841,
+          "instructions": 12589812,
+          "operator": "rope",
+          "outstanding": 0,
+          "parents": 2312,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.rope",
+          "translated": 30764
+        },
+        {
+          "children": 11264,
+          "cycles": 75477,
+          "duration_fs": 66675795054,
+          "instructions": 3020750,
+          "operator": "silu_multiply",
+          "outstanding": 0,
+          "parents": 11264,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.activation",
+          "translated": 33459
+        },
+        {
+          "children": 727488,
+          "cycles": 4161563,
+          "duration_fs": 3676292402827,
+          "instructions": 33361920,
+          "operator": "down_projection",
+          "outstanding": 0,
+          "parents": 727488,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.down",
+          "translated": 933888
+        },
+        {
+          "children": 1465792,
+          "cycles": 8316717,
+          "duration_fs": 7346923144877,
+          "instructions": 86599740,
+          "operator": "gate_up_projection",
+          "outstanding": 0,
+          "parents": 1463410,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.gate_up",
+          "translated": 2004992
+        },
+        {
+          "children": 2176,
+          "cycles": 66652,
+          "duration_fs": 58879858658,
+          "instructions": 5290064,
+          "operator": "mlp_norm",
+          "outstanding": 0,
+          "parents": 2176,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.norm",
+          "translated": 40976
+        },
+        {
+          "children": 4096,
+          "cycles": 28772,
+          "duration_fs": 25416961131,
+          "instructions": 491520,
+          "operator": "residual_add",
+          "outstanding": 0,
+          "parents": 4096,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.mlp.residual",
+          "translated": 6144
+        },
+        {
+          "children": 2176,
+          "cycles": 66654,
+          "duration_fs": 58881625442,
+          "instructions": 5290064,
+          "operator": "attention_norm",
+          "outstanding": 0,
+          "parents": 2176,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.norm.attention",
+          "translated": 40970
+        },
+        {
+          "children": 4097609,
+          "cycles": 23199917,
+          "duration_fs": 20494626325089,
+          "instructions": 476608000,
+          "operator": "lm_head",
+          "outstanding": 0,
+          "parents": 4097155,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.lm_head",
+          "translated": 800060777
+        },
+        {
+          "children": 2000,
+          "cycles": 19116,
+          "duration_fs": 16886925796,
+          "instructions": 704205,
+          "operator": "sampling",
+          "outstanding": 0,
+          "parents": 2000,
+          "ramulator2_instances": 1,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.sampling",
+          "translated": 2001
+        }
+      ],
+      "host_control": {
+        "request_finish": {
+          "calibrated": false,
+          "causal_timeline_ready": true,
+          "device_performance_included": false,
+          "duration_fs": 666667,
+          "memory_model": "not_applicable",
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_finish"
+        },
+        "request_start": {
+          "calibrated": false,
+          "causal_timeline_ready": true,
+          "device_performance_included": false,
+          "duration_fs": 666667,
+          "memory_model": "not_applicable",
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_start"
+        }
+      },
+      "makespan_fs": 35450346739701,
+      "operator_type_count": 19,
+      "performance_boundary": {
+        "causal_makespan_fs": 35450346739701,
+        "device_boundary_end_fs": 35450346739701,
+        "device_boundary_span_fs": 35450346073034,
+        "device_boundary_start_fs": 666667,
+        "excluded_control_duration_fs": 1333334,
+        "excluded_task_count": 2,
+        "included_task_count": 18,
+        "schema_version": "hetero-performance-boundary/v1"
+      },
+      "resource_causality": {
+        "all_tasks_non_overlapping": true,
+        "resource_id": "gpu0"
+      },
+      "run_dir": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
+      "runtime_memory": {
+        "kv_allocate": {
+          "children": 3,
+          "completion_time_fs": 125224971,
+          "contract_cycles": 19,
+          "duration_fs": 124558304,
+          "execution_clock_hz": 1132000000,
+          "execution_cycles": 141,
+          "logical_bytes": 192,
+          "outstanding": 0,
+          "ramulator2_instances": 1,
+          "reads": 1,
+          "rejected_admission_attempts": 0,
+          "requests": 3,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate",
+          "writes": 2
+        },
+        "kv_append": {
+          "children": 512,
+          "completion_time_fs": 2111822221438,
+          "contract_cycles": 520,
+          "duration_fs": 3917844523,
+          "execution_clock_hz": 1132000000,
+          "execution_cycles": 4435,
+          "logical_bytes": 32768,
+          "outstanding": 0,
+          "ramulator2_instances": 1,
+          "reads": 256,
+          "rejected_admission_attempts": 383,
+          "requests": 512,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+          "writes": 256
+        },
+        "kv_release": {
+          "children": 2,
+          "completion_time_fs": 35450346739701,
+          "contract_cycles": 18,
+          "duration_fs": 99823321,
+          "execution_clock_hz": 1132000000,
+          "execution_cycles": 113,
+          "logical_bytes": 128,
+          "outstanding": 0,
+          "ramulator2_instances": 1,
+          "reads": 1,
+          "rejected_admission_attempts": 0,
+          "requests": 2,
+          "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release",
+          "writes": 1
+        }
+      },
+      "simulation_input_key": "d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
+      "simulator_revision": "f8a95b2824698232a41c2b6ad49576fe034feb4a-dirty",
+      "task_count": 20,
+      "version_causality": {
+        "all_inputs_validated": true,
+        "all_outputs_committed_at_backend_completion": true,
+        "completion_time_commits": 18,
+        "input_version_checks": 31
+      }
+    }
+  ],
+  "performance_eligible": false,
+  "runtime_totals": {
+    "atlas_requests": 0,
+    "logical_bytes_per_leg": 33088,
+    "outstanding_at_exit": 0,
+    "ramulator2_instances_per_runtime_task": 1,
+    "requests_per_leg": 517
+  },
+  "schema_version": "hetero-p16-full-task-timeline-qualification/v1",
+  "status": "passed"
+}

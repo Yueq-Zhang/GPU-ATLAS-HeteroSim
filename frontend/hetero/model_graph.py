@@ -26,6 +26,7 @@ class ModelSpec:
     tied_embeddings: bool = True
     input_embedding_mode: str = "preembedded"
     materialize_parameters: bool = False
+    checkpoint_revision: str | None = None
 
     def __post_init__(self) -> None:
         integer_fields = (
@@ -192,6 +193,12 @@ def _build_materialized_request_graph(
     h = model.hidden_size
     i = model.intermediate_size
     qkv_width = h + 2 * model.num_kv_heads * model.head_dim
+    control_attributes = {
+        "batch_size": 1,
+        "context_length": request.prompt_length,
+        "q_len": request.prompt_length,
+        "attention_kv_len": request.prompt_length,
+    }
 
     # Static parameters are explicit Global-PA allocation candidates.
     add_value("model.tok_embeddings.weight", StorageClass.PARAMETER, (model.vocab_size, h))
@@ -219,9 +226,21 @@ def _build_materialized_request_graph(
             )
 
     add_node(
-        f"{prefix}.request_start", NodeKind.CONTROL, "request_start", Phase.CONTROL, 0
+        f"{prefix}.request_start",
+        NodeKind.CONTROL,
+        "request_start",
+        Phase.CONTROL,
+        0,
+        attributes=control_attributes,
     )
-    add_node(f"{prefix}.kv_allocate", NodeKind.STATE, "kv_allocate", Phase.CONTROL, 0)
+    add_node(
+        f"{prefix}.kv_allocate",
+        NodeKind.STATE,
+        "kv_allocate",
+        Phase.CONTROL,
+        0,
+        attributes=control_attributes,
+    )
 
     forward_steps = (
         [
@@ -267,6 +286,8 @@ def _build_materialized_request_graph(
             writes=(hidden,),
             attributes={
                 "operator_group": "embedding",
+                "batch_size": 1,
+                "context_length": request.prompt_length,
                 "q_len": q_len,
                 "past_kv_len": past_len,
                 "attention_kv_len": past_len + q_len,
@@ -278,6 +299,8 @@ def _build_materialized_request_graph(
             param = f"model.layers.{layer_id}"
             layer_input = hidden
             common = {
+                "batch_size": 1,
+                "context_length": request.prompt_length,
                 "q_len": q_len,
                 "past_kv_len": past_len,
                 "attention_kv_len": past_len + q_len,
@@ -466,6 +489,8 @@ def _build_materialized_request_graph(
         add_value(token, StorageClass.METADATA, (1,), dtype="int32")
         final_attributes = {
             "operator_group": "finalize",
+            "batch_size": 1,
+            "context_length": request.prompt_length,
             "q_len": 1,
             "source_q_len": q_len,
             "past_kv_len": past_len,
@@ -513,6 +538,7 @@ def _build_materialized_request_graph(
         "request_finish",
         Phase.CONTROL,
         request.output_length,
+        attributes=control_attributes,
     )
     add_node(
         f"{prefix}.kv_release",
@@ -520,6 +546,7 @@ def _build_materialized_request_graph(
         "kv_release",
         Phase.CONTROL,
         request.output_length,
+        attributes=control_attributes,
     )
     graph = ModelGraph("hetero-model-graph/v2", tuple(values), tuple(nodes))
     graph.validate()

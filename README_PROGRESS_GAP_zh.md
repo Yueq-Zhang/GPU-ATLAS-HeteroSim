@@ -1,8 +1,8 @@
 # GPU-ATLAS-HeteroSim 当前完成情况与计划差距
 
-评估日期：2026-08-30
-当前版本：`0.22.0`
-规范基线：`hetero-sim/v1`、设计合同v1.21
+评估日期：2026-08-31
+当前版本：`0.24.0`
+规范基线：`hetero-sim/v1`、设计合同v1.24
 
 ## 1. 当前结论
 
@@ -17,6 +17,8 @@ P10a已经完成单放置控制面：每个逻辑节点必须恰好映射到一�
 P10b-B至P14进一步完成了请求级Prefill部署：任务按读完成、计算周期、写完成和版本提交推进；GPU外部端口、ATLAS内部端口与Route Acquire请求共用唯一Ramulator2。完整TinyLlama‑1.1B FP16、BS=1、Context=1024、22层Prefill已双跑通过，但计算是未校准分块周期契约，内存是有界代表采样，因此不能发布端到端Latency、Token/s或加速比。
 
 P15e已完成Context=16一层Prefill大型请求轨迹的流式gzip双跑、Attention Norm在线Range-Rebase以及LM Head长时双遍资格；P15f完成QKV Projection的Allocator Segment Range-Rebase；P15g首先验证两个Ready算子的全局时间线。P15h现已完成其余10个GPU算子的重捕获、双遍资格与统一接入：12个`request_cycle_ready=true`真实Accel-Sim算子共享同一Prefill时间线，并通过依赖、GPU资源互斥、Global PA、唯一Ramulator2、Parent/Child/durable守恒、零在途和版本提交因果验证。其余8个控制、KV管理与残差任务仍为分析/运行时模型，性能资格保持关闭。
+
+P16已完成固定Shape的全任务请求周期建模：能力Catalog精确覆盖19种算子/20个实例；14种GPU算子覆盖15个真实Accel-Sim Trace实例；KV Allocate/Append/Release把精确Global PA请求经外部Link送入唯一live Ramulator2；Request Start/Finish作为主机控制边界参与因果时间线但排除在设备性能边界之外。两遍完整运行均完成517个KV运行时Parent、31次版本检查和18次版本提交，全部零在途。17/19种算子类型为`request_cycle_ready=true`，性能资格仍为0/19。
 
 内存与片上网络的当前状态必须分开表述：Ramulator2已经是`prefill_cycle`和既有耦合资格路径的实时内存时序所有者；BookSim2源码已随ATLAS固定版本并编译进`libatlasim-lib.so`，但当前P9a/P9b Chip配置没有`architecture.noc`，P14也未调用ATLAS完整Chip，因此BookSim2尚未在当前主实验中激活，状态保持`adapter_pending_qualification`。
 
@@ -57,6 +59,7 @@ P15e已完成Context=16一层Prefill大型请求轨迹的流式gzip双跑、Atte
 | P15f | QKV Allocator Segment Range-Rebase | ✅ 双算子Ready；🟡 全局时间线待接入 | QKV双跑2,168,865 cycles、34,943,066条指令；736,837次转换零漏配，12个范围；375,899 Parent与375,944 Child全部完成；Attention Norm+QKV共2个`request_cycle_ready=true` Artifact |
 | P15g | 两个Ready算子嵌入Prefill全局时间线 | ✅ 因果资格；性能未资格 | Attention在58,833,038,873 fs完成，QKV同刻启动；共享Value与Global PA 351,485,952；GPU资源不重叠；请求零在途；QKV验证Attention输出v1；其余任务分析回退 |
 | P15h | 12算子Range-Rebase与统一Prefill时间线 | ✅ 因果资格；性能未资格 | 10个新增算子重捕获与双遍资格全部通过；12个Ready算子共40,060,873 GPU cycles、6,995,173 Parent、6,998,046 Child和804,512,881次成功转换；84个Global PA区间、56个Workspace、12条请求绑定与18次版本提交通过因果检查；其余8任务仍为分析/运行时模型 |
+| P16 | 全任务周期模型与Shape资格门禁 | ✅ 功能/请求周期资格；性能未资格 | 19类/20实例；15个GPU Trace实例 + 3个KV live Ramulator2实例 + 2个主机控制边界；双遍517个KV Parent、87个PA范围、31次版本检查、18次完成时提交；性能资格0/19 |
 
 ## 4. 当前准确运行证据
 
@@ -106,12 +109,11 @@ P15e已完成Context=16一层Prefill大型请求轨迹的流式gzip双跑、Atte
 
 ## 6. 下一步顺序
 
-1. 将P15h从一层Context=16功能资格扩展到多层模型图，优先验证跨层KV生命周期、Global PA容量、Workspace复用和长时间运行的确定性；不得直接按层数线性外推当前周期。
-2. 为仍采用分析/运行时模型的控制、KV Allocate/Append/Release和Residual Add补齐可审计的周期模型或真实Backend，并重新执行端到端依赖、资源、地址、请求和版本门禁。
-3. 构建一层TinyLlama Decode，再扩展到22层单Token Decode；逐层核对依赖、KV生命周期、内存容量、任务数和请求守恒。
+1. 启动P17性能校准：测量或引用可信的GPU Kernel、Copy Engine、Runtime、外部Link和3D-DRAM参考点，形成逐参数来源、误差和适用Shape记录；校准完成前保持`performance_claim_allowed=false`。
+2. 构建一层TinyLlama Decode，再扩展到22层单Token Decode；逐层核对依赖、KV生命周期、内存容量、任务数和请求守恒。
+3. 将P16从一层Context=16扩展到多层模型图，验证跨层KV生命周期、Global PA容量、Workspace复用和长时间运行确定性；不得按层数线性外推现有周期。
 4. 增加多Batch Continuous/Ragged周期运行，使用真实Batched/Fused Kernel而不是复制单请求延迟。
-5. 使用硬件测量或可信参考点校准RTX 3070、外部Link和3D-DRAM，并激活、资格化ATLAS BookSim2；在此之前保持`performance_claim_allowed=false`。
-6. 增加长时间混合读写、公平性、QoS和死锁/活锁压力测试，并补齐Model 2 PCIe DMA与Model 4 CXL.mem周期路径。
+5. 激活并资格化ATLAS BookSim2，增加长时间混合读写、公平性、QoS和死锁/活锁压力测试，并补齐Model 2 PCIe DMA与Model 4 CXL.mem周期路径。
 
 ## 7. 已记录但暂缓：虚拟地址与地址哈希
 
@@ -139,4 +141,4 @@ P15e已完成Context=16一层Prefill大型请求轨迹的流式gzip双跑、Atte
 
 ## 8. 声明边界
 
-目录、接口或一次运行存在，不等于性能已经资格。当前可准确表述为：**分层GPU↔Logic‑Die↔3D‑DRAM路径、真实Accel-Sim与完整ATLAS Chip并发、严格单放置/版本化Residency、live Ramulator2请求周期运行时、Context=1024的P14部署、Context=16的P15d 13算子完整Value流量、12算子独立耦合资格、流式gzip请求轨迹，以及Attention Norm和QKV两个真实Accel-Sim算子的Prefill全局因果接入已经实现。** 当前不可表述为：全部算子稳定Global PA重绑定已完成、完整Prefill已由真实Accel-Sim算子覆盖、P14/P15是校准端到端性能、Decode或多Batch周期执行已完成、RTX 3070/目标3D‑DRAM已实机校准、VA→PA/MMU/TLB或XOR地址映射已实现，或固定Trace可安全复用于任意内存候选。
+目录、接口或一次运行存在，不等于性能已经资格。当前可准确表述为：**P16固定TinyLlama Layer-0、FP16、BS=1、Context=16的20个任务已无分析回退地完成双遍因果运行；15个GPU Trace实例和3个KV运行时实例具备请求周期资格，2个主机控制事件被显式排除在设备性能边界之外；依赖、资源、Global PA、唯一Ramulator2、请求守恒和版本提交均已验证。** 当前不可表述为：P16是校准端到端性能、Request Start/Finish是设备周期任务、Decode或多Batch周期执行已完成、RTX 3070/目标3D‑DRAM已实机校准、VA→PA/MMU/TLB或XOR地址映射已实现，或固定Trace可安全复用于任意Shape/内存候选。

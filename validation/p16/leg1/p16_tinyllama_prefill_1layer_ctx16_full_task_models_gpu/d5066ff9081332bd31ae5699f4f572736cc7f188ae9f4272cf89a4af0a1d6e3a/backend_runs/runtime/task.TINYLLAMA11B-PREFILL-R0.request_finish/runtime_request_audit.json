@@ -1,0 +1,18 @@
+{
+  "completions": [],
+  "contract_cycles": 1,
+  "contract_duration_fs": 666667,
+  "duration_fs": 666667,
+  "memory_statistics": {
+    "accepted_parent_ids": 0,
+    "host_control_only": true,
+    "instances": 0,
+    "observed_completion_ids": 0,
+    "outstanding": 0
+  },
+  "model_kind": "fixed_control",
+  "operator": "request_finish",
+  "requests": [],
+  "schema_version": "hetero-runtime-task-request-audit/v1",
+  "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_finish"
+}

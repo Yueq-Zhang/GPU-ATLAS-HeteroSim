@@ -1,0 +1,122 @@
+{
+  "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+  "claim_boundary": null,
+  "comparison": {
+    "external_memory_stats": [
+      {
+        "address_already_global": 0,
+        "address_binding_ranges": 3,
+        "address_translated": 5120,
+        "address_unmapped": 0,
+        "atlas_children": 0,
+        "atlas_completed": 0,
+        "atlas_parents": 0,
+        "child_retries": 0,
+        "children_completed": 132,
+        "children_sent": 132,
+        "completed": 132,
+        "cycles": 2364,
+        "durable_completed": 132,
+        "gateway_cycles": 2364,
+        "global_time_fs": 5910777385,
+        "gpu_children": 132,
+        "gpu_completed": 132,
+        "gpu_cycles": 6691,
+        "gpu_parents": 132,
+        "instances": 1,
+        "internal_bytes": 8448,
+        "link_cycles": 2364,
+        "logical_bytes": 4224,
+        "outstanding": 0,
+        "partitions": 16,
+        "reads": 132,
+        "rejected": 11236,
+        "request_payload_bytes": 0,
+        "request_wire_bytes": 4224,
+        "response_payload_bytes": 4224,
+        "response_wire_bytes": 8448,
+        "transaction_bytes": 64,
+        "writes": 0
+      },
+      {
+        "address_already_global": 0,
+        "address_binding_ranges": 3,
+        "address_translated": 5120,
+        "address_unmapped": 0,
+        "atlas_children": 0,
+        "atlas_completed": 0,
+        "atlas_parents": 0,
+        "child_retries": 0,
+        "children_completed": 132,
+        "children_sent": 132,
+        "completed": 132,
+        "cycles": 2364,
+        "durable_completed": 132,
+        "gateway_cycles": 2364,
+        "global_time_fs": 5910777385,
+        "gpu_children": 132,
+        "gpu_completed": 132,
+        "gpu_cycles": 6691,
+        "gpu_parents": 132,
+        "instances": 1,
+        "internal_bytes": 8448,
+        "link_cycles": 2364,
+        "logical_bytes": 4224,
+        "outstanding": 0,
+        "partitions": 16,
+        "reads": 132,
+        "rejected": 11236,
+        "request_payload_bytes": 0,
+        "request_wire_bytes": 4224,
+        "response_payload_bytes": 4224,
+        "response_wire_bytes": 8448,
+        "transaction_bytes": 64,
+        "writes": 0
+      }
+    ],
+    "gpu_tot_sim_cycle": [
+      6691,
+      6691
+    ],
+    "gpu_tot_sim_insn": [
+      851968,
+      851968
+    ]
+  },
+  "exact_match_required": true,
+  "overlap_evidence": [],
+  "provenance": {
+    "backend_config": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+    "co_resident_atlas": null,
+    "dependency_commits": {
+      "accel_sim_framework": "64653015f85fb5664c84a10f48527e8897d289d0",
+      "gpgpu_sim_distribution": "e10018b67a4b668e7b43f89280cf67624f1df4ff",
+      "ramulator2": "3996362187d7f8314936e5ad7560d93b66b6a215"
+    },
+    "environment_overrides": {},
+    "resume_completed_runs": {
+      "adapter_reused": false,
+      "enabled": false,
+      "native_baseline_reused": false
+    },
+    "trace_manifest": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json"
+  },
+  "qualified_scopes": [
+    "cycle_coupled_request_response"
+  ],
+  "replay_safety_qualified": false,
+  "schema_version": "hetero-accel-sim-qualification/v1",
+  "simulation_key": "fdb574b9cffc1f7b5f49f7cea8191690e2c85da2f0a3ab50a7a60c96a536d42d",
+  "status": "passed",
+  "target_gpu": "RTX 3070 SM86 compute complex with range-rebased ATLAS-style 3D-DRAM",
+  "target_sm": 86,
+  "timing_ownership": {
+    "co_resident_atlas_core_sram_noc": false,
+    "duration_mode": "coupled",
+    "external_ramulator2": "shared3d.ramulator2",
+    "gpu_core_cache_noc": "accel_sim",
+    "gpu_local_dram": null
+  },
+  "trace_id": "tinyllama.1_1b.layer0.token_embedding.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+  "trace_key": "f16eda8cc2caf58f69d4d90dbdc86cd569b7a384a80c97e4c8fbf2387be42aa0"
+}

@@ -1,5 +1,16 @@
 # Implementation status
 
+## 2026-08-31 — v0.24.0 / P16 complete for fixed-shape request-cycle causality
+
+- Added an auditable operator capability catalog for all 19 operator types / 20 task instances in the fixed TinyLlama Layer-0 BS=1 Context=16 Prefill graph. The catalog separates implementation, test, request-cycle readiness and performance eligibility and is regression-checked against the materialized graph.
+- Added exact model/checkpoint/batch/context gates. Existing request-cycle artifacts now fail closed when their checkpoint revision, Batch or Context changes; the capability gate also covers hidden/intermediate dimensions, attention/KV heads, head dimension, vocabulary and dtype.
+- Added shape-locked runtime models for Request Start/Finish and KV Allocate/Append/Release. The three KV tasks now emit exact 64-byte Global PA requests through the external Link into one live Ramulator2 per task; Request Start/Finish are explicit host-control events with no memory traffic and are excluded from the device performance boundary.
+- Added shape-locked standalone CUDA implementations for Token Embedding and Residual Add. Both now have non-empty SM86 traces and passed deterministic Range-Rebase double qualification. The catalog therefore has 14 request-cycle-ready operator types covering 15 task instances.
+- Double-qualified the P16 20-task timeline with no analytical fallback. Both legs have the same Simulation Key and makespan, 15 ready GPU Trace instances, 517 live KV runtime parents, 87 non-overlapping Global PA ranges, 31 input-version checks and 18 completion-time commits. All request paths conserve Parent/Child/durable completions and exit with zero outstanding work.
+- Added a top-of-address-space `external_input_widened_shadow` for the int64 token IDs consumed by the real embedding kernel. It avoids moving previously qualified low-address workspaces and remains an explicit Global PA adaptation, not VA-to-PA translation.
+- P16 closes the fixed Layer-0 BS=1 Context=16 implementation/request-cycle causality milestone. Runtime/Copy Engine/GPU/Link/DRAM parameters remain uncalibrated, so all 19 operator types stay performance-ineligible and the 35.450 ms causal makespan is not a publishable latency result.
+- Human-readable coverage is in `docs/OPERATOR_MODELING_STATUS.md`; the live qualification boundary is in `docs/qualification/p16_full_task_modeling_status.md`.
+
 ## 2026-08-30 — v0.22.0
 
 - Design contract: v1.22. P15h extends caller-owned runtime Global PA bindings to all twelve real GPU operators in the one-layer Context=16 Prefill graph and validates them in one online Accel-Sim timeline.

@@ -1,0 +1,55 @@
+{
+  "schema_version": "hetero-runtime-task-model/v1",
+  "catalog_id": "tinyllama.1_1b.prefill.layer0.bs1_ctx16.runtime_tasks.v1",
+  "clock_hz": 1500000000,
+  "parameter_source": "deterministic_implementation_contract_not_hardware_calibrated",
+  "calibrated": false,
+  "shape_contract": {
+    "model_spec_name": "TinyLlama-1.1B",
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "batch_size": 1,
+    "context_length": 16
+  },
+  "models": {
+    "request_start": {
+      "model_kind": "fixed_control",
+      "fixed_cycles": 1,
+      "transaction_bytes": 64,
+      "cycles_per_transaction": 1,
+      "metadata_read_bytes": 0,
+      "metadata_write_bytes": 0
+    },
+    "kv_allocate": {
+      "model_kind": "metadata_state",
+      "fixed_cycles": 16,
+      "transaction_bytes": 64,
+      "cycles_per_transaction": 1,
+      "metadata_read_bytes": 64,
+      "metadata_write_bytes": 128
+    },
+    "kv_append": {
+      "model_kind": "kv_copy_engine",
+      "fixed_cycles": 8,
+      "transaction_bytes": 64,
+      "cycles_per_transaction": 1,
+      "metadata_read_bytes": 0,
+      "metadata_write_bytes": 0
+    },
+    "request_finish": {
+      "model_kind": "fixed_control",
+      "fixed_cycles": 1,
+      "transaction_bytes": 64,
+      "cycles_per_transaction": 1,
+      "metadata_read_bytes": 0,
+      "metadata_write_bytes": 0
+    },
+    "kv_release": {
+      "model_kind": "metadata_state",
+      "fixed_cycles": 16,
+      "transaction_bytes": 64,
+      "cycles_per_transaction": 1,
+      "metadata_read_bytes": 64,
+      "metadata_write_bytes": 64
+    }
+  }
+}

@@ -23,7 +23,14 @@
         "effective_memory_bandwidth_Bps": {"type": "integer", "minimum": 1},
         "parameter_source": {"type": "string", "minLength": 1},
         "config_ref": {"type": "string", "minLength": 1},
-        "fallback_kind": {"enum": ["none", "analytical"]},
+        "fallback_kind": {"enum": ["none", "analytical", "runtime_cycle"]},
+        "runtime_task_model_ref": {"type": "string", "minLength": 1},
+        "runtime_task_operators": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
         "external_memory_bridge": {"type": "string"},
         "exports_memory_requests": {"type": "boolean"},
         "supports_stall_resume": {"type": "boolean"},
@@ -53,6 +60,7 @@
               "trace_manifest": {"type": "string", "minLength": 1},
               "operator_artifact": {"type": "string", "minLength": 1},
               "compatibility": {"enum": ["exact_operator", "surrogate_plumbing_probe"]},
+              "contract_overrides": {"type": "object"},
               "value_bindings": {
                 "type": "array",
                 "items": {

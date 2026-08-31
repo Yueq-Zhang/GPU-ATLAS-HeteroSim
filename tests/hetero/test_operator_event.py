@@ -152,6 +152,100 @@ def test_duplicate_operator_contention_backend_is_rejected_by_dispatcher(
         OperatorEventDispatcher(Path.cwd(), tmp_path / "backend_runs", backends)
 
 
+def test_runtime_cycle_fallback_dispatches_shape_locked_control_task(
+    tmp_path: Path,
+) -> None:
+    config = _operator_config(tmp_path)
+    gpu = config["backends"]["gpu"]  # type: ignore[index]
+    gpu["fallback_kind"] = "runtime_cycle"
+    gpu["runtime_task_model_ref"] = str(
+        Path(
+            "configs/hetero/runtime_tasks/"
+            "tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json"
+        ).resolve()
+    )
+    validate_config(config)
+    dispatcher = OperatorEventDispatcher(
+        Path.cwd(), tmp_path / "backend_runs", config["backends"]  # type: ignore[arg-type]
+    )
+    model = ModelSpec(
+        "TinyLlama-1.1B",
+        2048,
+        5632,
+        1,
+        32,
+        4,
+        64,
+        32000,
+        dtype="fp16",
+        checkpoint_revision="fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    )
+    node = ModelNode(
+        "request.start",
+        NodeKind.CONTROL,
+        "request_start",
+        Phase.CONTROL,
+        0,
+        0,
+        attributes={
+            "batch_size": 1,
+            "context_length": 16,
+            "q_len": 16,
+            "attention_kv_len": 16,
+        },
+    )
+    result = dispatcher.dispatch("gpu", node, model, "gpu0")
+    assert result.statistics["cycles"] == 1
+    assert result.fidelity["compute_fidelity"] == (
+        "host_control_boundary_uncalibrated"
+    )
+    assert result.fidelity["device_performance_included"] is False
+    assert result.fidelity["performance_eligible"] is False
+
+
+def test_runtime_cycle_operator_allowlist_precedes_analytical_fallback(
+    tmp_path: Path,
+) -> None:
+    config = _operator_config(tmp_path)
+    gpu = config["backends"]["gpu"]  # type: ignore[index]
+    gpu["fallback_kind"] = "analytical"
+    gpu["runtime_task_model_ref"] = str(
+        Path(
+            "configs/hetero/runtime_tasks/"
+            "tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json"
+        ).resolve()
+    )
+    gpu["runtime_task_operators"] = ["request_start"]
+    validate_config(config)
+    dispatcher = OperatorEventDispatcher(
+        Path.cwd(), tmp_path / "backend_runs", config["backends"]  # type: ignore[arg-type]
+    )
+    model = ModelSpec(
+        "TinyLlama-1.1B",
+        2048,
+        5632,
+        1,
+        32,
+        4,
+        64,
+        32000,
+        dtype="fp16",
+        checkpoint_revision="fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    )
+    node = ModelNode(
+        "request.start",
+        NodeKind.CONTROL,
+        "request_start",
+        Phase.CONTROL,
+        0,
+        0,
+        attributes={"batch_size": 1, "context_length": 16},
+    )
+    result = dispatcher.dispatch("gpu", node, model, "gpu0")
+    assert result.artifact["kind"] == "host_control_event"
+    assert dispatcher.provenance()["runtime_task_operators"] == ["request_start"]
+
+
 def test_shape_locked_trace_binding_rejects_wrong_prefill_length() -> None:
     key = OperatorCompatibilityKey(
         model_spec_name="TinyLlama-1.1B",
@@ -257,6 +351,76 @@ def test_shape_locked_trace_binding_accepts_explicit_layer_contract_override() -
         "TinyLlama-1.1B", 2048, 5632, 1, 32, 4, 64, 32000, dtype="fp16"
     )
     binding.validate_exact_contract(node, model)
+
+
+def test_shape_locked_trace_binding_rejects_batch_context_and_revision_changes() -> None:
+    key = OperatorCompatibilityKey(
+        model_spec_name="TinyLlama-1.1B",
+        checkpoint_revision="qualified-revision",
+        operator="attention_norm",
+        phase="prefill",
+        layer_id=0,
+        batch_size=1,
+        context_length=16,
+        q_len=16,
+        kv_length=16,
+        dtype="fp16",
+    )
+    artifact = OperatorArtifactManifest(
+        Path("artifact.json"),
+        "fake.norm",
+        key,
+        {"backend": {"kind": "accel_sim"}},
+        "hash",
+    )
+    manifest = TraceManifest.from_dict(
+        {
+            "schema_version": "hetero-trace-manifest/v1",
+            "trace_id": "fake.norm",
+            "trace_semantics": "functional",
+            "replay_safe": False,
+            "qualification_record": None,
+            "kernels_list": "kernelslist.g",
+            "capture": {},
+            "compilation": {},
+            "address_ranges": [],
+        }
+    )
+    binding = TraceBinding(
+        {"op": "attention_norm"}, manifest, "exact_operator", artifact
+    )
+    node = ModelNode(
+        "n0",
+        NodeKind.COMPUTE,
+        "attention_norm",
+        Phase.PREFILL,
+        0,
+        0,
+        attributes={
+            "batch_size": 2,
+            "context_length": 32,
+            "q_len": 16,
+            "attention_kv_len": 16,
+        },
+    )
+    model = ModelSpec(
+        "TinyLlama-1.1B",
+        2048,
+        5632,
+        1,
+        32,
+        4,
+        64,
+        32000,
+        dtype="fp16",
+        checkpoint_revision="different-revision",
+    )
+    with pytest.raises(OperatorEventError) as error:
+        binding.validate_exact_contract(node, model)
+    message = str(error.value)
+    assert "batch_size" in message
+    assert "context_length" in message
+    assert "checkpoint_revision" in message
 
 
 @pytest.mark.skipif(os.name == "nt", reason="POSIX fake Accel-Sim executable")

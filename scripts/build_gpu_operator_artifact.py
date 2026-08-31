@@ -163,6 +163,19 @@ def main() -> None:
         raise ValueError("runtime_state does not have an Accel-Sim trace manifest")
     if trace_manifest_path is not None:
         trace_manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        raw_compilation = metadata.get("compilation")
+        compilation = (
+            dict(raw_compilation)
+            if isinstance(raw_compilation, dict)
+            else {
+                "framework": "pytorch",
+                "pytorch": "2.3.0+cu121",
+                "cuda_runtime": "12.1",
+                "target_sm": args.target_sm,
+            }
+        )
+        compilation["implementation"] = metadata["implementation"]
+        compilation.setdefault("target_sm", args.target_sm)
         trace_manifest = {
             "schema_version": "hetero-trace-manifest/v1",
             "trace_id": artifact_id,
@@ -187,12 +200,7 @@ def main() -> None:
                 "dtype": metadata["dtype"],
                 "scope": metadata["scope"],
             },
-            "compilation": {
-                "pytorch": "2.3.0+cu121",
-                "cuda_runtime": "12.1",
-                "target_sm": args.target_sm,
-                "implementation": metadata["implementation"],
-            },
+            "compilation": compilation,
             "address_ranges": [
                 {
                     "capture_allocation_id": f"{item['tensor_id']}.capture0",
