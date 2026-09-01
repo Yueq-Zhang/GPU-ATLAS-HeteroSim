@@ -1,0 +1,40 @@
+{
+  "schema_version": "hetero-p17-native-vram-import/v1",
+  "source": {
+    "host": "192.168.5.2",
+    "base_commit": "93f52af",
+    "repository_state": "base_commit_plus_p17_worktree_changes",
+    "accel_sim_commit": "64653015f85fb5664c84a10f48527e8897d289d0",
+    "cuda_toolkit": "11.8",
+    "target_gpu": "NVIDIA GeForce RTX 3070",
+    "target_sm": 86
+  },
+  "qualified_operator_count": 14,
+  "records": {
+    "attention_norm": "a3738b91bd51f396f44ef5c389ee8e7e01e62085e73871410506fc40a34c55a4",
+    "causal_attention": "6d780956c55a3efc977037a0e1a04450673d08c5f9db8f7ce14cd064d3a80c12",
+    "down_projection": "ff0338ec463426203d66e7607020fb4e8413861f25ace77f20a9e6ab769a6be6",
+    "final_norm": "473926a456cfe7c77fabd72b18d4fc29ef283f7b8800adf0003f3ef279debfff",
+    "gate_up_projection": "95ae34d523c0094716bc14be477aff95310df10b83c14ae6e9c4772ebe84da32",
+    "lm_head": "3c5e091030646a3cd0be264655313b58df92dcf0a015548e8486b44f573277b5",
+    "mlp_norm": "f3cb337db07f612abb98f42bf00508bca26b4d1093f93297c471a44968c49f2c",
+    "output_projection": "e9ad8ffa646f0ece427805b61a05d02cf055ed39e9f12898400d2aa89277121e",
+    "qkv_projection": "3cd36bb81dc794d0abacc11fd530af315edb7d7b17bb641f10c05847b832cc87",
+    "residual_add": "63954426601368aa60eed911ed76b1199e1ff65d7c4a9ae2f8e553bc6fffbe1b",
+    "rope": "5dc962060cf19e0d262d54ab7298ec4d81b8685c386f7863be9b7608b78bdcee",
+    "sampling": "437787da877186f15238056a41a189a3825a838d915894fb5f39e5c3e90e277e",
+    "silu_multiply": "4ca925eb3b52dac228e9c27b835b9969feacfea92c40151050fbd8c87ab4f752",
+    "token_embedding": "bc35eee8bfcd44cac8748d60b0fa88943efbae430157b57d8e825fd78bf8fb69"
+  },
+  "simulator_catalog": {
+    "path": "validation/p17/gpu_operator_pairing/simulator_native_vram.json",
+    "sha256": "ea172fe5ef4c826df70db752a805eba810250470622f0793e3f6cb76635729d9"
+  },
+  "pairing_audit": {
+    "path": "validation/p17/gpu_operator_pairing/native_vram_pairing_audit.json",
+    "sha256": "a4cb1cf8f74ebba78bf308fa9101239b8142da6418be3e5dc05a11ba9c50dcc1",
+    "topology_match": true,
+    "paired_operator_count": 0,
+    "performance_claim_allowed": false
+  }
+}

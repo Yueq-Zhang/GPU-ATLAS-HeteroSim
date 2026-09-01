@@ -1,0 +1,40 @@
+{
+  "schema_version": "hetero-p17-sm86-sealed-recapture/v1",
+  "capture_host": {
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "compute_capability": "8.9",
+    "driver_version": "595.84"
+  },
+  "target_binary": {
+    "path": "/home/yueqi/gpu-atlas/p17_tinyllama_simple_ops_sm86_sealed",
+    "sha256": "ca91eb442c38e8929830ac424c8ded7777da469fa64eb02bca3e454a4f73acda",
+    "cuda_toolkit": "11.8",
+    "embedded_cubins": ["sm_86", "sm_86"]
+  },
+  "tracer": {
+    "name": "NVBit",
+    "version": "1.8",
+    "instrumentation_arch": "sm_89",
+    "sha256": "b37ffd0140ffd1c22b5c63319e8c8285540cb27af05860398c59a55a0c25dfb7"
+  },
+  "operators": {
+    "residual_add": {
+      "metadata_sha256": "f28fb4eb869bbb21a6b466bb62503fd8fc5b00215a3f496b0b25d42173593efb",
+      "kernels_list_sha256": "7d45a8c414bf9941a194b5ba96ea6e5a397a1acfc9d16364a3390f1309340665",
+      "trace_sha256": "859102ed6f160f46581426a06e18a3bdbf482510c3c8ce41e8c3f73e1f285bf7",
+      "trace_manifest_sha256": "b5517219cc50365056a27d1f63bf57754b92bda806a9545eab2026f3d251fe7a"
+    },
+    "token_embedding": {
+      "metadata_sha256": "5a9a7ad887abfc2945b3aa15dc09bd5779c63dcc52578b0840aad7dc6292d0d9",
+      "kernels_list_sha256": "29408bd1d80a75ded499c061f1fa63fb088880156af723cfa8c34a03b5317c2d",
+      "trace_sha256": "19b76926fb65f615fa047df382fd9d8848a68d3b9c6fe9d1543653fe0e90c6d3",
+      "trace_manifest_sha256": "4e152fb368c3e58c6a8c4de51d78943a1cc9fd92c9a971e6c12d26013241fcb3"
+    }
+  },
+  "claim_boundary": {
+    "trace_target_sm": 86,
+    "physical_capture_gpu_is_not_the_simulated_gpu": true,
+    "native_rtx3070_binary_identity_verified": false,
+    "performance_pairing_allowed": false
+  }
+}

@@ -2,13 +2,15 @@
 
 GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端到端 LLM 联合仿真工程。工程把完整 Prefill/Decode 请求图、算子放置、跨设备数据移动、Paged KV Cache 和全局事件调度连接到同一条可复现运行路径。
 
-> 当前版本为 `0.26.0`。P16固定Shape的全任务请求周期建模已经完成；P17现已完成14类GPU算子的RTX 3070原生测量Catalog，并增加实现、Shape、Artifact、Trace身份和内存拓扑的严格配对审计。当前原生测量使用GPU本地显存，而既有Accel-Sim资格使用外接共享3D-DRAM，Trace二进制身份也未核验；外部Link、Logic-Die Gateway和3D-DRAM仍没有可信参考点，因此继续禁止把当前结果作为端到端性能结论。
+> 当前版本为 `0.27.0`。P16固定Shape的全任务请求周期建模已经完成；P17现已完成14类GPU算子的RTX 3070原生测量，以及同为GPU本地显存拓扑的14类Accel-Sim双遍资格。拓扑现已匹配，但Native执行与Trace二进制身份仍未核验，且10/14算子的观测误差超过15%；外部Link、Logic-Die Gateway和3D-DRAM也仍没有独立参考点，因此继续禁止把当前结果作为端到端性能结论。
 
-长时间资格验证可以部署到`192.168.0.197`并把两个确定性Leg绑定到不同CPU并行执行；密码不进入仓库或日志。远端路径、GPT‑5.6 Luna `xhigh`编排约定、单轮入口和完成后严格合并方法见[远端验证规范](docs/REMOTE_VALIDATION.md)。
+长时间资格验证可以部署到`192.168.5.2`并把两个确定性Leg绑定到不同CPU并行执行；密码不进入仓库或日志。远端路径、GPT‑5.6 Luna `xhigh`编排约定、单轮入口和完成后严格合并方法见[远端验证规范](docs/REMOTE_VALIDATION.md)。
 
 完整架构约束以 [GPU + ATLAS 异构端到端仿真实现规范](docs/gpu_atlas_heterogeneous_simulation_design_zh.md) 为准，阶段进度见 [实现状态](docs/IMPLEMENTATION_STATUS.md)。
 
 计划与当前实现的逐项差距见 [当前完成情况与计划差距](README_PROGRESS_GAP_zh.md)。
+
+希望从环境构建、基础回归逐步手工复现到P14、P15h、P16和P17时，使用 [GPU-ATLAS-HeteroSim手工复现手册](REPRODUCTION_MANUAL_zh.md)。手册逐项列出实验配置、运行命令、输出目录、通过判据、当前外部Artifact缺口和性能声明边界。
 
 ## 1. 当前已实现的能力
 
@@ -22,7 +24,7 @@ GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端�
 - 可审计的[算子建模与测试状态表](docs/OPERATOR_MODELING_STATUS.md)：机器可读 Catalog 固定模型 Revision、Batch、Context、Q/KV 长度、dtype 与模型维度，并分别记录“已建模、已测试、请求周期 Ready、性能可用”；
 - Fail-closed性能校准门禁：分别跟踪GPU Kernel、Copy Engine、Runtime、外部Link、Logic-Die Gateway和3D-DRAM的参数绑定、证据类型、参考点、误差阈值与适用Shape；只有全部组件和全部设备任务同时通过才允许打开性能声明；
 - 可复现的实验与 DSE：配置/产物内容哈希、Simulation Key、运行缓存、依赖锁、Fidelity 标签、候选搜索和规范化报告；
-- 当前验证边界：P16已双遍验证固定TinyLlama Layer-0、FP16、BS=1、Context=16的20任务时间线；P17已在本机RTX 3070上完成14类GPU算子各500次原生测量，并保留32 KiB D2D Copy和同步空Kernel Launch基准。机器审计确认14/14合同覆盖，但因`gpu_local_vram != external_shared_3ddram`且Native/Trace二进制身份未核验，正式配对为0/14；当前6个必需组件的完整性能资格仍为0/6。
+- 当前验证边界：P16已双遍验证固定TinyLlama Layer-0、FP16、BS=1、Context=16的20任务时间线；P17已完成14类GPU算子各500次RTX 3070原生测量与14类Native-VRAM Accel-Sim确定性双跑。机器审计确认拓扑匹配和14/14合同覆盖，但Native/Trace二进制身份仍未核验，10/14误差超过15%，因此正式配对仍为0/14；当前6个必需组件的完整性能资格仍为0/6。
 
 ## 2. 目录结构
 
@@ -142,7 +144,16 @@ powershell -ExecutionPolicy Bypass `
 bash scripts/run_p17_native_vram_accelsim_qualification.sh
 ```
 
-该脚本可恢复逐算子长时间运行，并在14类全部完成后生成Native-VRAM模拟Catalog和误差审计；只有内存拓扑、实现、Shape、Artifact和Trace身份都匹配时才可能形成正式参考点。
+若Embedding/Residual的旧Trace不在验证主机，可先用一份固定SM86 cubin完成封存式重捕获，再通过显式覆盖文件运行全套资格：
+
+```bash
+bash scripts/run_p17_sealed_sm86_simple_operator_recapture.sh
+P17_TRACE_MANIFEST_OVERRIDES=\
+configs/hetero/calibration/p17_native_vram_trace_overrides.json \
+  bash scripts/run_p17_native_vram_accelsim_qualification.sh
+```
+
+脚本可恢复逐算子长时间运行，并在14类全部完成后生成Native-VRAM模拟Catalog和误差审计。当前14类双遍已完成，拓扑匹配但正式配对仍为0/14；只有内存拓扑、实现、Shape、Artifact、Trace二进制身份和误差阈值都匹配时才可能形成正式参考点。
 
 对P16双遍结果执行校准门禁审计：
 

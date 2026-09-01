@@ -1,0 +1,260 @@
+{
+  "blockers": [
+    "operator:attention_norm:native:trace_binary_identity_unverified",
+    "operator:attention_norm:relative_error_exceeds_tolerance",
+    "operator:causal_attention:native:trace_binary_identity_unverified",
+    "operator:causal_attention:relative_error_exceeds_tolerance",
+    "operator:down_projection:native:trace_binary_identity_unverified",
+    "operator:final_norm:native:trace_binary_identity_unverified",
+    "operator:final_norm:relative_error_exceeds_tolerance",
+    "operator:gate_up_projection:native:trace_binary_identity_unverified",
+    "operator:lm_head:native:trace_binary_identity_unverified",
+    "operator:mlp_norm:native:trace_binary_identity_unverified",
+    "operator:mlp_norm:relative_error_exceeds_tolerance",
+    "operator:output_projection:native:trace_binary_identity_unverified",
+    "operator:output_projection:relative_error_exceeds_tolerance",
+    "operator:qkv_projection:native:trace_binary_identity_unverified",
+    "operator:qkv_projection:relative_error_exceeds_tolerance",
+    "operator:residual_add:native:trace_binary_identity_unverified",
+    "operator:residual_add:relative_error_exceeds_tolerance",
+    "operator:rope:native:trace_binary_identity_unverified",
+    "operator:rope:relative_error_exceeds_tolerance",
+    "operator:sampling:native:trace_binary_identity_unverified",
+    "operator:silu_multiply:native:trace_binary_identity_unverified",
+    "operator:silu_multiply:relative_error_exceeds_tolerance",
+    "operator:token_embedding:native:trace_binary_identity_unverified",
+    "operator:token_embedding:relative_error_exceeds_tolerance"
+  ],
+  "gpu_operator_calibration_complete": false,
+  "native_catalog_id": "p17.tinyllama.layer0.bs1.ctx16.rtx3070.native_vram",
+  "native_memory_topology": "gpu_local_vram",
+  "operators": [
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified",
+        "relative_error_exceeds_tolerance"
+      ],
+      "implementation": "transformers.LlamaRMSNorm",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 272576004267,
+      "operator_type": "attention_norm",
+      "paired": false,
+      "relative_error": 0.8096423566904498,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.attention_norm",
+      "simulated_latency_fs": 51886925795,
+      "topology_match": true,
+      "within_tolerance": false
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified",
+        "relative_error_exceeds_tolerance"
+      ],
+      "implementation": "torch.scaled_dot_product_attention_causal",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 59392001480,
+      "operator_type": "causal_attention",
+      "paired": false,
+      "relative_error": 0.48055788750630263,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.causal_attention",
+      "simulated_latency_fs": 30850706714,
+      "topology_match": true,
+      "within_tolerance": false
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified"
+      ],
+      "implementation": "transformers.LlamaMLP.down_proj",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 89088000357,
+      "operator_type": "down_projection",
+      "paired": false,
+      "relative_error": 0.030535016153679498,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.down_projection",
+      "simulated_latency_fs": 91808303887,
+      "topology_match": true,
+      "within_tolerance": true
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified",
+        "relative_error_exceeds_tolerance"
+      ],
+      "implementation": "transformers.LlamaRMSNorm.final_position_only",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 111616000533,
+      "operator_type": "final_norm",
+      "paired": false,
+      "relative_error": 0.6044774682914055,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.final_norm",
+      "simulated_latency_fs": 44146643110,
+      "topology_match": true,
+      "within_tolerance": false
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified"
+      ],
+      "implementation": "two_exact_checkpoint_linear_projections_plus_pack",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 189311996102,
+      "operator_type": "gate_up_projection",
+      "paired": false,
+      "relative_error": 0.14411110403854527,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.gate_up_projection",
+      "simulated_latency_fs": 162030035336,
+      "topology_match": true,
+      "within_tolerance": true
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified"
+      ],
+      "implementation": "transformers.LlamaForCausalLM.lm_head.final_position_only",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 367615997791,
+      "operator_type": "lm_head",
+      "paired": false,
+      "relative_error": 0.08084107184556148,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.lm_head",
+      "simulated_latency_fs": 337897526502,
+      "topology_match": true,
+      "within_tolerance": true
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified",
+        "relative_error_exceeds_tolerance"
+      ],
+      "implementation": "transformers.LlamaRMSNorm.post_attention_layernorm",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 116864003241,
+      "operator_type": "mlp_norm",
+      "paired": false,
+      "relative_error": 0.5560059183665185,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.mlp_norm",
+      "simulated_latency_fs": 51886925795,
+      "topology_match": true,
+      "within_tolerance": false
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified",
+        "relative_error_exceeds_tolerance"
+      ],
+      "implementation": "transformers.LlamaAttention.o_proj",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 84799997509,
+      "operator_type": "output_projection",
+      "paired": false,
+      "relative_error": 0.5019563657944965,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.output_projection",
+      "simulated_latency_fs": 42234098940,
+      "topology_match": true,
+      "within_tolerance": false
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified",
+        "relative_error_exceeds_tolerance"
+      ],
+      "implementation": "three_exact_checkpoint_linear_projections_plus_pack",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 147264003754,
+      "operator_type": "qkv_projection",
+      "paired": false,
+      "relative_error": 0.42921792449421386,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.qkv_projection",
+      "simulated_latency_fs": 84055653710,
+      "topology_match": true,
+      "within_tolerance": false
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified",
+        "relative_error_exceeds_tolerance"
+      ],
+      "implementation": "heterosim_cuda_reference_residual_add_v1",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 9216000326,
+      "operator_type": "residual_add",
+      "paired": false,
+      "relative_error": 0.40685428584695127,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.residual_add",
+      "simulated_latency_fs": 5466431095,
+      "topology_match": true,
+      "within_tolerance": false
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified",
+        "relative_error_exceeds_tolerance"
+      ],
+      "implementation": "transformers.LlamaRotaryEmbedding_plus_apply_rotary_pos_emb",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 655391991138,
+      "operator_type": "rope",
+      "paired": false,
+      "relative_error": 0.8286920604643772,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.rope",
+      "simulated_latency_fs": 112273851590,
+      "topology_match": true,
+      "within_tolerance": false
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified"
+      ],
+      "implementation": "torch.argmax.greedy_sampling.final_position_only",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 17408000305,
+      "operator_type": "sampling",
+      "paired": false,
+      "relative_error": 0.015231190622385505,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.sampling",
+      "simulated_latency_fs": 17673144876,
+      "topology_match": true,
+      "within_tolerance": true
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified",
+        "relative_error_exceeds_tolerance"
+      ],
+      "implementation": "torch.nn.functional.silu_times_up_projection",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 26623999700,
+      "operator_type": "silu_multiply",
+      "paired": false,
+      "relative_error": 0.5568107685563113,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.silu_multiply",
+      "simulated_latency_fs": 11799469965,
+      "topology_match": true,
+      "within_tolerance": false
+    },
+    {
+      "blockers": [
+        "native:trace_binary_identity_unverified",
+        "relative_error_exceeds_tolerance"
+      ],
+      "implementation": "heterosim_cuda_reference_token_embedding_v1",
+      "max_relative_error": 0.15,
+      "measured_latency_fs": 9216000326,
+      "operator_type": "token_embedding",
+      "paired": false,
+      "relative_error": 0.30707007626900557,
+      "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.token_embedding",
+      "simulated_latency_fs": 6386042403,
+      "topology_match": true,
+      "within_tolerance": false
+    }
+  ],
+  "paired_operator_count": 0,
+  "performance_claim_allowed": false,
+  "required_operator_count": 14,
+  "schema_version": "hetero-gpu-operator-calibration-audit/v1",
+  "simulator_catalog_id": "p17.tinyllama.layer0.ctx16.native_vram.double_qualified",
+  "simulator_memory_topology": "gpu_local_vram",
+  "topology_match": true
+}

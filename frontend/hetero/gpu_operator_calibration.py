@@ -299,10 +299,20 @@ def build_native_vram_simulator_catalog(
             raise GPUOperatorCalibrationError(
                 f"invalid native-VRAM timing ownership for {operator}"
             )
-        trace_path, trace = _trace_manifest_for_contract(contract)
-        if qualification.get("trace_id") != trace.get("trace_id"):
+        contract_trace_path, contract_trace = _trace_manifest_for_contract(contract)
+        provenance = _mapping(qualification.get("provenance"), "provenance")
+        qualification_trace_locator = _nonempty(
+            provenance.get("trace_manifest"), "provenance.trace_manifest"
+        )
+        qualification_trace_path = _resolve(qualification_trace_locator, root)
+        qualification_trace = _json(qualification_trace_path)
+        if qualification.get("trace_id") != qualification_trace.get("trace_id"):
             raise GPUOperatorCalibrationError(
                 f"trace identity mismatch in qualification for {operator}"
+            )
+        if qualification_trace.get("trace_id") != contract_trace.get("trace_id"):
+            raise GPUOperatorCalibrationError(
+                f"qualified trace does not implement the contract for {operator}"
             )
         cycles = cycles_raw[0]
         operators.append(
@@ -314,8 +324,10 @@ def build_native_vram_simulator_catalog(
                 "operator_artifact_sha256": contract["artifact_sha256"],
                 "qualification_record": str(record_path),
                 "qualification_record_sha256": file_sha256(record_path),
-                "trace_manifest": str(trace_path),
-                "trace_manifest_sha256": file_sha256(trace_path),
+                "contract_trace_manifest": str(contract_trace_path),
+                "contract_trace_manifest_sha256": file_sha256(contract_trace_path),
+                "trace_manifest": str(qualification_trace_path),
+                "trace_manifest_sha256": file_sha256(qualification_trace_path),
                 "cycles": cycles,
                 "instructions": instructions_raw[0],
                 "operator_latency_fs": round(cycles * 1.0e15 / frequency),

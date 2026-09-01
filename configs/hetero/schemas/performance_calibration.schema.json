@@ -65,6 +65,7 @@
         "properties": {
           "source_id": {"type": "string", "minLength": 1},
           "path": {"type": "string", "minLength": 1},
+          "hash_mode": {"enum": ["raw_bytes", "text_lf_utf8"]},
           "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
         },
         "additionalProperties": false
@@ -138,6 +139,7 @@
               "locator": {"type": "string", "minLength": 1},
               "description": {"type": "string", "minLength": 1},
               "artifact_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "artifact_hash_mode": {"enum": ["raw_bytes", "text_lf_utf8"]},
               "measurement_scope": {"type": "string", "minLength": 1}
             },
             "additionalProperties": false

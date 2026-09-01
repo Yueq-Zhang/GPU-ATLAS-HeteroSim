@@ -11,7 +11,7 @@ from .performance_calibration import (
     evaluate_performance_gate,
 )
 
-__version__ = "0.25.0"
+__version__ = "0.27.0"
 
 __all__ = [
     "BandwidthContract",

@@ -1,5 +1,13 @@
 # Implementation status
 
+## 2026-09-01 — v0.27.0 / P17 native-VRAM double qualification and sealed SM86 recapture
+
+- Built the Accel-Sim 2.0 native-memory simulator with CUDA 11.8 on the validation host and completed deterministic double qualification for all fourteen fixed TinyLlama Layer-0 BS=1 Context=16 GPU operators. Every record has identical cycle/instruction pairs, Accel-Sim-owned local DRAM timing, no external Ramulator2 owner and total-duration accounting.
+- Recovered the previously absent Token Embedding and Residual Add inputs by compiling one sealed SM86 CUDA binary once, verifying that it contains only SM86 cubins, and capturing both kernels with NVBit 1.8. The physical capture host is an RTX 4090, while the traced target binary remains SM86; the record explicitly forbids treating the capture host as the simulated GPU.
+- Added resumable operator filters and Trace Manifest overrides to the P17 qualification runner. The native-VRAM catalog now seals the exact Manifest named by each qualification record, rather than silently substituting the contract's older Manifest. Cross-platform calibration hashes may opt into canonical LF UTF-8 hashing while binary evidence remains raw-byte hashed.
+- The new same-topology audit has `topology_match=true` but still pairs 0/14 operators: all fourteen native measurements lack exact Trace/binary identity, and ten exceed the 15% observational-error threshold. The four within the numerical threshold are Down Projection, Gate/Up Projection, LM Head and Sampling, but none is qualified while identity is unresolved.
+- P17 remains `audit_complete_blocked`: GPU, Copy and Runtime are `measured_unvalidated`; external Link, Logic-Die Gateway and 3D-DRAM remain `specified_only`; six-component performance qualification is 0/6 and `performance_claim_allowed=false`.
+
 ## 2026-08-31 — v0.26.0 / P17 exact 14-operator native catalog and topology-safe pairing
 
 - Added a native RTX 3070 benchmark that reuses the exact TinyLlama Layer-0 BS=1 Context=16 operator builders used for NVBit capture. The two P16 shape-locked CUDA operators import their matching CUDA-reference measurements; the other twelve operators execute the same high-level PyTorch targets. All fourteen records bind the exact implementation, shape key and qualified Artifact SHA-256.

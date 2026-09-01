@@ -8,23 +8,49 @@ QUALIFICATION_ROOT="${P17_NATIVE_VRAM_ROOT:-/opt/gpu-atlas/qualification/p17-nat
 NATIVE_CATALOG="${P17_NATIVE_CATALOG:-validation/p17/gpu_operator_pairing/native_rtx3070_local_vram.json}"
 SIMULATOR_CATALOG="${P17_SIMULATOR_CATALOG:-validation/p17/gpu_operator_pairing/simulator_native_vram.json}"
 PAIRING_AUDIT="${P17_PAIRING_AUDIT:-validation/p17/gpu_operator_pairing/native_vram_pairing_audit.json}"
+OPERATOR_FILTER="${P17_OPERATOR_FILTER:-}"
+TRACE_MANIFEST_OVERRIDES="${P17_TRACE_MANIFEST_OVERRIDES:-}"
+EXPECTED_OPERATOR_COUNT="${P17_EXPECTED_OPERATOR_COUNT:-14}"
+FINALIZE_CATALOG="${P17_FINALIZE_CATALOG:-1}"
+
+if [[ ! "$EXPECTED_OPERATOR_COUNT" =~ ^[1-9][0-9]*$ ]]; then
+  echo "P17_EXPECTED_OPERATOR_COUNT must be a positive integer" >&2
+  exit 2
+fi
+if [[ "$FINALIZE_CATALOG" != "0" && "$FINALIZE_CATALOG" != "1" ]]; then
+  echo "P17_FINALIZE_CATALOG must be 0 or 1" >&2
+  exit 2
+fi
 
 export PYTHONPATH="$(pwd)${PYTHONPATH:+:$PYTHONPATH}"
 mkdir -p "$QUALIFICATION_ROOT" "$(dirname "$SIMULATOR_CATALOG")"
 
 mapfile -t OPERATOR_TRACES < <(
-  "$PYTHON" - "$CAPABILITIES" <<'PY'
+  "$PYTHON" - "$CAPABILITIES" "$OPERATOR_FILTER" "$TRACE_MANIFEST_OVERRIDES" <<'PY'
 import json
 import sys
 from pathlib import Path
 
 capability_path = Path(sys.argv[1]).resolve()
+operator_filter = {item for item in sys.argv[2].split(",") if item}
+override_path = Path(sys.argv[3]).resolve() if sys.argv[3] else None
 root = Path.cwd().resolve()
 payload = json.loads(capability_path.read_text(encoding="utf-8"))
+overrides = {}
+if override_path is not None:
+    override_payload = json.loads(override_path.read_text(encoding="utf-8"))
+    if not isinstance(override_payload, dict) or not all(
+        isinstance(key, str) and isinstance(value, str)
+        for key, value in override_payload.items()
+    ):
+        raise SystemExit("P17 Trace Manifest overrides must be a string map")
+    overrides = override_payload
 for capability in payload["operator_types"]:
     if capability.get("backend_kind") != "accel_sim":
         continue
     operator = capability["operator_type"]
+    if operator_filter and operator not in operator_filter:
+        continue
     refs = capability.get("artifact_refs", [])
     if len(refs) != 1:
         raise SystemExit(f"{operator} does not have exactly one Artifact")
@@ -36,17 +62,26 @@ for capability in payload["operator_types"]:
     ]
     if len(traces) != 1:
         raise SystemExit(f"{operator} does not have exactly one Trace Manifest")
-    trace_path = Path(traces[0]["path"])
-    if not trace_path.is_absolute():
-        trace_path = (artifact_path.parent / trace_path).resolve()
+    if operator in overrides:
+        trace_path = Path(overrides[operator])
+        if not trace_path.is_absolute():
+            trace_path = (root / trace_path).resolve()
+    else:
+        trace_path = Path(traces[0]["path"])
+        if not trace_path.is_absolute():
+            trace_path = (artifact_path.parent / trace_path).resolve()
     if not trace_path.is_file():
         raise SystemExit(f"Trace Manifest is absent for {operator}: {trace_path}")
+    trace_manifest = json.loads(trace_path.read_text(encoding="utf-8"))
+    kernels_list = Path(trace_manifest["kernels_list"])
+    if not kernels_list.is_file():
+        raise SystemExit(f"kernels_list is absent for {operator}: {kernels_list}")
     print(f"{operator}\t{trace_path}")
 PY
 )
 
-if [[ ${#OPERATOR_TRACES[@]} -ne 14 ]]; then
-  echo "expected 14 GPU operators, found ${#OPERATOR_TRACES[@]}" >&2
+if [[ ${#OPERATOR_TRACES[@]} -ne "$EXPECTED_OPERATOR_COUNT" ]]; then
+  echo "expected $EXPECTED_OPERATOR_COUNT GPU operators, found ${#OPERATOR_TRACES[@]}" >&2
   exit 3
 fi
 
@@ -85,6 +120,11 @@ if (
     raise SystemExit(f"invalid native-VRAM qualification: {path}")
 PY
 done
+
+if [[ "$FINALIZE_CATALOG" == "0" ]]; then
+  echo "P17 partial native-VRAM qualification complete: $QUALIFICATION_ROOT"
+  exit 0
+fi
 
 "$PYTHON" scripts/build_p17_gpu_simulator_catalog.py \
   --capabilities "$CAPABILITIES" \

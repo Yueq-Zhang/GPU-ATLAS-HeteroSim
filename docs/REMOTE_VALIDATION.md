@@ -2,7 +2,7 @@
 
 ## Execution host
 
-- Default long-running validation host: `yueqi@192.168.0.197`.
+- Default long-running validation host: `yueqi@192.168.5.2`.
 - Project path: `/opt/gpu-atlas/GPU-ATLAS-HeteroSim`, symlinked to the
   user-owned checkout under `/home/yueqi/gpu-atlas`.
 - Dependency path: `/opt/gpu-atlas/dependencies`.

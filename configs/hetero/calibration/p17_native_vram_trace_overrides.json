@@ -1,0 +1,4 @@
+{
+  "residual_add": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json",
+  "token_embedding": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json"
+}

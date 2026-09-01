@@ -113,6 +113,50 @@ def test_calibration_fails_closed_on_status_error_and_hash(tmp_path: Path) -> No
     )
 
 
+def test_text_configuration_hash_is_stable_across_line_endings(
+    tmp_path: Path,
+) -> None:
+    config = tmp_path / "config.json"
+    config.write_bytes(b'{\r\n  "value": 1\r\n}\r\n')
+    normalized = b'{\n  "value": 1\n}\n'
+    payload = _payload(hashlib.sha256(normalized).hexdigest(), "1" * 64)
+    payload["configuration_sources"][0]["hash_mode"] = "text_lf_utf8"
+    record = PerformanceCalibration.from_payload(payload)
+    audit = record.audit(tmp_path)
+    assert audit["configuration_sources"][0]["matched"] is True
+    assert audit["configuration_sources"][0]["hash_mode"] == "text_lf_utf8"
+
+    config.write_bytes(normalized)
+    audit = record.audit(tmp_path)
+    assert audit["configuration_sources"][0]["matched"] is True
+
+
+def test_text_artifact_hash_is_stable_across_line_endings(tmp_path: Path) -> None:
+    config = tmp_path / "config.json"
+    config.write_text("{}\n", encoding="utf-8")
+    measurement = tmp_path / "measurements/gpu.json"
+    measurement.parent.mkdir()
+    measurement.write_bytes(b'{\r\n  "latency": 10\r\n}\r\n')
+    normalized = b'{\n  "latency": 10\n}\n'
+    payload = _payload(
+        hashlib.sha256(config.read_bytes()).hexdigest(),
+        hashlib.sha256(normalized).hexdigest(),
+    )
+    payload["components"]["gpu_kernel"]["sources"][0]["artifact_hash_mode"] = (
+        "text_lf_utf8"
+    )
+    record = PerformanceCalibration.from_payload(payload)
+    audit = record.audit(tmp_path)
+    artifact = audit["components"]["gpu_kernel"]["source_artifacts"][0]
+    assert artifact["matched"] is True
+    assert artifact["artifact_hash_mode"] == "text_lf_utf8"
+
+    measurement.write_bytes(normalized)
+    audit = record.audit(tmp_path)
+    artifact = audit["components"]["gpu_kernel"]["source_artifacts"][0]
+    assert artifact["matched"] is True
+
+
 def test_task_gate_excludes_host_controls_but_rejects_ineligible_device_task(
     tmp_path: Path,
 ) -> None:

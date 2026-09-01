@@ -5,7 +5,7 @@
 | 字段 | 内容 |
 | --- | --- |
 | 状态 | 已冻结的实现基线 |
-| 版本 | 1.26 |
+| 版本 | 1.27 |
 | 日期 | 2026-08-31 |
 | 适用工程 | ATLAS-MICRO-2026 |
 | 当前基线提交 | 96202b410b9c26702e6b6b60f280ecb80914b927 |
@@ -2794,7 +2794,7 @@ P17引入`hetero-performance-calibration/v1`，把请求周期正确性与性能
 
 P17首批本机测量固定RTX 3070、SM86、CUDA 11.6、50次Warmup和500次测量，覆盖Context=16的Embedding、Residual、32 KiB本地D2D Copy及空Kernel事件/同步时延。第二批测量固定TinyLlama revision、Layer 0、FP16、BS=1和Context=16，覆盖全部14类GPU算子；Embedding/Residual使用P16定形CUDA参考实现，其余12类复用NVBit捕获脚本的高层Target。模型权重、源码、能力Catalog、算子Artifact和测量产物均有SHA-256。
 
-14算子配对必须额外满足：Operator类型全集一致、Implementation一致、精确Shape Key一致、Artifact哈希一致、Native执行与Trace Manifest/二进制身份一致、内存拓扑一致以及误差阈值通过。高层PyTorch Target名称相同不能替代Trace二进制身份核验。当前Native Catalog为`gpu_local_vram`，既有Accel-Sim Catalog为`external_shared_3ddram`，且Native新执行未绑定已捕获Trace身份，因此正式配对为0/14。实现已提供可恢复的Native-VRAM Accel-Sim双遍脚本和严格Importer，但远端14算子结果尚未生成。外部Link、Gateway和3D-DRAM独立参考同样缺失，当前审计必须返回`audit_complete_blocked`并保持`performance_claim_allowed=false`。
+14算子配对必须额外满足：Operator类型全集一致、Implementation一致、精确Shape Key一致、Artifact哈希一致、Native执行与Trace Manifest/二进制身份一致、内存拓扑一致以及误差阈值通过。高层PyTorch Target名称相同不能替代Trace二进制身份核验。P17现已完成14类`gpu_local_vram` Accel-Sim双遍资格，且Importer封存资格记录实际使用的Trace Manifest；Embedding和Residual由同一份仅含SM86 cubin的封存二进制重新捕获。新审计已消除拓扑不匹配，但14类Native测量都没有与Trace建立精确二进制身份，且10/14的观测误差超过15%，因此正式配对仍为0/14。外部Link、Gateway和3D-DRAM独立参考同样缺失，当前审计必须返回`audit_complete_blocked`并保持`performance_claim_allowed=false`。
 
 ---
 
@@ -2895,3 +2895,4 @@ P17首批本机测量固定RTX 3070、SM86、CUDA 11.6、50次Warmup和500次测
 | 1.24 | 2026-08-31 | 完成P16固定Shape全任务请求周期闭环：15个GPU Trace实例、3个KV live Ramulator2实例和2个主机控制边界双遍通过；增加顶部输入宽度Shadow、20任务因果与性能边界自动资格记录，同时保持整机性能未校准 |
 | 1.25 | 2026-08-31 | 启动P17独立性能校准：增加六组件机器合同、配置/测量哈希、证据/Shape/误差fail-closed门禁和全局任务资格AND规则；完成RTX 3070首批原生测量并明确本地显存不可外推外接3D-DRAM |
 | 1.26 | 2026-08-31 | 完成固定TinyLlama Shape的14类RTX 3070原生算子测量Catalog；增加Implementation/Shape/Artifact/Trace身份/内存拓扑严格配对、Native-VRAM Accel-Sim双遍Runner与Importer；当前0/14正式配对且整机性能门禁保持关闭 |
+| 1.27 | 2026-09-01 | 完成14类Native-VRAM Accel-Sim确定性双遍资格；以同一封存SM86 cubin重捕获Embedding/Residual，增加Trace覆盖、实际资格Manifest封存与跨平台文本哈希；拓扑匹配但二进制身份和10类误差仍阻止正式配对 |

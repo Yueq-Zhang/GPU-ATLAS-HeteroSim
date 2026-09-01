@@ -32,6 +32,22 @@ _EVIDENCE_CLASSES = {
     "official_specification",
     "implementation_configuration",
 }
+_CONFIGURATION_HASH_MODES = {"raw_bytes", "text_lf_utf8"}
+
+
+def _content_sha256(path: Path, hash_mode: str) -> str:
+    """Hash content without making declared text inputs host-specific."""
+
+    if hash_mode == "raw_bytes":
+        payload = path.read_bytes()
+    elif hash_mode == "text_lf_utf8":
+        text = path.read_text(encoding="utf-8")
+        payload = text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+    else:  # The loader validates this; keep the helper fail-closed for direct use.
+        raise PerformanceCalibrationError(
+            f"unsupported configuration hash_mode: {hash_mode}"
+        )
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _mapping(value: object, path: str) -> Mapping[str, object]:
@@ -83,6 +99,7 @@ class CalibrationSource:
     locator: str
     description: str
     artifact_sha256: str | None
+    artifact_hash_mode: str
     measurement_scope: str | None
 
 
@@ -244,7 +261,14 @@ class PerformanceCalibration:
                 raise PerformanceCalibrationError(
                     "configuration sha256 must be lowercase"
                 )
-            configuration_sources.append(dict(item))
+            hash_mode = str(item.get("hash_mode", "raw_bytes"))
+            if hash_mode not in _CONFIGURATION_HASH_MODES:
+                raise PerformanceCalibrationError(
+                    "configuration hash_mode must be raw_bytes or text_lf_utf8"
+                )
+            normalized_item = dict(item)
+            normalized_item["hash_mode"] = hash_mode
+            configuration_sources.append(normalized_item)
 
         components_raw = _mapping(payload.get("components"), "components")
         if set(required_components) - set(components_raw):
@@ -338,6 +362,9 @@ class PerformanceCalibration:
                             if source.get("artifact_sha256") is not None
                             else None
                         ),
+                        artifact_hash_mode=str(
+                            source.get("artifact_hash_mode", "raw_bytes")
+                        ),
                         measurement_scope=(
                             _nonempty(
                                 source.get("measurement_scope"), "measurement_scope"
@@ -348,6 +375,10 @@ class PerformanceCalibration:
                     )
                 )
                 digest = sources[-1].artifact_sha256
+                if sources[-1].artifact_hash_mode not in _CONFIGURATION_HASH_MODES:
+                    raise PerformanceCalibrationError(
+                        "source artifact_hash_mode must be raw_bytes or text_lf_utf8"
+                    )
                 if digest is not None and (
                     len(digest) != 64
                     or any(c not in "0123456789abcdef" for c in digest)
@@ -440,6 +471,7 @@ class PerformanceCalibration:
         root = Path(project_root).resolve() if project_root is not None else None
         for raw in self.configuration_sources:
             expected = str(raw["sha256"])
+            hash_mode = str(raw["hash_mode"])
             path = Path(str(raw["path"]))
             if not path.is_absolute() and root is not None:
                 path = root / path
@@ -447,7 +479,7 @@ class PerformanceCalibration:
             actual: str | None = None
             matched: bool | None = None
             if exists:
-                actual = hashlib.sha256(path.read_bytes()).hexdigest()
+                actual = _content_sha256(path, hash_mode)
                 matched = actual == expected
                 if not matched:
                     blockers.append(f"configuration:{raw['source_id']}:sha256_mismatch")
@@ -457,6 +489,7 @@ class PerformanceCalibration:
                 {
                     "source_id": raw["source_id"],
                     "path": str(raw["path"]),
+                    "hash_mode": hash_mode,
                     "expected_sha256": expected,
                     "actual_sha256": actual,
                     "exists": exists,
@@ -484,7 +517,7 @@ class PerformanceCalibration:
                 actual: str | None = None
                 matched: bool | None = None
                 if exists:
-                    actual = hashlib.sha256(artifact_path.read_bytes()).hexdigest()
+                    actual = _content_sha256(artifact_path, source.artifact_hash_mode)
                     matched = actual == source.artifact_sha256
                     if not matched:
                         component_blockers.append(
@@ -500,6 +533,7 @@ class PerformanceCalibration:
                         "source_id": source.source_id,
                         "locator": source.locator,
                         "measurement_scope": source.measurement_scope,
+                        "artifact_hash_mode": source.artifact_hash_mode,
                         "expected_sha256": source.artifact_sha256,
                         "actual_sha256": actual,
                         "exists": exists,

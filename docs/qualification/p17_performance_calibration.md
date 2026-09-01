@@ -1,7 +1,7 @@
 # P17 性能校准状态
 
-日期：2026-08-31
-状态：校准基础设施与14类RTX 3070原生算子测量完成；同拓扑/同Trace配对未完成，整机性能资格未通过
+日期：2026-09-01
+状态：14类RTX 3070原生测量与14类Native-VRAM Accel-Sim双遍完成；同Trace二进制身份未完成，整机性能资格未通过
 
 ## 已实现
 
@@ -9,7 +9,7 @@ P17把请求周期资格与性能资格彻底分开。`hetero-performance-calibr
 
 | 组件 | 当前状态 | 已有证据 | 仍缺少的资格条件 |
 |---|---|---|---|
-| GPU Operator | `measured_unvalidated` | 14类固定Shape RTX 3070原生测量；14类外接3D-DRAM Accel-Sim周期Catalog | 同拓扑Native-VRAM Accel-Sim双跑以及Native执行/捕获Trace二进制身份核验 |
+| GPU Operator | `measured_unvalidated` | 14类固定Shape RTX 3070原生测量；14类Native-VRAM Accel-Sim确定性双遍 | Native执行/捕获Trace二进制身份核验；10个超阈值算子解释与修正 |
 | Copy Engine | `measured_unvalidated` | RTX 3070本地显存32 KiB D2D Copy | 与外接3D-DRAM KV Copy语义一致的延迟/带宽点 |
 | Runtime | `measured_unvalidated` | 空Kernel + Device Synchronize主机计时 | 实际框架Request Start/Finish和Kernel Launch分解 |
 | 外部Link | `specified_only` | 12.8 GB/s、10 ns配置合同 | 独立带宽扫描和往返延迟参考 |
@@ -64,7 +64,9 @@ P17把请求周期资格与性能资格彻底分开。`hetero-performance-calibr
 - Native与Simulator内存拓扑；
 - 允许的相对误差。
 
-当前`pairing_audit.json`的SHA-256为`c1790667cb463b2aa5c8c6f955eee9b4f12f735f62222e1d500db28460ae1365`，结果为`paired_operator_count=0/14`、`topology_match=false`、`performance_claim_allowed=false`。主要阻断是`gpu_local_vram != external_shared_3ddram`以及14类Native新执行均未绑定到已捕获Trace身份。这个结果表示审计正确阻止了不等价数据配对，不表示14类原生测量或既有请求周期资格运行失败。
+新增`simulator_native_vram.json`保存14类`gpu_local_vram`双遍周期，SHA-256为`ea172fe5ef4c826df70db752a805eba810250470622f0793e3f6cb76635729d9`。每类均满足两遍周期/指令相同、GPU本地DRAM由Accel-Sim唯一计时、没有外部Ramulator2且采用总时长统计。Embedding/Residual由同一份SHA-256封存的SM86二进制重新捕获；RTX 4090仅是运行NVBit插桩的物理主机，不是模拟目标，也不能据此补齐RTX 3070原生测量的二进制身份。
+
+当前`native_vram_pairing_audit.json`的SHA-256为`a4cb1cf8f74ebba78bf308fa9101239b8142da6418be3e5dc05a11ba9c50dcc1`，结果为`paired_operator_count=0/14`、`topology_match=true`、`performance_claim_allowed=false`。14类全部被`native:trace_binary_identity_unverified`阻断；其中Down Projection、Gate/Up Projection、LM Head和Sampling的数值误差不超过15%，其余10类超阈值。数值落入阈值也不能绕过身份门禁。
 
 ## 自动审计结果
 
@@ -82,10 +84,9 @@ P17复用了P16最终双遍运行，确认两遍Simulation Key均为`d5066ff9081
 
 ## 后续闭环
 
-1. 在完整Trace主机执行`run_p17_native_vram_accelsim_qualification.sh`，逐算子生成Native-VRAM Accel-Sim双遍资格记录；
-2. 在与Trace捕获一致的软件环境计时并记录Kernel Launch序列/Trace身份，避免把高层Target名称等同于二进制相同；
-3. 通过配对器核对14类同拓扑数据并生成误差点，失败算子不得从其他算子外推；
-4. 分离框架Launch、同步、KV Copy固定时延和持续带宽，避免用一个常数拟合总时间；
-5. 为12.8 GB/s外部Link和Logic-Die Gateway建立独立Payload/Queue扫描；
-6. 用独立3D-DRAM硬件数据或可信参考模拟器核对Row-hit、Row-miss和持续混合带宽；
-7. 六项全部通过后重新生成算子Artifact、运行完整双遍时间线，并由全局门禁自动决定是否允许性能声明。
+1. 在与Trace捕获一致的软件环境直接计时同一Kernel/Binary，记录Binary SHA-256、Launch序列和Trace身份，避免把高层Target名称等同于二进制相同；
+2. 对10个超出15%阈值的算子分解WDDM调度、框架Launch、同步、核心频率、Cache/DRAM配置和Kernel选择差异，禁止用单一缩放系数修正；
+3. 分离框架Launch、同步、KV Copy固定时延和持续带宽，避免用一个常数拟合总时间；
+4. 为12.8 GB/s外部Link和Logic-Die Gateway建立独立Payload/Queue扫描；
+5. 用独立3D-DRAM硬件数据或可信参考模拟器核对Row-hit、Row-miss和持续混合带宽；
+6. 六项全部通过后重新生成算子Artifact、运行完整双遍时间线，并由全局门禁自动决定是否允许性能声明。

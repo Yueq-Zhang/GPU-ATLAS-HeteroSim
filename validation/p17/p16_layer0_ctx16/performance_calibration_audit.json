@@ -84,9 +84,10 @@
         ],
         "source_artifacts": [
           {
-            "actual_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+            "actual_sha256": "41fbcbc7ea70ac95c053c625bef7ea9e153ea963cdba879c561d9d4821ffca34",
+            "artifact_hash_mode": "text_lf_utf8",
             "exists": true,
-            "expected_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+            "expected_sha256": "41fbcbc7ea70ac95c053c625bef7ea9e153ea963cdba879c561d9d4821ffca34",
             "locator": "validation/p17/native_rtx3070/native_measurements.json",
             "matched": true,
             "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram",
@@ -177,9 +178,10 @@
         ],
         "source_artifacts": [
           {
-            "actual_sha256": "72535255fb2703b272c7cc3d2949cf2dd95ef428def1d1fd4beac72248fb6bb1",
+            "actual_sha256": "4a296c2ab6c3336135d20b0a93eefc407e366ea3b1d10d4aa4514d3e533797f4",
+            "artifact_hash_mode": "text_lf_utf8",
             "exists": true,
-            "expected_sha256": "72535255fb2703b272c7cc3d2949cf2dd95ef428def1d1fd4beac72248fb6bb1",
+            "expected_sha256": "4a296c2ab6c3336135d20b0a93eefc407e366ea3b1d10d4aa4514d3e533797f4",
             "locator": "validation/p17/gpu_operator_pairing/native_rtx3070_local_vram.json",
             "matched": true,
             "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram",
@@ -242,9 +244,10 @@
         ],
         "source_artifacts": [
           {
-            "actual_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+            "actual_sha256": "41fbcbc7ea70ac95c053c625bef7ea9e153ea963cdba879c561d9d4821ffca34",
+            "artifact_hash_mode": "text_lf_utf8",
             "exists": true,
-            "expected_sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d",
+            "expected_sha256": "41fbcbc7ea70ac95c053c625bef7ea9e153ea963cdba879c561d9d4821ffca34",
             "locator": "validation/p17/native_rtx3070/native_measurements.json",
             "matched": true,
             "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram",
@@ -264,6 +267,7 @@
         "actual_sha256": "4c11629e1a17216a641bca52f6ec0d4c46aa1c60f8c2c6f0f45c4a07f0a00933",
         "exists": true,
         "expected_sha256": "4c11629e1a17216a641bca52f6ec0d4c46aa1c60f8c2c6f0f45c4a07f0a00933",
+        "hash_mode": "text_lf_utf8",
         "matched": true,
         "path": "configs/hetero/experiments/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu.json",
         "source_id": "p16_experiment"
@@ -272,6 +276,7 @@
         "actual_sha256": "da41dc6c68070d01dc44a1f6d7b6009d8fb1a2167868eb1f7bb34cd88ad9b8df",
         "exists": true,
         "expected_sha256": "da41dc6c68070d01dc44a1f6d7b6009d8fb1a2167868eb1f7bb34cd88ad9b8df",
+        "hash_mode": "text_lf_utf8",
         "matched": true,
         "path": "configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
         "source_id": "gpu_backend"
@@ -280,6 +285,7 @@
         "actual_sha256": "3595efe544a708e7d7e74431c7c2f0cbf465fbe256c1e23514fa77e5d0dbb8cb",
         "exists": true,
         "expected_sha256": "3595efe544a708e7d7e74431c7c2f0cbf465fbe256c1e23514fa77e5d0dbb8cb",
+        "hash_mode": "text_lf_utf8",
         "matched": true,
         "path": "configs/hetero/runtime_tasks/tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json",
         "source_id": "runtime_model"
@@ -288,6 +294,7 @@
         "actual_sha256": "448442cba5b8edbe053cd166353954a97b675f837b958cd88c626f4ba55c2a16",
         "exists": true,
         "expected_sha256": "448442cba5b8edbe053cd166353954a97b675f837b958cd88c626f4ba55c2a16",
+        "hash_mode": "text_lf_utf8",
         "matched": true,
         "path": "configs/hetero/memory/ramulator2_hbdram_edge_16ch_shared.yaml",
         "source_id": "dram_config"
