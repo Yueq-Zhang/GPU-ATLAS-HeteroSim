@@ -35,6 +35,11 @@ def main() -> None:
         type=Path,
         help="Use native-VRAM Accel-Sim double-run records from this directory",
     )
+    parser.add_argument(
+        "--execution-identity-catalog",
+        type=Path,
+        help="Attach independently sealed same-Binary identity evidence",
+    )
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     if args.qualification_root is None:
@@ -43,6 +48,7 @@ def main() -> None:
             args.repository_root,
             core_frequency_hz=args.core_frequency_hz,
             memory_topology=args.memory_topology,
+            execution_identity_catalog=args.execution_identity_catalog,
         )
     else:
         payload = build_native_vram_simulator_catalog(
@@ -50,6 +56,7 @@ def main() -> None:
             args.repository_root,
             args.qualification_root,
             core_frequency_hz=args.core_frequency_hz,
+            execution_identity_catalog=args.execution_identity_catalog,
         )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

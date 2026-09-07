@@ -1,0 +1,22 @@
+{
+  "requests": [
+    {
+      "request_id": "R0",
+      "arrival_time_fs": 0,
+      "prompt_length": 1,
+      "output_length": 2,
+      "priority": 0,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 16
+    },
+    {
+      "request_id": "R1",
+      "arrival_time_fs": 0,
+      "prompt_length": 1,
+      "output_length": 2,
+      "priority": 0,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 31
+    }
+  ]
+}

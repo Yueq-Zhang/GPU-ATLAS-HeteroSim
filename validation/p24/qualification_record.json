@@ -1,0 +1,114 @@
+{
+  "boundary": "P24 validates functional-cycle EOS, maximum output length, explicit barrier cancellation, KV capacity pressure, release and Global PA reuse for a single decoder layer. Exact batched traces and calibrated performance remain outside this qualification.",
+  "cases": {
+    "eos_max_active_cancel": {
+      "checks": {
+        "active_cancel_observed": true,
+        "admission_allocation_bijective": true,
+        "all_requests_terminal": true,
+        "allocation_epochs_unique": true,
+        "double_run_identical": true,
+        "eos_observed": true,
+        "global_pa_active_ranges_disjoint": true,
+        "kv_peak_within_capacity": true,
+        "max_length_observed": true,
+        "performance_claim_closed": true,
+        "single_layer_only": true,
+        "zero_in_flight": true,
+        "zero_kv_bytes_after_retirement": true
+      },
+      "config_ref": "configs/hetero/experiments/p24_tinyllama_1layer_request_controls_bs3.json",
+      "conservation": {
+        "admission_allocation_bijective": true,
+        "admitted_requests": 3,
+        "all_requests_terminal": true,
+        "allocated_requests": 3,
+        "input_requests": 3,
+        "released_requests": 3,
+        "terminal_requests": 3,
+        "zero_in_flight": true
+      },
+      "memory": {
+        "active_allocations_after_run": [],
+        "active_range_overlap_count": 0,
+        "allocation_epoch_unique": true,
+        "capacity_bytes": 98304,
+        "capacity_delayed_request_ids": [],
+        "peak_bytes": 98304,
+        "retired_range_reuse_count": 0,
+        "zero_bytes_after_retirement": true
+      },
+      "qualification_passed": true,
+      "resolved_config_sha256": "72c382a3dd007918eccd017fac4e22f76dd0596d9516ceaf02412af4d3bc037f",
+      "termination": {
+        "cancelled_before_admission": [],
+        "reason_counts": {
+          "cancelled": 1,
+          "completed": 0,
+          "eos": 1,
+          "max_length": 1
+        }
+      }
+    },
+    "kv_capacity_release_reuse": {
+      "checks": {
+        "admission_allocation_bijective": true,
+        "all_requests_terminal": true,
+        "all_termination_reasons_observed": true,
+        "allocation_epochs_unique": true,
+        "capacity_delayed_admission_observed": true,
+        "capacity_reached": true,
+        "double_run_identical": true,
+        "global_pa_active_ranges_disjoint": true,
+        "kv_peak_within_capacity": true,
+        "performance_claim_closed": true,
+        "retired_global_pa_reused": true,
+        "single_layer_only": true,
+        "waiting_cancel_never_allocated": true,
+        "zero_in_flight": true,
+        "zero_kv_bytes_after_retirement": true
+      },
+      "config_ref": "configs/hetero/experiments/p24_tinyllama_1layer_kv_pressure_bs4.json",
+      "conservation": {
+        "admission_allocation_bijective": true,
+        "admitted_requests": 3,
+        "all_requests_terminal": true,
+        "allocated_requests": 3,
+        "input_requests": 4,
+        "released_requests": 3,
+        "terminal_requests": 4,
+        "zero_in_flight": true
+      },
+      "memory": {
+        "active_allocations_after_run": [],
+        "active_range_overlap_count": 0,
+        "allocation_epoch_unique": true,
+        "capacity_bytes": 32768,
+        "capacity_delayed_request_ids": [
+          "R1-max",
+          "R3-complete"
+        ],
+        "peak_bytes": 32768,
+        "retired_range_reuse_count": 2,
+        "zero_bytes_after_retirement": true
+      },
+      "qualification_passed": true,
+      "resolved_config_sha256": "87d125a3c4924816b537e4c207d70d90ff94dc83cdf20804b6782e2f213f88b9",
+      "termination": {
+        "cancelled_before_admission": [
+          "R2-cancel-waiting"
+        ],
+        "reason_counts": {
+          "cancelled": 1,
+          "completed": 1,
+          "eos": 1,
+          "max_length": 1
+        }
+      }
+    }
+  },
+  "performance_claim_allowed": false,
+  "qualification_passed": true,
+  "schema_version": "hetero-p24-request-control-qualification/v1",
+  "validation_scope": "tinyllama_decode_single_layer_only"
+}

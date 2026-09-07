@@ -86,7 +86,7 @@
   "exact_match_required": true,
   "overlap_evidence": [],
   "provenance": {
-    "backend_config": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+    "backend_config": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p18-7303c02/configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
     "co_resident_atlas": null,
     "dependency_commits": {
       "accel_sim_framework": "64653015f85fb5664c84a10f48527e8897d289d0",
@@ -96,17 +96,17 @@
     "environment_overrides": {},
     "resume_completed_runs": {
       "adapter_reused": false,
-      "enabled": false,
+      "enabled": true,
       "native_baseline_reused": false
     },
-    "trace_manifest": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json"
+    "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p18-7303c02/configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json"
   },
   "qualified_scopes": [
     "cycle_coupled_request_response"
   ],
   "replay_safety_qualified": false,
   "schema_version": "hetero-accel-sim-qualification/v1",
-  "simulation_key": "14138779e6608361f3017572220ceda1f156f876acd1b7e4352c527a5629e4b4",
+  "simulation_key": "e8bec0d12964be1906edf396be7c21ad4a5db56f50f36b42224d75a2a77a1776",
   "status": "passed",
   "target_gpu": "RTX 3070 SM86 compute complex with range-rebased ATLAS-style 3D-DRAM",
   "target_sm": 86,
@@ -118,5 +118,5 @@
     "gpu_local_dram": null
   },
   "trace_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
-  "trace_key": "eca972dce9dcce192deb7b07c4400b262d0370a20a88c1c8de2a4067eb3363e4"
+  "trace_key": "16e8672a94dffc7e475ef1654abbd78556e1fe2d2b93e264347547fb2ddbd5e4"
 }

@@ -1,4 +1,4 @@
-"""P10b-B live request-cycle runtime for strict Prefill execution plans."""
+"""Live request-cycle runtime for strict materialized request plans."""
 
 from __future__ import annotations
 
@@ -112,6 +112,7 @@ def run_prefill_cycle_dag(
     transaction_bytes: int,
     max_samples_per_value: int,
     request_trace_path: Path | None = None,
+    runtime_schema_version: str = "hetero-prefill-cycle-runtime/v1",
 ) -> dict[str, object]:
     """Run device tasks, routes and one live Ramulator2 on one cycle timeline."""
 
@@ -619,7 +620,7 @@ def run_prefill_cycle_dag(
     makespan_fs = max(int(item["completion_time_fs"]) for item in ordered_timing)
     memory_trace = trace_recorder.finalize()
     return {
-        "schema_version": "hetero-prefill-cycle-runtime/v1",
+        "schema_version": runtime_schema_version,
         "makespan_fs": makespan_fs,
         "tasks": ordered_timing,
         "backend_dispatch_count": backend_dispatch_count,
@@ -630,3 +631,34 @@ def run_prefill_cycle_dag(
         "memory_statistics": memory_stats,
         "artifact_coverage": coverage,
     }
+
+
+def run_request_cycle_dag(
+    execution_graph: Mapping[str, object],
+    dispatch_specs: Mapping[str, OnlineDispatchSpec],
+    dispatcher: PrefillCycleDispatcher,
+    bridge: LiveRamulator2Bridge,
+    allocations: Mapping[str, GlobalAllocation],
+    *,
+    global_clock_hz: int,
+    transaction_bytes: int,
+    max_samples_per_value: int,
+    request_trace_path: Path | None = None,
+) -> dict[str, object]:
+    """Run a Prefill, Decode or control-only graph on the generic P19 path."""
+
+    return run_prefill_cycle_dag(
+        execution_graph,
+        dispatch_specs,
+        dispatcher,
+        bridge,
+        allocations,
+        global_clock_hz=global_clock_hz,
+        transaction_bytes=transaction_bytes,
+        max_samples_per_value=max_samples_per_value,
+        request_trace_path=request_trace_path,
+        runtime_schema_version="hetero-request-cycle-runtime/v1",
+    )
+
+
+RequestCycleRuntimeError = PrefillCycleRuntimeError

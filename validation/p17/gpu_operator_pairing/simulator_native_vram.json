@@ -12,242 +12,988 @@
   "operator_count": 14,
   "operators": [
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
       "contract_trace_manifest_sha256": "64785c8ff333a2c0eae25af7ac47cd2427b2a6f9a7768b5806dbdd3c00e6228c",
       "cycles": 58736,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 8,
+        "kernel_sequence_sha256": "094299e86a37493619645251b7d098ffad341bc74f2a72bcfb3ccea5f2303b81",
+        "launch_contract_sha256": "0da56fb17c55fa1f0beb6dc077e3e3d1ae6863c2f1fba79161a41949852f0bd2",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "da1bf3c2f0a14cd200bab81f8415c7b47c684b6c23ef6e07d5edcceacc010f8a",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/attention_norm.json",
+          "native_measurement_sha256": "048efa98c0d8e1b558700e67efdb7e1a5c5ea28e1ca92bc8ae694efa54a8d86a",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x609543e6e150.tracez",
+              "sha256": "0cee87aece9414dd87eb0486c846b2a0664f906056aac650ef733283e9e82cf8"
+            },
+            {
+              "name": "kernel-2-ctx_0x609543e6e150.tracez",
+              "sha256": "223ba8c1a2aa4b3f1d4392b5bb36ea9b4c3b93e3754152b9da5e3655f5c1c72f"
+            },
+            {
+              "name": "kernel-3-ctx_0x609543e6e150.tracez",
+              "sha256": "6c9708be4d86a3866336a605fdf7f974334913bc5aadda68e72c970c1569c4dd"
+            },
+            {
+              "name": "kernel-4-ctx_0x609543e6e150.tracez",
+              "sha256": "2cd82e1ec30856802040b33ff37f59bb555da8493379349825a3ae4f971dba79"
+            },
+            {
+              "name": "kernel-5-ctx_0x609543e6e150.tracez",
+              "sha256": "f2f0cb3e8f4ec8a623e753f07615c470ce3a580b18b2f4ac098ec5fe30ff6039"
+            },
+            {
+              "name": "kernel-6-ctx_0x609543e6e150.tracez",
+              "sha256": "8ada4b5affd7c736ca816bb821d6ffb760ace6ba1b16110e4a6ec3424c3ed43b"
+            },
+            {
+              "name": "kernel-7-ctx_0x609543e6e150.tracez",
+              "sha256": "4f58719afce92e597ec82bee0beffb566cb0b9cf17130acfdce34e5dbb378a6a"
+            },
+            {
+              "name": "kernel-8-ctx_0x609543e6e150.tracez",
+              "sha256": "97d3879719db59628d20d898b50aca802de9c7052291ae7fa7b979ec27a45aed"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
+          "trace_manifest_sha256": "299fe5e792d5dae7fa6fd662117a462134155fd0597c569aad05a8ae959a784d"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "transformers.LlamaRMSNorm",
       "instructions": 5290064,
       "operator_artifact": "configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "3e9241ba12ecfbc00bae8b5cbeaafcfd6a77e464301f9454537c7b424cfbd6a3",
       "operator_latency_fs": 51886925795,
       "operator_type": "attention_norm",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/attention-norm-native-vram/qualification_record.json",
-      "qualification_record_sha256": "a3738b91bd51f396f44ef5c389ee8e7e01e62085e73871410506fc40a34c55a4",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/attention-norm-native-vram/qualification_record.json",
+      "qualification_record_sha256": "02a9341159b04f3e5313928d5acd29685e8e1f0a348e1af62fdf58e361e844d6",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.attention_norm",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15e/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
-      "trace_manifest_sha256": "64785c8ff333a2c0eae25af7ac47cd2427b2a6f9a7768b5806dbdd3c00e6228c"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
+      "trace_manifest_sha256": "299fe5e792d5dae7fa6fd662117a462134155fd0597c569aad05a8ae959a784d"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_trace.json",
       "contract_trace_manifest_sha256": "b7071dd41d6c9b1fedff652140b1e6f805187d851374096d142db9bc6f7d106c",
       "cycles": 34923,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 3,
+        "kernel_sequence_sha256": "6fa0630cd9ab18dd6313a778200b4ea8208168bda40cd2360911e69f27ff3aec",
+        "launch_contract_sha256": "b8d44b8a3fe248b759737445514f27ead00d40a17a088d2b196f9060ac126214",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "f9c4a889263aaf567face8e77758fef06f7d4afccc563f537dffd65b4f1b7669",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/causal_attention.json",
+          "native_measurement_sha256": "79bf77944c9b252f9d950677add42053d244b294d40943d098c5145df957bbdc",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x6177a3664af0.tracez",
+              "sha256": "08e5dd70c00c12c92d9b4770445bb6dba781719e916572d72ba09da5dec348e2"
+            },
+            {
+              "name": "kernel-2-ctx_0x6177a3664af0.tracez",
+              "sha256": "59afac5761799d004ca895d6360f24907fe1d7fbb6826cf47fa5f1be4aaab070"
+            },
+            {
+              "name": "kernel-3-ctx_0x6177a3664af0.tracez",
+              "sha256": "d7248f71106d6e791c6508aefa23f38fd39192e3c679e67b16dab1d46d718b44"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_trace.json",
+          "trace_manifest_sha256": "835bd1750016c6306646a63ee87311e9bf74181cdca4d2dffdc4c1a78edf1e4d"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "torch.scaled_dot_product_attention_causal",
       "instructions": 11962112,
       "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "a7f215765e0b1c7185f717f8db7a1dfda1e2d94e0282136a89c57175c7f87294",
       "operator_latency_fs": 30850706714,
       "operator_type": "causal_attention",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/causal-attention-native-vram/qualification_record.json",
-      "qualification_record_sha256": "6d780956c55a3efc977037a0e1a04450673d08c5f9db8f7ce14cd064d3a80c12",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/causal-attention-native-vram/qualification_record.json",
+      "qualification_record_sha256": "1ad011e60a404da6539cc68d295574f87e576bc294abadd1de9e40eb54d4893f",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.causal_attention",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_trace.json",
-      "trace_manifest_sha256": "b7071dd41d6c9b1fedff652140b1e6f805187d851374096d142db9bc6f7d106c"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_trace.json",
+      "trace_manifest_sha256": "835bd1750016c6306646a63ee87311e9bf74181cdca4d2dffdc4c1a78edf1e4d"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_down_projection_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_down_projection_sm86_trace.json",
       "contract_trace_manifest_sha256": "dfcd34a20ec4225008d842545996e06d7cb9526901c4299b6a67ea6371c8e5f0",
       "cycles": 103927,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "c313269c90f803bebb063508a96d7bef141b186119fbd13e91bc29dc10bd1dc4",
+        "launch_contract_sha256": "574d3622744644ee912da80260d806ed318baddac34ec254a243be2abad38200",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "b6de4f32310a0d783fe351f4dac9510365562d3b630103dbdf96b9a54ea72909",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/down_projection.json",
+          "native_measurement_sha256": "f0864e4e5e465d7f5565a34ecccfe28838b10bb3da100a92b7e4f7c2a71735eb",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x57edfed79050.tracez",
+              "sha256": "73142bbe89fb345957e568eb139259a430661326c1477ffcf31887158b861b9e"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_down_projection_sm86_trace.json",
+          "trace_manifest_sha256": "4a313490ca5f3afd9adc8a2e43ac11ed3e2efa3eabab9d4f3f33efb613a00124"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "transformers.LlamaMLP.down_proj",
       "instructions": 33361920,
       "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_down_projection_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "5c4c51e61411a148ce6f5ab5ac02e0843fdc0b4d7a5bef0ac58fa2f3d00f4a87",
       "operator_latency_fs": 91808303887,
       "operator_type": "down_projection",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/down-projection-native-vram/qualification_record.json",
-      "qualification_record_sha256": "ff0338ec463426203d66e7607020fb4e8413861f25ace77f20a9e6ab769a6be6",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/down-projection-native-vram/qualification_record.json",
+      "qualification_record_sha256": "7bfb2cabc7d05d060db0d4e5a43c27e308fccc82e6bdf93b2143a31362689ed9",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.down_projection",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_down_projection_sm86_trace.json",
-      "trace_manifest_sha256": "dfcd34a20ec4225008d842545996e06d7cb9526901c4299b6a67ea6371c8e5f0"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_down_projection_sm86_trace.json",
+      "trace_manifest_sha256": "4a313490ca5f3afd9adc8a2e43ac11ed3e2efa3eabab9d4f3f33efb613a00124"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_final_norm_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_final_norm_sm86_trace.json",
       "contract_trace_manifest_sha256": "0c64325f264de83afc2012aed97d2948805faacbdcd068c28e851bc476ab884e",
       "cycles": 49974,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 8,
+        "kernel_sequence_sha256": "d5ff853689c0557586097ee3dbff6268b6ef1b63134a70402b6c2c93f08bee03",
+        "launch_contract_sha256": "3dc40423a6ccec56656101cd651205755bdc241c33f4d05076d7d4bb392c941b",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "26129c8471ff331d77a74d62ebad481689653e56c95c97dfd66e18d8e40cd60b",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/final_norm.json",
+          "native_measurement_sha256": "d4bd8473a4ddb491b764ae18a270c8c95fdea74aefd525caec8a3325600d1807",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x60007bf529f0.tracez",
+              "sha256": "67df8ff227c9b71f81558d99fa12d92c888b556a58d8ca828d22e75b0535d1d1"
+            },
+            {
+              "name": "kernel-2-ctx_0x60007bf529f0.tracez",
+              "sha256": "69c0ef46abe713f6486d6f95c67693f77c4ab81166c1842c090611c963595fc7"
+            },
+            {
+              "name": "kernel-3-ctx_0x60007bf529f0.tracez",
+              "sha256": "85cec7a3b05d7229c299faed0ef8ea8453d6f3d4ed21ae9cb4d86e521b9df33d"
+            },
+            {
+              "name": "kernel-4-ctx_0x60007bf529f0.tracez",
+              "sha256": "c737b5962736183efe75913095e3da9dd48b29a0ed8e745983c961e3938f7dab"
+            },
+            {
+              "name": "kernel-5-ctx_0x60007bf529f0.tracez",
+              "sha256": "1680a4ec8e313bc137c739c2c2a3361facda96b7b07c003918729434195973c1"
+            },
+            {
+              "name": "kernel-6-ctx_0x60007bf529f0.tracez",
+              "sha256": "9de9356a0d77fdb4667b6cfdbeefafa1bd72f8c79d0e83d297c9b15997857b40"
+            },
+            {
+              "name": "kernel-7-ctx_0x60007bf529f0.tracez",
+              "sha256": "b643ee71f69395dcbd0a3a4ffe755d02a6d350fd71c14fd0dcc294a15c7f283a"
+            },
+            {
+              "name": "kernel-8-ctx_0x60007bf529f0.tracez",
+              "sha256": "b461c7db15943cba825d6b6579eadf77d176c65c251f39677d61302811e2ae09"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_final_norm_sm86_trace.json",
+          "trace_manifest_sha256": "36aa4e42a324355c459dbb8f91579a7c81cc4da38bd045d5ca931143fc38c2b2"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "transformers.LlamaRMSNorm.final_position_only",
       "instructions": 318253,
       "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_final_norm_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "8b77eeb62b23b921395c0daba752d79c3b55be8d2d9482a60d6577e06ee17a9c",
       "operator_latency_fs": 44146643110,
       "operator_type": "final_norm",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/final-norm-native-vram/qualification_record.json",
-      "qualification_record_sha256": "473926a456cfe7c77fabd72b18d4fc29ef283f7b8800adf0003f3ef279debfff",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/final-norm-native-vram/qualification_record.json",
+      "qualification_record_sha256": "f96a6c22392d7824bc1d02521873e16d6911399e06ed8e4b094d687bc2f1a84d",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.final_norm",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_final_norm_sm86_trace.json",
-      "trace_manifest_sha256": "0c64325f264de83afc2012aed97d2948805faacbdcd068c28e851bc476ab884e"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_final_norm_sm86_trace.json",
+      "trace_manifest_sha256": "36aa4e42a324355c459dbb8f91579a7c81cc4da38bd045d5ca931143fc38c2b2"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json",
       "contract_trace_manifest_sha256": "175aee51b44fcf430f3b057a4d90e1567ab13e96e0c16019f26ba719322a0826",
       "cycles": 183418,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 3,
+        "kernel_sequence_sha256": "fb6ec5ff15ce9f695a9eec2c03d292fab96562be6769f5f5eb46fbd5fc3a7e66",
+        "launch_contract_sha256": "4539a8a1bf9c71439625765b67576ab3adf4f7e2cb21299fe06b1777dd986cb7",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "8a1c7696fc5471a4599d57714a8eafb2b149a6e34bbdbd98d8b1b600b2a469a1",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/gate_up_projection.json",
+          "native_measurement_sha256": "99ead896904197ee54b767d55d6531646d13469adcaf0aca8119764524a7598d",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x61ae78b24ae0.tracez",
+              "sha256": "05504f15106008d00088e3e1007c6f86722aea07f8a12d62b8ef86f611bf37a7"
+            },
+            {
+              "name": "kernel-2-ctx_0x61ae78b24ae0.tracez",
+              "sha256": "80de993a67c658a1b6fb117f026063ffbff15238424d23b5e0bc8c1909d0d5c1"
+            },
+            {
+              "name": "kernel-3-ctx_0x61ae78b24ae0.tracez",
+              "sha256": "1c555d1e820d6af7490172f75b4f2325a0f83b39d1c7579f8c8375789fdb43f5"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json",
+          "trace_manifest_sha256": "03f83afdde364ef696073bae297661d4a119a9466856a7117aa5604674b6ea81"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "two_exact_checkpoint_linear_projections_plus_pack",
       "instructions": 86599740,
       "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "c599dbe1c55879bde5359e1ad0f49f76916ff17b84a34f7888dedea83e3ff81d",
       "operator_latency_fs": 162030035336,
       "operator_type": "gate_up_projection",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/gate-up-projection-native-vram/qualification_record.json",
-      "qualification_record_sha256": "95ae34d523c0094716bc14be477aff95310df10b83c14ae6e9c4772ebe84da32",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/gate-up-projection-native-vram/qualification_record.json",
+      "qualification_record_sha256": "b528669c2a34bcc7b2126bc297de4c1c8267f5a0a3769e3c87e625cf995f798a",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.gate_up_projection",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json",
-      "trace_manifest_sha256": "175aee51b44fcf430f3b057a4d90e1567ab13e96e0c16019f26ba719322a0826"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json",
+      "trace_manifest_sha256": "03f83afdde364ef696073bae297661d4a119a9466856a7117aa5604674b6ea81"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_lm_head_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_lm_head_sm86_trace.json",
       "contract_trace_manifest_sha256": "84864ab1255db96328fb2f9945e083690f11d639e9e0b64b3ca5c5eeed03ea57",
       "cycles": 382500,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "256fa85b36e8544bca0bb821d92b500aeea2d91a4c93e8dbb14bbca93e60aa18",
+        "launch_contract_sha256": "b24bb0572de02aa213ae0dca57732a188e5d76b1ab86e5332e7ed17e5c17fd2d",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "87f476ce62cb36895e03d47ed26892dafc0f059a1eef14b05d700110093c1f02",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/lm_head.json",
+          "native_measurement_sha256": "5273ca85d381336aebc76bc829e83a25cbd5ccc30c91df328518be5f7f892030",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5f4de1f174e0.tracez",
+              "sha256": "7bf2688a9734ef45a5ed4297e9b71cb7db98b38533e42730d2d02a3759d83d28"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_lm_head_sm86_trace.json",
+          "trace_manifest_sha256": "01eb8d54f42a09cede32f071f9887c108ba41892893fda2ab452a34435aac112"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "transformers.LlamaForCausalLM.lm_head.final_position_only",
       "instructions": 476608000,
       "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_lm_head_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "ac180bc99e8c19076e3f65205ae5a8d3a6f309bdad5382e31726351f2dd6444c",
       "operator_latency_fs": 337897526502,
       "operator_type": "lm_head",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/lm-head-native-vram/qualification_record.json",
-      "qualification_record_sha256": "3c5e091030646a3cd0be264655313b58df92dcf0a015548e8486b44f573277b5",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/lm-head-native-vram/qualification_record.json",
+      "qualification_record_sha256": "8ab6663621c17254db4d2a96349c6fefa0567a9f72badf53b70ebc512268238a",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.lm_head",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_lm_head_sm86_trace.json",
-      "trace_manifest_sha256": "84864ab1255db96328fb2f9945e083690f11d639e9e0b64b3ca5c5eeed03ea57"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_lm_head_sm86_trace.json",
+      "trace_manifest_sha256": "01eb8d54f42a09cede32f071f9887c108ba41892893fda2ab452a34435aac112"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_trace.json",
       "contract_trace_manifest_sha256": "dd112464cc0f8fb5cf61c78ac7b40911d4bff81a946769214e68702452459493",
       "cycles": 58736,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 8,
+        "kernel_sequence_sha256": "094299e86a37493619645251b7d098ffad341bc74f2a72bcfb3ccea5f2303b81",
+        "launch_contract_sha256": "e0e24f34471ce6c71d6d92ab54c5a732e181a1dc47d97e4c7bcbd8f404c95ea9",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "38b3b1319bcf1156ac04fde2238631e5d2cf6c668ad9df9a7980d8145f38d392",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/mlp_norm.json",
+          "native_measurement_sha256": "f46a67164f285d96da949f9d1dd9e28764e526c4262ca46f544a266ca2b78994",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "3557f4b16e2666baea904cde72a9690444d07d9f11f8b2954720742abf2556be"
+            },
+            {
+              "name": "kernel-2-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "a0bafbe7091951b70cafd6bd73db256f7caf77cbb4aaa6d2a21bf2064d1d4737"
+            },
+            {
+              "name": "kernel-3-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "01bbff60eeb75d83eb920c274f6328638385582deba7f66eca8ff1531322f6b1"
+            },
+            {
+              "name": "kernel-4-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "9e5c8795b4a1c66d4205c1298a92f152f2dde5444f58ceda644ce22224d1f2f4"
+            },
+            {
+              "name": "kernel-5-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "afae4235de7c6f34faf29504b64c65a3d2786a1510e01d84103a499a2e925084"
+            },
+            {
+              "name": "kernel-6-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "1bde275b5fcb4d9c79eab3dab447c01d5da1c9dc7984ec4bc8cd80cd020637a9"
+            },
+            {
+              "name": "kernel-7-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "a511448aa1931fa72920ddc2fe9263e1bcd7427050f66da4081a854486e6f28a"
+            },
+            {
+              "name": "kernel-8-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "ae6e8751f423bf00149aa7ed0e032b8c9088ad6cd819ef73c634cc5c64b82043"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_trace.json",
+          "trace_manifest_sha256": "e5092ad9c1d894c5a7dac05b0a5ed1e82eaea92189bb977a9fe80a2ba5296987"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "transformers.LlamaRMSNorm.post_attention_layernorm",
       "instructions": 5290064,
       "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "b1508a98cc6dcfcde446052a82b2aa81dd907ee4f7a2485b98c2d5d429225818",
       "operator_latency_fs": 51886925795,
       "operator_type": "mlp_norm",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/mlp-norm-native-vram/qualification_record.json",
-      "qualification_record_sha256": "f3cb337db07f612abb98f42bf00508bca26b4d1093f93297c471a44968c49f2c",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/mlp-norm-native-vram/qualification_record.json",
+      "qualification_record_sha256": "db5220a7da2d5d5fdb68be13537b38a3f0987a235abc0d837904781ac3c88e7f",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.mlp_norm",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_trace.json",
-      "trace_manifest_sha256": "dd112464cc0f8fb5cf61c78ac7b40911d4bff81a946769214e68702452459493"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_trace.json",
+      "trace_manifest_sha256": "e5092ad9c1d894c5a7dac05b0a5ed1e82eaea92189bb977a9fe80a2ba5296987"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_output_projection_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_output_projection_sm86_trace.json",
       "contract_trace_manifest_sha256": "c5e6b792d46415f7cda4a0b16f690d8d8250684fe4466f51db207df54fa52988",
       "cycles": 47809,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "2a854484d98ebf06afa21e9d4417d9bdf7043482401fc5844cffbcde1f0deab6",
+        "launch_contract_sha256": "93e45a8dc13d539e11fd9db1477c6f6b50527bdda6af2764cb3f5835f1bb14ca",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "bfbba469ef0b54d43869c49817749a421de6a5b6e33a7416262cb4a8853601f1",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/output_projection.json",
+          "native_measurement_sha256": "27a36589f4de440943ba2739997e1435e1eac198193c0e212ee3a9cce6538cfb",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x55d494230270.tracez",
+              "sha256": "950d357408005d281de062762b207d7247ea2e40e4f4a2292ade53b26edd0a32"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_output_projection_sm86_trace.json",
+          "trace_manifest_sha256": "15c872a29e40e43fa451db834efa81c48912e48a6df8f8d4815c6b97c5feb6db"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "transformers.LlamaAttention.o_proj",
       "instructions": 20140032,
       "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_output_projection_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "7c5e318e93aaceef9215eab63c82fdc3cc239747ce670afddc85a7f33ef5a225",
       "operator_latency_fs": 42234098940,
       "operator_type": "output_projection",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/output-projection-native-vram/qualification_record.json",
-      "qualification_record_sha256": "e9ad8ffa646f0ece427805b61a05d02cf055ed39e9f12898400d2aa89277121e",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/output-projection-native-vram/qualification_record.json",
+      "qualification_record_sha256": "9c4efa0fcc62b9b0ab3da19ea91e95c5013c17151c70312015ae7bbf077b5cf0",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.output_projection",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_output_projection_sm86_trace.json",
-      "trace_manifest_sha256": "c5e6b792d46415f7cda4a0b16f690d8d8250684fe4466f51db207df54fa52988"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_output_projection_sm86_trace.json",
+      "trace_manifest_sha256": "15c872a29e40e43fa451db834efa81c48912e48a6df8f8d4815c6b97c5feb6db"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
       "contract_trace_manifest_sha256": "f4c772e3b38e12120e5d0c40843ae36f5da8d336293fe03e485548314a85f97a",
       "cycles": 95151,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 6,
+        "kernel_sequence_sha256": "169aa8b688e9c20bc081d7257c7c22115f1dbc4e8ed02ced2043dd3a620380e7",
+        "launch_contract_sha256": "a5082a17ade2f6741ce08edda61fb373bf5b48b35cfca9b08c6f99946a74362c",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "e3ba604b29c6077d77445502a8d2f835d7c4e416c65c6f6ad7f2429c0ffb9a5f",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/qkv_projection.json",
+          "native_measurement_sha256": "3385e834bb59c4d089ae9f99fc098bab093c9898f31d3da217753410cd11d33c",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5e33718d5420.tracez",
+              "sha256": "1b8638832dedc3312cbeaa5c68baeaee8b341364422fd730a71fc01b85bf9e37"
+            },
+            {
+              "name": "kernel-2-ctx_0x5e33718d5420.tracez",
+              "sha256": "d115b89de4c677ddd70c468f672928ae28100d22d6a7c3ceb022c564af3345c7"
+            },
+            {
+              "name": "kernel-3-ctx_0x5e33718d5420.tracez",
+              "sha256": "a079e5d962317d5dfec241f880c5b44ae80cff4ebbcc733c958bee19a9e342b0"
+            },
+            {
+              "name": "kernel-4-ctx_0x5e33718d5420.tracez",
+              "sha256": "aff6ceef4d6ed990396ede651b105fef7b2855a65447bbc7e70d6ca444acda31"
+            },
+            {
+              "name": "kernel-5-ctx_0x5e33718d5420.tracez",
+              "sha256": "587318dbf220cdc2d8b8ea2f39dea47a83d335c3abcb06eb17a04da5208a8bb5"
+            },
+            {
+              "name": "kernel-6-ctx_0x5e33718d5420.tracez",
+              "sha256": "ea2c758b2705893a1c3aabf284270bd93c1d286017c12123e5c2847d00ec71f0"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
+          "trace_manifest_sha256": "6ff816e48d87b02b624f7cc2e0ac15f84c6250815c07c8ac7e56e8e2183835d3"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "three_exact_checkpoint_linear_projections_plus_pack",
       "instructions": 34943066,
       "operator_artifact": "configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "23684c39bfa9becf31a310e604610b02530a1963a795a4cdac32943db80df03b",
       "operator_latency_fs": 84055653710,
       "operator_type": "qkv_projection",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/qkv-projection-native-vram/qualification_record.json",
-      "qualification_record_sha256": "3cd36bb81dc794d0abacc11fd530af315edb7d7b17bb641f10c05847b832cc87",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/qkv-projection-native-vram/qualification_record.json",
+      "qualification_record_sha256": "f68b2f1f92f7ebac9b4dbc1012afec3f17c7cf851a9f8d69d9269cec61206b16",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.qkv_projection",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15f/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
-      "trace_manifest_sha256": "f4c772e3b38e12120e5d0c40843ae36f5da8d336293fe03e485548314a85f97a"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
+      "trace_manifest_sha256": "6ff816e48d87b02b624f7cc2e0ac15f84c6250815c07c8ac7e56e8e2183835d3"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json",
-      "contract_trace_manifest_sha256": "b5b419b9160f5e77b9e2221b72b89beff99636d4c1a0aabdb077c3cede9a7677",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json",
+      "contract_trace_manifest_sha256": "8ea1794bf7ea3544c834c322c85687f7ef3af486bf2a08ac379e5fc63cae0eb7",
       "cycles": 6188,
+      "execution_identity": {
+        "executable_sha256": "a6441fa163fde8cc33c3de08e6516a02296b6c0a0ca9cc6823977ad22acbdb24",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "390076d34ab2b3d51f8937a2f0ff8fae043a09fa1c61b753d796a6bedf433834",
+        "launch_contract_sha256": "a62cfacb1fd2d139afc8b29fe7afefd5df9d3ac5870fd0067747b6757e50b86d",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "3c8c4f8d4dec787576c9e1ad5dc3f55104e97bd465e569162a1a8381f29c16be",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/residual_add.json",
+          "native_measurement_sha256": "745668aaf8512060b0a1f4a2e1b2ac519d80c1afd515206b192f4416b54c7d2b",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": null,
+          "target_kind": "elf_binary",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5d77e7495a00.tracez",
+              "sha256": "922ba9f4f2cd4c8cff52624f6abba60d3b8acd5e659a77d6aa32357b60f9d497"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json",
+          "trace_manifest_sha256": "2bee184b9080bfe71bf47b22894999e56f1ff51eea2be7db092eebaa7aecf287"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "heterosim_cuda_reference_residual_add_v1",
       "instructions": 491520,
       "operator_artifact": "configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_residual_add_sm86_shared_hbdram_range_rebase.json",
-      "operator_artifact_sha256": "cadecc33d749e61968742082685bcaa393a9489f13656d5cc63490581ac52828",
+      "operator_artifact_sha256": "b6f5e403e4349851f4ce8f2e20266cb54a3660a39b8d17e20bd1e83c99bb8c4c",
       "operator_latency_fs": 5466431095,
       "operator_type": "residual_add",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/residual-add-native-vram/qualification_record.json",
-      "qualification_record_sha256": "63954426601368aa60eed911ed76b1199e1ff65d7c4a9ae2f8e553bc6fffbe1b",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/residual-add-native-vram/qualification_record.json",
+      "qualification_record_sha256": "db598d78105366c84aa66c96c94540f32845a351aa7ad7d30b463ef3dde5bae1",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.residual_add",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json",
-      "trace_manifest_sha256": "b5517219cc50365056a27d1f63bf57754b92bda806a9545eab2026f3d251fe7a"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json",
+      "trace_manifest_sha256": "2bee184b9080bfe71bf47b22894999e56f1ff51eea2be7db092eebaa7aecf287"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_rope_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_rope_sm86_trace.json",
       "contract_trace_manifest_sha256": "30946c351369e53d54558e1d164d75ece2091da05b2f4aec88ee2e93894b0064",
       "cycles": 127094,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 19,
+        "kernel_sequence_sha256": "293715b428f567928b0ecfe69ef730e18678c22bf51e8cb3a7f5c6a15282ac76",
+        "launch_contract_sha256": "da3b22982f821199dec9070a776ff427ddf518542d1305ec1990fb57e3272513",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "4f083de07c08842f7c5ab8bab965c02ce9ee41e561cd271f3a62cab99ca3daaf",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/rope.json",
+          "native_measurement_sha256": "9432bba18834a062ef01539e62d4dc1cc69e613cc5d26fe17d9ae406b512cae6",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5fd38bf35140.tracez",
+              "sha256": "63cae1c972519bdaf5ce662490c7a4b5654a3e372a5d045b1ea10624a4f02a15"
+            },
+            {
+              "name": "kernel-2-ctx_0x5fd38bf35140.tracez",
+              "sha256": "92f4a685d43429f5448c6648fbf2d718a3043989fb387f28a0e13a057258a93f"
+            },
+            {
+              "name": "kernel-3-ctx_0x5fd38bf35140.tracez",
+              "sha256": "40a301670d358c2395ca63b4fe6938eb25f933622b37183667cdc550f6fd9c65"
+            },
+            {
+              "name": "kernel-4-ctx_0x5fd38bf35140.tracez",
+              "sha256": "2fc33f3c01027981dfd91071f6e74d611a01d674214eefbbec4d2182404ab6e3"
+            },
+            {
+              "name": "kernel-5-ctx_0x5fd38bf35140.tracez",
+              "sha256": "fd15994524b4e902134d5b5ca7a325318a04cf29f51e0c1240f77ea52c26736b"
+            },
+            {
+              "name": "kernel-6-ctx_0x5fd38bf35140.tracez",
+              "sha256": "cc5f63fcc93b064cab2816ba2daa56b8dc9a8e94a64954e6e3cf23aed005ce4b"
+            },
+            {
+              "name": "kernel-7-ctx_0x5fd38bf35140.tracez",
+              "sha256": "1d42f6851bf618bcdd161394ece54cdc6fabb8537b1faf8e2664e1bf3a685b1b"
+            },
+            {
+              "name": "kernel-8-ctx_0x5fd38bf35140.tracez",
+              "sha256": "f5f15070c97438c44def0d88a72771f63759257266095b8da0c8f67157d9ffe2"
+            },
+            {
+              "name": "kernel-9-ctx_0x5fd38bf35140.tracez",
+              "sha256": "1fe146834fe631402e72950a9bbd13279a00ffa74b27b5c860662fa629dd3638"
+            },
+            {
+              "name": "kernel-10-ctx_0x5fd38bf35140.tracez",
+              "sha256": "4429718038c7d24b3576464111c05744f91e9c875015612e4948aaef322d0f3a"
+            },
+            {
+              "name": "kernel-11-ctx_0x5fd38bf35140.tracez",
+              "sha256": "cc5068d7be8b2974e680c758f01c46700c67f3237f6920aeb34b8443df1fb57d"
+            },
+            {
+              "name": "kernel-12-ctx_0x5fd38bf35140.tracez",
+              "sha256": "3d7e1769f24bfbfcdf98884443c960ad52f6d8d01c3334da597992bc5fa861b6"
+            },
+            {
+              "name": "kernel-13-ctx_0x5fd38bf35140.tracez",
+              "sha256": "1c30389cef2d80e9d1de1d9d8d37072c79d2775287063fc20ab30feaa1b7680f"
+            },
+            {
+              "name": "kernel-14-ctx_0x5fd38bf35140.tracez",
+              "sha256": "4de635f2a8f219f2c2e2d06962695fa4a3b1e958f0047403b3645e025bc204a2"
+            },
+            {
+              "name": "kernel-15-ctx_0x5fd38bf35140.tracez",
+              "sha256": "b4d8a018e0fcd172e232ee6c7c54edada5ffd6f473cb7ec00ba4724a02854cda"
+            },
+            {
+              "name": "kernel-16-ctx_0x5fd38bf35140.tracez",
+              "sha256": "72d2ed7e11e5310b9ad6a722e237e9fee1596ec7f6939ca103d5d4c8075898d6"
+            },
+            {
+              "name": "kernel-17-ctx_0x5fd38bf35140.tracez",
+              "sha256": "3e1c4de64f3c40f9096cb2050ae5dd1b8ccbffb1a969da85b664f9700bb42927"
+            },
+            {
+              "name": "kernel-18-ctx_0x5fd38bf35140.tracez",
+              "sha256": "a542b5ccb20ba2f77663934be00e4f7c3e4ead8b12a4b0bb308b00512fb3e3b4"
+            },
+            {
+              "name": "kernel-19-ctx_0x5fd38bf35140.tracez",
+              "sha256": "abc7b94b848767052df16e1c5401786e13a15a036416d3302534e7d9b14150d3"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_rope_sm86_trace.json",
+          "trace_manifest_sha256": "f2b6b0e7f7b2674b82b722567188679d5782c691275cec957b4a6cfbc74486bb"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "transformers.LlamaRotaryEmbedding_plus_apply_rotary_pos_emb",
       "instructions": 12589812,
       "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_rope_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "89c190e2a38fc4c289cc78c7ce03f772240339d36059c521bb09a9c1e10eb5fd",
       "operator_latency_fs": 112273851590,
       "operator_type": "rope",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/rope-native-vram/qualification_record.json",
-      "qualification_record_sha256": "5dc962060cf19e0d262d54ab7298ec4d81b8685c386f7863be9b7608b78bdcee",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/rope-native-vram/qualification_record.json",
+      "qualification_record_sha256": "afcd3cf67f8d1637dbd77bd0fefd79c2309fd72aea67923a06d931d3a01b2ee9",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.rope",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_rope_sm86_trace.json",
-      "trace_manifest_sha256": "30946c351369e53d54558e1d164d75ece2091da05b2f4aec88ee2e93894b0064"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_rope_sm86_trace.json",
+      "trace_manifest_sha256": "f2b6b0e7f7b2674b82b722567188679d5782c691275cec957b4a6cfbc74486bb"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_sampling_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_sampling_sm86_trace.json",
       "contract_trace_manifest_sha256": "a5a9c1aba62dccc1d379b6e5208dcf4ea78760ec95bb173ff5e42ab046b88795",
       "cycles": 20006,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "d121a98384a0da5e448a358ee4928cde0a82cfa9f490513c44a900a2c770f5c0",
+        "launch_contract_sha256": "d66076b54ea072045d5a39b7203ea2cc6150548c9b54bfb92801539b1db3daf3",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "6f82d9bf62fd38eda8bed851de75e76aca997dc8fff1a05aad552f426436eeb4",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/sampling.json",
+          "native_measurement_sha256": "9675d489306af72a0b388ea9a335e6c71b8197e3d83747437361e77e7e93e9a9",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5bea9ad39930.tracez",
+              "sha256": "fb49a64531cc8954629d10b412093f5a463435cba86039145cdafce642a12f79"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_sampling_sm86_trace.json",
+          "trace_manifest_sha256": "306314b522ace01e1a58d6fc9faa8e8ae8ab1d09be10e07f99ea72acca1aac8a"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "torch.argmax.greedy_sampling.final_position_only",
       "instructions": 704205,
       "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_sampling_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "82ebd59827a64621717a6bad66408328ddb3747681938a1e51a1964e081b3dff",
       "operator_latency_fs": 17673144876,
       "operator_type": "sampling",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/sampling-native-vram/qualification_record.json",
-      "qualification_record_sha256": "437787da877186f15238056a41a189a3825a838d915894fb5f39e5c3e90e277e",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/sampling-native-vram/qualification_record.json",
+      "qualification_record_sha256": "45d2ce3dd99f75f4608de9337604ffad58d9f4bbee72bd7787d714005932d33b",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q1.kv16.sampling",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_sampling_sm86_trace.json",
-      "trace_manifest_sha256": "a5a9c1aba62dccc1d379b6e5208dcf4ea78760ec95bb173ff5e42ab046b88795"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_sampling_sm86_trace.json",
+      "trace_manifest_sha256": "306314b522ace01e1a58d6fc9faa8e8ae8ab1d09be10e07f99ea72acca1aac8a"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_trace.json",
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_trace.json",
       "contract_trace_manifest_sha256": "56c47c4416e43d5a3f642fc7094a45b8c74f103ba3ee62710aaddcd685ffd2bc",
       "cycles": 13357,
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 2,
+        "kernel_sequence_sha256": "5dee548d9cd611e84354ed008787cd9c8815f7c11dc6e831fc5738cabd8cfbf4",
+        "launch_contract_sha256": "5e583904e7df74c69fa2d07507387ff943a74bc00ec9c85c259f98309ff2f589",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "06931421304f95d40f5f6d661aa801ab7c8db20bb5404d16da5065a2379b13a7",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/silu_multiply.json",
+          "native_measurement_sha256": "dfccb8337fbb1bbe8253827e2e2398ef8513c5435dc7aa9080bbc8e6a65b8b93",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5ce9f7d6c1c0.tracez",
+              "sha256": "3736233cb56c17f8bab7e0b150bc99bbac838554c679811f346683c790d09a7a"
+            },
+            {
+              "name": "kernel-2-ctx_0x5ce9f7d6c1c0.tracez",
+              "sha256": "f7203090c3a78872fae8b4f1c8d6655cd0b79138e80bc3c4c1c22c145b75163b"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_trace.json",
+          "trace_manifest_sha256": "21477c608ce5d9e5291c014be3d238044044dfb311abdecece31e41101f3c747"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "torch.nn.functional.silu_times_up_projection",
       "instructions": 3020750,
       "operator_artifact": "configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_shared_hbdram_range_rebase.json",
       "operator_artifact_sha256": "5f9fe854f173a56dd75653c8160820e4be0fef0c47a0867634ed5c4849de5afb",
       "operator_latency_fs": 11799469965,
       "operator_type": "silu_multiply",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/silu-multiply-native-vram/qualification_record.json",
-      "qualification_record_sha256": "4ca925eb3b52dac228e9c27b835b9969feacfea92c40151050fbd8c87ab4f752",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/silu-multiply-native-vram/qualification_record.json",
+      "qualification_record_sha256": "15fa99cc35afc9ad922d9199656fb1d91ba3698f52f27b5da362fcb3c0f0e80f",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.silu_multiply",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_trace.json",
-      "trace_manifest_sha256": "56c47c4416e43d5a3f642fc7094a45b8c74f103ba3ee62710aaddcd685ffd2bc"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_trace.json",
+      "trace_manifest_sha256": "21477c608ce5d9e5291c014be3d238044044dfb311abdecece31e41101f3c747"
     },
     {
-      "contract_trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json",
-      "contract_trace_manifest_sha256": "96e8d7e820e862e03937b166edadd45e25c4af194b0ba3a2aa38cf4e51c88037",
-      "cycles": 7229,
+      "contract_trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json",
+      "contract_trace_manifest_sha256": "2d1a2c1545bae6d601ba49876f969a0834a86f5337d48b5abf40849ce92a9e25",
+      "cycles": 7247,
+      "execution_identity": {
+        "executable_sha256": "a6441fa163fde8cc33c3de08e6516a02296b6c0a0ca9cc6823977ad22acbdb24",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "48642a6d30837de2eaa955aca476f33bf0c5d9de74eb82260c1765190dad600e",
+        "launch_contract_sha256": "0a877f58f660f8ea2f3753211194b44e05e430e15ea36c332bfd838d12536e47",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "0d1225afaaa6e28b3c1f1a3e595f430f8c4d237088c525cf8dfa57633f252def",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/token_embedding.json",
+          "native_measurement_sha256": "336ab72459b1a8ac8d810257338aa004d04091f5468884c4e7e347c557cd8dfe",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": null,
+          "target_kind": "elf_binary",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5d90a26fca00.tracez",
+              "sha256": "46260e23da0e70400698dc87c9ae9254dcacd06fff71d1112d1cc45401bfa163"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json",
+          "trace_manifest_sha256": "a5220699eab0168248aa6664958e726651cc2968bb3939a0ae260aab1671596b"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "heterosim_cuda_reference_token_embedding_v1",
       "instructions": 851968,
       "operator_artifact": "configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_shared_hbdram_range_rebase.json",
-      "operator_artifact_sha256": "7ba140dcb244c6a1a75804de0e0abfad6a70504517c5c12782099f3f4a06fbf0",
-      "operator_latency_fs": 6386042403,
+      "operator_artifact_sha256": "e82becf47873c1f0cf9b84ff3de35460a5a9ade5562739d3fd8bd8741ce7b6c0",
+      "operator_latency_fs": 6401943463,
       "operator_type": "token_embedding",
-      "qualification_record": "/opt/gpu-atlas/qualification/p17-native-vram/token-embedding-native-vram/qualification_record.json",
-      "qualification_record_sha256": "bc35eee8bfcd44cac8748d60b0fa88943efbae430157b57d8e825fd78bf8fb69",
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p17/native_vram_qualification/token-embedding-native-vram/qualification_record.json",
+      "qualification_record_sha256": "0cdc256add0c8ae158f0aee6c63ae37318c727984fd075dc305eb963986bf6a5",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.token_embedding",
       "source_status": "passed_native_vram_double_run",
-      "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json",
-      "trace_manifest_sha256": "4e152fb368c3e58c6a8c4de51d78943a1cc9fd92c9a971e6c12d26013241fcb3"
+      "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json",
+      "trace_manifest_sha256": "a5220699eab0168248aa6664958e726651cc2968bb3939a0ae260aab1671596b"
     }
   ],
   "performance_qualification": {

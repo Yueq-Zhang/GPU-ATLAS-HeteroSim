@@ -14,7 +14,10 @@ from __future__ import annotations
 
 import argparse
 import ctypes
+import hashlib
 import json
+import math
+import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -22,6 +25,7 @@ from typing import Any
 
 import torch
 import torch.nn.functional as F
+import transformers
 from transformers import AutoModelForCausalLM
 from transformers.models.llama.modeling_llama import apply_rotary_pos_emb, repeat_kv
 
@@ -72,7 +76,83 @@ def _arguments() -> argparse.Namespace:
     parser.add_argument("--driver-profiler", action="store_true")
     parser.add_argument("--capture-allocator-history", action="store_true")
     parser.add_argument("--warmup", type=int, default=0)
+    parser.add_argument("--iterations", type=int, default=500)
+    parser.add_argument("--native-measurement-output", type=Path)
     return parser.parse_args()
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _canonical_sha256(value: object) -> str:
+    encoded = json.dumps(
+        value, ensure_ascii=True, separators=(",", ":"), sort_keys=True
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _launch_program_identity() -> tuple[str, dict[str, object]]:
+    python_executable = Path(sys.executable).resolve()
+    workload_source = Path(__file__).resolve()
+    torch_extension = Path(torch._C.__file__).resolve()
+    components: dict[str, object] = {
+        "program_kind": "python_pytorch_launch_program",
+        "python_executable": str(python_executable),
+        "python_executable_sha256": _file_sha256(python_executable),
+        "workload_source": str(workload_source),
+        "workload_source_sha256": _file_sha256(workload_source),
+        "torch_extension": str(torch_extension),
+        "torch_extension_sha256": _file_sha256(torch_extension),
+        "python_version": sys.version.split()[0],
+        "pytorch": torch.__version__,
+        "transformers": transformers.__version__,
+        "cuda_runtime": torch.version.cuda,
+    }
+    return _canonical_sha256(components), components
+
+
+def _measurement_summary(values_fs: list[float]) -> dict[str, int]:
+    if not values_fs:
+        raise ValueError("native measurement requires at least one sample")
+    ordered = sorted(values_fs)
+
+    def percentile(fraction: float) -> int:
+        return round(ordered[round(fraction * (len(ordered) - 1))])
+
+    return {
+        "min_fs": round(ordered[0]),
+        "p10_fs": percentile(0.10),
+        "median_fs": percentile(0.50),
+        "p90_fs": percentile(0.90),
+        "max_fs": round(ordered[-1]),
+        "mean_fs": round(math.fsum(ordered) / len(ordered)),
+    }
+
+
+def _measure_native(
+    target: Target,
+    warmup: int,
+    iterations: int,
+) -> dict[str, int]:
+    for _ in range(warmup):
+        target.run()
+    torch.cuda.synchronize()
+    start = torch.cuda.Event(enable_timing=True)
+    stop = torch.cuda.Event(enable_timing=True)
+    values_fs: list[float] = []
+    for _ in range(iterations):
+        start.record()
+        outputs = target.run()
+        stop.record()
+        stop.synchronize()
+        values_fs.append(float(start.elapsed_time(stop)) * 1.0e12)
+    del outputs
+    return _measurement_summary(values_fs)
 
 
 def _host_random(shape: tuple[int, ...], seed: int) -> torch.Tensor:
@@ -401,6 +481,14 @@ def main() -> None:
         raise ValueError("context and batch-size must be positive")
     if args.warmup < 0:
         raise ValueError("warmup must be unsigned")
+    if args.iterations <= 0:
+        raise ValueError("iterations must be positive")
+    if args.native_measurement_output and (
+        args.driver_profiler or args.capture_allocator_history
+    ):
+        raise ValueError(
+            "native measurement cannot enable profiler or allocator capture"
+        )
 
     if args.operator in LIGHTWEIGHT_OPERATORS:
         target = _lightweight_target(
@@ -413,6 +501,64 @@ def main() -> None:
             dtype=torch.float16,
         ).cuda().eval()
         target = _target(args.operator, model, args.context, args.batch_size)
+
+    revision_path = args.model.parent.parent / "refs" / "main"
+    revision = revision_path.read_text(encoding="utf-8").strip()
+    if args.native_measurement_output:
+        with torch.inference_mode():
+            summary = _measure_native(target, args.warmup, args.iterations)
+        device = torch.cuda.get_device_properties(torch.cuda.current_device())
+        target_sm = device.major * 10 + device.minor
+        launch_program_sha256, program_components = _launch_program_identity()
+        measurement = {
+            "schema_version": "hetero-p17-sealed-native-pytorch-operator/v1",
+            "model_spec_name": "TinyLlama-1.1B",
+            "checkpoint_revision": revision,
+            "operator_type": args.operator,
+            "implementation": target.implementation,
+            "phase": "prefill",
+            "batch_size": args.batch_size,
+            "context_length": args.context,
+            "q_len": (
+                1 if args.operator in FINAL_POSITION_OPERATORS else args.context
+            ),
+            "dtype": "fp16",
+            "device": {
+                "name": device.name,
+                "compute_capability": f"{device.major}.{device.minor}",
+                "multiprocessors": device.multi_processor_count,
+                "global_memory_bytes": device.total_memory,
+            },
+            "software": {
+                "python": sys.version.split()[0],
+                "pytorch": torch.__version__,
+                "transformers": transformers.__version__,
+                "cuda_runtime": torch.version.cuda,
+            },
+            "protocol": {
+                "warmup_iterations": args.warmup,
+                "measured_iterations": args.iterations,
+                "timer": "cuda_event_per_iteration",
+                "synchronization": "stop_event_synchronize_each_iteration",
+                "statistic": "median",
+            },
+            "launch": {
+                "program_kind": "python_pytorch_launch_program",
+                "launch_program_sha256": launch_program_sha256,
+                "target_sm": target_sm,
+                "program_components": program_components,
+            },
+            "measurement": summary,
+            "measurement_scope": "native_rtx3070_local_vram",
+            "performance_eligible": False,
+        }
+        rendered = json.dumps(measurement, indent=2, sort_keys=True)
+        args.native_measurement_output.parent.mkdir(parents=True, exist_ok=True)
+        args.native_measurement_output.write_text(
+            rendered + "\n", encoding="utf-8"
+        )
+        print(rendered)
+        return
     profiler = ctypes.CDLL("libcuda.so.1") if args.driver_profiler else None
 
     with torch.inference_mode():
@@ -467,8 +613,7 @@ def main() -> None:
         )
         allocator_ranges = merge_address_ranges((*event_ranges, *backing_segments))
 
-    revision_path = args.model.parent.parent / "refs" / "main"
-    revision = revision_path.read_text(encoding="utf-8").strip()
+    launch_program_sha256, program_components = _launch_program_identity()
     metadata = {
         "schema_version": "heterosim-exact-llm-operator/v2",
         "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
@@ -491,6 +636,11 @@ def main() -> None:
                 torch.cuda.get_device_capability()[0] * 10
                 + torch.cuda.get_device_capability()[1]
             ),
+            "launch_program": {
+                "kind": "python_pytorch_launch_program",
+                "sha256": launch_program_sha256,
+                "components": program_components,
+            },
         },
         "warmup_iterations": args.warmup,
         "capture_selector": (

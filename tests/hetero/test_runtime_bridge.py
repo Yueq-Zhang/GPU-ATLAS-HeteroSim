@@ -32,6 +32,96 @@ def test_cpp_scheduler_matches_frozen_epoch_table() -> None:
         [("R2", "prefill", 2, 1)],
         [("R2", "decode", 3, 1)],
     ]
+    assert result["epochs"][0]["admitted_request_ids"] == ["R0", "R1"]
+    assert result["epochs"][0]["retired_request_ids"] == ["R1"]
+
+
+def test_cpp_scheduler_re_admits_after_kv_capacity_is_released() -> None:
+    result = simulate_token_barrier(
+        [
+            {
+                "request_id": "K0",
+                "arrival_time_fs": 0,
+                "prompt_length": 1,
+                "output_length": 1,
+                "kv_reservation_bytes": 64,
+            },
+            {
+                "request_id": "K1",
+                "arrival_time_fs": 0,
+                "prompt_length": 1,
+                "output_length": 1,
+                "kv_reservation_bytes": 64,
+            },
+        ],
+        {
+            "max_num_sequences": 2,
+            "max_batched_tokens": 2,
+            "prefill_chunk_tokens": 1,
+            "max_prefill_wait_epochs": 8,
+            "epoch_duration_fs": 1000,
+            "kv_capacity_bytes": 64,
+        },
+    )
+    assert [epoch["admitted_request_ids"] for epoch in result["epochs"]] == [
+        ["K0"],
+        ["K1"],
+    ]
+
+
+def test_cpp_scheduler_applies_eos_max_length_and_barrier_cancellation() -> None:
+    result = simulate_token_barrier(
+        [
+            {
+                "request_id": "E",
+                "prompt_length": 1,
+                "output_length": 8,
+                "execution_scope": "decode_loop",
+                "initial_kv_length": 16,
+                "kv_reservation_bytes": 64,
+                "eos_after_generated_tokens": 2,
+            },
+            {
+                "request_id": "M",
+                "prompt_length": 1,
+                "output_length": 8,
+                "execution_scope": "decode_loop",
+                "initial_kv_length": 16,
+                "kv_reservation_bytes": 64,
+                "max_output_tokens": 3,
+            },
+            {
+                "request_id": "C",
+                "prompt_length": 1,
+                "output_length": 8,
+                "execution_scope": "decode_loop",
+                "initial_kv_length": 16,
+                "kv_reservation_bytes": 64,
+                "cancel_time_fs": 1000,
+            },
+        ],
+        {
+            "max_num_sequences": 3,
+            "max_batched_tokens": 3,
+            "prefill_chunk_tokens": 1,
+            "epoch_duration_fs": 1000,
+            "kv_capacity_bytes": 192,
+        },
+    )
+    by_id = {item["request_id"]: item for item in result["requests"]}
+    assert (by_id["E"]["generated_length"], by_id["E"]["termination_reason"]) == (
+        2,
+        "eos",
+    )
+    assert (by_id["M"]["generated_length"], by_id["M"]["termination_reason"]) == (
+        3,
+        "max_length",
+    )
+    assert (by_id["C"]["generated_length"], by_id["C"]["termination_reason"]) == (
+        1,
+        "cancelled",
+    )
+    assert result["epochs"][1]["cancelled_request_ids"] == ["C"]
 
 
 def test_cpp_paged_kv_matches_tiny_golden_values() -> None:

@@ -251,6 +251,91 @@ def test_gpu_artifact_builder_includes_observed_opaque_workspaces(
     assert loaded.payload["address_contract"]["capture_allocator_coverage"] == (
         "target_window_pytorch_allocator_plus_tensor_segments"
     )
+    trace_payload = json.loads(manifest.read_text(encoding="utf-8"))
+    assert trace_payload["kernels_list"] == "kernelslist.g"
+    assert all(
+        not Path(str(item["path"])).is_absolute()
+        for item in loaded.payload["files"]
+    )
+
+
+def test_gpu_artifact_builder_preserves_decode_shape_and_sm89(
+    tmp_path: Path,
+) -> None:
+    metadata = tmp_path / "decode_metadata.json"
+    metadata.write_text(
+        json.dumps(
+            {
+                "schema_version": "heterosim-exact-llm-operator/v2",
+                "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+                "model_spec_name": "TinyLlama-1.1B",
+                "revision": "fe8a4e",
+                "operator": "causal_attention",
+                "phase": "decode_step",
+                "layer_id": 0,
+                "batch_size": 1,
+                "context_length": 16,
+                "q_len": 1,
+                "kv_length": 19,
+                "dtype": "fp16",
+                "implementation": "unit_test_decode_attention",
+                "scope": "one_exact_decode_shape_locked_operator_not_end_to_end",
+                "compilation": {"target_sm": 89},
+                "tensors": [
+                    {
+                        "tensor_id": "decode.query",
+                        "role": "input",
+                        "address": 0x2000,
+                        "size_bytes": 128,
+                        "shape": [1, 1, 1, 64],
+                        "strides": [64, 64, 64, 1],
+                        "dtype": "float16",
+                        "layout": "strided",
+                        "alignment_bytes": 256,
+                    }
+                ],
+                "capture_allocator": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    trace = tmp_path / "decode.tracez"
+    trace.write_bytes(b"trace")
+    kernels = tmp_path / "kernelslist.g"
+    kernels.write_text(trace.name + "\n", encoding="utf-8")
+    artifact = tmp_path / "decode_artifact.json"
+    trace_manifest = tmp_path / "decode_trace_manifest.json"
+    project_root = Path(__file__).resolve().parents[2]
+    subprocess.run(
+        [
+            sys.executable,
+            str(project_root / "scripts" / "build_gpu_operator_artifact.py"),
+            "--metadata",
+            str(metadata),
+            "--kernels-list",
+            str(kernels),
+            "--output",
+            str(artifact),
+            "--trace-manifest-output",
+            str(trace_manifest),
+            "--gpu",
+            "NVIDIA GeForce RTX 4090",
+            "--target-sm",
+            "89",
+        ],
+        cwd=project_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    payload = json.loads(artifact.read_text(encoding="utf-8"))
+    assert payload["artifact_id"] == (
+        "tinyllama.1_1b.layer0.causal_attention."
+        "decode_step.bs1.ctx16.q1.kv19.fp16.sm89.accel_sim_v2"
+    )
+    assert payload["backend"]["target_sm"] == 89
+    assert payload["source_contract"]["kv_length"] == 19
+    assert json.loads(trace_manifest.read_text())["compilation"]["target_sm"] == 89
 
 
 def test_catalog_reports_registration_separately_from_cycle_readiness(
@@ -388,6 +473,13 @@ def test_coupled_artifact_builder_preserves_global_pa_gate(tmp_path: Path) -> No
     assert artifact.request_cycle_ready is False
     execution = artifact.payload["execution_contract"]
     assert execution["global_pa_binding_ready"] is False
+    assert artifact.payload["qualification"]["qualification_record"] == (
+        "qualification.json"
+    )
+    assert all(
+        not Path(str(item["path"])).is_absolute()
+        for item in artifact.payload["files"]
+    )
 
 
 def test_coupled_artifact_builder_promotes_qualified_range_rebase(

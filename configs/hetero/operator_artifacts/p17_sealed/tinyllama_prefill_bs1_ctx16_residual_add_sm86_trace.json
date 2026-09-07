@@ -6,11 +6,15 @@
       "capture_allocation_id": "tinyllama.layer0.residual_add.input.capture0",
       "capture_epoch": 0,
       "layout": "strided",
-      "shape": [1, 16, 2048],
+      "shape": [
+        1,
+        16,
+        2048
+      ],
       "size_bytes": 65536,
       "tensor_id": "tinyllama.layer0.residual_add.input",
       "tensor_offset_bytes": 0,
-      "trace_base": 126654917640192,
+      "trace_base": 47286583296,
       "view_offset_bytes": 0
     },
     {
@@ -19,11 +23,15 @@
       "capture_allocation_id": "tinyllama.layer0.residual_add.residual.capture0",
       "capture_epoch": 0,
       "layout": "strided",
-      "shape": [1, 16, 2048],
+      "shape": [
+        1,
+        16,
+        2048
+      ],
       "size_bytes": 65536,
       "tensor_id": "tinyllama.layer0.residual_add.residual",
       "tensor_offset_bytes": 0,
-      "trace_base": 126654917705728,
+      "trace_base": 47286648832,
       "view_offset_bytes": 0
     },
     {
@@ -32,11 +40,15 @@
       "capture_allocation_id": "tinyllama.layer0.residual_add.output.capture0",
       "capture_epoch": 0,
       "layout": "strided",
-      "shape": [1, 16, 2048],
+      "shape": [
+        1,
+        16,
+        2048
+      ],
       "size_bytes": 65536,
       "tensor_id": "tinyllama.layer0.residual_add.output",
       "tensor_offset_bytes": 0,
-      "trace_base": 126654917771264,
+      "trace_base": 47286714368,
       "view_offset_bytes": 0
     }
   ],
@@ -53,7 +65,7 @@
       "kv_length": 16,
       "q_len": 16
     },
-    "source": "P17 sealed SM86 cubin capture",
+    "source": "P15 shape-locked operator capture",
     "tool": "NVBit",
     "version": "1.8"
   },
@@ -64,7 +76,7 @@
     "implementation": "heterosim_cuda_reference_residual_add_v1",
     "target_sm": 86
   },
-  "kernels_list": "/opt/gpu-atlas/qualification/p17-simple-sm86-sealed/tinyllama-prefill-bs1-ctx16-residual-add/traces/kernelslist.g",
+  "kernels_list": "evidence/local_rtx3070_same_binary_v1/residual_add/traces/kernelslist.g",
   "qualification_record": null,
   "replay_safe": false,
   "schema_version": "hetero-trace-manifest/v1",

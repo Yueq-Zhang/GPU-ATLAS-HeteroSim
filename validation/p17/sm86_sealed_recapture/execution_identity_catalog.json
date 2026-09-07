@@ -1,0 +1,799 @@
+{
+  "catalog_id": "p17.sm86.sealed.same_binary.trace_execution_identity",
+  "claim_boundary": {
+    "reason": "sealed Trace and native RTX 3070 measurements use the same executable",
+    "same_binary_native_pairing_complete": true
+  },
+  "operator_count": 14,
+  "operators": [
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 8,
+        "kernel_sequence_sha256": "094299e86a37493619645251b7d098ffad341bc74f2a72bcfb3ccea5f2303b81",
+        "launch_contract_sha256": "0da56fb17c55fa1f0beb6dc077e3e3d1ae6863c2f1fba79161a41949852f0bd2",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "da1bf3c2f0a14cd200bab81f8415c7b47c684b6c23ef6e07d5edcceacc010f8a",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/attention_norm.json",
+          "native_measurement_sha256": "048efa98c0d8e1b558700e67efdb7e1a5c5ea28e1ca92bc8ae694efa54a8d86a",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x609543e6e150.tracez",
+              "sha256": "0cee87aece9414dd87eb0486c846b2a0664f906056aac650ef733283e9e82cf8"
+            },
+            {
+              "name": "kernel-2-ctx_0x609543e6e150.tracez",
+              "sha256": "223ba8c1a2aa4b3f1d4392b5bb36ea9b4c3b93e3754152b9da5e3655f5c1c72f"
+            },
+            {
+              "name": "kernel-3-ctx_0x609543e6e150.tracez",
+              "sha256": "6c9708be4d86a3866336a605fdf7f974334913bc5aadda68e72c970c1569c4dd"
+            },
+            {
+              "name": "kernel-4-ctx_0x609543e6e150.tracez",
+              "sha256": "2cd82e1ec30856802040b33ff37f59bb555da8493379349825a3ae4f971dba79"
+            },
+            {
+              "name": "kernel-5-ctx_0x609543e6e150.tracez",
+              "sha256": "f2f0cb3e8f4ec8a623e753f07615c470ce3a580b18b2f4ac098ec5fe30ff6039"
+            },
+            {
+              "name": "kernel-6-ctx_0x609543e6e150.tracez",
+              "sha256": "8ada4b5affd7c736ca816bb821d6ffb760ace6ba1b16110e4a6ec3424c3ed43b"
+            },
+            {
+              "name": "kernel-7-ctx_0x609543e6e150.tracez",
+              "sha256": "4f58719afce92e597ec82bee0beffb566cb0b9cf17130acfdce34e5dbb378a6a"
+            },
+            {
+              "name": "kernel-8-ctx_0x609543e6e150.tracez",
+              "sha256": "97d3879719db59628d20d898b50aca802de9c7052291ae7fa7b979ec27a45aed"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_attention_norm_sm86_trace.json",
+          "trace_manifest_sha256": "299fe5e792d5dae7fa6fd662117a462134155fd0597c569aad05a8ae959a784d"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "attention_norm"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 3,
+        "kernel_sequence_sha256": "6fa0630cd9ab18dd6313a778200b4ea8208168bda40cd2360911e69f27ff3aec",
+        "launch_contract_sha256": "b8d44b8a3fe248b759737445514f27ead00d40a17a088d2b196f9060ac126214",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "f9c4a889263aaf567face8e77758fef06f7d4afccc563f537dffd65b4f1b7669",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/causal_attention.json",
+          "native_measurement_sha256": "79bf77944c9b252f9d950677add42053d244b294d40943d098c5145df957bbdc",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x6177a3664af0.tracez",
+              "sha256": "08e5dd70c00c12c92d9b4770445bb6dba781719e916572d72ba09da5dec348e2"
+            },
+            {
+              "name": "kernel-2-ctx_0x6177a3664af0.tracez",
+              "sha256": "59afac5761799d004ca895d6360f24907fe1d7fbb6826cf47fa5f1be4aaab070"
+            },
+            {
+              "name": "kernel-3-ctx_0x6177a3664af0.tracez",
+              "sha256": "d7248f71106d6e791c6508aefa23f38fd39192e3c679e67b16dab1d46d718b44"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_causal_attention_sm86_trace.json",
+          "trace_manifest_sha256": "835bd1750016c6306646a63ee87311e9bf74181cdca4d2dffdc4c1a78edf1e4d"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "causal_attention"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "c313269c90f803bebb063508a96d7bef141b186119fbd13e91bc29dc10bd1dc4",
+        "launch_contract_sha256": "574d3622744644ee912da80260d806ed318baddac34ec254a243be2abad38200",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "b6de4f32310a0d783fe351f4dac9510365562d3b630103dbdf96b9a54ea72909",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/down_projection.json",
+          "native_measurement_sha256": "f0864e4e5e465d7f5565a34ecccfe28838b10bb3da100a92b7e4f7c2a71735eb",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x57edfed79050.tracez",
+              "sha256": "73142bbe89fb345957e568eb139259a430661326c1477ffcf31887158b861b9e"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_down_projection_sm86_trace.json",
+          "trace_manifest_sha256": "4a313490ca5f3afd9adc8a2e43ac11ed3e2efa3eabab9d4f3f33efb613a00124"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "down_projection"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 8,
+        "kernel_sequence_sha256": "d5ff853689c0557586097ee3dbff6268b6ef1b63134a70402b6c2c93f08bee03",
+        "launch_contract_sha256": "3dc40423a6ccec56656101cd651205755bdc241c33f4d05076d7d4bb392c941b",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "26129c8471ff331d77a74d62ebad481689653e56c95c97dfd66e18d8e40cd60b",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/final_norm.json",
+          "native_measurement_sha256": "d4bd8473a4ddb491b764ae18a270c8c95fdea74aefd525caec8a3325600d1807",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x60007bf529f0.tracez",
+              "sha256": "67df8ff227c9b71f81558d99fa12d92c888b556a58d8ca828d22e75b0535d1d1"
+            },
+            {
+              "name": "kernel-2-ctx_0x60007bf529f0.tracez",
+              "sha256": "69c0ef46abe713f6486d6f95c67693f77c4ab81166c1842c090611c963595fc7"
+            },
+            {
+              "name": "kernel-3-ctx_0x60007bf529f0.tracez",
+              "sha256": "85cec7a3b05d7229c299faed0ef8ea8453d6f3d4ed21ae9cb4d86e521b9df33d"
+            },
+            {
+              "name": "kernel-4-ctx_0x60007bf529f0.tracez",
+              "sha256": "c737b5962736183efe75913095e3da9dd48b29a0ed8e745983c961e3938f7dab"
+            },
+            {
+              "name": "kernel-5-ctx_0x60007bf529f0.tracez",
+              "sha256": "1680a4ec8e313bc137c739c2c2a3361facda96b7b07c003918729434195973c1"
+            },
+            {
+              "name": "kernel-6-ctx_0x60007bf529f0.tracez",
+              "sha256": "9de9356a0d77fdb4667b6cfdbeefafa1bd72f8c79d0e83d297c9b15997857b40"
+            },
+            {
+              "name": "kernel-7-ctx_0x60007bf529f0.tracez",
+              "sha256": "b643ee71f69395dcbd0a3a4ffe755d02a6d350fd71c14fd0dcc294a15c7f283a"
+            },
+            {
+              "name": "kernel-8-ctx_0x60007bf529f0.tracez",
+              "sha256": "b461c7db15943cba825d6b6579eadf77d176c65c251f39677d61302811e2ae09"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_final_norm_sm86_trace.json",
+          "trace_manifest_sha256": "36aa4e42a324355c459dbb8f91579a7c81cc4da38bd045d5ca931143fc38c2b2"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "final_norm"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 3,
+        "kernel_sequence_sha256": "fb6ec5ff15ce9f695a9eec2c03d292fab96562be6769f5f5eb46fbd5fc3a7e66",
+        "launch_contract_sha256": "4539a8a1bf9c71439625765b67576ab3adf4f7e2cb21299fe06b1777dd986cb7",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "8a1c7696fc5471a4599d57714a8eafb2b149a6e34bbdbd98d8b1b600b2a469a1",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/gate_up_projection.json",
+          "native_measurement_sha256": "99ead896904197ee54b767d55d6531646d13469adcaf0aca8119764524a7598d",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x61ae78b24ae0.tracez",
+              "sha256": "05504f15106008d00088e3e1007c6f86722aea07f8a12d62b8ef86f611bf37a7"
+            },
+            {
+              "name": "kernel-2-ctx_0x61ae78b24ae0.tracez",
+              "sha256": "80de993a67c658a1b6fb117f026063ffbff15238424d23b5e0bc8c1909d0d5c1"
+            },
+            {
+              "name": "kernel-3-ctx_0x61ae78b24ae0.tracez",
+              "sha256": "1c555d1e820d6af7490172f75b4f2325a0f83b39d1c7579f8c8375789fdb43f5"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json",
+          "trace_manifest_sha256": "03f83afdde364ef696073bae297661d4a119a9466856a7117aa5604674b6ea81"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "gate_up_projection"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "256fa85b36e8544bca0bb821d92b500aeea2d91a4c93e8dbb14bbca93e60aa18",
+        "launch_contract_sha256": "b24bb0572de02aa213ae0dca57732a188e5d76b1ab86e5332e7ed17e5c17fd2d",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "87f476ce62cb36895e03d47ed26892dafc0f059a1eef14b05d700110093c1f02",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/lm_head.json",
+          "native_measurement_sha256": "5273ca85d381336aebc76bc829e83a25cbd5ccc30c91df328518be5f7f892030",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5f4de1f174e0.tracez",
+              "sha256": "7bf2688a9734ef45a5ed4297e9b71cb7db98b38533e42730d2d02a3759d83d28"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_lm_head_sm86_trace.json",
+          "trace_manifest_sha256": "01eb8d54f42a09cede32f071f9887c108ba41892893fda2ab452a34435aac112"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "lm_head"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 8,
+        "kernel_sequence_sha256": "094299e86a37493619645251b7d098ffad341bc74f2a72bcfb3ccea5f2303b81",
+        "launch_contract_sha256": "e0e24f34471ce6c71d6d92ab54c5a732e181a1dc47d97e4c7bcbd8f404c95ea9",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "38b3b1319bcf1156ac04fde2238631e5d2cf6c668ad9df9a7980d8145f38d392",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/mlp_norm.json",
+          "native_measurement_sha256": "f46a67164f285d96da949f9d1dd9e28764e526c4262ca46f544a266ca2b78994",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "3557f4b16e2666baea904cde72a9690444d07d9f11f8b2954720742abf2556be"
+            },
+            {
+              "name": "kernel-2-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "a0bafbe7091951b70cafd6bd73db256f7caf77cbb4aaa6d2a21bf2064d1d4737"
+            },
+            {
+              "name": "kernel-3-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "01bbff60eeb75d83eb920c274f6328638385582deba7f66eca8ff1531322f6b1"
+            },
+            {
+              "name": "kernel-4-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "9e5c8795b4a1c66d4205c1298a92f152f2dde5444f58ceda644ce22224d1f2f4"
+            },
+            {
+              "name": "kernel-5-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "afae4235de7c6f34faf29504b64c65a3d2786a1510e01d84103a499a2e925084"
+            },
+            {
+              "name": "kernel-6-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "1bde275b5fcb4d9c79eab3dab447c01d5da1c9dc7984ec4bc8cd80cd020637a9"
+            },
+            {
+              "name": "kernel-7-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "a511448aa1931fa72920ddc2fe9263e1bcd7427050f66da4081a854486e6f28a"
+            },
+            {
+              "name": "kernel-8-ctx_0x5efbf5b8e0e0.tracez",
+              "sha256": "ae6e8751f423bf00149aa7ed0e032b8c9088ad6cd819ef73c634cc5c64b82043"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_mlp_norm_sm86_trace.json",
+          "trace_manifest_sha256": "e5092ad9c1d894c5a7dac05b0a5ed1e82eaea92189bb977a9fe80a2ba5296987"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "mlp_norm"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "2a854484d98ebf06afa21e9d4417d9bdf7043482401fc5844cffbcde1f0deab6",
+        "launch_contract_sha256": "93e45a8dc13d539e11fd9db1477c6f6b50527bdda6af2764cb3f5835f1bb14ca",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "bfbba469ef0b54d43869c49817749a421de6a5b6e33a7416262cb4a8853601f1",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/output_projection.json",
+          "native_measurement_sha256": "27a36589f4de440943ba2739997e1435e1eac198193c0e212ee3a9cce6538cfb",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x55d494230270.tracez",
+              "sha256": "950d357408005d281de062762b207d7247ea2e40e4f4a2292ade53b26edd0a32"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_output_projection_sm86_trace.json",
+          "trace_manifest_sha256": "15c872a29e40e43fa451db834efa81c48912e48a6df8f8d4815c6b97c5feb6db"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "output_projection"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 6,
+        "kernel_sequence_sha256": "169aa8b688e9c20bc081d7257c7c22115f1dbc4e8ed02ced2043dd3a620380e7",
+        "launch_contract_sha256": "a5082a17ade2f6741ce08edda61fb373bf5b48b35cfca9b08c6f99946a74362c",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "e3ba604b29c6077d77445502a8d2f835d7c4e416c65c6f6ad7f2429c0ffb9a5f",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/qkv_projection.json",
+          "native_measurement_sha256": "3385e834bb59c4d089ae9f99fc098bab093c9898f31d3da217753410cd11d33c",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5e33718d5420.tracez",
+              "sha256": "1b8638832dedc3312cbeaa5c68baeaee8b341364422fd730a71fc01b85bf9e37"
+            },
+            {
+              "name": "kernel-2-ctx_0x5e33718d5420.tracez",
+              "sha256": "d115b89de4c677ddd70c468f672928ae28100d22d6a7c3ceb022c564af3345c7"
+            },
+            {
+              "name": "kernel-3-ctx_0x5e33718d5420.tracez",
+              "sha256": "a079e5d962317d5dfec241f880c5b44ae80cff4ebbcc733c958bee19a9e342b0"
+            },
+            {
+              "name": "kernel-4-ctx_0x5e33718d5420.tracez",
+              "sha256": "aff6ceef4d6ed990396ede651b105fef7b2855a65447bbc7e70d6ca444acda31"
+            },
+            {
+              "name": "kernel-5-ctx_0x5e33718d5420.tracez",
+              "sha256": "587318dbf220cdc2d8b8ea2f39dea47a83d335c3abcb06eb17a04da5208a8bb5"
+            },
+            {
+              "name": "kernel-6-ctx_0x5e33718d5420.tracez",
+              "sha256": "ea2c758b2705893a1c3aabf284270bd93c1d286017c12123e5c2847d00ec71f0"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_qkv_projection_sm86_trace.json",
+          "trace_manifest_sha256": "6ff816e48d87b02b624f7cc2e0ac15f84c6250815c07c8ac7e56e8e2183835d3"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "qkv_projection"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "a6441fa163fde8cc33c3de08e6516a02296b6c0a0ca9cc6823977ad22acbdb24",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "390076d34ab2b3d51f8937a2f0ff8fae043a09fa1c61b753d796a6bedf433834",
+        "launch_contract_sha256": "a62cfacb1fd2d139afc8b29fe7afefd5df9d3ac5870fd0067747b6757e50b86d",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "3c8c4f8d4dec787576c9e1ad5dc3f55104e97bd465e569162a1a8381f29c16be",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/residual_add.json",
+          "native_measurement_sha256": "745668aaf8512060b0a1f4a2e1b2ac519d80c1afd515206b192f4416b54c7d2b",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": null,
+          "target_kind": "elf_binary",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5d77e7495a00.tracez",
+              "sha256": "922ba9f4f2cd4c8cff52624f6abba60d3b8acd5e659a77d6aa32357b60f9d497"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json",
+          "trace_manifest_sha256": "2bee184b9080bfe71bf47b22894999e56f1ff51eea2be7db092eebaa7aecf287"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "residual_add"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 19,
+        "kernel_sequence_sha256": "293715b428f567928b0ecfe69ef730e18678c22bf51e8cb3a7f5c6a15282ac76",
+        "launch_contract_sha256": "da3b22982f821199dec9070a776ff427ddf518542d1305ec1990fb57e3272513",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "4f083de07c08842f7c5ab8bab965c02ce9ee41e561cd271f3a62cab99ca3daaf",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/rope.json",
+          "native_measurement_sha256": "9432bba18834a062ef01539e62d4dc1cc69e613cc5d26fe17d9ae406b512cae6",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5fd38bf35140.tracez",
+              "sha256": "63cae1c972519bdaf5ce662490c7a4b5654a3e372a5d045b1ea10624a4f02a15"
+            },
+            {
+              "name": "kernel-2-ctx_0x5fd38bf35140.tracez",
+              "sha256": "92f4a685d43429f5448c6648fbf2d718a3043989fb387f28a0e13a057258a93f"
+            },
+            {
+              "name": "kernel-3-ctx_0x5fd38bf35140.tracez",
+              "sha256": "40a301670d358c2395ca63b4fe6938eb25f933622b37183667cdc550f6fd9c65"
+            },
+            {
+              "name": "kernel-4-ctx_0x5fd38bf35140.tracez",
+              "sha256": "2fc33f3c01027981dfd91071f6e74d611a01d674214eefbbec4d2182404ab6e3"
+            },
+            {
+              "name": "kernel-5-ctx_0x5fd38bf35140.tracez",
+              "sha256": "fd15994524b4e902134d5b5ca7a325318a04cf29f51e0c1240f77ea52c26736b"
+            },
+            {
+              "name": "kernel-6-ctx_0x5fd38bf35140.tracez",
+              "sha256": "cc5f63fcc93b064cab2816ba2daa56b8dc9a8e94a64954e6e3cf23aed005ce4b"
+            },
+            {
+              "name": "kernel-7-ctx_0x5fd38bf35140.tracez",
+              "sha256": "1d42f6851bf618bcdd161394ece54cdc6fabb8537b1faf8e2664e1bf3a685b1b"
+            },
+            {
+              "name": "kernel-8-ctx_0x5fd38bf35140.tracez",
+              "sha256": "f5f15070c97438c44def0d88a72771f63759257266095b8da0c8f67157d9ffe2"
+            },
+            {
+              "name": "kernel-9-ctx_0x5fd38bf35140.tracez",
+              "sha256": "1fe146834fe631402e72950a9bbd13279a00ffa74b27b5c860662fa629dd3638"
+            },
+            {
+              "name": "kernel-10-ctx_0x5fd38bf35140.tracez",
+              "sha256": "4429718038c7d24b3576464111c05744f91e9c875015612e4948aaef322d0f3a"
+            },
+            {
+              "name": "kernel-11-ctx_0x5fd38bf35140.tracez",
+              "sha256": "cc5068d7be8b2974e680c758f01c46700c67f3237f6920aeb34b8443df1fb57d"
+            },
+            {
+              "name": "kernel-12-ctx_0x5fd38bf35140.tracez",
+              "sha256": "3d7e1769f24bfbfcdf98884443c960ad52f6d8d01c3334da597992bc5fa861b6"
+            },
+            {
+              "name": "kernel-13-ctx_0x5fd38bf35140.tracez",
+              "sha256": "1c30389cef2d80e9d1de1d9d8d37072c79d2775287063fc20ab30feaa1b7680f"
+            },
+            {
+              "name": "kernel-14-ctx_0x5fd38bf35140.tracez",
+              "sha256": "4de635f2a8f219f2c2e2d06962695fa4a3b1e958f0047403b3645e025bc204a2"
+            },
+            {
+              "name": "kernel-15-ctx_0x5fd38bf35140.tracez",
+              "sha256": "b4d8a018e0fcd172e232ee6c7c54edada5ffd6f473cb7ec00ba4724a02854cda"
+            },
+            {
+              "name": "kernel-16-ctx_0x5fd38bf35140.tracez",
+              "sha256": "72d2ed7e11e5310b9ad6a722e237e9fee1596ec7f6939ca103d5d4c8075898d6"
+            },
+            {
+              "name": "kernel-17-ctx_0x5fd38bf35140.tracez",
+              "sha256": "3e1c4de64f3c40f9096cb2050ae5dd1b8ccbffb1a969da85b664f9700bb42927"
+            },
+            {
+              "name": "kernel-18-ctx_0x5fd38bf35140.tracez",
+              "sha256": "a542b5ccb20ba2f77663934be00e4f7c3e4ead8b12a4b0bb308b00512fb3e3b4"
+            },
+            {
+              "name": "kernel-19-ctx_0x5fd38bf35140.tracez",
+              "sha256": "abc7b94b848767052df16e1c5401786e13a15a036416d3302534e7d9b14150d3"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_rope_sm86_trace.json",
+          "trace_manifest_sha256": "f2b6b0e7f7b2674b82b722567188679d5782c691275cec957b4a6cfbc74486bb"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "rope"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "d121a98384a0da5e448a358ee4928cde0a82cfa9f490513c44a900a2c770f5c0",
+        "launch_contract_sha256": "d66076b54ea072045d5a39b7203ea2cc6150548c9b54bfb92801539b1db3daf3",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "6f82d9bf62fd38eda8bed851de75e76aca997dc8fff1a05aad552f426436eeb4",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/sampling.json",
+          "native_measurement_sha256": "9675d489306af72a0b388ea9a335e6c71b8197e3d83747437361e77e7e93e9a9",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5bea9ad39930.tracez",
+              "sha256": "fb49a64531cc8954629d10b412093f5a463435cba86039145cdafce642a12f79"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_sampling_sm86_trace.json",
+          "trace_manifest_sha256": "306314b522ace01e1a58d6fc9faa8e8ae8ab1d09be10e07f99ea72acca1aac8a"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "sampling"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+        "kernel_launch_count": 2,
+        "kernel_sequence_sha256": "5dee548d9cd611e84354ed008787cd9c8815f7c11dc6e831fc5738cabd8cfbf4",
+        "launch_contract_sha256": "5e583904e7df74c69fa2d07507387ff943a74bc00ec9c85c259f98309ff2f589",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "06931421304f95d40f5f6d661aa801ab7c8db20bb5404d16da5065a2379b13a7",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/silu_multiply.json",
+          "native_measurement_sha256": "dfccb8337fbb1bbe8253827e2e2398ef8513c5435dc7aa9080bbc8e6a65b8b93",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": {
+            "cuda_runtime": "12.1",
+            "program_kind": "python_pytorch_launch_program",
+            "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+            "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+            "python_version": "3.10.20",
+            "pytorch": "2.3.0+cu121",
+            "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+            "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+            "transformers": "4.57.6",
+            "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+            "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+          },
+          "target_kind": "python_pytorch_launch_program",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5ce9f7d6c1c0.tracez",
+              "sha256": "3736233cb56c17f8bab7e0b150bc99bbac838554c679811f346683c790d09a7a"
+            },
+            {
+              "name": "kernel-2-ctx_0x5ce9f7d6c1c0.tracez",
+              "sha256": "f7203090c3a78872fae8b4f1c8d6655cd0b79138e80bc3c4c1c22c145b75163b"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_trace.json",
+          "trace_manifest_sha256": "21477c608ce5d9e5291c014be3d238044044dfb311abdecece31e41101f3c747"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "silu_multiply"
+    },
+    {
+      "execution_identity": {
+        "executable_sha256": "a6441fa163fde8cc33c3de08e6516a02296b6c0a0ca9cc6823977ad22acbdb24",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "48642a6d30837de2eaa955aca476f33bf0c5d9de74eb82260c1765190dad600e",
+        "launch_contract_sha256": "0a877f58f660f8ea2f3753211194b44e05e430e15ea36c332bfd838d12536e47",
+        "native_measurement_observed": true,
+        "provenance": {
+          "kernels_list_sha256": "0d1225afaaa6e28b3c1f1a3e595f430f8c4d237088c525cf8dfa57633f252def",
+          "native_measured_iterations": 500,
+          "native_measurement": "validation/p17/native_rtx3070/sealed_same_binary_v1/token_embedding.json",
+          "native_measurement_sha256": "336ab72459b1a8ac8d810257338aa004d04091f5468884c4e7e347c557cd8dfe",
+          "native_warmup_iterations": 50,
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "bffc4f1b8d75e740131482a0337ad1a0f2c255ed96b95b18609bb02f7ec26712",
+          "target_components": null,
+          "target_kind": "elf_binary",
+          "trace_files": [
+            {
+              "name": "kernel-1-ctx_0x5d90a26fca00.tracez",
+              "sha256": "46260e23da0e70400698dc87c9ae9254dcacd06fff71d1112d1cc45401bfa163"
+            }
+          ],
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json",
+          "trace_manifest_sha256": "a5220699eab0168248aa6664958e726651cc2968bb3939a0ae260aab1671596b"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
+      "operator_type": "token_embedding"
+    }
+  ],
+  "schema_version": "hetero-gpu-execution-identity-catalog/v1"
+}

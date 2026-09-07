@@ -1,0 +1,10 @@
+{
+  "schema_version": "hetero-p25-interconnect-activation/v1",
+  "backend": "booksim2",
+  "adapter_abi": "gpu-atlas-booksim2-adapter/v1",
+  "adapter_library": "third_party/booksim2/build/libbooksim2_adapter.so",
+  "network_config": "configs/hetero/p25/booksim2_single_layer_mesh.cfg",
+  "activation_policy": "fail_closed",
+  "allow_analytical_fallback": false,
+  "performance_claim_allowed": false
+}

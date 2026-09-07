@@ -20,6 +20,7 @@ class OperatorCapabilityError(ValueError):
 
 _BACKENDS = {
     "accel_sim",
+    "cycle_replay",
     "runtime_cycle",
     "runtime_live_ramulator2",
     "runtime_state",

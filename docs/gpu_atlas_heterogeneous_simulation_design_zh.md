@@ -5,10 +5,10 @@
 | 字段 | 内容 |
 | --- | --- |
 | 状态 | 已冻结的实现基线 |
-| 版本 | 1.27 |
-| 日期 | 2026-08-31 |
+| 版本 | 1.35 |
+| 日期 | 2026-09-07 |
 | 适用工程 | ATLAS-MICRO-2026 |
-| 当前基线提交 | 96202b410b9c26702e6b6b60f280ecb80914b927 |
+| 当前基线提交 | 7303c02（另含v0.30.0工作区更新） |
 | 主要目标 | GPU 与 3D-DRAM Compute Die/ATLAS 的端到端 LLM 联合仿真 |
 
 本文档是后续实现、代码评审、配置设计和实验解释的主规范。后续工作如果与本文档冲突，应先修改本文档并记录原因，再修改代码。不能在实现中静默改变本文档已经冻结的拓扑语义、地址语义、计时所有权或端到端 Token 语义。
@@ -2792,9 +2792,79 @@ P17引入`hetero-performance-calibration/v1`，把请求周期正确性与性能
 
 校准必须保持拓扑和语义匹配。RTX 3070本地显存Kernel或D2D Copy不能校准GPU经12.8 GB/s外部Link访问3D-DRAM的路径；空Kernel同步时延不能直接替代框架Request Start/Finish；3D-DRAM理论峰值也不能替代Row-hit、Row-miss和混合流量参考。任何跨拓扑结果只能记录为`measured_unvalidated`，不得计算为正式误差点。
 
-P17首批本机测量固定RTX 3070、SM86、CUDA 11.6、50次Warmup和500次测量，覆盖Context=16的Embedding、Residual、32 KiB本地D2D Copy及空Kernel事件/同步时延。第二批测量固定TinyLlama revision、Layer 0、FP16、BS=1和Context=16，覆盖全部14类GPU算子；Embedding/Residual使用P16定形CUDA参考实现，其余12类复用NVBit捕获脚本的高层Target。模型权重、源码、能力Catalog、算子Artifact和测量产物均有SHA-256。
+P17首批本机测量固定RTX 3070、SM86、CUDA 11.6、50次Warmup和500次测量，覆盖Context=16的Embedding、Residual、32 KiB本地D2D Copy及空Kernel事件/同步时延。第二批测量固定TinyLlama revision、Layer 0、FP16、BS=1和Context=16，覆盖全部14类GPU算子；Embedding/Residual使用P16定形CUDA参考实现，其余12类使用同一封存Python/PyTorch执行程序完成原生计时和NVBit捕获。模型权重、解释器、PyTorch扩展、工作负载源码、能力Catalog、算子Artifact和测量产物均有SHA-256。
 
-14算子配对必须额外满足：Operator类型全集一致、Implementation一致、精确Shape Key一致、Artifact哈希一致、Native执行与Trace Manifest/二进制身份一致、内存拓扑一致以及误差阈值通过。高层PyTorch Target名称相同不能替代Trace二进制身份核验。P17现已完成14类`gpu_local_vram` Accel-Sim双遍资格，且Importer封存资格记录实际使用的Trace Manifest；Embedding和Residual由同一份仅含SM86 cubin的封存二进制重新捕获。新审计已消除拓扑不匹配，但14类Native测量都没有与Trace建立精确二进制身份，且10/14的观测误差超过15%，因此正式配对仍为0/14。外部Link、Gateway和3D-DRAM独立参考同样缺失，当前审计必须返回`audit_complete_blocked`并保持`performance_claim_allowed=false`。
+14算子配对必须额外满足：Operator类型全集一致、Implementation一致、精确Shape Key一致、Artifact哈希一致、Native执行与Trace Manifest/执行程序身份一致、内存拓扑一致以及误差阈值通过。高层PyTorch Target名称相同不能替代Trace身份核验。P17现已为全部14类完成本机RTX 3070原生测量、NVBit捕获和`gpu_local_vram` Accel-Sim双遍资格，共覆盖63个Kernel Launch；Importer封存资格记录实际使用的Trace Manifest。14/14的身份、Artifact和拓扑门禁均匹配，Down Projection、Output Projection、QKV Projection和LM Head通过15%误差门禁，正式配对为4/14；其余10类仅因观测误差超阈值被阻断。外部Link、Gateway和3D-DRAM独立参考同样缺失，当前审计必须返回`audit_complete_blocked`并保持`performance_claim_allowed=false`。
+
+### 25.8 可执行身份与可移植资格证据
+
+同一Binary门禁使用`hetero-gpu-execution-identity/v1`。每个Native或Simulator算子记录必须包含`executable_sha256`、`launch_contract_sha256`、`kernel_sequence_sha256`、`target_sm`、`kernel_launch_count`、`native_measurement_observed`和`trace_capture_observed`。Launch Contract至少绑定Operator、Implementation、精确Shape、dtype和有序Launch Header；Kernel Sequence从Trace Header提取稳定字段并排除运行期VA。配对只比较不可变身份字段，但还要求Native侧实际观测标志和Trace侧实际观测标志分别为真。仅复制身份JSON、仅共享Trace Manifest或仅使用同一高层Target都不得获得身份资格。
+
+当前封存Catalog已为14/14算子同时建立Native侧与Trace侧身份。Token Embedding和Residual Add来自同一个SM86 ELF；其余12类通过Python解释器、`torch._C`扩展、工作负载源码和软件版本的规范化摘要封存动态执行程序，再绑定Launch Contract与实际Kernel Sequence。重新测量过程自然刷新Operator Artifact哈希，没有直接修改SHA字段。当前身份、Artifact和拓扑阻断均为零；4类通过误差门禁，其余10类保持fail-closed。
+
+P16的两个轻量算子证据必须随仓库保存并使用相对定位：Metadata、Kernel List、Trace、Range-Rebase资格记录和耦合Artifact组成闭包，加载时逐文件复核内容哈希。Backend切换工作目录前必须把在线地址绑定表解析为绝对路径；否则相对输出根会把合法绑定表错误解释为Backend子目录。该可移植性修复不改变Trace语义、Global PA映射、Simulation Key组成或性能声明边界。
+
+### 25.9 P19固定Shape Decode请求周期闭环
+
+P19把`prefill_cycle`的分块周期Catalog和在线运行时泛化为向后兼容的`request_cycle`。通用Catalog必须显式声明可处理的`prefill/decode/control` Phase；Dispatch前仍需匹配模型规格和算子类型。该泛化不改变P11–P14旧配置的Schema或历史输出。
+
+固定资格工作负载为TinyLlama‑1.1B revision `fe8a4e...`、FP16、BS=1、初始KV/Context=16、单次`decode_step`、`q_len=1`。每层必须恰有一个KV Append和一个Causal Attention；Append读取K/V版本0并写版本1，Attention只能在对应Append全部内存请求durable完成后读取版本1。每个KV Tensor的初始有效范围是8,192 B，追加范围是`offset=8,192 B,size=512 B`，并绑定到独立Global PA分配。
+
+P19必须同时资格1层20任务和22层272任务。每种规模执行两个隔离Leg，并逐条验证：DAG依赖、单`gpu0`资源互斥、请求地址属于相应Value分配、请求完成位于任务区间内、Parent/Child/durable守恒、唯一Ramulator2、零ATLAS Parent、零在途、KV 16→17及版本提交，以及两遍周期/请求/版本/流式Trace哈希完全一致。当前通过记录分别含190和3,382个GPU Parent。
+
+P19关闭的是Decode功能、地址、请求和状态因果门槛，不是GPU性能门槛。现有GPU计算为`request_tiled_cycle_contract`，`accel_sim_instruction_trace_coverage=0.0`。在为Decode精确Shape捕获并资格Accel-Sim Artifact、完成P17/P18六组件校准前，必须保持`performance_claim_allowed=false`，不得将42,057/566,052 GPU周期或相应makespan解释为RTX 3070预测。
+
+### 25.10 P20多Token自回归Decode闭环
+
+P20新增`execution_scope=decode_loop`，并保留`decode_step`严格要求`output_length=1`。Loop长度由`output_length`给出；第0步Embedding读取外部`decode_token_id`，第`s>0`步必须读取第`s-1`步Sampling写出的Token。Sampling完成、Token版本可见与`gpu0`资源空闲共同门禁下一步Embedding，不允许通过重复独立单步结果构造多Token时间线。
+
+固定资格为TinyLlama‑1.1B revision `fe8a4e...`、FP16、BS=1、初始KV=16、连续4个`q_len=1`步骤。每层同一K/V逻辑值依次执行四次读改写，输入/输出版本为`0→1→2→3→4`，Attention读取当步新版本。单Tensor每Token为512 B，四个追加范围分别是`[8192,8704)`、`[8704,9216)`、`[9216,9728)`和`[9728,10240)`，并全部绑定到该Tensor唯一Global PA分配。
+
+1层和22层图分别包含68和1,076个任务，每种规模执行两个隔离Leg。资格必须验证：前一步Sampling→下一步Embedding、Append→Attention、最后Sampling→Request Finish→KV Release、任务依赖、单`gpu0`互斥、Global PA包含、请求Issue/Completion位于任务区间、Parent/Child/durable守恒、唯一Ramulator2、零ATLAS Parent、零在途、最终K/V版本4，以及双遍周期/请求/流式Trace哈希一致。当前记录分别守恒760和13,528个GPU Parent。
+
+P20同样只是功能资格。四个KV长度17–20虽有精确Shape能力合同，但GPU计算仍使用`request_tiled_cycle_contract`，Accel-Sim指令Trace覆盖率为0。每个真实Decode Shape必须单独捕获并资格，禁止从Prefill、P19单步或相邻KV长度外推周期；P20观测TTFT/ITL不得用作硬件性能结论。
+
+### 25.11 P22多Batch功能周期闭环
+
+P22把多请求调度冻结为显式状态机：`WAITING → READY → RUNNING → COMMIT → FINISHED/RETIRE`。Arrival只进入等待集合；Epoch边界按`max_active_sequences`和`kv_capacity_bytes`执行Admission；请求完成当前Token后提交Token/KV版本；达到输出长度后Retire并释放KV预约及动态Global PA。任何请求不得在Arrival前被选择、不得在前一步Commit前进入下一步，也不得在Retire后继续产生任务。
+
+Batch计划必须先按Phase和Device划分，再按配置选择`homogeneous`、`padding_dense`或`ragged_split`。每个Sub-Batch记录成员顺序、Q/KV长度、有效与补齐工作量、`cu_seqlens`、输入/输出Permutation和成员到请求的双射映射。GPU与ATLAS是不同资源域，不允许把跨设备成员伪装成一个Kernel；同设备同Epoch的资源区间不得重叠。
+
+周期合同分为两种：`request_cycle_composed`使用已记录的调度Epoch时长组织功能时间线，不宣称一个真实Batch Kernel；`batched_kernel_cycle`必须从封存Catalog精确匹配模型、Revision、Phase、算子、Layer、Device、dtype、Batch、成员Q/KV长度和Shape。缺项或不匹配时必须失败关闭，不允许复制或缩放BS=1周期。
+
+动态内存必须以Admission/Retire为生命周期边界。资格检查要求所有活跃Global PA范围不重叠、分配Epoch唯一、Retire后占用为零、释放范围可安全复用，并满足请求数、Selection、Token和Sub-Batch成员守恒。固定五组双遍覆盖静态同形BS=2、Ragged Padding、Ragged Split、22层Continuous四请求以及两层Prefill/Decode混合四请求；机器记录位于`validation/p22/qualification_record.json`。
+
+当前P22仅获得功能和因果资格。正式运行使用`scheduling.epoch_duration_fs`，没有真实Batched/Fused GPU或ATLAS Artifact，也没有把批处理Kernel的请求流送入共享Ramulator2。因此输出的makespan、Token/s、利用率和公平性只能用于调度回归，必须保持`performance_claim_allowed=false`。
+
+### 25.12 P23远端Batch Trace资格合同
+
+P23固定TinyLlama‑1.1B FP16、Layer 0、BS=2、Context=16、`q_len=1`和KV=17。SASS编译/加载、Kernel实际执行、NVBit读取和Trace捕获必须全部发生在指定远端RTX 4090；本地RTX 3070只能接收封存产物，不得重新生成或替换SASS。Manifest同时记录`capture_device_sm=89`与每个已执行Kernel头中的真实`binary version`，两者不得混同。
+
+Accel-Sim 2.0把SM80与SM86映射到同一Ampere Opcode Map，因此P23允许显式声明的SM80/SM86混合序列，但必须保留完整Kernel顺序、实际版本集合、Replay Target和兼容合同；默认单Binary流程仍对混合版本失败关闭。该允许只打开后续功能资格入口，不自动证明RTX 4090性能等价。
+
+14类GPU算子逐个执行Range-Rebase双遍资格，检查周期、指令、external-memory统计、唯一Ramulator2、地址覆盖、Parent/Child/durable守恒、零ATLAS请求和零在途。只有全部通过后才能生成P23 Ready Catalog；之后还必须补齐KV Append并把精确Artifact周期接入一个共享BS=2单层时间线，才可关闭P23功能里程碑。
+
+### 25.13 P24请求终止与容量生命周期
+
+请求可携带重放式EOS位置、最大输出Token数和显式取消时刻。EOS/最大长度在Token完成时自然退休；取消只在token-step barrier采样，前一Epoch已发工作必须先提交。等待中与已激活请求均可取消，且每个请求只能产生一个终止原因：`completed/eos/max_length/cancelled`。
+
+Admission按全请求KV预约检查容量；只有成功Admission的请求才能分配Global PA。Retire按同一Barrier的`release-before-allocate`顺序释放容量与地址，确定性first-fit可复用已释放区间。资格必须验证Admission/Allocation双射、活动范围不重叠、Allocation Epoch唯一、峰值不越界、等待取消不分配，以及最终零字节、零活动分配和零在途。当前P24只资格单层功能周期，不建模mid-kernel抢占或真实性能。
+
+### 25.14 P25 QoS与存活性
+
+控制面以确定性加权公平策略在GPU与ATLAS资源上选择请求，显式记录QoS Class、Weight、Virtual Runtime、最大等待和饥饿覆盖。资格同时检查高优先级前缀服务优势、同等级请求Jain公平性、最大等待上界、总工作守恒和双遍摘要一致。
+
+Watchdog以“存在Ready且未完成工作，但窗口内没有Useful Progress”为触发条件，并按状态是否变化区分Deadlock与Livelock；故障注入只用于证明检测分支。BookSim2只有在Adapter ABI、库、网络配置、逐周期Step/Credit API和确定性Probe同时通过时才算激活，缺任一项必须失败关闭，禁止静默退回分析NoC。当前P25结果是调度微周期，不是GPU、ATLAS、NoC或DRAM硬件周期。
+
+### 25.15 推理框架接入边界
+
+推理框架接入必须保持功能语义与时序语义分离。Hugging Face、vLLM或TensorRT-LLM拥有权重、数值计算、Logits和真实Token；本工程接收版本化模型/请求清单、算子Shape、Tensor/KV身份和调度事件，并拥有设备放置、Global PA、数据移动、资源占用和仿真时间。第一版采用shadow simulation，不把周期模型注册成能生成数值结果的框架设备。
+
+GPU算子必须由框架实际选择的执行程序在目标SM上完成编译/加载、NVBit捕获、身份封存和Accel-Sim资格；ATLAS算子由Tensor IR、分块、布局和地址规划生成任务及内存Trace。两者通过统一Artifact Key和Global PA接入运行时。Artifact Key至少包含模型Revision、算子、精确Shape、dtype、融合/Kernel实现、编译参数、目标设备架构和执行身份；Batch、Context、`q_len`或KV Length导致Kernel Dispatch变化时不得静默复用。
+
+捕获不要求每个请求重新执行，但跨请求复用必须命中合格Catalog。只有证明动态指令、控制流和地址行为不随候选变化时才能设置`replay_safe=true`；缺失精确Artifact时必须失败关闭，或由配置显式选择带Fidelity标签的分析回退。框架捕获地址必须先绑定稳定Tensor/Value Range并映射到Global PA，不得无声明地当作最终物理地址。
+
+正式实现与验收按`docs/INFERENCE_FRAMEWORK_INTEGRATION_TODO_zh.md`的F0–F8执行：Hugging Face导出、Tensor/KV绑定、GPU Trace Catalog、ATLAS Tensor IR编译、shadow运行接口、vLLM Continuous/Ragged Batch与Paged KV、TensorRT-LLM以及端到端资格。在全部执行任务和硬件组件通过门禁前，框架接入存在也不允许打开性能声明。
 
 ---
 
@@ -2896,3 +2966,11 @@ P17首批本机测量固定RTX 3070、SM86、CUDA 11.6、50次Warmup和500次测
 | 1.25 | 2026-08-31 | 启动P17独立性能校准：增加六组件机器合同、配置/测量哈希、证据/Shape/误差fail-closed门禁和全局任务资格AND规则；完成RTX 3070首批原生测量并明确本地显存不可外推外接3D-DRAM |
 | 1.26 | 2026-08-31 | 完成固定TinyLlama Shape的14类RTX 3070原生算子测量Catalog；增加Implementation/Shape/Artifact/Trace身份/内存拓扑严格配对、Native-VRAM Accel-Sim双遍Runner与Importer；当前0/14正式配对且整机性能门禁保持关闭 |
 | 1.27 | 2026-09-01 | 完成14类Native-VRAM Accel-Sim确定性双遍资格；以同一封存SM86 cubin重捕获Embedding/Residual，增加Trace覆盖、实际资格Manifest封存与跨平台文本哈希；拓扑匹配但二进制身份和10类误差仍阻止正式配对 |
+| 1.28 | 2026-09-01 | 将P16两个外部Artifact闭包改为仓库内可移植证据并重新完成20任务双遍资格；增加可执行/Launch/Kernel序列三重SHA的同一Binary身份合同与双侧观测门禁，封存两个Trace侧身份并保持0/14性能配对 |
+| 1.29 | 2026-09-01 | 固定本机RTX 3070/SM86为P17正式目标；用同一Linux可执行文件完成Embedding/Residual的50+500原生测量、NVBit捕获和Native-VRAM双遍资格，消除两类身份与Artifact阻断；误差门禁仍使正式配对保持0/14 |
+| 1.30 | 2026-09-01 | 完成剩余12类本机RTX 3070同一执行程序原生测量、NVBit捕获和Native-VRAM双遍资格；14类共63个Kernel Launch的身份、Artifact和拓扑门禁全部通过，4/14通过数值配对，六组件整机性能门禁继续关闭 |
+| 1.31 | 2026-09-02 | 完成P19固定单Token Decode的通用request_cycle执行、KV生命周期与Global PA审计、1层/22层精确Shape能力目录和双遍资格；验证请求/版本/资源因果并继续冻结未校准分块周期性能声明 |
+| 1.32 | 2026-09-02 | 完成P20连续四Token自回归Decode：新增兼容的decode_loop、Sampling到下一步Embedding门禁、KV版本0→4与四段Global PA追加审计；1层/22层双遍功能资格通过并继续冻结未校准周期性能声明 |
+| 1.33 | 2026-09-04 | 冻结推理框架接入F0–F8路线：框架负责数值、GPU负责真实Trace、ATLAS负责Tensor IR编译、仿真器负责shadow时序；记录Hugging Face、Tensor/Global PA、Trace Catalog、vLLM、TensorRT-LLM和端到端资格待办 |
+| 1.34 | 2026-09-07 | 完成P22多Batch功能周期闭环：实现Static/Continuous请求状态机、KV容量Admission/Retire、Homogeneous/Padding/Ragged Split、GPU/ATLAS设备Sub-Batch和动态Global PA生命周期双遍资格；冻结真实Batched/Fused Kernel与性能资格仍未完成的边界 |
+| 1.35 | 2026-09-07 | 完成P24 EOS/最大长度/取消/KV容量与Global PA复用功能资格，以及P25确定性QoS、公平性和死锁/活锁Watchdog资格；启动P23远端RTX 4090专属SASS/BS=2 Trace与Range-Rebase双遍流程，并冻结混合Ampere SASS、BookSim2未激活及性能未资格边界 |

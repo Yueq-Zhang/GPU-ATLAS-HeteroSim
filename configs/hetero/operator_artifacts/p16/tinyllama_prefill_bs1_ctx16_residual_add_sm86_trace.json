@@ -14,7 +14,7 @@
       "size_bytes": 65536,
       "tensor_id": "tinyllama.layer0.residual_add.input",
       "tensor_offset_bytes": 0,
-      "trace_base": 47286583296,
+      "trace_base": 126654917640192,
       "view_offset_bytes": 0
     },
     {
@@ -31,7 +31,7 @@
       "size_bytes": 65536,
       "tensor_id": "tinyllama.layer0.residual_add.residual",
       "tensor_offset_bytes": 0,
-      "trace_base": 47286648832,
+      "trace_base": 126654917705728,
       "view_offset_bytes": 0
     },
     {
@@ -48,7 +48,7 @@
       "size_bytes": 65536,
       "tensor_id": "tinyllama.layer0.residual_add.output",
       "tensor_offset_bytes": 0,
-      "trace_base": 47286714368,
+      "trace_base": 126654917771264,
       "view_offset_bytes": 0
     }
   ],
@@ -76,7 +76,7 @@
     "implementation": "heterosim_cuda_reference_residual_add_v1",
     "target_sm": 86
   },
-  "kernels_list": "/opt/gpu-atlas/qualification/p16-cuda-reference-v3/tinyllama-prefill-bs1-ctx16-residual-add/traces/kernelslist.g",
+  "kernels_list": "evidence/residual_add/traces/kernelslist.g",
   "qualification_record": null,
   "replay_safe": false,
   "schema_version": "hetero-trace-manifest/v1",

@@ -73,6 +73,7 @@ def test_materialized_binding_is_deterministic_and_preserves_tensor_offset(
     first = materialize_online_address_bindings(_manifest(), _policy(), tmp_path / "a")
     second = materialize_online_address_bindings(_manifest(), _policy(), tmp_path / "b")
     assert first["table_sha256"] == second["table_sha256"]
+    assert Path(str(first["table_path"])).is_absolute()
     assert first["translation_point"] == "mem_fetch_before_gpu_cache_lookup"
     assert first["dram_tuple_mapping"].startswith("deferred_to_single_ramulator2")
     rows = (tmp_path / "a" / "online_address_bindings.tsv").read_text().splitlines()
@@ -105,6 +106,7 @@ def test_explicit_binding_preserves_global_timeline_addresses(tmp_path: Path) ->
     )
     rows = (tmp_path / "online_address_bindings.tsv").read_text().splitlines()
     assert payload["allocation_owner"] == "prefill_global_timeline"
+    assert Path(str(payload["table_path"])).is_absolute()
     assert rows[-2] == "range\t1048576\t1048832\t512\t768"
     assert rows[-1] == "range\t1052672\t1052800\t1088\t1216"
 

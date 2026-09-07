@@ -6,10 +6,18 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import sys
 from pathlib import Path
 from typing import Any
 
-from frontend.hetero.capture_allocation_ranges import subtract_address_ranges
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
+from frontend.hetero.capture_allocation_ranges import (  # noqa: E402
+    subtract_address_ranges,
+)
 
 
 def _sha256(path: Path) -> str:
@@ -20,14 +28,28 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _file(path: Path, base: Path, kind: str) -> dict[str, object]:
+def _render_path(path: Path, base: Path) -> str:
+    """Render repository-local evidence as a cross-platform relative path."""
+
+    path = path.resolve()
+    base = base.resolve()
     try:
-        rendered = str(path.relative_to(base))
+        path.relative_to(base)
+        return Path(os.path.relpath(path, base)).as_posix()
     except ValueError:
-        rendered = str(path)
+        pass
+    try:
+        path.relative_to(_PROJECT_ROOT)
+        base.relative_to(_PROJECT_ROOT)
+        return Path(os.path.relpath(path, base)).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def _file(path: Path, base: Path, kind: str) -> dict[str, object]:
     return {
         "kind": kind,
-        "path": rendered,
+        "path": _render_path(path, base),
         "sha256": _sha256(path),
         "size_bytes": path.stat().st_size,
     }
@@ -79,6 +101,20 @@ def main() -> None:
     operator = str(metadata["operator"])
     context = int(metadata["context_length"])
     batch = int(metadata["batch_size"])
+    phase = str(metadata["phase"])
+    q_len = int(metadata["q_len"])
+    kv_length = int(metadata["kv_length"])
+    compilation_metadata = metadata.get("compilation")
+    metadata_target_sm = (
+        compilation_metadata.get("target_sm")
+        if isinstance(compilation_metadata, dict)
+        else None
+    )
+    target_sm = int(metadata_target_sm or args.target_sm)
+    if target_sm != args.target_sm:
+        raise ValueError(
+            f"metadata target_sm={target_sm} does not match --target-sm={args.target_sm}"
+        )
     tensors = [
         {
             "tensor_id": item["tensor_id"],
@@ -152,9 +188,19 @@ def main() -> None:
             "an empty kernels list is only valid for the explicit "
             "kv_append state operation"
         )
+    if phase == "prefill":
+        shape_key = f"prefill.bs{batch}_ctx{context}"
+    elif phase == "decode_step":
+        shape_key = f"decode_step.bs{batch}.ctx{context}.q{q_len}.kv{kv_length}"
+    else:
+        raise ValueError(f"unsupported operator phase: {phase}")
     artifact_id = (
-        f"tinyllama.1_1b.layer0.{operator}.prefill.bs{batch}_ctx{context}.fp16."
-        + ("runtime_state_v1" if runtime_state else "sm86.accel_sim_v2")
+        f"tinyllama.1_1b.layer0.{operator}.{shape_key}.fp16."
+        + (
+            "runtime_state_v1"
+            if runtime_state
+            else f"sm{target_sm}.accel_sim_v2"
+        )
     )
     trace_manifest_path = (
         args.trace_manifest_output.resolve() if args.trace_manifest_output else None
@@ -175,16 +221,16 @@ def main() -> None:
             }
         )
         compilation["implementation"] = metadata["implementation"]
-        compilation.setdefault("target_sm", args.target_sm)
+        compilation.setdefault("target_sm", target_sm)
         trace_manifest = {
             "schema_version": "hetero-trace-manifest/v1",
             "trace_id": artifact_id,
             "trace_semantics": "functional",
             "replay_safe": False,
             "qualification_record": None,
-            "kernels_list": str(kernels_list),
+            "kernels_list": _render_path(kernels_list, trace_manifest_path.parent),
             "capture": {
-                "source": "P15 shape-locked operator capture",
+                "source": f"shape-locked {phase} operator capture",
                 "tool": "NVBit",
                 "version": "1.8",
                 "model": metadata["model"],
@@ -284,7 +330,7 @@ def main() -> None:
             "accel_sim_version": "2.0.0",
             "gpu": args.gpu,
             "driver": args.driver,
-            "target_sm": args.target_sm,
+            "target_sm": target_sm,
         },
         "execution_contract": {
             "trace_semantics": "none" if runtime_state else "functional",
@@ -330,7 +376,7 @@ def main() -> None:
             ),
             "performance_eligible": False,
             "qualification_record": (
-                str(qualification_path) if qualification_path else None
+                _render_path(qualification_path, base) if qualification_path else None
             ),
         },
         "tensors": tensors,

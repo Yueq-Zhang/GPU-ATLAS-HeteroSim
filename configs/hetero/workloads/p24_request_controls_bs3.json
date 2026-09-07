@@ -1,0 +1,31 @@
+{
+  "requests": [
+    {
+      "request_id": "R-eos",
+      "arrival_time_fs": 0,
+      "prompt_length": 1,
+      "output_length": 8,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 16,
+      "eos_after_generated_tokens": 2
+    },
+    {
+      "request_id": "R-max",
+      "arrival_time_fs": 0,
+      "prompt_length": 1,
+      "output_length": 8,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 16,
+      "max_output_tokens": 3
+    },
+    {
+      "request_id": "R-cancel-active",
+      "arrival_time_fs": 0,
+      "prompt_length": 1,
+      "output_length": 8,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 16,
+      "cancel_time_fs": 1000
+    }
+  ]
+}

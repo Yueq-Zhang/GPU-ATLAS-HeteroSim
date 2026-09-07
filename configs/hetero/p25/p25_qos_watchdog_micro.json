@@ -1,0 +1,81 @@
+{
+  "schema_version": "hetero-p25-qos-stress/v1",
+  "name": "p25_tinyllama_layer0_gpu_atlas_qos_micro",
+  "scope": {
+    "model": "TinyLlama-1.1B",
+    "layers": [0],
+    "purpose": "functional_qos_liveness_qualification"
+  },
+  "interconnect": {
+    "backend": "analytical"
+  },
+  "policy": {
+    "class_weights": {
+      "latency": 4,
+      "normal": 2,
+      "throughput": 1
+    },
+    "max_starvation_cycles": 5,
+    "watchdog_window_cycles": 4,
+    "max_micro_cycles": 256,
+    "fairness_window_cycles": 12
+  },
+  "requests": [
+    {
+      "request_id": "latency-mixed-0",
+      "qos_class": "latency",
+      "arrival_cycle": 0,
+      "stages": [
+        {"resource_id": "gpu0", "work_units": 6},
+        {"resource_id": "atlas0.compute", "work_units": 2}
+      ]
+    },
+    {
+      "request_id": "normal-gpu-0",
+      "qos_class": "normal",
+      "fairness_group": "normal-gpu-peers",
+      "arrival_cycle": 0,
+      "stages": [
+        {"resource_id": "gpu0", "work_units": 8}
+      ]
+    },
+    {
+      "request_id": "normal-gpu-1",
+      "qos_class": "normal",
+      "fairness_group": "normal-gpu-peers",
+      "arrival_cycle": 0,
+      "stages": [
+        {"resource_id": "gpu0", "work_units": 8}
+      ]
+    },
+    {
+      "request_id": "throughput-gpu-0",
+      "qos_class": "throughput",
+      "arrival_cycle": 0,
+      "stages": [
+        {"resource_id": "gpu0", "work_units": 12}
+      ]
+    },
+    {
+      "request_id": "latency-mixed-1",
+      "qos_class": "latency",
+      "arrival_cycle": 1,
+      "stages": [
+        {"resource_id": "atlas0.compute", "work_units": 6},
+        {"resource_id": "gpu0", "work_units": 2}
+      ]
+    },
+    {
+      "request_id": "throughput-atlas-0",
+      "qos_class": "throughput",
+      "arrival_cycle": 1,
+      "stages": [
+        {"resource_id": "atlas0.compute", "work_units": 12}
+      ]
+    }
+  ],
+  "qualification": {
+    "performance_claim_allowed": false,
+    "booksim2_required": false
+  }
+}

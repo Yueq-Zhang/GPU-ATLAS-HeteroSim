@@ -1,0 +1,59 @@
+{
+  "batch_size": 1,
+  "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "context_length": 16,
+  "device": {
+    "compute_capability": "8.6",
+    "global_memory_bytes": 8589410304,
+    "multiprocessors": 46,
+    "name": "NVIDIA GeForce RTX 3070"
+  },
+  "dtype": "fp16",
+  "implementation": "transformers.LlamaMLP.down_proj",
+  "launch": {
+    "launch_program_sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890",
+    "program_components": {
+      "cuda_runtime": "12.1",
+      "program_kind": "python_pytorch_launch_program",
+      "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+      "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+      "python_version": "3.10.20",
+      "pytorch": "2.3.0+cu121",
+      "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+      "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+      "transformers": "4.57.6",
+      "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+      "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+    },
+    "program_kind": "python_pytorch_launch_program",
+    "target_sm": 86
+  },
+  "measurement": {
+    "max_fs": 193696007133,
+    "mean_fs": 100383873165,
+    "median_fs": 96256002784,
+    "min_fs": 61439998448,
+    "p10_fs": 94112001359,
+    "p90_fs": 119744002819
+  },
+  "measurement_scope": "native_rtx3070_local_vram",
+  "model_spec_name": "TinyLlama-1.1B",
+  "operator_type": "down_projection",
+  "performance_eligible": false,
+  "phase": "prefill",
+  "protocol": {
+    "measured_iterations": 500,
+    "statistic": "median",
+    "synchronization": "stop_event_synchronize_each_iteration",
+    "timer": "cuda_event_per_iteration",
+    "warmup_iterations": 50
+  },
+  "q_len": 16,
+  "schema_version": "hetero-p17-sealed-native-pytorch-operator/v1",
+  "software": {
+    "cuda_runtime": "12.1",
+    "python": "3.10.20",
+    "pytorch": "2.3.0+cu121",
+    "transformers": "4.57.6"
+  }
+}

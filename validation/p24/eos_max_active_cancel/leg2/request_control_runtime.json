@@ -1,0 +1,294 @@
+{
+  "cancellation_granularity": "token_step_barrier",
+  "conservation": {
+    "admission_allocation_bijective": true,
+    "admitted_requests": 3,
+    "all_requests_terminal": true,
+    "allocated_requests": 3,
+    "input_requests": 3,
+    "released_requests": 3,
+    "terminal_requests": 3,
+    "zero_in_flight": true
+  },
+  "memory": {
+    "active_allocations_after_run": [],
+    "active_range_overlap_count": 0,
+    "allocation_epoch_unique": true,
+    "capacity_bytes": 98304,
+    "capacity_delayed_request_ids": [],
+    "peak_bytes": 98304,
+    "retired_range_reuse_count": 0,
+    "zero_bytes_after_retirement": true
+  },
+  "memory_lifecycle": {
+    "events": [
+      {
+        "active": true,
+        "allocation_epoch": 1,
+        "allocation_id": "R-cancel-active.kv",
+        "memory_space_id": "shared0.dram3d",
+        "offset_bytes": 0,
+        "operation": "allocate",
+        "size_bytes": 32768,
+        "time_fs": 0
+      },
+      {
+        "active": true,
+        "allocation_epoch": 2,
+        "allocation_id": "R-eos.kv",
+        "memory_space_id": "shared0.dram3d",
+        "offset_bytes": 32768,
+        "operation": "allocate",
+        "size_bytes": 32768,
+        "time_fs": 0
+      },
+      {
+        "active": true,
+        "allocation_epoch": 3,
+        "allocation_id": "R-max.kv",
+        "memory_space_id": "shared0.dram3d",
+        "offset_bytes": 65536,
+        "operation": "allocate",
+        "size_bytes": 32768,
+        "time_fs": 0
+      },
+      {
+        "active": false,
+        "allocation_epoch": 1,
+        "allocation_id": "R-cancel-active.kv",
+        "memory_space_id": "shared0.dram3d",
+        "offset_bytes": 0,
+        "operation": "release",
+        "size_bytes": 32768,
+        "time_fs": 1000
+      },
+      {
+        "active": false,
+        "allocation_epoch": 2,
+        "allocation_id": "R-eos.kv",
+        "memory_space_id": "shared0.dram3d",
+        "offset_bytes": 32768,
+        "operation": "release",
+        "size_bytes": 32768,
+        "time_fs": 2000
+      },
+      {
+        "active": false,
+        "allocation_epoch": 3,
+        "allocation_id": "R-max.kv",
+        "memory_space_id": "shared0.dram3d",
+        "offset_bytes": 65536,
+        "operation": "release",
+        "size_bytes": 32768,
+        "time_fs": 3000
+      }
+    ],
+    "memory_spaces": [
+      {
+        "memory_space_id": "shared0.dram3d",
+        "peak_bytes": 98304,
+        "used_bytes": 0
+      }
+    ],
+    "schema_version": "hetero-memory-lifecycle/v1"
+  },
+  "performance_claim_allowed": false,
+  "qualification_boundary": "Functional-cycle request termination, barrier cancellation and KV capacity/reuse only; no exact batched GPU/ATLAS trace or calibrated performance claim.",
+  "requests": [
+    {
+      "admission_time_fs": 0,
+      "arrival_time_fs": 0,
+      "cancel_observed_time_fs": 1000,
+      "effective_natural_limit": 8,
+      "final_committed_kv_length": 17,
+      "finish_time_fs": 1000,
+      "generated_length": 1,
+      "initial_kv_length": 16,
+      "kv_reservation_bytes": 32768,
+      "request_id": "R-cancel-active",
+      "requested_output_length": 8,
+      "termination_reason": "cancelled",
+      "token_ready_time_fs": [
+        1000
+      ]
+    },
+    {
+      "admission_time_fs": 0,
+      "arrival_time_fs": 0,
+      "cancel_observed_time_fs": null,
+      "effective_natural_limit": 2,
+      "final_committed_kv_length": 18,
+      "finish_time_fs": 2000,
+      "generated_length": 2,
+      "initial_kv_length": 16,
+      "kv_reservation_bytes": 32768,
+      "request_id": "R-eos",
+      "requested_output_length": 8,
+      "termination_reason": "eos",
+      "token_ready_time_fs": [
+        1000,
+        2000
+      ]
+    },
+    {
+      "admission_time_fs": 0,
+      "arrival_time_fs": 0,
+      "cancel_observed_time_fs": null,
+      "effective_natural_limit": 3,
+      "final_committed_kv_length": 19,
+      "finish_time_fs": 3000,
+      "generated_length": 3,
+      "initial_kv_length": 16,
+      "kv_reservation_bytes": 32768,
+      "request_id": "R-max",
+      "requested_output_length": 8,
+      "termination_reason": "max_length",
+      "token_ready_time_fs": [
+        1000,
+        2000,
+        3000
+      ]
+    }
+  ],
+  "scheduler_result": {
+    "epochs": [
+      {
+        "active_request_ids": [
+          "R-cancel-active",
+          "R-eos",
+          "R-max"
+        ],
+        "admitted_request_ids": [
+          "R-cancel-active",
+          "R-eos",
+          "R-max"
+        ],
+        "boundary_time_fs": 0,
+        "cancelled_request_ids": [],
+        "completion_time_fs": 1000,
+        "epoch_id": 0,
+        "retired_request_ids": [],
+        "selections": [
+          {
+            "phase": "decode",
+            "request_id": "R-cancel-active",
+            "token_begin": 16,
+            "token_count": 1
+          },
+          {
+            "phase": "decode",
+            "request_id": "R-eos",
+            "token_begin": 16,
+            "token_count": 1
+          },
+          {
+            "phase": "decode",
+            "request_id": "R-max",
+            "token_begin": 16,
+            "token_count": 1
+          }
+        ]
+      },
+      {
+        "active_request_ids": [
+          "R-eos",
+          "R-max"
+        ],
+        "admitted_request_ids": [],
+        "boundary_time_fs": 1000,
+        "cancelled_request_ids": [
+          "R-cancel-active"
+        ],
+        "completion_time_fs": 2000,
+        "epoch_id": 1,
+        "retired_request_ids": [
+          "R-cancel-active",
+          "R-eos"
+        ],
+        "selections": [
+          {
+            "phase": "decode",
+            "request_id": "R-eos",
+            "token_begin": 17,
+            "token_count": 1
+          },
+          {
+            "phase": "decode",
+            "request_id": "R-max",
+            "token_begin": 17,
+            "token_count": 1
+          }
+        ]
+      },
+      {
+        "active_request_ids": [
+          "R-max"
+        ],
+        "admitted_request_ids": [],
+        "boundary_time_fs": 2000,
+        "cancelled_request_ids": [],
+        "completion_time_fs": 3000,
+        "epoch_id": 2,
+        "retired_request_ids": [
+          "R-max"
+        ],
+        "selections": [
+          {
+            "phase": "decode",
+            "request_id": "R-max",
+            "token_begin": 18,
+            "token_count": 1
+          }
+        ]
+      }
+    ],
+    "requests": [
+      {
+        "committed_kv_length": 17,
+        "finish_time_fs": 1000,
+        "generated_length": 1,
+        "request_id": "R-cancel-active",
+        "termination_reason": "cancelled",
+        "token_ready_time_fs": [
+          1000
+        ]
+      },
+      {
+        "committed_kv_length": 18,
+        "finish_time_fs": 2000,
+        "generated_length": 2,
+        "request_id": "R-eos",
+        "termination_reason": "eos",
+        "token_ready_time_fs": [
+          1000,
+          2000
+        ]
+      },
+      {
+        "committed_kv_length": 19,
+        "finish_time_fs": 3000,
+        "generated_length": 3,
+        "request_id": "R-max",
+        "termination_reason": "max_length",
+        "token_ready_time_fs": [
+          1000,
+          2000,
+          3000
+        ]
+      }
+    ],
+    "schema_version": "hetero-runtime-result/v1"
+  },
+  "schema_version": "hetero-p24-request-control-runtime/v1",
+  "single_layer_qualification": true,
+  "termination": {
+    "cancelled_before_admission": [],
+    "reason_counts": {
+      "cancelled": 1,
+      "completed": 0,
+      "eos": 1,
+      "max_length": 1
+    }
+  },
+  "timing_semantics": "token_step_barrier_functional_cycle"
+}

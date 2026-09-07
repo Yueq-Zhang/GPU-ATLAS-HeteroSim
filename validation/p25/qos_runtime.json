@@ -1,0 +1,850 @@
+{
+  "conservation": {
+    "all_requests_finished": true,
+    "finished_requests": 6,
+    "input_requests": 6,
+    "input_work_units": 56,
+    "service_work_units": 56,
+    "zero_work_in_flight": true
+  },
+  "metrics": {
+    "makespan_micro_cycles": 36,
+    "max_observed_wait_cycles": 5,
+    "same_group_prefix_jain_fairness": {
+      "normal-gpu-peers": 0.9615384615384616
+    },
+    "service_units_by_class_in_fairness_window": {
+      "latency": 11,
+      "normal": 5,
+      "throughput": 7
+    },
+    "service_units_by_resource": {
+      "atlas0.compute": 20,
+      "gpu0": 36
+    },
+    "starvation_override_count": 5,
+    "weighted_jain_fairness": 0.6585365853658537
+  },
+  "performance_claim_allowed": false,
+  "progress_samples": [
+    {
+      "cycle": 0,
+      "ready_requests": 4,
+      "state_digest": "429667e2fc84f590d935584720354b06eee01871d3586e25139381175a82c8cf",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 1,
+      "ready_requests": 6,
+      "state_digest": "14ad09705d343acac09315230c6ed67da4cfd5195d6856235c9f5fc841f2b8d0",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 2,
+      "ready_requests": 6,
+      "state_digest": "541f522611d2b6dfd536f8fe14573cffa84a4311069dfd70be935b0add48dcc5",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 3,
+      "ready_requests": 6,
+      "state_digest": "79db38b483e8adef1787e63319d9dd1711d16984c55ecd50deb503ddb480aa06",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 4,
+      "ready_requests": 6,
+      "state_digest": "80181a2ef687503e70ad3f5cc685f765a3573a794e406f074386e44ddeaa28e6",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 5,
+      "ready_requests": 6,
+      "state_digest": "aa20ed585874c1a9338bd1c63e31274ad2ae556cda98ffc8cc888a671970845c",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 6,
+      "ready_requests": 6,
+      "state_digest": "e06bff0f20a25c5f72e0fe57d1ae70fe5a9b3768e5542f3117dc8a38b704efdb",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 7,
+      "ready_requests": 6,
+      "state_digest": "1af97838d5905c78c444eb5bde2d9116bd9bc8dbdc09b3faec20ea3459ed2f87",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 8,
+      "ready_requests": 6,
+      "state_digest": "6777dd194e9411d40615d60ebf69c2645b7a1e9dcd7e7a9b96e6a71a28d09c1d",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 9,
+      "ready_requests": 6,
+      "state_digest": "015b310756cc32cb7d9bfe0434c4e8d8a5960e8901adb0fc64c61c2a961c82d0",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 10,
+      "ready_requests": 6,
+      "state_digest": "e73ea8dc32d7459e592083944639c452a662ff783531cac6c77f6bd8e060ed5b",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 11,
+      "ready_requests": 6,
+      "state_digest": "6b2cb633e087af248315d8e1f3f6b3231c9b1c79ce996210b098f32d8b594d84",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 12,
+      "ready_requests": 6,
+      "state_digest": "b1932a1cf3d1281cdea91b6803c676b309fd0a7458876e3354abfcc6ea9d7239",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 13,
+      "ready_requests": 6,
+      "state_digest": "249c6ca8f82996d88a9567234dee9fec685f68642400887aca856883495ccbd9",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 14,
+      "ready_requests": 6,
+      "state_digest": "506f378a5ae99568e9031bcc745b4446d7099d76249d26d67d25c586868dc016",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 15,
+      "ready_requests": 6,
+      "state_digest": "04bd1deb14b99e5371706c33debef711fdbe486a3b90549d6346b017eb612c63",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 16,
+      "ready_requests": 5,
+      "state_digest": "bb43ac5f4c619632e03e6586f42ea1134cb7e1c89de9b4cfedb7b4767b6fd0a5",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 17,
+      "ready_requests": 5,
+      "state_digest": "80ea0787faf1a1a58a699128a4f5799cf90f31fc8b3311c03a8d40ec93c97df5",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 18,
+      "ready_requests": 5,
+      "state_digest": "3d6b4082731e4faa7207ff94bdaf9a7cdc95904e07414d9075f0f9301eb24565",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 19,
+      "ready_requests": 4,
+      "state_digest": "f0144a5545e9fc210591ca11d40fb16e95072224fdb5f5fb4f2045bde4acf15c",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 20,
+      "ready_requests": 4,
+      "state_digest": "ba9dc7d18c955bd1cd5b5c7866b033df8bd9d95e223986625abef39a1ae48121",
+      "useful_progress_units": 2
+    },
+    {
+      "cycle": 21,
+      "ready_requests": 3,
+      "state_digest": "022922fcaf8d091113a34efb5e350d92c81b5ec1ca82c846091b9d12fba95e17",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 22,
+      "ready_requests": 3,
+      "state_digest": "cb50c520c9218700cf49d989fe95058f9b1dc9285ea29897ce41452e12633060",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 23,
+      "ready_requests": 3,
+      "state_digest": "dbbb81a5fe8e1107eb876768b3f6c1b5174dafc0231289e880bada9a629ff96a",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 24,
+      "ready_requests": 3,
+      "state_digest": "9cf21d2359f683f79d8635e25ca02d92e4305afebfbc8cb2b45c9090ac59a36b",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 25,
+      "ready_requests": 3,
+      "state_digest": "f3b2d6e12483a56e2d39e1d6e349a6470995fe38f3527a5ec931e2bcc391b6d9",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 26,
+      "ready_requests": 3,
+      "state_digest": "d9823e1cdb10257bac595ee7c60838067a2a01e7471363d85010c10e51103d47",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 27,
+      "ready_requests": 2,
+      "state_digest": "25fd3e17515878191cb4b15dfcbd5cbfdd0ab63716095f010dcbb8da7f427d52",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 28,
+      "ready_requests": 2,
+      "state_digest": "c56cb419f1fb86f8adfb1f6c3aacf471a871f7507749c731786fbdee5febf24a",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 29,
+      "ready_requests": 1,
+      "state_digest": "0fb46b0c118eed74d1ef0af5fe6c8a130702e7edec6f6713a724f7e4e6d626cb",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 30,
+      "ready_requests": 1,
+      "state_digest": "2981d38fbe3c84c4029db1fc153ef5e3a4690e50dc13a4ab08b9ca3c2fcad7c4",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 31,
+      "ready_requests": 1,
+      "state_digest": "90212169cff7465f3bf0647e544e58fa453785c011e44479e2ce601e251032a6",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 32,
+      "ready_requests": 1,
+      "state_digest": "3035ca18731a0a144719641caf437bb2ccd296066faf58ae3b28a0e6d15fbab3",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 33,
+      "ready_requests": 1,
+      "state_digest": "d2b7002d160b0ab2ae73761eb09accf4377840befecddc30c3108fc0cd4895f4",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 34,
+      "ready_requests": 1,
+      "state_digest": "5978c5bb158a2d3e6a4f5d6ba670b0e6b8a76793e18716247f346836a36d6d7e",
+      "useful_progress_units": 1
+    },
+    {
+      "cycle": 35,
+      "ready_requests": 1,
+      "state_digest": "fc3c1279fa6ace43271bbcff7314c752f6772bb7099ca526671029e121d143f0",
+      "useful_progress_units": 1
+    }
+  ],
+  "qualification_boundary": "P25 functional QoS/liveness micro-model only; micro-cycles are not GPU, ATLAS, BookSim2 or DRAM performance cycles",
+  "requests": [
+    {
+      "arrival_cycle": 0,
+      "completion_cycle": 16,
+      "fairness_group": "latency-mixed-0",
+      "max_wait_cycles": 3,
+      "qos_class": "latency",
+      "request_id": "latency-mixed-0",
+      "resource_service_units": {
+        "atlas0.compute": 2,
+        "gpu0": 6
+      },
+      "service_units": 8,
+      "service_units_in_fairness_window": 5,
+      "weight": 4
+    },
+    {
+      "arrival_cycle": 1,
+      "completion_cycle": 19,
+      "fairness_group": "latency-mixed-1",
+      "max_wait_cycles": 5,
+      "qos_class": "latency",
+      "request_id": "latency-mixed-1",
+      "resource_service_units": {
+        "atlas0.compute": 6,
+        "gpu0": 2
+      },
+      "service_units": 8,
+      "service_units_in_fairness_window": 6,
+      "weight": 4
+    },
+    {
+      "arrival_cycle": 0,
+      "completion_cycle": 27,
+      "fairness_group": "normal-gpu-peers",
+      "max_wait_cycles": 4,
+      "qos_class": "normal",
+      "request_id": "normal-gpu-0",
+      "resource_service_units": {
+        "gpu0": 8
+      },
+      "service_units": 8,
+      "service_units_in_fairness_window": 3,
+      "weight": 2
+    },
+    {
+      "arrival_cycle": 0,
+      "completion_cycle": 29,
+      "fairness_group": "normal-gpu-peers",
+      "max_wait_cycles": 4,
+      "qos_class": "normal",
+      "request_id": "normal-gpu-1",
+      "resource_service_units": {
+        "gpu0": 8
+      },
+      "service_units": 8,
+      "service_units_in_fairness_window": 2,
+      "weight": 2
+    },
+    {
+      "arrival_cycle": 1,
+      "completion_cycle": 21,
+      "fairness_group": "throughput-atlas-0",
+      "max_wait_cycles": 4,
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_service_units": {
+        "atlas0.compute": 12
+      },
+      "service_units": 12,
+      "service_units_in_fairness_window": 5,
+      "weight": 1
+    },
+    {
+      "arrival_cycle": 0,
+      "completion_cycle": 36,
+      "fairness_group": "throughput-gpu-0",
+      "max_wait_cycles": 5,
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_service_units": {
+        "gpu0": 12
+      },
+      "service_units": 12,
+      "service_units_in_fairness_window": 2,
+      "weight": 1
+    }
+  ],
+  "schema_version": "hetero-p25-qos-runtime/v1",
+  "service_events": [
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 0,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 1,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-1",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 1,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 2,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 2,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-1",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 3,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-1",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 3,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 4,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-1",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 4,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 5,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-1",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 5,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 6,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-1",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 6,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 7,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 7,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-1",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 8,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-1",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 8,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 9,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "starvation_override",
+      "cycle": 9,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 10,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 10,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 11,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 11,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 12,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 12,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-1",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 13,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 13,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 14,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "starvation_override",
+      "cycle": 14,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-1",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 15,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "starvation_override",
+      "cycle": 15,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 16,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 16,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 17,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 17,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-1",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 18,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 18,
+      "event": "SERVICE",
+      "qos_class": "latency",
+      "request_id": "latency-mixed-1",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 19,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 19,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 20,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-atlas-0",
+      "resource_id": "atlas0.compute",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 20,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-1",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "starvation_override",
+      "cycle": 21,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 22,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 23,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-1",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 24,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 25,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-1",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 26,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "starvation_override",
+      "cycle": 27,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 28,
+      "event": "SERVICE",
+      "qos_class": "normal",
+      "request_id": "normal-gpu-1",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 29,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 30,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 31,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 32,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 33,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 34,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    },
+    {
+      "arbitration_reason": "weighted_fair",
+      "cycle": 35,
+      "event": "SERVICE",
+      "qos_class": "throughput",
+      "request_id": "throughput-gpu-0",
+      "resource_id": "gpu0",
+      "useful_progress": true
+    }
+  ],
+  "timing_semantics": "deterministic_scheduler_micro_cycles",
+  "watchdog": {
+    "deadlock_detected": false,
+    "forward_progress_proven_for_run": true,
+    "livelock_detected": false,
+    "window_cycles": 4
+  }
+}

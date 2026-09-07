@@ -136,8 +136,11 @@
         "prompt_length": {"type": "integer", "minimum": 1},
         "output_length": {"type": "integer", "minimum": 1},
         "priority": {"type": "integer"},
-        "execution_scope": {"enum": ["full_request", "decode_step"]},
-        "initial_kv_length": {"type": "integer", "minimum": 0}
+        "execution_scope": {"enum": ["full_request", "decode_step", "decode_loop"]},
+        "initial_kv_length": {"type": "integer", "minimum": 0},
+        "eos_after_generated_tokens": {"type": "integer", "minimum": 1},
+        "max_output_tokens": {"type": "integer", "minimum": 1},
+        "cancel_time_fs": {"type": "integer", "minimum": 0}
       }
     },
     "workload": {
@@ -148,7 +151,7 @@
       "type": "object", "additionalProperties": false,
       "required": ["mode", "max_num_sequences", "max_batched_tokens", "prefill_chunk_tokens", "epoch_duration_fs"],
       "properties": {
-        "mode": {"enum": ["static_ragged", "continuous", "continuous_batching"]},
+        "mode": {"enum": ["static_ragged", "request_batch", "continuous", "continuous_batching"]},
         "epoch_mode": {"enum": ["token_step_barrier"]},
         "admission": {"enum": ["fcfs", "kv_capacity_aware"]},
         "decode_priority": {"type": "boolean"},
@@ -158,7 +161,11 @@
         "prefill_chunk_tokens": {"type": "integer", "minimum": 1},
         "max_prefill_wait_epochs": {"type": "integer", "minimum": 0},
         "kv_reservation_mode": {"enum": ["full_request", "max_request"]},
-        "epoch_duration_fs": {"type": "integer", "minimum": 1}
+        "epoch_duration_fs": {"type": "integer", "minimum": 1},
+        "batch_policy": {"enum": ["homogeneous", "padding_dense", "ragged_split"]},
+        "batch_cycle_mode": {"enum": ["request_cycle_composed", "batched_kernel_cycle"]},
+        "batch_artifact_catalog_ref": {"type": "string", "minLength": 1},
+        "cancellation_granularity": {"const": "token_step_barrier"}
       }
     },
     "placement": {
@@ -205,7 +212,7 @@
       "type": "object", "additionalProperties": false, "required": ["coupling"],
       "properties": {
         "coupling": {"enum": ["analytical", "operator_event", "request_cycle"]},
-        "execution_mode": {"enum": ["scheduler_validation", "analytical_preview", "operator_event", "full_runtime", "prefill_cycle"]},
+        "execution_mode": {"enum": ["scheduler_validation", "analytical_preview", "operator_event", "full_runtime", "prefill_cycle", "request_cycle"]},
         "validation_policy": {"enum": ["required", "deferred"]}
       }
     },

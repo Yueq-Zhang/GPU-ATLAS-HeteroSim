@@ -1,6 +1,6 @@
 # P16 全任务请求周期建模资格
 
-日期：2026-08-31
+日期：2026-09-01
 状态：固定Shape的功能与请求周期资格通过；性能资格关闭
 
 ## 固定范围
@@ -18,6 +18,8 @@ P16现在精确覆盖19种算子、20个任务实例，没有隐式分析回退�
 - `kv_allocate`、`kv_append`、`kv_release`生成显式Global PA请求，经外部Link进入各自唯一的live Ramulator2；
 - `request_start`和`request_finish`是无内存请求的主机控制边界事件，参与因果时间线，但明确排除在设备性能边界之外；
 - Token ID真实Kernel使用64-bit索引，而物化图仍保留通用元素宽度。为避免改变已资格算子的低地址分配，P16从4 GiB空间顶部保留一个`external_input_widened_shadow`，显式绑定128 B输入，不把它解释为VA翻译。
+
+Token Embedding和Residual Add的`operator_metadata.json`、`kernelslist.g`、非空SM86 Trace及Range-Rebase资格记录现已归档在`configs/hetero/operator_artifacts/p16/`下。源Artifact、Trace Manifest、耦合Artifact和资格记录均使用仓库相对路径；加载时仍逐文件核验SHA-256。在线地址绑定表会在Accel-Sim改变工作目录前解析为绝对路径，避免相对`validation/p16`输出根导致错误查找。
 
 两遍完整时间线使用相同Simulation Key `d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a`，核心结果完全一致：
 
@@ -45,7 +47,7 @@ KV运行时请求进一步分解为：
 
 执行周期按共享GPU外部端口的1.132 GHz时钟统计，包含live链路/DRAM等待和固定控制周期；公式合同周期仍按未校准实现参数单独保存，不再冒充实际执行周期。每个KV任务均满足Ramulator2实例数1、Parent ID唯一、accepted=observed=completed=durable、Child sent=completed、ATLAS请求0和退出在途0。全部任务满足依赖先完成、`gpu0`资源不重叠、Global PA不重叠、输入版本启动时核验以及输出只在Backend完成时提交。
 
-机器可读资格记录为`validation/p16/p16_full_task_qualification.json`，自动检查入口为：
+机器可读资格记录为`validation/p16/p16_full_task_qualification.json`，当前SHA-256为`710c8f7ff135cb0bae393e4a61cfcb277dd6a7e4ec9732955fbceef06ccac46f`。当前版本已在新的远端部署中从仓库内Artifact重新执行两遍，并把原始运行目录同步回本地后再次运行同一汇总器；除环境相关`run_dir`外，重新汇总内容与远端资格记录一致。自动检查入口为：
 
 ```bash
 python scripts/summarize_p16_full_task_timeline.py \

@@ -130,16 +130,34 @@
     },
     {
       "cycles": 28772,
+      "execution_identity": {
+        "executable_sha256": "ca91eb442c38e8929830ac424c8ded7777da469fa64eb02bca3e454a4f73acda",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "3322e9c3ae5ad2d6179cb0ec16ec108cbbbe6424fb62788053dfc36a5a1fd099",
+        "launch_contract_sha256": "d9e5e1f9867c43083123badc28af86f43cb8908f2670b740501447b4b2b8a957",
+        "native_measurement_observed": false,
+        "provenance": {
+          "kernels_list_sha256": "7d45a8c414bf9941a194b5ba96ea6e5a397a1acfc9d16364a3390f1309340665",
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "be39515262126080e44f10753d33e5fd2245518389fc4da8baf36e58d1739750",
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json",
+          "trace_manifest_sha256": "b5517219cc50365056a27d1f63bf57754b92bda806a9545eab2026f3d251fe7a",
+          "trace_sha256": "859102ed6f160f46581426a06e18a3bdbf482510c3c8ce41e8c3f73e1f285bf7"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "heterosim_cuda_reference_residual_add_v1",
       "operator_artifact": "configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_residual_add_sm86_shared_hbdram_range_rebase.json",
-      "operator_artifact_sha256": "cadecc33d749e61968742082685bcaa393a9489f13656d5cc63490581ac52828",
+      "operator_artifact_sha256": "b6f5e403e4349851f4ce8f2e20266cb54a3660a39b8d17e20bd1e83c99bb8c4c",
       "operator_latency_fs": 25416961131,
       "operator_type": "residual_add",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.residual_add",
       "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
       "trace_id": "tinyllama.1_1b.layer0.residual_add.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
       "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p16\\tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json",
-      "trace_manifest_sha256": "b5b419b9160f5e77b9e2221b72b89beff99636d4c1a0aabdb077c3cede9a7677"
+      "trace_manifest_sha256": "8ea1794bf7ea3544c834c322c85687f7ef3af486bf2a08ac379e5fc63cae0eb7"
     },
     {
       "cycles": 135684,
@@ -182,16 +200,34 @@
     },
     {
       "cycles": 6691,
+      "execution_identity": {
+        "executable_sha256": "ca91eb442c38e8929830ac424c8ded7777da469fa64eb02bca3e454a4f73acda",
+        "kernel_launch_count": 1,
+        "kernel_sequence_sha256": "57653a659dc89e24d0e0ec17c17e65e5c03b308fa95f21ff17bac440662b41bf",
+        "launch_contract_sha256": "2e4432b4aecba21943b747d636758fafc94d9837895dd72221be41a85972e911",
+        "native_measurement_observed": false,
+        "provenance": {
+          "kernels_list_sha256": "29408bd1d80a75ded499c061f1fa63fb088880156af723cfa8c34a03b5317c2d",
+          "recapture_record": "validation/p17/sm86_sealed_recapture/recapture_record.json",
+          "recapture_record_sha256": "be39515262126080e44f10753d33e5fd2245518389fc4da8baf36e58d1739750",
+          "trace_manifest": "configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json",
+          "trace_manifest_sha256": "4e152fb368c3e58c6a8c4de51d78943a1cc9fd92c9a971e6c12d26013241fcb3",
+          "trace_sha256": "19b76926fb65f615fa047df382fd9d8848a68d3b9c6fe9d1543653fe0e90c6d3"
+        },
+        "schema_version": "hetero-gpu-execution-identity/v1",
+        "target_sm": 86,
+        "trace_capture_observed": true
+      },
       "implementation": "heterosim_cuda_reference_token_embedding_v1",
       "operator_artifact": "configs/hetero/operator_artifacts/p16/tinyllama_prefill_bs1_ctx16_token_embedding_sm86_shared_hbdram_range_rebase.json",
-      "operator_artifact_sha256": "7ba140dcb244c6a1a75804de0e0abfad6a70504517c5c12782099f3f4a06fbf0",
+      "operator_artifact_sha256": "e82becf47873c1f0cf9b84ff3de35460a5a9ade5562739d3fd8bd8741ce7b6c0",
       "operator_latency_fs": 5910777385,
       "operator_type": "token_embedding",
       "shape_key": "tinyllama-1.1b.prefill.layer0.fp16.bs1.ctx16.q16.kv16.token_embedding",
       "source_status": "cycle_coupled_range_rebased_pending_global_timeline",
       "trace_id": "tinyllama.1_1b.layer0.token_embedding.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
       "trace_manifest": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\operator_artifacts\\p16\\tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json",
-      "trace_manifest_sha256": "96e8d7e820e862e03937b166edadd45e25c4af194b0ba3a2aa38cf4e51c88037"
+      "trace_manifest_sha256": "2d1a2c1545bae6d601ba49876f969a0834a86f5337d48b5abf40849ce92a9e25"
     }
   ],
   "performance_qualification": {

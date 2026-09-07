@@ -1,0 +1,479 @@
+{
+  "catalog_id": "tinyllama.1_1b.decode4.bs1_ctx16.layers1.p20",
+  "claim_boundary": {
+    "performance_claim_allowed": false,
+    "reason": "P20 is a functional multi-token request-cycle qualification. The GPU cycle contract is not performance calibrated."
+  },
+  "model_contracts": {
+    "tinyllama_1_1b_fe8a4e_fp16": {
+      "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+      "dtype": "fp16",
+      "head_dim": 64,
+      "hidden_size": 2048,
+      "intermediate_size": 5632,
+      "model_spec_name": "TinyLlama-1.1B",
+      "num_attention_heads": 32,
+      "num_kv_heads": 4,
+      "vocab_size": 32000
+    }
+  },
+  "operator_types": [
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "attention_norm",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "causal_attention",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "down_projection",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "final_norm",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "gate_up_projection",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 1,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "kv_allocate",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "state",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "kv_append",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "state",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 1,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "kv_release",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "state",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "lm_head",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "mlp_norm",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "output_projection",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "qkv_projection",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [],
+      "backend_kind": "event_marker",
+      "cycle_fidelity": "event_only",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 1,
+      "notes": "Causal request boundary; excluded from device performance.",
+      "operator_type": "request_finish",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "control_ctx16_to20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "control",
+      "test_status": "graph_causality_tested"
+    },
+    {
+      "artifact_refs": [],
+      "backend_kind": "event_marker",
+      "cycle_fidelity": "event_only",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 1,
+      "notes": "Causal request boundary; excluded from device performance.",
+      "operator_type": "request_start",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "control_ctx16_to20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "control",
+      "test_status": "graph_causality_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 8,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "residual_add",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "rope",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "sampling",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "control",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "silu_multiply",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    },
+    {
+      "artifact_refs": [
+        "configs/hetero/cycle_artifacts/tinyllama11b_request_cycle_fp16_v1.json"
+      ],
+      "backend_kind": "cycle_replay",
+      "cycle_fidelity": "runtime_cycle_contract",
+      "implementation_status": "implemented",
+      "instances_in_reference_graph": 4,
+      "notes": "P20 qualifies the four-token request-cycle, versioned KV state, Global PA and one live Ramulator2. GPU compute remains an uncalibrated tiled cycle contract, not an Accel-Sim trace.",
+      "operator_type": "token_embedding",
+      "performance_eligible": false,
+      "request_cycle_ready": false,
+      "shape_contract_refs": [
+        "decode_s0_l0_q1_kv17",
+        "decode_s1_l0_q1_kv18",
+        "decode_s2_l0_q1_kv19",
+        "decode_s3_l0_q1_kv20"
+      ],
+      "shape_policy": "exact_only",
+      "task_kind": "compute",
+      "test_status": "runtime_cycle_contract_tested"
+    }
+  ],
+  "reference_graph": "configs/hetero/experiments/p20_tinyllama_decode4_1layer_bs1_ctx16_request_cycle.json",
+  "schema_version": "hetero-operator-capability-catalog/v1",
+  "shape_contracts": {
+    "control_ctx16_to20": {
+      "batch_size": 1,
+      "context_length": 16,
+      "kv_length": 20,
+      "layer_id": 0,
+      "model_contract_ref": "tinyllama_1_1b_fe8a4e_fp16",
+      "phase": "control",
+      "q_len": 1
+    },
+    "decode_s0_l0_q1_kv17": {
+      "batch_size": 1,
+      "context_length": 16,
+      "kv_length": 17,
+      "layer_id": 0,
+      "model_contract_ref": "tinyllama_1_1b_fe8a4e_fp16",
+      "phase": "decode_step",
+      "q_len": 1
+    },
+    "decode_s1_l0_q1_kv18": {
+      "batch_size": 1,
+      "context_length": 16,
+      "kv_length": 18,
+      "layer_id": 0,
+      "model_contract_ref": "tinyllama_1_1b_fe8a4e_fp16",
+      "phase": "decode_step",
+      "q_len": 1
+    },
+    "decode_s2_l0_q1_kv19": {
+      "batch_size": 1,
+      "context_length": 16,
+      "kv_length": 19,
+      "layer_id": 0,
+      "model_contract_ref": "tinyllama_1_1b_fe8a4e_fp16",
+      "phase": "decode_step",
+      "q_len": 1
+    },
+    "decode_s3_l0_q1_kv20": {
+      "batch_size": 1,
+      "context_length": 16,
+      "kv_length": 20,
+      "layer_id": 0,
+      "model_contract_ref": "tinyllama_1_1b_fe8a4e_fp16",
+      "phase": "decode_step",
+      "q_len": 1
+    }
+  }
+}

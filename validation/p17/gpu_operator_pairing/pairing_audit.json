@@ -2,45 +2,59 @@
   "blockers": [
     "memory_topology_mismatch:gpu_local_vram!=external_shared_3ddram",
     "operator:attention_norm:memory_topology_mismatch",
-    "operator:attention_norm:native:trace_binary_identity_unverified",
+    "operator:attention_norm:native:execution_identity_unverified",
     "operator:attention_norm:relative_error_exceeds_tolerance",
+    "operator:attention_norm:simulator:execution_identity_unverified",
     "operator:causal_attention:memory_topology_mismatch",
-    "operator:causal_attention:native:trace_binary_identity_unverified",
+    "operator:causal_attention:native:execution_identity_unverified",
     "operator:causal_attention:relative_error_exceeds_tolerance",
+    "operator:causal_attention:simulator:execution_identity_unverified",
     "operator:down_projection:memory_topology_mismatch",
-    "operator:down_projection:native:trace_binary_identity_unverified",
+    "operator:down_projection:native:execution_identity_unverified",
     "operator:down_projection:relative_error_exceeds_tolerance",
+    "operator:down_projection:simulator:execution_identity_unverified",
     "operator:final_norm:memory_topology_mismatch",
-    "operator:final_norm:native:trace_binary_identity_unverified",
+    "operator:final_norm:native:execution_identity_unverified",
     "operator:final_norm:relative_error_exceeds_tolerance",
+    "operator:final_norm:simulator:execution_identity_unverified",
     "operator:gate_up_projection:memory_topology_mismatch",
-    "operator:gate_up_projection:native:trace_binary_identity_unverified",
+    "operator:gate_up_projection:native:execution_identity_unverified",
     "operator:gate_up_projection:relative_error_exceeds_tolerance",
+    "operator:gate_up_projection:simulator:execution_identity_unverified",
     "operator:lm_head:memory_topology_mismatch",
-    "operator:lm_head:native:trace_binary_identity_unverified",
+    "operator:lm_head:native:execution_identity_unverified",
     "operator:lm_head:relative_error_exceeds_tolerance",
+    "operator:lm_head:simulator:execution_identity_unverified",
     "operator:mlp_norm:memory_topology_mismatch",
-    "operator:mlp_norm:native:trace_binary_identity_unverified",
+    "operator:mlp_norm:native:execution_identity_unverified",
     "operator:mlp_norm:relative_error_exceeds_tolerance",
+    "operator:mlp_norm:simulator:execution_identity_unverified",
     "operator:output_projection:memory_topology_mismatch",
-    "operator:output_projection:native:trace_binary_identity_unverified",
+    "operator:output_projection:native:execution_identity_unverified",
     "operator:output_projection:relative_error_exceeds_tolerance",
+    "operator:output_projection:simulator:execution_identity_unverified",
     "operator:qkv_projection:memory_topology_mismatch",
-    "operator:qkv_projection:native:trace_binary_identity_unverified",
+    "operator:qkv_projection:native:execution_identity_unverified",
     "operator:qkv_projection:relative_error_exceeds_tolerance",
+    "operator:qkv_projection:simulator:execution_identity_unverified",
     "operator:residual_add:memory_topology_mismatch",
-    "operator:residual_add:native:trace_binary_identity_unverified",
+    "operator:residual_add:native:artifact_sha256_mismatch",
+    "operator:residual_add:native:execution_identity_unverified",
     "operator:residual_add:relative_error_exceeds_tolerance",
     "operator:rope:memory_topology_mismatch",
-    "operator:rope:native:trace_binary_identity_unverified",
+    "operator:rope:native:execution_identity_unverified",
     "operator:rope:relative_error_exceeds_tolerance",
+    "operator:rope:simulator:execution_identity_unverified",
     "operator:sampling:memory_topology_mismatch",
-    "operator:sampling:native:trace_binary_identity_unverified",
+    "operator:sampling:native:execution_identity_unverified",
+    "operator:sampling:simulator:execution_identity_unverified",
     "operator:silu_multiply:memory_topology_mismatch",
-    "operator:silu_multiply:native:trace_binary_identity_unverified",
+    "operator:silu_multiply:native:execution_identity_unverified",
     "operator:silu_multiply:relative_error_exceeds_tolerance",
+    "operator:silu_multiply:simulator:execution_identity_unverified",
     "operator:token_embedding:memory_topology_mismatch",
-    "operator:token_embedding:native:trace_binary_identity_unverified",
+    "operator:token_embedding:native:artifact_sha256_mismatch",
+    "operator:token_embedding:native:execution_identity_unverified",
     "operator:token_embedding:relative_error_exceeds_tolerance"
   ],
   "gpu_operator_calibration_complete": false,
@@ -49,10 +63,12 @@
   "operators": [
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "transformers.LlamaRMSNorm",
       "max_relative_error": 0.15,
       "measured_latency_fs": 272576004267,
@@ -66,10 +82,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "torch.scaled_dot_product_attention_causal",
       "max_relative_error": 0.15,
       "measured_latency_fs": 59392001480,
@@ -83,10 +101,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "transformers.LlamaMLP.down_proj",
       "max_relative_error": 0.15,
       "measured_latency_fs": 89088000357,
@@ -100,10 +120,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "transformers.LlamaRMSNorm.final_position_only",
       "max_relative_error": 0.15,
       "measured_latency_fs": 111616000533,
@@ -117,10 +139,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "two_exact_checkpoint_linear_projections_plus_pack",
       "max_relative_error": 0.15,
       "measured_latency_fs": 189311996102,
@@ -134,10 +158,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "transformers.LlamaForCausalLM.lm_head.final_position_only",
       "max_relative_error": 0.15,
       "measured_latency_fs": 367615997791,
@@ -151,10 +177,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "transformers.LlamaRMSNorm.post_attention_layernorm",
       "max_relative_error": 0.15,
       "measured_latency_fs": 116864003241,
@@ -168,10 +196,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "transformers.LlamaAttention.o_proj",
       "max_relative_error": 0.15,
       "measured_latency_fs": 84799997509,
@@ -185,10 +215,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "three_exact_checkpoint_linear_projections_plus_pack",
       "max_relative_error": 0.15,
       "measured_latency_fs": 147264003754,
@@ -202,10 +234,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:artifact_sha256_mismatch",
+        "native:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "heterosim_cuda_reference_residual_add_v1",
       "max_relative_error": 0.15,
       "measured_latency_fs": 9216000326,
@@ -219,10 +253,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "transformers.LlamaRotaryEmbedding_plus_apply_rotary_pos_emb",
       "max_relative_error": 0.15,
       "measured_latency_fs": 655391991138,
@@ -236,9 +272,11 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch"
       ],
+      "execution_identity_match": false,
       "implementation": "torch.argmax.greedy_sampling.final_position_only",
       "max_relative_error": 0.15,
       "measured_latency_fs": 17408000305,
@@ -252,10 +290,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:execution_identity_unverified",
+        "simulator:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "torch.nn.functional.silu_times_up_projection",
       "max_relative_error": 0.15,
       "measured_latency_fs": 26623999700,
@@ -269,10 +309,12 @@
     },
     {
       "blockers": [
-        "native:trace_binary_identity_unverified",
+        "native:artifact_sha256_mismatch",
+        "native:execution_identity_unverified",
         "memory_topology_mismatch",
         "relative_error_exceeds_tolerance"
       ],
+      "execution_identity_match": false,
       "implementation": "heterosim_cuda_reference_token_embedding_v1",
       "max_relative_error": 0.15,
       "measured_latency_fs": 9216000326,

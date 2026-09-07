@@ -13,8 +13,8 @@ ACCEL_COMMIT="64653015f85fb5664c84a10f48527e8897d289d0"
 DEPENDENCIES_ROOT="${ACCEL_SIM_DEPS_ROOT:-/opt/gpu-atlas/dependencies}"
 ACCEL_ROOT="${ACCEL_SIM_ROOT:-$DEPENDENCIES_ROOT/accel-sim-framework-$ACCEL_COMMIT}"
 CUDA_ROOT="${ACCEL_SIM_CUDA_ROOT:-/usr/local/cuda-11.8}"
-TRACER="$ACCEL_ROOT/util/tracer_nvbit/tracer_tool/tracer_tool.so"
-POSTPROCESSOR="$ACCEL_ROOT/util/tracer_nvbit/tracer_tool/traces-processing/post-traces-processing"
+TRACER="${ACCEL_SIM_TRACER:-$ACCEL_ROOT/util/tracer_nvbit/tracer_tool/tracer_tool.so}"
+POSTPROCESSOR="${ACCEL_SIM_POSTPROCESSOR:-$ACCEL_ROOT/util/tracer_nvbit/tracer_tool/traces-processing/post-traces-processing}"
 
 [[ -x "$APPLICATION" ]] || { echo "application is not executable: $APPLICATION" >&2; exit 2; }
 [[ -f "$TRACER" ]] || { echo "tracer not built: $TRACER" >&2; exit 2; }

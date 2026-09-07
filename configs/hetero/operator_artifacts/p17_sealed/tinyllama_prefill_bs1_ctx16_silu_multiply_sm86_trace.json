@@ -1,0 +1,147 @@
+{
+  "address_ranges": [
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.silu_multiply.gate.capture0",
+      "capture_allocation_id": "tinyllama.layer0.silu_multiply.gate.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "tensor_id": "tinyllama.layer0.silu_multiply.gate",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47380156928,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.silu_multiply.up.capture0",
+      "capture_allocation_id": "tinyllama.layer0.silu_multiply.up.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "tensor_id": "tinyllama.layer0.silu_multiply.up",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47380337152,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.silu_multiply.output.capture0",
+      "capture_allocation_id": "tinyllama.layer0.silu_multiply.output.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "tensor_id": "tinyllama.layer0.silu_multiply.output",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47380697600,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.silu_multiply.opaque_workspace_0.capture0",
+      "capture_allocation_id": "tinyllama.layer0.silu_multiply.opaque_workspace_0.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_allocator_range",
+      "shape": [
+        1298944
+      ],
+      "size_bytes": 1298944,
+      "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_0",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47378857984,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.silu_multiply.opaque_workspace_1.capture0",
+      "capture_allocation_id": "tinyllama.layer0.silu_multiply.opaque_workspace_1.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_allocator_range",
+      "shape": [
+        180224
+      ],
+      "size_bytes": 180224,
+      "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_1",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47380517376,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.silu_multiply.opaque_workspace_2.capture0",
+      "capture_allocation_id": "tinyllama.layer0.silu_multiply.opaque_workspace_2.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_allocator_range",
+      "shape": [
+        77312
+      ],
+      "size_bytes": 77312,
+      "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_2",
+      "tensor_offset_bytes": 0,
+      "trace_base": 47380877824,
+      "view_offset_bytes": 0
+    }
+  ],
+  "capture": {
+    "dtype": "fp16",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "operator": "silu_multiply",
+    "phase": "prefill",
+    "scope": "one_shape_locked_operator_not_end_to_end",
+    "shape": {
+      "batch_size": 1,
+      "context_length": 16,
+      "kv_length": 16,
+      "q_len": 16
+    },
+    "source": "P15 shape-locked operator capture",
+    "tool": "NVBit",
+    "version": "1.8"
+  },
+  "compilation": {
+    "cuda_runtime": "12.1",
+    "framework": "pytorch",
+    "implementation": "torch.nn.functional.silu_times_up_projection",
+    "launch_program": {
+      "components": {
+        "cuda_runtime": "12.1",
+        "program_kind": "python_pytorch_launch_program",
+        "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+        "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+        "python_version": "3.10.20",
+        "pytorch": "2.3.0+cu121",
+        "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+        "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+        "transformers": "4.57.6",
+        "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+        "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+      },
+      "kind": "python_pytorch_launch_program",
+      "sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890"
+    },
+    "pytorch": "2.3.0+cu121",
+    "target_sm": 86
+  },
+  "kernels_list": "evidence/local_rtx3070_same_binary_v1/silu_multiply/traces/kernelslist.g",
+  "qualification_record": null,
+  "replay_safe": false,
+  "schema_version": "hetero-trace-manifest/v1",
+  "trace_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+  "trace_semantics": "functional"
+}

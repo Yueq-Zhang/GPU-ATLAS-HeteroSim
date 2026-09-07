@@ -1,6 +1,19 @@
+from pathlib import Path
+import re
+
+from frontend.hetero import __version__
 from frontend.hetero.cli import main
 from frontend.hetero.trace_manifest import TraceManifest
 import json
+
+
+def test_package_version_matches_project_metadata() -> None:
+    project = (Path(__file__).resolve().parents[2] / "pyproject.toml").read_text(
+        encoding="utf-8"
+    )
+    match = re.search(r'^version = "([^"]+)"$', project, flags=re.MULTILINE)
+    assert match is not None
+    assert __version__ == match.group(1)
 
 
 def test_validate_command(capsys) -> None:

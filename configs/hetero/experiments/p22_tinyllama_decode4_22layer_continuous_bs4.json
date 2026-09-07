@@ -1,0 +1,25 @@
+{
+  "schema_version": "hetero-sim/v1",
+  "experiment": {
+    "name": "p22_tinyllama_decode4_22layer_continuous_bs4",
+    "seed": 1,
+    "generation_mode": "trace_locked"
+  },
+  "simulation": {
+    "coupling": "request_cycle",
+    "execution_mode": "scheduler_validation",
+    "validation_policy": "required"
+  },
+  "system": {"profile": "model3_gpu_native_3ddram"},
+  "backends": {
+    "gpu": {"kind": "roofline"},
+    "atlas": {"kind": "none"},
+    "host": {"kind": "none"}
+  },
+  "model": {"ref": "configs/hetero/models/tinyllama_1_1b_decode_22layer_fp16.json"},
+  "workload": {"ref": "configs/hetero/workloads/p22_tinyllama_decode4_continuous_bs4.json"},
+  "scheduling": {"ref": "configs/hetero/schedulers/p22_continuous_ragged_bs4.json"},
+  "placement": {"ref": "configs/hetero/placements/gpu_only.json"},
+  "address": {"ref": "configs/hetero/addresses/paged_kv_tiny.json"},
+  "metrics": {"ref": "configs/hetero/metrics/e2e_validation.json"}
+}

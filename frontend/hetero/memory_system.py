@@ -7,8 +7,8 @@ non-coherent residency contracts; timing is delegated to the C++ services.
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
-from typing import Mapping, Sequence
 
 from .runtime_bridge import (
     plan_memory_lifecycle,
@@ -126,9 +126,11 @@ def kv_allocation_size(
     model: Mapping[str, object],
     address: Mapping[str, object],
 ) -> int:
+    scope = request.get("execution_scope", "full_request")
     final_tokens = (
-        int(request.get("initial_kv_length", 0)) + 1
-        if request.get("execution_scope", "full_request") == "decode_step"
+        int(request.get("initial_kv_length", 0))
+        + int(request["output_length"])
+        if scope in {"decode_step", "decode_loop"}
         else int(request["prompt_length"]) + int(request["output_length"]) - 1
     )
     page_tokens = int(address["page_tokens"])
@@ -154,6 +156,8 @@ def build_dynamic_kv_lifecycle(
     first_use: dict[str, int] = {}
     for epoch in scheduler_result["epochs"]:  # type: ignore[index]
         boundary = int(epoch["boundary_time_fs"])
+        for request_id in epoch.get("admitted_request_ids", []):
+            first_use.setdefault(str(request_id), boundary)
         for selection in epoch["selections"]:
             first_use.setdefault(str(selection["request_id"]), boundary)
     finishes = {

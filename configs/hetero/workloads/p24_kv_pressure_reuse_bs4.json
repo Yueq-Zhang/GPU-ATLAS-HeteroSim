@@ -1,0 +1,39 @@
+{
+  "requests": [
+    {
+      "request_id": "R0-eos",
+      "arrival_time_fs": 0,
+      "prompt_length": 1,
+      "output_length": 8,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 16,
+      "eos_after_generated_tokens": 1
+    },
+    {
+      "request_id": "R1-max",
+      "arrival_time_fs": 0,
+      "prompt_length": 1,
+      "output_length": 8,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 16,
+      "max_output_tokens": 2
+    },
+    {
+      "request_id": "R2-cancel-waiting",
+      "arrival_time_fs": 0,
+      "prompt_length": 1,
+      "output_length": 8,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 16,
+      "cancel_time_fs": 1500
+    },
+    {
+      "request_id": "R3-complete",
+      "arrival_time_fs": 0,
+      "prompt_length": 1,
+      "output_length": 1,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 16
+    }
+  ]
+}

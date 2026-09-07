@@ -1,0 +1,69 @@
+{
+  "booksim2_activation_gate": {
+    "activated": false,
+    "failed_closed": true,
+    "passed": true,
+    "reason": "BookSim2 adapter_library does not exist: third_party/booksim2/build/libbooksim2_adapter.so",
+    "requested": true
+  },
+  "boundary": "P25 proves deterministic functional QoS arbitration, bounded starvation and deadlock/livelock termination for a one-layer GPU/ATLAS micro-stress. BookSim2 is not activated and scheduler micro-cycles are not performance cycles.",
+  "metrics": {
+    "makespan_micro_cycles": 36,
+    "max_observed_wait_cycles": 5,
+    "same_group_prefix_jain_fairness": {
+      "normal-gpu-peers": 0.9615384615384616
+    },
+    "service_units_by_class_in_fairness_window": {
+      "latency": 11,
+      "normal": 5,
+      "throughput": 7
+    },
+    "service_units_by_resource": {
+      "atlas0.compute": 20,
+      "gpu0": 36
+    },
+    "starvation_override_count": 5,
+    "weighted_jain_fairness": 0.6585365853658537
+  },
+  "normal_run_checks": {
+    "all_requests_finished": true,
+    "double_run_identical": true,
+    "gpu_and_atlas_serviced": true,
+    "healthy_run_forward_progress": true,
+    "latency_class_advantaged_in_prefix": true,
+    "performance_claim_closed": true,
+    "same_class_peer_fairness": true,
+    "single_layer_scope": true,
+    "starvation_bound_obeyed": true,
+    "work_conserved": true
+  },
+  "performance_claim_allowed": false,
+  "qualification_passed": true,
+  "runtime_digest": "efb219a89418cb9004fe85d67aa6560af2211f76fb7ff45915c8d42e4e387588",
+  "schema_version": "hetero-p25-qos-liveness-qualification/v1",
+  "scope": {
+    "layers": [
+      0
+    ],
+    "model": "TinyLlama-1.1B",
+    "purpose": "functional_qos_liveness_qualification"
+  },
+  "watchdog_fault_checks": {
+    "deadlock": {
+      "classification": "deadlock",
+      "detected": true,
+      "detection_cycle": 3,
+      "fault": "deadlock",
+      "passed": true,
+      "window_cycles": 4
+    },
+    "livelock": {
+      "classification": "livelock",
+      "detected": true,
+      "detection_cycle": 3,
+      "fault": "livelock",
+      "passed": true,
+      "window_cycles": 4
+    }
+  }
+}

@@ -14,7 +14,7 @@
   "exact_match_required": true,
   "overlap_evidence": [],
   "provenance": {
-    "backend_config": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/backends/gpu_accelsim_rtx3070.json",
+    "backend_config": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/backends/gpu_accelsim_rtx3070.json",
     "co_resident_atlas": null,
     "dependency_commits": {
       "accel_sim_framework": "64653015f85fb5664c84a10f48527e8897d289d0",
@@ -22,18 +22,18 @@
     },
     "environment_overrides": {},
     "resume_completed_runs": {
-      "adapter_reused": true,
+      "adapter_reused": false,
       "enabled": true,
-      "native_baseline_reused": true
+      "native_baseline_reused": false
     },
-    "trace_manifest": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p17-93f52af-v3/configs/hetero/operator_artifacts/p15h/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json"
+    "trace_manifest": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json"
   },
   "qualified_scopes": [
     "adapter_equivalence"
   ],
   "replay_safety_qualified": false,
   "schema_version": "hetero-accel-sim-qualification/v1",
-  "simulation_key": "e4b9bc6b16c07ceacdf83cb2053a3cc30ffae5a2bd8ed9e99386b1b49ce9b9d4",
+  "simulation_key": "7651d4944900af1a868b2630b5b0fc3e204545a3af080cade8859a4f477e5900",
   "status": "passed",
   "target_gpu": "NVIDIA GeForce RTX 3070",
   "target_sm": 86,
@@ -45,5 +45,5 @@
     "gpu_local_dram": "accel_sim"
   },
   "trace_id": "tinyllama.1_1b.layer0.gate_up_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
-  "trace_key": "9df8a83fa8e9081a0ed02705b7399e661f115e6760f222f82b23d106b3e13544"
+  "trace_key": "75da0a20877d49b36c58e0eec97eaffaad8b7751fcf727b8e754c44dbcce4518"
 }

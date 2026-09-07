@@ -1,8 +1,8 @@
 # GPU-ATLAS-HeteroSim 当前完成情况与计划差距
 
-评估日期：2026-08-31
-当前版本：`0.27.0`
-规范基线：`hetero-sim/v1`、设计合同v1.27
+评估日期：2026-09-07
+当前版本：`0.34.0`
+规范基线：`hetero-sim/v1`、设计合同v1.35
 
 ## 1. 当前结论
 
@@ -18,9 +18,23 @@ P10b-B至P14进一步完成了请求级Prefill部署：任务按读完成、计�
 
 P15e已完成Context=16一层Prefill大型请求轨迹的流式gzip双跑、Attention Norm在线Range-Rebase以及LM Head长时双遍资格；P15f完成QKV Projection的Allocator Segment Range-Rebase；P15g首先验证两个Ready算子的全局时间线。P15h现已完成其余10个GPU算子的重捕获、双遍资格与统一接入：12个`request_cycle_ready=true`真实Accel-Sim算子共享同一Prefill时间线，并通过依赖、GPU资源互斥、Global PA、唯一Ramulator2、Parent/Child/durable守恒、零在途和版本提交因果验证。其余8个控制、KV管理与残差任务仍为分析/运行时模型，性能资格保持关闭。
 
-P16已完成固定Shape的全任务请求周期建模：能力Catalog精确覆盖19种算子/20个实例；14种GPU算子覆盖15个真实Accel-Sim Trace实例；KV Allocate/Append/Release把精确Global PA请求经外部Link送入唯一live Ramulator2；Request Start/Finish作为主机控制边界参与因果时间线但排除在设备性能边界之外。两遍完整运行均完成517个KV运行时Parent、31次版本检查和18次版本提交，全部零在途。17/19种算子类型为`request_cycle_ready=true`，性能资格仍为0/19。
+P16已完成固定Shape的全任务请求周期建模，并补齐干净Checkout所需的可移植证据：Token Embedding和Residual Add的Metadata、Kernel List、Trace与Range-Rebase资格记录现为仓库相对路径；在线地址绑定表会在切换到Accel-Sim输出目录前解析为绝对路径。当前版本已在远端从仓库内证据重新完成两遍20任务运行；每遍包含15个真实Accel-Sim Trace实例、517个KV运行时Parent、31次版本检查和18次版本提交，全部零在途。17/19种算子类型为`request_cycle_ready=true`，性能资格仍为0/19。
 
-P17已完成性能校准基础设施、14类GPU算子的首轮本机测量和14类Native-VRAM Accel-Sim双遍资格：机器合同把GPU Operator、Copy Engine、Runtime、外部Link、Logic-Die Gateway和3D-DRAM拆成6个独立校准组件，核验配置与测量SHA-256、可信证据类型、必需指标、误差阈值和适用Shape。RTX 3070原生本地显存Catalog对每类算子执行50次Warmup和500次CUDA Event测量；模拟Catalog逐类保存两遍完全一致的周期/指令和实际Trace Manifest。Embedding/Residual已用同一份仅含SM86 cubin的封存二进制重新捕获。严格审计现已确认`gpu_local_vram`拓扑匹配，但14类Native执行均未证明与Trace二进制一致，且10/14误差超过15%，因此正式配对仍为0/14。GPU/Copy/Runtime仅为`measured_unvalidated`，其余3项为`specified_only`，整机性能资格仍为0/6。P16两遍确定性已由P17审计复核，`performance_claim_allowed=false`保持不变。
+P17已完成全部14类GPU算子的本机RTX 3070闭环：每类都执行50次预热、500次CUDA Event测量、NVBit 1.8捕获和Native-VRAM Accel-Sim双遍资格。`hetero-gpu-execution-identity/v1`封存Executable或Python/PyTorch执行程序、Launch Contract、Kernel Sequence、Target SM和双侧观测标志，共覆盖63个真实Kernel Launch。14/14身份、Artifact和拓扑门禁均通过；Down Projection、Output Projection、QKV Projection和LM Head通过15%数值误差门禁，正式配对为4/14，其余10类仅因误差超阈值阻断。GPU/Copy/Runtime仍为`measured_unvalidated`，其余3项为`specified_only`，整机性能资格仍为0/6，`performance_claim_allowed=false`保持不变。
+
+P18已启动逐算子误差校准。首个机器可读Triage基线将Native与Accel-Sim延迟、误差方向、倍率、Kernel数量、周期和指令统一封存：平均绝对误差45.67%，中位绝对误差46.04%；11类模拟时间低于Native，3类高于Native。当前分为6类严重误差、3类中等误差、1类接近阈值和4类已通过，下一步先复核4类通过项的稳定性，再逐组定位10类超阈值原因。
+
+P19已完成固定Decode功能闭环。新增通用`request_cycle`执行模式、Decode KV生命周期审计、1层/22层精确Shape能力目录和双遍资格工具。TinyLlama‑1.1B FP16、BS=1、初始Context=16、`q_len=1`的1层20任务与22层272任务均双跑通过；分别完成190和3,382个GPU Parent，K/V按层从版本0提交到1、长度16增长到17。全部请求落在对应Global PA区间，依赖与`gpu0`互斥、唯一Ramulator2、Parent/Child/durable守恒、零ATLAS请求和零在途均通过。当前GPU计算仍为`request_tiled_cycle_contract`，Accel-Sim指令Trace覆盖率为0，因此这些周期和makespan只能作为功能证据。
+
+P20已把该路径扩展为真正的多Token自回归循环。`decode_loop`与P19单步Scope分离，固定连续生成4个Token；第0步读取外部Token，后3步必须读取前一步Sampling结果。1层68任务与22层1,076任务均完成双遍，分别守恒760和13,528个GPU Parent；每层K/V由长度16/版本0推进至长度20/版本4，四次追加的Global PA偏移、Append→Attention、Sampling→下一步Embedding、最终Finish→Release和请求完成区间全部通过审计。该结果仍是功能资格，性能声明保持关闭。
+
+P22已完成多Batch功能周期闭环。运行时显式记录请求Arrival、KV容量Admission、Active、Commit、Finish与Retire，并在Admission时分配、Retire时释放动态Global PA。三种Batch策略`homogeneous`、`padding_dense`和`ragged_split`与两种周期模式`request_cycle_composed`、`batched_kernel_cycle`均有fail-closed配置合同。静态同形BS=2、两种静态Ragged、22层Continuous四请求、两层Prefill/Decode混合四请求共5组双遍通过；GPU/ATLAS设备Sub-Batch、请求/KV版本、地址不重叠与释放复用、资源互斥和零在途均已验证。当前正式资格仍使用Scheduler Epoch组合，不是真实Batched/Fused Kernel周期，性能声明保持关闭。
+
+P23正在把P22的BS=2路径替换为真实GPU Trace。固定TinyLlama Layer 0、Context=16、KV=17的14类GPU算子已经全部在远端RTX 4090完成SASS读取与NVBit捕获；捕获设备SM89和逐Kernel实际SASS版本分别记录，当前包含SM80、SM86及显式的混合Ampere序列。本地不生成或替换这些SASS。Range-Rebase Accel-Sim双遍资格已启动，完成前不得建立完整Batch Ready Catalog或时间线性能结论。
+
+P24已完成单层请求控制功能资格：EOS、最大长度、token-step barrier取消、KV容量准入、Retire释放和Global PA first-fit复用均进入C++ Scheduler与Runner。两组双遍覆盖活跃/等待取消、32 KiB容量压力、延迟Admission和地址复用，全部零重叠、零泄漏、零在途。
+
+P25已完成单层控制面QoS与存活性资格：GPU/ATLAS确定性加权公平仲裁、优先级、饥饿上界、deadlock/livelock Watchdog均通过双遍或故障注入检查。BookSim2适配器仍未激活，当前指标只是调度微周期，性能声明保持关闭。
 
 内存与片上网络的当前状态必须分开表述：Ramulator2已经是`prefill_cycle`和既有耦合资格路径的实时内存时序所有者；BookSim2源码已随ATLAS固定版本并编译进`libatlasim-lib.so`，但当前P9a/P9b Chip配置没有`architecture.noc`，P14也未调用ATLAS完整Chip，因此BookSim2尚未在当前主实验中激活，状态保持`adapter_pending_qualification`。
 
@@ -28,11 +42,11 @@ P17已完成性能校准基础设施、14类GPU算子的首轮本机测量和14�
 
 | 步骤 | 状态 | 当前证据 | 仍需完成 |
 |---|---|---|---|
-| 第一步：独立Accel-Sim后端 | ✅ | v2.0.0；QV100回归；RTX 3070 NVBit 1.8；真实TinyLlama Q投影36,324 cycles | RTX 3070实机校准；RTX 4090配置与Trace |
+| 第一步：独立Accel-Sim后端 | ✅ | v2.0.0；QV100回归；RTX 3070 NVBit 1.8；14类算子本机同一执行程序身份与双遍闭环 | 分析并校准10类超阈值误差 |
 | 第二步：算子事件级GPU+ATLAS | ✅ | 同一ModelGraph支持GPU/ATLAS放置、传输和回退；精确Q投影GPU Trace与ATLAS YAML已匹配 | 把全部层算子替换为真实Artifact；真实多Batch Kernel Shape |
 | 第三步：共享3D‑DRAM请求级耦合 | ✅ P10b-B/P14部署闭环 | 严格计划、GPU/ATLAS端口、Route Fence/Acquire、单Owner Ramulator2、22层Prefill全部连通 | 用全算子真实Trace/ATLAS Artifact替换分块周期契约和采样流量；长时间竞争与QoS |
 
-## 3. P1–P15执行状态
+## 3. P1–P25执行状态
 
 | 顺序 | 计划项 | 状态 | 验收证据或差距 |
 |---:|---|---:|---|
@@ -62,6 +76,14 @@ P17已完成性能校准基础设施、14类GPU算子的首轮本机测量和14�
 | P15g | 两个Ready算子嵌入Prefill全局时间线 | ✅ 因果资格；性能未资格 | Attention在58,833,038,873 fs完成，QKV同刻启动；共享Value与Global PA 351,485,952；GPU资源不重叠；请求零在途；QKV验证Attention输出v1；其余任务分析回退 |
 | P15h | 12算子Range-Rebase与统一Prefill时间线 | ✅ 因果资格；性能未资格 | 10个新增算子重捕获与双遍资格全部通过；12个Ready算子共40,060,873 GPU cycles、6,995,173 Parent、6,998,046 Child和804,512,881次成功转换；84个Global PA区间、56个Workspace、12条请求绑定与18次版本提交通过因果检查；其余8任务仍为分析/运行时模型 |
 | P16 | 全任务周期模型与Shape资格门禁 | ✅ 功能/请求周期资格；性能未资格 | 19类/20实例；15个GPU Trace实例 + 3个KV live Ramulator2实例 + 2个主机控制边界；双遍517个KV Parent、87个PA范围、31次版本检查、18次完成时提交；性能资格0/19 |
+| P17 | GPU算子性能配对门禁 | ✅ 身份/确定性；🟡 性能校准未完成 | 14类算子完成Native/Trace双侧身份和Native-VRAM双遍；4/14通过15%误差门禁；六组件整机资格0/6 |
+| P18 | 误差定位基线 | 🟡 已建立Triage，结果问题暂缓 | 14类平均绝对误差45.67%；基线和输入哈希已封存，未把误差原因当作已确认结论 |
+| P19 | 固定单Token Decode请求周期功能闭环 | ✅ 1层/22层双遍功能资格；性能未资格 | BS=1、初始KV=16、`q_len=1`；20/272任务，190/3,382 GPU Parent，KV 0→1、长度16→17；Global PA、依赖、资源、唯一Ramulator2与零在途通过；Accel-Sim指令Trace覆盖率0 |
+| P20 | 连续四Token自回归Decode闭环 | ✅ 1层/22层双遍功能资格；性能未资格 | BS=1、初始KV=16、4步`q_len=1`；68/1,076任务，760/13,528 GPU Parent，KV版本0→4、长度16→20；Sampling链、追加地址、完成和释放因果通过；Accel-Sim指令Trace覆盖率0 |
+| P22 | Static/Continuous多Batch功能周期闭环 | ✅ 5组双遍功能资格；性能未资格 | Homogeneous/Padding/Ragged Split、GPU/ATLAS设备Sub-Batch、KV容量Admission/Retire、Global PA分配释放复用、请求/Token守恒与确定性通过；真实Batched/Fused Kernel Artifact尚缺 |
+| P23 | BS=2真实GPU Trace与Batch周期替换 | 🟡 14/14远端捕获完成；双遍资格运行中 | 所有SASS在远端RTX 4090获取；固定Layer 0、Context=16、KV=17；Range-Rebase、逐算子双遍、KV Append和统一时间线仍需完成 |
+| P24 | EOS/最大长度/取消/KV容量控制 | ✅ 单层双遍功能资格；性能未资格 | 活跃与等待取消、容量延迟准入、Retire释放、Global PA复用、请求/内存守恒与零在途通过 |
+| P25 | QoS、公平性与死锁/活锁检测 | ✅ 控制面功能资格；🟡 BookSim2未激活 | 加权公平、优先级、最大等待和Watchdog通过；当前为调度微周期，不是NoC/设备硬件周期 |
 
 ## 4. 当前准确运行证据
 
@@ -102,8 +124,8 @@ P17已完成性能校准基础设施、14类GPU算子的首轮本机测量和14�
 |---|---:|---:|---|
 | 四种系统组织形式 | ✅ | 部分 | Model 3直连路径已落地；Model 2 PCIe DMA与Model 4 CXL.mem仍主要是事件级 |
 | 自由算子放置 | ✅ 严格一一对应 | Prefill部署周期 | 固定Shape的14类GPU Artifact与3类KV运行时任务已请求周期资格；其他Shape/Decode/多Batch仍需新Artifact |
-| Prefill/Decode完整图 | ✅ | Prefill已部署 | 22层Prefill生命周期完成；Decode请求周期部署待完成；当前计算契约/采样流量性能未资格 |
-| 多Batch Continuous/Ragged | ✅ | ⬜ | 需要真实Batched/Fused Kernel Trace与ATLAS分块Artifact |
+| Prefill/Decode完整图 | ✅ | Prefill与固定四Token Decode已部署 | 22层Prefill及1/22层四Token Decode功能闭环完成；真实Decode Accel-Sim Artifact与性能校准待完成 |
+| 多Batch Continuous/Ragged | ✅ | ✅ 功能周期 | Static/Continuous、三种Batch策略、跨设备Sub-Batch和动态KV/Global PA生命周期已通过；真实Batched/Fused Kernel Trace与ATLAS分块Artifact仍缺 |
 | GPU/ATLAS共享DRAM竞争 | ✅ 参考 | ✅ 真实Accel-Sim+完整ATLAS Chip | 长时间混合读写、公平性和QoS待实现 |
 | ATLAS片上BookSim2 NoC | ✅ 源码/构建 | ⬜ 当前实验未激活 | `libnoc.a`和BookSim符号已构建；需增加`architecture.noc`、真实NoC Packet、统计守恒与双跑资格 |
 | 地址层次与映射 | ✅ 设计/离线 | 🟡 在线部分 | 离线支持TraceAddr→Tensor+Offset→Global PA；P9b在线GPU仍直接传递`data->get_addr()`，DRAM仅支持OneLevelInterleave |
@@ -111,11 +133,12 @@ P17已完成性能校准基础设施、14类GPU算子的首轮本机测量和14�
 
 ## 6. 下一步顺序
 
-1. 继续P17性能校准：14类Native-VRAM Accel-Sim双遍已完成；下一步必须让原生计时直接执行与Trace捕获相同的Kernel/Binary并封存哈希，分析10个超出15%阈值的算子。随后为Copy Engine和Runtime补齐语义匹配的框架测量，为外部Link、Logic-Die Gateway和3D-DRAM引入独立硬件或可信参考模拟器点。禁止用本地显存结果替代外接3D-DRAM校准。
-2. 构建一层TinyLlama Decode，再扩展到22层单Token Decode；逐层核对依赖、KV生命周期、内存容量、任务数和请求守恒。
-3. 将P16从一层Context=16扩展到多层模型图，验证跨层KV生命周期、Global PA容量、Workspace复用和长时间运行确定性；不得按层数线性外推现有周期。
-4. 增加多Batch Continuous/Ragged周期运行，使用真实Batched/Fused Kernel而不是复制单请求延迟。
-5. 激活并资格化ATLAS BookSim2，增加长时间混合读写、公平性、QoS和死锁/活锁压力测试，并补齐Model 2 PCIe DMA与Model 4 CXL.mem周期路径。
+1. 继续P17性能校准：分析10个超出15%阈值的算子，分别核对框架Launch/同步、核心频率、Cache/DRAM参数和Kernel选择；为Copy Engine和Runtime补齐语义匹配的框架测量，并为外部Link、Logic-Die Gateway和3D-DRAM引入独立硬件或可信参考模拟器点。禁止用本地显存结果替代外接3D-DRAM校准，也禁止用统一缩放系数掩盖算子差异。
+2. 完成P23固定BS=2、KV=17的14类Range-Rebase双遍资格，补齐KV Append，生成封存的精确Batch Catalog，并让真实Artifact周期驱动单层统一时间线；不得把Scheduler Epoch或BS=1周期缩放成Batch性能。
+3. 将P23方法扩展到P20的KV长度18–20和所需Ragged Shape；每个精确Shape单独在远端目标GPU获取SASS/Trace并资格，禁止从相邻KV长度外推。
+4. 把P24请求控制接入真实P23 Batch时间线，验证取消只在合法barrier生效、退休释放发生在全部请求durable完成之后，并增加更长生成与Context压力。
+5. 为P25实现并资格化BookSim2真实step/credit适配器，再把控制面QoS策略接入GPU/ATLAS/NoC/DRAM请求路径；当前微周期结果不得替代硬件周期。
+6. 按[推理框架对接开发清单](docs/INFERENCE_FRAMEWORK_INTEGRATION_TODO_zh.md)推进F0–F8：先完成Hugging Face离线导出与Tensor/Global PA绑定，再完成GPU真实Trace Catalog、ATLAS Tensor IR编译和shadow simulation，之后接入vLLM Continuous/Ragged Batch与Paged KV，最后扩展TensorRT-LLM并执行端到端资格。当前仅有PyTorch/Transformers算子捕获程序，不等于已完成框架对接。
 
 ## 7. 已记录但暂缓：虚拟地址与地址哈希
 
@@ -143,4 +166,4 @@ P17已完成性能校准基础设施、14类GPU算子的首轮本机测量和14�
 
 ## 8. 声明边界
 
-目录、接口或一次运行存在，不等于性能已经资格。当前可准确表述为：**P16固定TinyLlama Layer-0、FP16、BS=1、Context=16的20个任务已无分析回退地完成双遍因果运行；15个GPU Trace实例和3个KV运行时实例具备请求周期资格，2个主机控制事件被显式排除在设备性能边界之外；依赖、资源、Global PA、唯一Ramulator2、请求守恒和版本提交均已验证。P17另有14类同Shape原生GPU测量和14类同拓扑Accel-Sim双遍记录，但当前正式配对仍为0/14。** 当前不可表述为：P16是校准端到端性能、Request Start/Finish是设备周期任务、Decode或多Batch周期执行已完成、RTX 3070/目标3D‑DRAM已实机校准、Native高层Target执行与NVBit Trace已证明二进制相同、VA→PA/MMU/TLB或XOR地址映射已实现，或固定Trace可安全复用于任意Shape/内存候选。
+目录、接口或一次运行存在，不等于性能已经资格。当前可准确表述为：**P16固定TinyLlama Layer-0 Prefill完成真实Trace/运行时全任务双遍因果运行；P17的14类同ShapeGPU算子完成Native/Trace身份与确定性记录；P19/P20完成单请求Decode功能资格；P22完成多请求功能周期资格；P23完成固定BS=2、KV=17的14类远端Trace捕获且双遍资格在途；P24/P25完成单层请求控制与QoS/存活性功能资格。** 当前不可表述为：P23已经完成统一Batch Ready时间线、P24支持mid-kernel抢占、P25已激活BookSim2、任何P22–P25 makespan/Token/s是校准性能、VA→PA/MMU/TLB或XOR地址映射已实现，或固定Artifact可安全复用于任意Shape/内存候选。

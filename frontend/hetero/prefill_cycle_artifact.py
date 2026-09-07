@@ -1,4 +1,4 @@
-"""Deterministic operator-cycle contracts for complete Prefill deployment.
+"""Deterministic operator-cycle contracts for request-graph deployment.
 
 These contracts are neither Roofline estimates nor instruction traces.  They
 describe explicit tiled work schedules whose cycles are replayed by the live
@@ -69,8 +69,23 @@ class PrefillCycleCatalog:
             raise PrefillCycleArtifactError(f"failed to load {path}: {error}") from error
         if not isinstance(payload, Mapping):
             raise PrefillCycleArtifactError("cycle catalog root must be an object")
-        if payload.get("schema_version") != "hetero-prefill-cycle-catalog/v1":
+        if payload.get("schema_version") not in {
+            "hetero-prefill-cycle-catalog/v1",
+            "hetero-request-cycle-catalog/v1",
+        }:
             raise PrefillCycleArtifactError("invalid cycle catalog schema_version")
+        if payload.get("schema_version") == "hetero-request-cycle-catalog/v1":
+            supported = payload.get("supported_phases")
+            if (
+                not isinstance(supported, list)
+                or not supported
+                or any(item not in {"prefill", "decode", "control"} for item in supported)
+                or len(set(supported)) != len(supported)
+            ):
+                raise PrefillCycleArtifactError(
+                    "request-cycle catalog supported_phases must be a unique "
+                    "non-empty subset of prefill/decode/control"
+                )
         devices = payload.get("devices")
         if not isinstance(devices, Mapping) or not devices:
             raise PrefillCycleArtifactError("cycle catalog devices are required")
@@ -116,15 +131,23 @@ class PrefillCycleCatalog:
             raise PrefillCycleArtifactError("operator_profiles must be an object")
         return {str(op) for op in profiles}
 
+    def supported_phases(self) -> set[str]:
+        if self.payload.get("schema_version") == "hetero-prefill-cycle-catalog/v1":
+            return {"prefill", "control"}
+        raw = self.payload.get("supported_phases")
+        assert isinstance(raw, list)
+        return {str(item) for item in raw}
+
     def plan(
         self,
         spec: OnlineDispatchSpec,
         global_clock_hz: int,
     ) -> CycleTaskPlan:
         self.validate_model(spec.model)
-        if spec.node.phase.value not in {"prefill", "control"}:
+        if spec.node.phase.value not in self.supported_phases():
             raise PrefillCycleArtifactError(
-                f"P11-P14 catalog accepts Prefill/control only: {spec.node.node_id}"
+                "cycle catalog does not support phase "
+                f"{spec.node.phase.value}: {spec.node.node_id}"
             )
         device = self._device(spec.device_id)
         clock_hz = _positive(device, "clock_hz")
@@ -164,7 +187,12 @@ class PrefillCycleCatalog:
                 "performance_eligible": False,
             },
             artifact={
-                "kind": "prefill_tiled_cycle_contract",
+                "kind": (
+                    "request_tiled_cycle_contract"
+                    if self.payload.get("schema_version")
+                    == "hetero-request-cycle-catalog/v1"
+                    else "prefill_tiled_cycle_contract"
+                ),
                 "catalog": str(self.source_path),
                 "catalog_sha256": self.content_sha256,
                 "operator": spec.node.op,
@@ -277,7 +305,11 @@ def _operator_cycles(
 
 
 class PrefillCycleDispatcher:
-    """Resolve one explicit cycle contract for every placed Prefill task."""
+    """Resolve one explicit cycle contract for every placed request task.
+
+    The historical class name remains part of the public API.  Generic
+    ``request_cycle`` runs use the alias at the end of this module.
+    """
 
     def __init__(
         self,
@@ -300,7 +332,7 @@ class PrefillCycleDispatcher:
                 continue
             if backend.get("kind") != "cycle_replay":
                 raise PrefillCycleArtifactError(
-                    f"{backend_key} must use cycle_replay in prefill_cycle mode"
+                    f"{backend_key} must use cycle_replay in request-cycle mode"
                 )
             path = Path(str(backend["cycle_artifact_ref"]))
             if not path.is_absolute():
@@ -348,7 +380,11 @@ class PrefillCycleDispatcher:
                 registered = operator_catalog.match(
                     model_spec_name=spec.model.name,
                     operator=spec.node.op,
-                    phase="prefill",
+                    phase=(
+                        "decode_step"
+                        if spec.node.phase.value == "decode"
+                        else spec.node.phase.value
+                    ),
                     layer_id=int(spec.node.layer_id or 0),
                     batch_size=1,
                     context_length=int(
@@ -418,7 +454,15 @@ class PrefillCycleDispatcher:
             op = str(self._plans[task_id].artifact["operator"])
             full_by_op[op] = full_by_op.get(op, 0) + 1
         return {
-            "schema_version": "hetero-prefill-artifact-coverage/v1",
+            "schema_version": (
+                "hetero-request-artifact-coverage/v1"
+                if any(
+                    catalog.payload.get("schema_version")
+                    == "hetero-request-cycle-catalog/v1"
+                    for catalog in self._catalogs.values()
+                )
+                else "hetero-prefill-artifact-coverage/v1"
+            ),
             "expected_tasks": len(expected_task_ids),
             "covered_tasks": len(actual),
             "coverage": 1.0,
@@ -437,3 +481,10 @@ class PrefillCycleDispatcher:
                 for key, value in sorted(self._catalogs.items())
             },
         }
+
+
+# P19 generic names.  Keeping aliases avoids breaking all P10b-P14 imports and
+# checked-in evidence while allowing new code to use phase-neutral terminology.
+RequestCycleArtifactError = PrefillCycleArtifactError
+RequestCycleCatalog = PrefillCycleCatalog
+RequestCycleDispatcher = PrefillCycleDispatcher

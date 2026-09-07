@@ -19,7 +19,31 @@ struct MutableRequest {
     std::uint64_t waiting_epochs{};
     std::vector<TimeFs> token_ready_time_fs;
     TimeFs finish_time_fs{};
+    std::string termination_reason{"completed"};
 };
+
+std::uint64_t effective_output_limit(const RequestInput& request) {
+    auto limit = request.output_length;
+    if (request.eos_after_generated_tokens != 0) {
+        limit = std::min(limit, request.eos_after_generated_tokens);
+    }
+    if (request.max_output_tokens != 0) {
+        limit = std::min(limit, request.max_output_tokens);
+    }
+    return limit;
+}
+
+std::string natural_termination_reason(const RequestInput& request) {
+    const auto limit = effective_output_limit(request);
+    if (request.eos_after_generated_tokens != 0 &&
+        request.eos_after_generated_tokens == limit) {
+        return "eos";
+    }
+    if (request.max_output_tokens != 0 && request.max_output_tokens == limit) {
+        return "max_length";
+    }
+    return "completed";
+}
 
 void validate(const std::vector<RequestInput>& requests, const SchedulerConfig& config) {
     if (requests.empty()) {
@@ -35,11 +59,15 @@ void validate(const std::vector<RequestInput>& requests, const SchedulerConfig& 
     std::vector<std::string> ids;
     for (const auto& request : requests) {
         if (request.request_id.empty() || request.prompt_length == 0 ||
-            request.output_length == 0) {
+            request.output_length == 0 || request.kv_reservation_bytes == 0) {
             throw std::invalid_argument("invalid request input");
         }
         if (request.decode_step && request.initial_kv_length == 0) {
             throw std::invalid_argument("decode-step request requires initial KV length");
+        }
+        if (request.cancel_time_fs != std::numeric_limits<TimeFs>::max() &&
+            request.cancel_time_fs < request.arrival_time_fs) {
+            throw std::invalid_argument("request cancellation precedes arrival");
         }
         ids.push_back(request.request_id);
     }
@@ -61,12 +89,13 @@ SchedulerResult simulate_token_barrier(
         state.push_back(MutableRequest{
             request, State::kWaiting, 0, 0,
             request.decode_step ? request.initial_kv_length : 0,
-            0, {}, 0});
+            0, {}, 0, "completed"});
     }
 
     SchedulerResult result;
     TimeFs boundary = 0;
     std::uint64_t epoch_id = 0;
+    std::uint64_t reserved_kv_bytes = 0;
     const std::uint64_t max_epochs = 1000000;
 
     while (true) {
@@ -79,6 +108,35 @@ SchedulerResult simulate_token_barrier(
         }
         if (epoch_id >= max_epochs) {
             throw std::runtime_error("scheduler exceeded maximum epoch count");
+        }
+
+        EpochRecord epoch;
+        epoch.epoch_id = epoch_id;
+        epoch.boundary_time_fs = boundary;
+        if (boundary > std::numeric_limits<TimeFs>::max() - config.epoch_duration_fs) {
+            throw std::overflow_error("scheduler time exceeds TimeFs");
+        }
+        epoch.completion_time_fs = boundary + config.epoch_duration_fs;
+
+        // Cancellation is sampled at token-step barriers.  Work issued in the
+        // preceding epoch commits before a cancellation observed here.
+        for (auto& request : state) {
+            if (request.state == State::kFinished ||
+                request.input.cancel_time_fs > boundary) {
+                continue;
+            }
+            if (request.state == State::kPrefillReady ||
+                request.state == State::kDecodeReady) {
+                if (reserved_kv_bytes < request.input.kv_reservation_bytes) {
+                    throw std::runtime_error("KV reservation accounting underflow");
+                }
+                reserved_kv_bytes -= request.input.kv_reservation_bytes;
+            }
+            request.state = State::kFinished;
+            request.finish_time_fs = boundary;
+            request.termination_reason = "cancelled";
+            epoch.cancelled_request_ids.push_back(request.input.request_id);
+            epoch.retired_request_ids.push_back(request.input.request_id);
         }
 
         std::size_t active = static_cast<std::size_t>(std::count_if(
@@ -101,11 +159,25 @@ SchedulerResult simulate_token_barrier(
             if (active >= config.max_num_sequences) {
                 break;
             }
+            const auto reservation = state[index].input.kv_reservation_bytes;
+            if (config.kv_capacity_bytes != 0 &&
+                reservation > config.kv_capacity_bytes - reserved_kv_bytes) {
+                continue;
+            }
             state[index].state = state[index].input.decode_step
                                      ? State::kDecodeReady
                                      : State::kPrefillReady;
+            epoch.admitted_request_ids.push_back(state[index].input.request_id);
+            reserved_kv_bytes += reservation;
             ++active;
         }
+        for (const auto& request : state) {
+            if (request.state == State::kPrefillReady ||
+                request.state == State::kDecodeReady) {
+                epoch.active_request_ids.push_back(request.input.request_id);
+            }
+        }
+        std::sort(epoch.active_request_ids.begin(), epoch.active_request_ids.end());
 
         std::vector<std::size_t> decode;
         std::vector<std::size_t> prefill;
@@ -135,13 +207,6 @@ SchedulerResult simulate_token_barrier(
                               state[rhs].input.request_id};
         });
 
-        EpochRecord epoch;
-        epoch.epoch_id = epoch_id;
-        epoch.boundary_time_fs = boundary;
-        if (boundary > std::numeric_limits<TimeFs>::max() - config.epoch_duration_fs) {
-            throw std::overflow_error("scheduler time exceeds TimeFs");
-        }
-        epoch.completion_time_fs = boundary + config.epoch_duration_fs;
         std::uint64_t budget = config.max_batched_tokens;
 
         std::size_t reserved_prefill = std::numeric_limits<std::size_t>::max();
@@ -182,6 +247,22 @@ SchedulerResult simulate_token_barrier(
         }
 
         if (epoch.selections.empty()) {
+            if (!epoch.retired_request_ids.empty()) {
+                result.epochs.push_back(std::move(epoch));
+                boundary += config.epoch_duration_fs;
+                ++epoch_id;
+                continue;
+            }
+            const auto has_arrived_waiting = std::any_of(
+                state.begin(), state.end(), [&](const MutableRequest& request) {
+                    return request.state == State::kWaiting &&
+                           request.input.arrival_time_fs <= boundary;
+                });
+            if (active == 0 && has_arrived_waiting &&
+                config.kv_capacity_bytes != 0) {
+                throw std::runtime_error(
+                    "no arrived request fits the KV admission capacity");
+            }
             const auto next_arrival = std::min_element(
                 state.begin(), state.end(), [](const MutableRequest& lhs, const MutableRequest& rhs) {
                     const auto lhs_time = lhs.state == State::kWaiting
@@ -212,9 +293,14 @@ SchedulerResult simulate_token_barrier(
                 if (request->prompt_cursor == request->input.prompt_length) {
                     request->generated_length = 1;
                     request->token_ready_time_fs.push_back(epoch.completion_time_fs);
-                    if (request->generated_length == request->input.output_length) {
+                    if (request->generated_length ==
+                        effective_output_limit(request->input)) {
                         request->state = State::kFinished;
                         request->finish_time_fs = epoch.completion_time_fs;
+                        request->termination_reason =
+                            natural_termination_reason(request->input);
+                        epoch.retired_request_ids.push_back(request->input.request_id);
+                        reserved_kv_bytes -= request->input.kv_reservation_bytes;
                     } else {
                         request->state = State::kDecodeReady;
                     }
@@ -223,9 +309,14 @@ SchedulerResult simulate_token_barrier(
                 ++request->generated_length;
                 ++request->committed_kv_length;
                 request->token_ready_time_fs.push_back(epoch.completion_time_fs);
-                if (request->generated_length == request->input.output_length) {
+                if (request->generated_length ==
+                    effective_output_limit(request->input)) {
                     request->state = State::kFinished;
                     request->finish_time_fs = epoch.completion_time_fs;
+                    request->termination_reason =
+                        natural_termination_reason(request->input);
+                    epoch.retired_request_ids.push_back(request->input.request_id);
+                    reserved_kv_bytes -= request->input.kv_reservation_bytes;
                 } else {
                     request->state = State::kDecodeReady;
                 }
@@ -252,7 +343,8 @@ SchedulerResult simulate_token_barrier(
             request.generated_length,
             request.committed_kv_length,
             request.token_ready_time_fs,
-            request.finish_time_fs});
+            request.finish_time_fs,
+            request.termination_reason});
     }
     std::sort(result.requests.begin(), result.requests.end(),
               [](const RequestResult& lhs, const RequestResult& rhs) {

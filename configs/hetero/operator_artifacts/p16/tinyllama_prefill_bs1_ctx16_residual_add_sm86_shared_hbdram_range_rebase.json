@@ -31,45 +31,45 @@
   "files": [
     {
       "kind": "operator_metadata",
-      "path": "/opt/gpu-atlas/qualification/p16-cuda-reference-v3/tinyllama-prefill-bs1-ctx16-residual-add/operator_metadata.json",
-      "sha256": "64ef74e16d8a7b36fa69d8d59fe739e4d392f103b447577b80992d3c36d9f25b",
-      "size_bytes": 1676
+      "path": "evidence/residual_add/operator_metadata.json",
+      "sha256": "f28fb4eb869bbb21a6b466bb62503fd8fc5b00215a3f496b0b25d42173593efb",
+      "size_bytes": 1688
     },
     {
       "kind": "kernels_list",
-      "path": "/opt/gpu-atlas/qualification/p16-cuda-reference-v3/tinyllama-prefill-bs1-ctx16-residual-add/traces/kernelslist.g",
-      "sha256": "9fff451bd628f51548a4b34f449118cbf6cde0bcafb10e79943969b05adf5eb7",
+      "path": "evidence/residual_add/traces/kernelslist.g",
+      "sha256": "7d45a8c414bf9941a194b5ba96ea6e5a397a1acfc9d16364a3390f1309340665",
       "size_bytes": 35
     },
     {
       "kind": "instruction_trace",
-      "path": "/opt/gpu-atlas/qualification/p16-cuda-reference-v3/tinyllama-prefill-bs1-ctx16-residual-add/traces/kernel-1-ctx_0x6137eab98890.tracez",
-      "sha256": "dc1354bcc416b2aff5f30395d63a8e65d471ea4d5ae870432a37d93c890d55d0",
-      "size_bytes": 275354
+      "path": "evidence/residual_add/traces/kernel-1-ctx_0x5ec3a1e60f90.tracez",
+      "sha256": "859102ed6f160f46581426a06e18a3bdbf482510c3c8ce41e8c3f73e1f285bf7",
+      "size_bytes": 280256
     },
     {
       "kind": "accel_sim_trace_manifest",
       "path": "tinyllama_prefill_bs1_ctx16_residual_add_sm86_trace.json",
-      "sha256": "b5b419b9160f5e77b9e2221b72b89beff99636d4c1a0aabdb077c3cede9a7677",
-      "size_bytes": 2591
+      "sha256": "8ea1794bf7ea3544c834c322c85687f7ef3af486bf2a08ac379e5fc63cae0eb7",
+      "size_bytes": 2618
     },
     {
       "kind": "standalone_operator_artifact",
       "path": "tinyllama_prefill_bs1_ctx16_residual_add_sm86.json",
-      "sha256": "fb5756774174714bd5b2ad4965a02f9b91439522e9b1c25f589e1a15a60edce1",
-      "size_bytes": 3842
+      "sha256": "ca7bd41e745092ffe7431fedd7fc7d0cba60a4b7f5fcb54ba8890a30bb4b783e",
+      "size_bytes": 3778
     },
     {
       "kind": "coupled_accel_sim_backend",
-      "path": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+      "path": "../../backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
       "sha256": "da41dc6c68070d01dc44a1f6d7b6009d8fb1a2167868eb1f7bb34cd88ad9b8df",
       "size_bytes": 3113
     },
     {
       "kind": "cycle_coupled_qualification_record",
       "path": "qualification_records/residual_add_range_rebase.json",
-      "sha256": "ef86dc64f3e3cf70ff87dfd45925ec5c80b6b471ab3ad84f56914f8b206a7a5f",
-      "size_bytes": 4004
+      "sha256": "2f4ff86f22ce76fff7a7e1584e1180d44fcc63906a82b3d71bddc505cfe0240c",
+      "size_bytes": 4041
     }
   ],
   "qualification": {
@@ -78,7 +78,7 @@
     "instructions": 491520,
     "outstanding": 0,
     "performance_eligible": false,
-    "qualification_record": "/opt/gpu-atlas/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p16/qualification_records/residual_add_range_rebase.json",
+    "qualification_record": "qualification_records/residual_add_range_rebase.json",
     "ramulator2_instances": 1,
     "status": "cycle_coupled_range_rebased_pending_global_timeline"
   },
@@ -115,7 +115,7 @@
         1
       ],
       "tensor_id": "tinyllama.layer0.residual_add.input",
-      "trace_base": 47286583296
+      "trace_base": 126654917640192
     },
     {
       "alignment_bytes": 256,
@@ -134,7 +134,7 @@
         1
       ],
       "tensor_id": "tinyllama.layer0.residual_add.residual",
-      "trace_base": 47286648832
+      "trace_base": 126654917705728
     },
     {
       "alignment_bytes": 256,
@@ -153,7 +153,7 @@
         1
       ],
       "tensor_id": "tinyllama.layer0.residual_add.output",
-      "trace_base": 47286714368
+      "trace_base": 126654917771264
     }
   ]
 }

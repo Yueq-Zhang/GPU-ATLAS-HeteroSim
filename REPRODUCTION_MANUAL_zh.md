@@ -1,6 +1,6 @@
 # GPU-ATLAS-HeteroSim 中文手工复现手册
 
-本文面向希望手动构建、运行和核验 GPU-ATLAS-HeteroSim 的使用者。内容对应工程版本 `0.27.0`，记录日期为 2026-09-01。所有命令默认从工程根目录执行。
+本文面向希望手动构建、运行和核验 GPU-ATLAS-HeteroSim 的使用者。内容对应工程版本 `0.34.0`，记录日期为 2026-09-07。所有命令默认从工程根目录执行。
 
 本手册把“程序成功退出”“请求周期资格通过”和“性能资格通过”视为三个不同结论：
 
@@ -22,22 +22,28 @@
 | R5 | TinyLlama Q投影三后端 | 可复现 | Accel-Sim、ATLAS、Checkpoint和Trace | 同Shape下GPU本地显存、GPU外接3D-DRAM、ATLAS内部执行的独立资格 |
 | R6 | P9b GPU与完整ATLAS Chip并发 | 可复现 | Accel-Sim + ATLAS + 唯一Ramulator2 | 两个真实计算后端并发推进并争用共享3D-DRAM |
 | R7 | P15h 12真实GPU算子单层Prefill | 已通过，可在完整Artifact环境复现 | Accel-Sim + 12套Range-Rebase Artifact | 12个真实GPU算子进入同一DAG时间线，地址、请求和版本因果闭环 |
-| R8 | P16 20任务完整单层Prefill | 历史双遍通过；当前从零复现有外部Artifact缺口 | Accel-Sim + P16归档Artifact | 固定Shape下14种GPU Trace、KV运行时和控制任务的完整单层因果闭环 |
-| R9 | P17 14类Native-VRAM单算子双遍 | 已在远端通过，可恢复运行 | Accel-Sim 2.0远端环境 | 14类算子在GPU本地显存拓扑下周期/指令确定性 |
+| R8 | P16 20任务完整单层Prefill | 仓库内证据双遍重资格通过 | Accel-Sim + P16可移植Artifact | 固定Shape下14种GPU Trace、KV运行时和控制任务的完整单层因果闭环 |
+| R9 | P17 14类Native-VRAM单算子双遍 | 14类确定性与本机执行程序身份闭环通过 | 本机RTX 3070 WSL + Accel-Sim 2.0 | 14类算子周期/指令确定性、Native/Trace身份一致和4/14误差配对 |
 | R10 | P17性能校准审计 | 可立即执行审计 | 本机证据目录 | 审计过程成功；当前预期结果为`audit_complete_blocked`而非`qualified` |
+| R11 | P19单Token Decode 1层/22层 | 仓库配置与资格工具双遍通过 | 本机WSL + Ramulator2 Bridge | Decode DAG、KV 16→17、Global PA、请求完成和版本提交闭环 |
+| R12 | P20连续4 Token Decode 1层/22层 | 仓库配置与资格工具双遍通过 | 本机WSL + Ramulator2 Bridge | 自回归Token链、KV 16→20/版本0→4、Global PA和请求完成闭环 |
+| R13 | P22 Static/Continuous多Batch | 5组仓库配置双遍通过 | 本机WSL | Homogeneous/Padding/Ragged Split、设备Sub-Batch、KV Admission/Retire和动态Global PA生命周期闭环 |
 
 ## 2. 冻结软件与实验基线
 
 ### 2.1 工程和模型
 
-- 工程版本：`0.27.0`；
-- 当前代码基线：运行前使用`git rev-parse HEAD`记录，当前开发基线为`93f52af`加P17工作区更新；
+- 工程版本：`0.34.0`；
+- 当前代码基线：运行前使用`git rev-parse HEAD`记录；当前功能基线为`7303c02`加v0.30.0工作区更新，正式复现时应记录实际提交而不是只复制本行；
 - P15h/P16/P17固定模型：TinyLlama-1.1B；
 - Checkpoint revision：`fe8a4ea1ffedaf415f4da2f062534de366a451e6`；
 - Dtype：FP16；
 - 单层资格Shape：Layer 0、BS=1、Context/Q/KV=16；
 - Final Norm、LM Head和Sampling：`q_len=1`；
 - Q投影Decode资格Shape：BS=1、已有KV长度1024、`M=1,K=2048,N=2048`。
+- P19 Decode功能Shape：BS=1、初始KV=16、`q_len=1`、最终KV=17，分别使用1层和22层；GPU计算为未校准分块周期合同。
+- P20 Decode功能Shape：BS=1、初始KV=16、连续4步`q_len=1`、最终KV=20，分别使用1层和22层；四步GPU计算均为未校准分块周期合同。
+- P22多Batch功能Shape：静态同形BS=2、静态Ragged BS=2、Continuous四请求和混合Prefill/Decode四请求；正式资格使用`request_cycle_composed`与Scheduler Epoch时长，不是Batched/Fused Kernel性能。
 
 ### 2.2 外部依赖
 
@@ -53,7 +59,7 @@
 | Ramulator2 | commit `3996362187d7f8314936e5ad7560d93b66b6a215` |
 | BookSim2 | commit `1a8ec21ecc71f26be6907e373034e18c136ee459`，当前不作为已资格路径 |
 
-远端长时间验证主机为`yueqi@192.168.5.2`。认证信息只能交互输入，不写入命令文件、配置、日志或仓库。远端物理GPU为RTX 4090，但现有Trace的模拟目标仍是RTX 3070/SM86；不能把捕获主机型号写成模拟目标。
+P17正式性能目标固定为本机RTX 3070/SM86。远端长时间验证主机`yueqi@192.168.5.2`可用于不依赖原生GPU身份的长时模拟，但其RTX 4090结果不得作为P17原生性能基线，也不得与本机3070测量混为同一资格组。认证信息只能交互输入，不写入命令文件、配置、日志或仓库。
 
 ## 3. 首次安装与构建
 
@@ -128,30 +134,15 @@ ctest --test-dir simulator/build --output-on-failure
 
 覆盖：时间单位、事件队列、Global Event Runtime、后端接口、调度器、内存服务、Paged KV、运行时内存规划和共享服务。
 
-### 4.2 Python自包含回归
+### 4.2 Python完整回归
 
-当前本机复核结果为163项通过。由于两项P16测试仍引用缺失的旧外部Artifact，当前建议先运行自包含集合：
-
-```bash
-.venv/bin/python -m pytest tests/hetero -q \
-  -k "not test_p16_simple_gpu_operators_have_deterministic_range_rebase_evidence"
-```
-
-预期结果：`163 passed, 2 deselected`。测试数量可能随开发变化，应以`0 failed`为最终判据。
-
-完整集合命令为：
+P16的可移植证据已经纳入仓库，不再需要排除两个Artifact测试。执行完整集合：
 
 ```bash
 .venv/bin/python -m pytest tests/hetero -q
 ```
 
-当前已知的两项失败只应来自以下缺失目录：
-
-```text
-/opt/gpu-atlas/qualification/p16-cuda-reference-v3/
-```
-
-如果出现其他失败，应视为新回归，不得用上述排除条件掩盖。
+v0.34.0加入P24请求控制、P25 QoS/存活性以及P23远端Batch Trace入口，当前在默认WSL环境复核为`232 passed`。测试数量可能随开发变化，应以`0 failed`为最终判据。任何失败都应视为回归或环境依赖缺失，不得用旧的P16外部目录排除条件掩盖。Windows Python不能加载Linux构建的`_heterosim_runtime`，因此必须在构建该扩展的同一个WSL环境执行完整回归。
 
 ## 5. 配置预检
 
@@ -434,22 +425,18 @@ P15h中Token Embedding、两次Residual Add、KV任务和Request边界仍是分�
 - KV Allocate/Append/Release产生显式64 B请求；
 - Request Start/Finish为无内存请求的主机控制边界。
 
-### 13.2 当前复现限制
+### 13.2 可移植证据闭包
 
-历史双遍资格已经通过，但当前两个P16 Artifact仍指向缺失的旧目录：
+Token Embedding和Residual Add所需的原始`operator_metadata.json`、Kernel List、非空SM86 Trace和Range-Rebase资格记录已经归档到：
 
 ```text
-/opt/gpu-atlas/qualification/p16-cuda-reference-v3/
+configs/hetero/operator_artifacts/p16/evidence/
+configs/hetero/operator_artifacts/p16/qualification_records/
 ```
 
-因此，在恢复以下算子的原始`operator_metadata.json`、Trace、Kernel List和资格记录之前，不能宣称“从干净checkout一条命令重新跑通P16”：
+对应源Artifact、Trace Manifest和共享3D-DRAM耦合Artifact都使用仓库相对路径，并在加载时核验内容SHA-256。不能用另一个Trace覆盖这些文件后继续沿用旧资格；任何内容变化都必须重新生成源Artifact、Range-Rebase资格、耦合Artifact和Simulation Key。
 
-- Token Embedding；
-- Residual Add。
-
-不能把P17 Native-VRAM封存Trace直接替换到P16外接3D-DRAM配置中而仍沿用旧资格；若要迁移，必须生成新的源Artifact、Range-Rebase资格、耦合Artifact和Simulation Key。
-
-### 13.3 外部证据完整后的双遍入口
+### 13.3 双遍入口
 
 ```bash
 HETEROSIM_PYTHON=.venv/bin/python \
@@ -464,6 +451,8 @@ P16_RUN_ROOT=/opt/gpu-atlas/repro/p16 \
 ```
 
 通过判据：20任务依赖、资源互斥、Global PA、请求完成、输入版本、输出提交和双遍结果全部一致；每个KV任务只有一个Ramulator2，ATLAS请求为0，退出时零在途。
+
+当前版本已在新的远端部署中使用上述仓库内证据完成双遍。默认相对`validation/p16`输出根也已验证；在线地址绑定表会在Accel-Sim切换工作目录前转换为绝对路径。
 
 ### 13.4 只复核已归档双遍
 
@@ -489,15 +478,23 @@ P16_RUN_ROOT=/opt/gpu-atlas/repro/p16 \
 
 十四类算子为：Token Embedding、Attention Norm、QKV Projection、RoPE、Causal Attention、Output Projection、MLP Norm、Gate/Up Projection、SiLU Multiply、Down Projection、Residual Add、Final Norm、LM Head和Sampling。
 
-### 14.2 远端运行
+### 14.2 本机RTX 3070 WSL运行
+
+当前Accel-Sim 2.0、CUDA 11.8和P17 Python环境安装在`Ubuntu-22.04`发行版。先从PowerShell显式进入该发行版，不能依赖系统当前默认WSL：
+
+```powershell
+wsl -d Ubuntu-22.04
+```
 
 ```bash
-ssh yueqi@192.168.5.2
 cd /opt/gpu-atlas/GPU-ATLAS-HeteroSim
 
 export PYTHONPATH=.
 export HETEROSIM_PYTHON=/opt/conda/envs/qserve-local/bin/python
 export P17_TRACE_MANIFEST_OVERRIDES=configs/hetero/calibration/p17_native_vram_trace_overrides.json
+python scripts/build_p17_execution_identity_catalog.py \
+  --output validation/p17/sm86_sealed_recapture/execution_identity_catalog.json
+export P17_EXECUTION_IDENTITY_CATALOG=validation/p17/sm86_sealed_recapture/execution_identity_catalog.json
 bash scripts/run_p17_native_vram_accelsim_qualification.sh
 ```
 
@@ -513,6 +510,15 @@ P17_FINALIZE_CATALOG=0 \
 通过判据：每个`qualification_record.json`为`status=passed`；两遍GPU cycle和instruction相同；没有`external_memory_stats`；GPU本地DRAM由Accel-Sim拥有；`external_ramulator2=false`；时长使用total模式。
 
 当前14类已经全部满足上述确定性门禁，但这只是单算子Native-VRAM仿真资格，不是单层时间线，也不是硬件性能校准。
+
+`P17_EXECUTION_IDENTITY_CATALOG`是可选的附加门禁输入，不会凭空补齐身份。全部14类算子的正式闭环使用下列两个本机RTX 3070入口：
+
+```bash
+bash scripts/run_p17_local_rtx3070_simple_operator_pairing.sh
+bash scripts/run_p17_local_rtx3070_remaining_operator_pairing.sh
+```
+
+两个入口均在`Ubuntu-22.04`中执行，要求RTX 3070/SM86，并拒绝非目标GPU。第一个封存Embedding/Residual使用的SM86 ELF；第二个按Attention Norm至Sampling的固定顺序逐算子封存Python/PyTorch执行程序、进行50+500原生计时、process范围NVBit捕获和双遍资格。脚本可续跑，某算子失败时保留现场并停止后续资格。
 
 ## 15. R10：P17性能校准和审计
 
@@ -540,8 +546,9 @@ P17资格脚本在14类全部完成后会自动生成：
 当前预期：
 
 - `topology_match=true`；
-- `paired_operator_count=0/14`；
-- 14类均缺少Native执行/Trace二进制身份闭环；
+- `paired_operator_count=4/14`；
+- 全部14类的Native/Trace身份、Artifact与拓扑匹配；
+- Down Projection、Output Projection、QKV Projection和LM Head通过15%误差门禁；
 - 10类误差超过15%；
 - `performance_claim_allowed=false`。
 
@@ -570,7 +577,106 @@ performance_claim_allowed=false
 
 这是“审计成功且性能门禁保持关闭”，不是仿真失败。只有GPU Kernel、Copy Engine、Runtime、外部Link、Logic-Die Gateway和3D-DRAM六项全部验证后，才允许出现性能资格通过。
 
-## 16. 通用输出检查
+## 16. R11：P19单Token Decode功能资格
+
+确认配置和Ramulator2 Bridge存在后执行：
+
+```bash
+test -f /opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-ramulator2/ramulator2_bridge/libramulator_gpgpusim_bridge.so
+bash scripts/run_p19_decode_qualification.sh
+```
+
+脚本依次运行1层与22层配置，每种规模各运行两个隔离Leg，再生成：
+
+```text
+validation/p19/one_layer/qualification_record.json
+validation/p19/twenty_two_layer/qualification_record.json
+validation/p19/qualification_summary.json
+```
+
+固定配置分别为：
+
+```text
+configs/hetero/experiments/p19_tinyllama_decode_1layer_bs1_ctx16_request_cycle.json
+configs/hetero/experiments/p19_tinyllama_decode_22layer_bs1_ctx16_request_cycle.json
+```
+
+通过判据：1层/22层任务数为20/272，GPU Parent为190/3,382；两遍周期、请求、最终版本和流式Trace哈希一致；每层KV由长度16、版本0追加到长度17、版本1；所有请求位于相应Global PA内；唯一Ramulator2、零ATLAS请求、零在途。`performance_claim_allowed=false`必须保持不变。
+
+## 17. R12：P20连续四Token Decode功能资格
+
+确认同一Ramulator2 Bridge存在后执行：
+
+```bash
+test -f /opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-ramulator2/ramulator2_bridge/libramulator_gpgpusim_bridge.so
+bash scripts/run_p20_decode_loop_qualification.sh
+```
+
+脚本对以下两个配置各运行两个隔离Leg：
+
+```text
+configs/hetero/experiments/p20_tinyllama_decode4_1layer_bs1_ctx16_request_cycle.json
+configs/hetero/experiments/p20_tinyllama_decode4_22layer_bs1_ctx16_request_cycle.json
+```
+
+输出为`validation/p20/one_layer/qualification_record.json`、`validation/p20/twenty_two_layer/qualification_record.json`和`validation/p20/qualification_summary.json`。通过判据：任务数68/1,076，GPU Parent 760/13,528；四步Sampling依次驱动下一步Embedding；每层K/V长度16→20、版本0→4；追加偏移、请求完成区间、Global PA、唯一Ramulator2、Parent/Child/durable守恒、零ATLAS请求、零在途和双遍流式Trace哈希全部一致。周期、TTFT与ITL均为未校准功能观测，`performance_claim_allowed=false`必须保持不变。
+
+## 18. R13：P22多Batch功能周期资格
+
+在已构建Python扩展的同一WSL环境执行：
+
+```bash
+python3 scripts/qualify_p22_multi_batch.py
+```
+
+脚本依次双跑以下五组实验：
+
+```text
+configs/hetero/experiments/p22_tinyllama_decode4_1layer_static_bs2.json
+configs/hetero/experiments/p22_tinyllama_decode2_1layer_static_ragged_padding_bs2.json
+configs/hetero/experiments/p22_tinyllama_decode2_1layer_static_ragged_split_bs2.json
+configs/hetero/experiments/p22_tinyllama_decode4_22layer_continuous_bs4.json
+configs/hetero/experiments/p22_tinyllama_2layer_mixed_continuous_bs4.json
+```
+
+结果汇总到`validation/p22/qualification_record.json`。通过判据：5个Case与全部布尔检查为真；所有请求各Admission/Retire一次；Selection与Token数守恒；活跃Global PA不重叠，Retire后占用为零；释放范围可复用；GPU/ATLAS按设备分离Sub-Batch；两遍`batch_plan.json`、`memory_lifecycle.json`和`multi_batch_runtime.json`一致；退出时零在途。
+
+若只核验现有输出，可执行：
+
+```bash
+python3 scripts/qualify_p22_multi_batch.py --reuse-existing
+```
+
+P22记录中的时长来自`scheduling.epoch_duration_fs`，不是实际Batched/Fused Kernel周期。即使资格通过，也必须确认`performance_claim_allowed=false`。
+
+## 19. R14：P23远端BS=2真实Trace
+
+P23固定TinyLlama Layer 0、FP16、BS=2、Context=16、`q_len=1`、KV=17。下面两步都在RTX 4090远端工程执行；本地不得重新编译、捕获或替换SASS。
+
+```bash
+bash scripts/run_p23_remote_bs2_capture.sh
+bash scripts/run_p23_bs2_decode_range_rebase_qualification.sh
+```
+
+捕获Catalog必须报告14个算子，并分别记录`capture_device_sm=89`、逐Kernel `binary_versions`和`replay_target_sm`。SM80/SM86混合序列只有在显式Ampere兼容合同下才允许继续；不得把实际版本改写为SM89。资格阶段逐算子检查双遍周期、指令和external-memory统计一致、唯一Ramulator2、地址零漏配、Parent/Child/durable守恒、零ATLAS请求与零在途。当前捕获14/14完成，双遍资格仍在远端运行。
+
+## 20. R15：P24请求终止与KV容量
+
+```bash
+python3 scripts/qualify_p24_request_controls.py
+```
+
+检查`validation/p24/qualification_record.json`：两组案例必须双遍通过，覆盖EOS、最大长度、活跃/等待取消、32 KiB容量压力、延迟Admission、Retire释放和Global PA复用；最终活动分配、占用字节与在途请求均为零。取消语义只到token-step barrier，不代表mid-kernel抢占。
+
+## 21. R16：P25 QoS与存活性
+
+```bash
+python3 scripts/qualify_p25_qos_liveness.py
+```
+
+检查`validation/p25/qualification_record.json`：正常运行需双遍一致、GPU/ATLAS工作量守恒、最大等待不超过策略上界，同等级前缀Jain公平性通过；deadlock和livelock故障注入均须被Watchdog终止。BookSim2适配器未安装时应看到`failed_closed=true`，不能把调度微周期解释为NoC或设备硬件周期。
+
+## 22. 通用输出检查
 
 一次完整运行通常产生以下文件，具体集合取决于执行模式：
 
@@ -584,6 +690,11 @@ performance_claim_allowed=false
 | `residency.json` | 值版本、设备驻留和跨设备动作 |
 | `online_dispatch.json` | 后端启动/完成和版本提交 |
 | `qualification_record.json` | 双遍一致性和资格结论 |
+| `batch_plan.json` | Phase/Device/Shape Sub-Batch、成员映射、Padding和Artifact匹配 |
+| `memory_lifecycle.json` | 动态KV/Global PA分配、释放、峰值和复用审计 |
+| `multi_batch_runtime.json` | 请求状态、Commit/Retire、资源区间、守恒和调度指标 |
+| `request_control_runtime.json` | EOS/长度/取消、KV容量、释放与地址复用 |
+| `qos_runtime.json` | QoS仲裁、公平性、等待与Watchdog证据 |
 
 正式通过至少检查：
 
@@ -598,9 +709,9 @@ performance_claim_allowed=false
 9. 消费者在生产者完成和正确版本可见后启动；
 10. `performance_claim_allowed`按实际校准状态保持关闭或打开，不得手工覆盖。
 
-## 17. 常见故障
+## 23. 常见故障
 
-### 17.1 `_heterosim_runtime`找不到
+### 23.1 `_heterosim_runtime`找不到
 
 原因通常是Windows Python和WSL构建树混用，或Python版本与pybind模块不匹配。解决方法是在同一WSL环境中重新执行：
 
@@ -609,23 +720,23 @@ cmake -S simulator -B simulator/build -DCMAKE_BUILD_TYPE=Release
 cmake --build simulator/build --clean-first --parallel
 ```
 
-### 17.2 Ramulator2 Bridge不存在
+### 23.2 Ramulator2 Bridge不存在
 
 检查配置中的`bridge_library`绝对路径，并确认依赖版本与`dependency_lock.yaml`一致。不要把另一个提交构建出的`.so`复制后沿用旧Simulation Key。
 
-### 17.3 Artifact文件不存在或哈希不匹配
+### 23.3 Artifact文件不存在或哈希不匹配
 
 Artifact会校验元数据、Kernel List、Trace、资格记录和配置哈希。应恢复原始证据或重新生成完整Artifact；不要只编辑JSON中的路径或SHA字段。
 
-### 17.4 P17返回`audit_complete_blocked`
+### 23.4 P17返回`audit_complete_blocked`
 
 这是当前预期结果。它表示审计执行成功，但性能参考点、身份或误差门禁尚未满足。
 
-### 17.5 输出目录已有部分文件
+### 23.5 输出目录已有部分文件
 
 Trace捕获脚本会拒绝把新捕获混入非空目录。为每次捕获使用新目录；资格脚本只有在明确支持`--resume-completed-runs`时才能复用已完成Leg。
 
-## 18. 建议的人工复现顺序
+## 24. 建议的人工复现顺序
 
 首次人工复现建议严格按以下顺序推进：
 
@@ -637,7 +748,12 @@ Trace捕获脚本会拒绝把新捕获混入非空目录。为每次捕获使用
 6. R5：单算子Q投影三后端；
 7. R6：P9b真实GPU/ATLAS并发；
 8. R7：P15h十二真实算子单层时间线；
-9. 恢复P16外部Artifact后执行R8；
-10. 在远端执行R9，并用R10审计而不是直接报告性能。
+9. 使用仓库内P16可移植Artifact执行R8；
+10. 在本机RTX 3070 WSL执行R9，并用R10审计而不是直接报告性能；该P17身份不得被远端4090结果替换。
+11. 执行R11，复核1层与22层Decode的功能资格；不得把未校准P19周期与Native性能比较。
+12. 执行R12，复核连续四Token的自回归、KV版本和请求周期资格；不得把未校准P20周期、TTFT或ITL作为性能结果。
+13. 执行R13，复核Static/Continuous、三种Batch策略、设备Sub-Batch和动态KV/Global PA生命周期；不得把Scheduler Epoch指标作为真实Batch性能。
+14. 在远端RTX 4090执行R14；所有SASS获取都必须留在远端，完成双遍前不得发布Batch性能。
+15. 执行R15和R16，分别复核请求终止/KV容量以及QoS/存活性；BookSim2未激活时保持失败关闭。
 
 若某一级失败，应保留该次输出目录和命令身份，不继续用其结果生成下一级性能结论。

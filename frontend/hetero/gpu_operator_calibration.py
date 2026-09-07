@@ -14,6 +14,13 @@ import json
 from pathlib import Path
 from typing import Mapping
 
+from .gpu_execution_identity import (
+    GPUExecutionIdentityError,
+    execution_identities_match,
+    load_execution_identity_catalog,
+    validate_execution_identity,
+)
+
 
 class GPUOperatorCalibrationError(ValueError):
     """Raised when an operator calibration catalog is incomplete or ambiguous."""
@@ -75,7 +82,20 @@ def file_sha256(path: str | Path) -> str:
 
 def _resolve(path: str, base: Path) -> Path:
     candidate = Path(path)
-    return candidate if candidate.is_absolute() else (base / candidate).resolve()
+    resolved = candidate if candidate.is_absolute() else (base / candidate).resolve()
+    if resolved.exists():
+        return resolved
+    # Imported qualification records intentionally preserve their original
+    # host path.  Rebase a missing locator only when its repository-relative
+    # suffix is present in the current checkout.
+    normalized = candidate.as_posix()
+    for marker in ("/configs/", "/validation/"):
+        if marker not in normalized:
+            continue
+        rebased = (base / marker.strip("/") / normalized.split(marker, 1)[1]).resolve()
+        if rebased.is_file():
+            return rebased
+    return resolved
 
 
 def load_gpu_operator_contracts(
@@ -185,33 +205,40 @@ def build_simulator_measurement_catalog(
     *,
     core_frequency_hz: int,
     memory_topology: str,
+    execution_identity_catalog: str | Path | None = None,
 ) -> dict[str, object]:
     """Extract cycle evidence already sealed into the qualified artifacts."""
 
     frequency = _positive_int(core_frequency_hz, "core_frequency_hz")
     topology = _nonempty(memory_topology, "memory_topology")
     contracts = load_gpu_operator_contracts(capability_path, repository_root)
+    identities = (
+        load_execution_identity_catalog(execution_identity_catalog)
+        if execution_identity_catalog is not None
+        else {}
+    )
     operators: list[dict[str, object]] = []
     for operator, contract in sorted(contracts.items()):
         artifact = _json(Path(str(contract["artifact_path"])))
         trace_path, trace = _trace_manifest_for_contract(contract)
         qualification = _mapping(artifact.get("qualification"), "qualification")
         cycles = _positive_int(qualification.get("cycles"), "qualification.cycles")
-        operators.append(
-            {
-                "operator_type": operator,
-                "implementation": contract["implementation"],
-                "shape_key": exact_shape_key(contract),
-                "operator_artifact": contract["artifact_locator"],
-                "operator_artifact_sha256": contract["artifact_sha256"],
-                "trace_id": trace.get("trace_id"),
-                "trace_manifest": str(trace_path),
-                "trace_manifest_sha256": file_sha256(trace_path),
-                "cycles": cycles,
-                "operator_latency_fs": round(cycles * 1.0e15 / frequency),
-                "source_status": qualification.get("status"),
-            }
-        )
+        record = {
+            "operator_type": operator,
+            "implementation": contract["implementation"],
+            "shape_key": exact_shape_key(contract),
+            "operator_artifact": contract["artifact_locator"],
+            "operator_artifact_sha256": contract["artifact_sha256"],
+            "trace_id": trace.get("trace_id"),
+            "trace_manifest": str(trace_path),
+            "trace_manifest_sha256": file_sha256(trace_path),
+            "cycles": cycles,
+            "operator_latency_fs": round(cycles * 1.0e15 / frequency),
+            "source_status": qualification.get("status"),
+        }
+        if operator in identities:
+            record["execution_identity"] = identities[operator]
+        operators.append(record)
     first = next(iter(contracts.values()))
     return {
         "schema_version": SIMULATOR_SCHEMA,
@@ -247,6 +274,7 @@ def build_native_vram_simulator_catalog(
     qualification_root: str | Path,
     *,
     core_frequency_hz: int,
+    execution_identity_catalog: str | Path | None = None,
 ) -> dict[str, object]:
     """Build a catalog from deterministic native-VRAM Accel-Sim double runs."""
 
@@ -254,6 +282,11 @@ def build_native_vram_simulator_catalog(
     root = Path(repository_root).resolve()
     qualification_directory = Path(qualification_root).resolve()
     contracts = load_gpu_operator_contracts(capability_path, root)
+    identities = (
+        load_execution_identity_catalog(execution_identity_catalog)
+        if execution_identity_catalog is not None
+        else {}
+    )
     operators: list[dict[str, object]] = []
     for operator, contract in sorted(contracts.items()):
         record_path = (
@@ -315,25 +348,26 @@ def build_native_vram_simulator_catalog(
                 f"qualified trace does not implement the contract for {operator}"
             )
         cycles = cycles_raw[0]
-        operators.append(
-            {
-                "operator_type": operator,
-                "implementation": contract["implementation"],
-                "shape_key": exact_shape_key(contract),
-                "operator_artifact": contract["artifact_locator"],
-                "operator_artifact_sha256": contract["artifact_sha256"],
-                "qualification_record": str(record_path),
-                "qualification_record_sha256": file_sha256(record_path),
-                "contract_trace_manifest": str(contract_trace_path),
-                "contract_trace_manifest_sha256": file_sha256(contract_trace_path),
-                "trace_manifest": str(qualification_trace_path),
-                "trace_manifest_sha256": file_sha256(qualification_trace_path),
-                "cycles": cycles,
-                "instructions": instructions_raw[0],
-                "operator_latency_fs": round(cycles * 1.0e15 / frequency),
-                "source_status": "passed_native_vram_double_run",
-            }
-        )
+        record = {
+            "operator_type": operator,
+            "implementation": contract["implementation"],
+            "shape_key": exact_shape_key(contract),
+            "operator_artifact": contract["artifact_locator"],
+            "operator_artifact_sha256": contract["artifact_sha256"],
+            "qualification_record": str(record_path),
+            "qualification_record_sha256": file_sha256(record_path),
+            "contract_trace_manifest": str(contract_trace_path),
+            "contract_trace_manifest_sha256": file_sha256(contract_trace_path),
+            "trace_manifest": str(qualification_trace_path),
+            "trace_manifest_sha256": file_sha256(qualification_trace_path),
+            "cycles": cycles,
+            "instructions": instructions_raw[0],
+            "operator_latency_fs": round(cycles * 1.0e15 / frequency),
+            "source_status": "passed_native_vram_double_run",
+        }
+        if operator in identities:
+            record["execution_identity"] = identities[operator]
+        operators.append(record)
     first = next(iter(contracts.values()))
     return {
         "schema_version": SIMULATOR_SCHEMA,
@@ -392,6 +426,14 @@ def _operator_records(
             _positive_number(
                 record.get("operator_latency_fs"), f"{operator}.operator_latency_fs"
             )
+        if "execution_identity" in record:
+            try:
+                validate_execution_identity(
+                    record["execution_identity"],
+                    f"{path}.{operator}.execution_identity",
+                )
+            except GPUExecutionIdentityError as error:
+                raise GPUOperatorCalibrationError(str(error)) from error
         records[operator] = record
     count = payload.get("operator_count")
     if count != len(records):
@@ -457,12 +499,33 @@ def audit_gpu_operator_pairing(
                 record_blockers.append(f"{kind}:shape_mismatch")
             if record["operator_artifact_sha256"] != contract["artifact_sha256"]:
                 record_blockers.append(f"{kind}:artifact_sha256_mismatch")
-        native_trace_sha = native_record.get("trace_manifest_sha256")
-        simulator_trace_sha = simulator_record.get("trace_manifest_sha256")
-        if not isinstance(native_trace_sha, str):
-            record_blockers.append("native:trace_binary_identity_unverified")
-        elif native_trace_sha != simulator_trace_sha:
-            record_blockers.append("trace_binary_identity_mismatch")
+        native_identity_raw = native_record.get("execution_identity")
+        simulator_identity_raw = simulator_record.get("execution_identity")
+        native_identity = None
+        simulator_identity = None
+        if native_identity_raw is None:
+            record_blockers.append("native:execution_identity_unverified")
+        else:
+            native_identity = validate_execution_identity(
+                native_identity_raw, "native.execution_identity"
+            )
+            if not native_identity["native_measurement_observed"]:
+                record_blockers.append("native:measurement_identity_not_observed")
+        if simulator_identity_raw is None:
+            record_blockers.append("simulator:execution_identity_unverified")
+        else:
+            simulator_identity = validate_execution_identity(
+                simulator_identity_raw, "simulator.execution_identity"
+            )
+            if not simulator_identity["trace_capture_observed"]:
+                record_blockers.append("simulator:trace_identity_not_observed")
+        identity_match = False
+        if native_identity is not None and simulator_identity is not None:
+            identity_match = execution_identities_match(
+                native_identity, simulator_identity
+            )
+            if not identity_match:
+                record_blockers.append("execution_identity_mismatch")
         if not topology_match:
             record_blockers.append("memory_topology_mismatch")
         measured = float(
@@ -488,6 +551,7 @@ def audit_gpu_operator_pairing(
                 "max_relative_error": max_relative_error,
                 "within_tolerance": within_tolerance,
                 "topology_match": topology_match,
+                "execution_identity_match": identity_match,
                 "paired": paired,
                 "blockers": record_blockers,
             }

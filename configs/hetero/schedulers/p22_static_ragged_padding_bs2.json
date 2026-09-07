@@ -1,0 +1,15 @@
+{
+  "mode": "request_batch",
+  "epoch_mode": "token_step_barrier",
+  "admission": "fcfs",
+  "decode_priority": true,
+  "prefill_aging": true,
+  "max_num_sequences": 2,
+  "max_batched_tokens": 2,
+  "prefill_chunk_tokens": 1,
+  "max_prefill_wait_epochs": 8,
+  "kv_reservation_mode": "full_request",
+  "epoch_duration_fs": 1000,
+  "batch_policy": "padding_dense",
+  "batch_cycle_mode": "request_cycle_composed"
+}

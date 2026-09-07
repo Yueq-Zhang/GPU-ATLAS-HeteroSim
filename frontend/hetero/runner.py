@@ -11,12 +11,17 @@ from pathlib import Path
 from typing import Any
 
 from .analytical import estimate_link_duration_fs, estimate_node_cost
-from .batching import build_batch_plan
+from .batching import build_batch_plan, load_batch_artifact_catalog
+from .decode_lifecycle import (
+    build_decode_kv_lifecycle,
+    build_decode_loop_kv_lifecycle,
+)
 from .execution_plan import build_single_placement_plan, route_to_dict
 from .global_memory_map import build_global_memory_map
 from .live_ramulator2 import LiveRamulator2Bridge
 from .memory_system import (
     build_dynamic_kv_lifecycle,
+    kv_allocation_size,
     run_reference_coupled_dag,
 )
 from .model_graph import (
@@ -26,20 +31,24 @@ from .model_graph import (
     model_spec_from_config,
     request_specs_from_config,
 )
+from .multi_batch_runtime import build_multi_batch_runtime
 from .online_operator_runtime import (
     OnlineDispatchSpec,
     run_online_operator_dag,
 )
 from .operator_event import OperatorEventDispatcher
-from .placement import place_nodes
 from .performance_calibration import (
     PerformanceCalibration,
     evaluate_performance_gate,
 )
+from .placement import place_nodes
 from .prefill_cycle_artifact import PrefillCycleDispatcher
-from .prefill_cycle_runtime import run_prefill_cycle_dag
+from .prefill_cycle_runtime import run_prefill_cycle_dag, run_request_cycle_dag
+from .request_control_runtime import run_request_control_runtime
 from .runtime_bridge import allocate_paged_kv, run_task_dag, simulate_token_barrier
 from .topology import primary_3ddram
+
+_CYCLE_EXECUTION_MODES = {"prefill_cycle", "request_cycle"}
 
 
 def simulation_input_key(config: Mapping[str, object]) -> str:
@@ -62,6 +71,33 @@ def _write_json(path: Path, payload: object) -> None:
         json.dumps(_jsonable(payload), indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+
+
+def _scheduler_contract_inputs(
+    requests: list[dict[str, object]],
+    model: Mapping[str, object],
+    address: Mapping[str, object],
+    scheduling: Mapping[str, object],
+) -> tuple[list[dict[str, object]], dict[str, object]]:
+    """Attach exact KV reservations to the C++ admission contract."""
+
+    enriched: list[dict[str, object]] = []
+    for request in requests:
+        enriched.append(
+            {
+                **request,
+                "kv_reservation_bytes": kv_allocation_size(
+                    request, model, address
+                ),
+            }
+        )
+    scheduler = dict(scheduling)
+    scheduler["kv_capacity_bytes"] = (
+        int(address["kv_capacity_bytes"])
+        if scheduling.get("admission") == "kv_capacity_aware"
+        else 0
+    )
+    return enriched, scheduler
 
 
 def _validate_gpu_only_shared_3d_baseline(
@@ -147,6 +183,7 @@ def _execution_graph(
         "operator_event",
         "full_runtime",
         "prefill_cycle",
+        "request_cycle",
     }
     tasks: list[dict[str, object]] = []
     routes: list[dict[str, object]] = []
@@ -196,7 +233,7 @@ def _execution_graph(
                     payload_bytes = int(route_record["payload_bytes"])
                     duration_fs = (
                         max(1, int(link.get("latency_fs", 0)))
-                        if execution_mode == "prefill_cycle"
+                        if execution_mode in _CYCLE_EXECUTION_MODES
                         and str(
                             getattr(
                                 route_record.get("kind"),
@@ -215,7 +252,7 @@ def _execution_graph(
                             "analytical_parameters": dict(link),
                             "route_timing_semantics": (
                                 "live_durable_fence_and_consumer_acquire_probe"
-                                if execution_mode == "prefill_cycle"
+                                if execution_mode in _CYCLE_EXECUTION_MODES
                                 and str(
                                     getattr(
                                         route_record.get("kind"),
@@ -317,7 +354,7 @@ def _execution_graph(
                         "duration_fs": duration_fs,
                     }
                 )
-            elif execution_mode in {"operator_event", "prefill_cycle"}:
+            elif execution_mode in {"operator_event", *_CYCLE_EXECUTION_MODES}:
                 operator_dispatch_specs[task_id] = OnlineDispatchSpec(
                     task_id=task_id,
                     backend_key=backend_key,
@@ -350,7 +387,7 @@ def _execution_graph(
                 "logical_node_count": logical_nodes,
                 "materialized_device_task_count": len(tasks),
                 "backend_dispatch_count": 0
-                if execution_mode in {"operator_event", "prefill_cycle"}
+                if execution_mode in {"operator_event", *_CYCLE_EXECUTION_MODES}
                 else None,
                 "each_logical_node_exactly_once": exact_once,
             },
@@ -416,13 +453,14 @@ def _metrics(
         request_metrics.append(
             {
                 "request_id": request_id,
-                "ttft_fs": ready[0] - arrival,
+                "ttft_fs": ready[0] - arrival if ready else None,
                 "tpot_fs": sum(intervals) / len(intervals) if intervals else None,
                 "itl_fs": intervals,
-                "e2e_user_fs": ready[-1] - arrival,
+                "e2e_user_fs": ready[-1] - arrival if ready else None,
                 "retire_latency_fs": int(result["finish_time_fs"]) - arrival,
                 "generated_length": result["generated_length"],
                 "final_committed_kv_len": result["committed_kv_length"],
+                "termination_reason": result.get("termination_reason", "completed"),
             }
         )
     return {
@@ -489,8 +527,10 @@ def _timed_metrics(
                 - arrival,
                 "generated_length": len(ready),
                 "final_committed_kv_len": (
-                    int(request.get("initial_kv_length", 0)) + 1
-                    if request.get("execution_scope", "full_request") == "decode_step"
+                    int(request.get("initial_kv_length", 0))
+                    + int(request["output_length"])
+                    if request.get("execution_scope", "full_request")
+                    in {"decode_step", "decode_loop"}
                     else int(request["prompt_length"])
                     + int(request["output_length"])
                     - 1
@@ -576,16 +616,44 @@ def execute_run(
     allocation_requests = []
     for request in request_configs:
         allocation_request = dict(request)
-        if allocation_request.get("execution_scope", "full_request") == "decode_step":
+        if allocation_request.get("execution_scope", "full_request") in {
+            "decode_step",
+            "decode_loop",
+        }:
             allocation_request["prompt_length"] = (
-                int(allocation_request["initial_kv_length"]) + 1
+                int(allocation_request["initial_kv_length"])
+                + int(allocation_request["output_length"])
             )
             allocation_request["output_length"] = 1
         allocation_request.pop("execution_scope", None)
         allocation_request.pop("initial_kv_length", None)
         allocation_requests.append(allocation_request)
-    bindings = allocate_paged_kv(
-        allocation_requests, model_config, address, memory_space_id
+    if "batch_cycle_mode" in scheduling:
+        bindings = {
+            "schema_version": "hetero-buffer-bindings/v2",
+            "memory_space_id": memory_space_id,
+            "used_bytes": 0,
+            "allocation_mode": "deferred_until_admission",
+            "allocations": [
+                {
+                    "request_id": str(request["request_id"]),
+                    "memory_space_id": memory_space_id,
+                    "offset_bytes": None,
+                    "allocation_epoch": None,
+                    "allocated_bytes": kv_allocation_size(
+                        request, model_config, address
+                    ),
+                    "binding_state": "deferred_until_admission",
+                }
+                for request in request_configs
+            ],
+        }
+    else:
+        bindings = allocate_paged_kv(
+            allocation_requests, model_config, address, memory_space_id
+        )
+    scheduler_requests, scheduler_contract = _scheduler_contract_inputs(
+        request_configs, model_config, address, scheduling
     )
     simulation = dict(config["simulation"])  # type: ignore[arg-type]
     execution_mode = str(simulation.get("execution_mode", "scheduler_validation"))
@@ -615,7 +683,10 @@ def execute_run(
     online_dispatch_payload: dict[str, object] | None = None
     request_cycle_payload: dict[str, object] | None = None
     global_memory_map_payload: dict[str, object] | None = None
-    prefill_coverage_payload: dict[str, object] | None = None
+    request_cycle_coverage_payload: dict[str, object] | None = None
+    decode_lifecycle_payload: dict[str, object] | None = None
+    multi_batch_runtime_payload: dict[str, object] | None = None
+    request_control_runtime_payload: dict[str, object] | None = None
     shared_config: Mapping[str, object] | None = None
     shared_reference_active = False
     if (
@@ -640,7 +711,7 @@ def execute_run(
             capacity_bytes=capacity_bytes,
             alignment_bytes=alignment_bytes,
         )
-    if execution_mode in {"full_runtime", "prefill_cycle"}:
+    if execution_mode in {"full_runtime", *_CYCLE_EXECUTION_MODES}:
         memory_services = system.get("memory_services", {})
         if not isinstance(memory_services, Mapping):
             raise ValueError("system.memory_services must be an object")
@@ -665,6 +736,7 @@ def execute_run(
         "operator_event",
         "full_runtime",
         "prefill_cycle",
+        "request_cycle",
     }:
         if execution_mode == "full_runtime":
             runtime_result, link_statistics, memory_statistics = (
@@ -714,14 +786,16 @@ def execute_run(
                 "final_versions": runtime_result["final_versions"],
                 "performance_boundary": runtime_result["performance_boundary"],
             }
-        elif execution_mode == "prefill_cycle":
+        elif execution_mode in _CYCLE_EXECUTION_MODES:
             if (
                 not isinstance(shared_config, Mapping)
                 or shared_config.get("kind") != "ramulator2"
             ):
-                raise ValueError("prefill_cycle requires a live Ramulator2 service")
+                raise ValueError(
+                    f"{execution_mode} requires a live Ramulator2 service"
+                )
             global_clock_hz = int(shared_config["gpu_clock_hz"])
-            prefill_dispatcher = PrefillCycleDispatcher(
+            request_dispatcher = PrefillCycleDispatcher(
                 project_root, backends, global_clock_hz
             )
             allocations, global_memory_map_payload = build_global_memory_map(
@@ -734,11 +808,46 @@ def execute_run(
                 ),
                 int(address.get("allocation_alignment_bytes", 64)),
             )
+            decode_lifecycles = []
+            for graph, _decisions, request in placed_graphs:
+                if request.execution_scope == "decode_step":
+                    decode_lifecycles.append(
+                        build_decode_kv_lifecycle(
+                            graph, model, request, allocations
+                        )
+                    )
+                elif request.execution_scope == "decode_loop":
+                    decode_lifecycles.append(
+                        build_decode_loop_kv_lifecycle(
+                            graph, model, request, allocations
+                        )
+                    )
+            if decode_lifecycles:
+                decode_lifecycle_payload = {
+                    "schema_version": (
+                        "hetero-decode-kv-lifecycle-bundle/v2"
+                        if any(
+                            item["schema_version"]
+                            == "hetero-decode-kv-lifecycle/v2"
+                            for item in decode_lifecycles
+                        )
+                        else "hetero-decode-kv-lifecycle-bundle/v1"
+                    ),
+                    "request_count": len(decode_lifecycles),
+                    "requests": decode_lifecycles,
+                    "all_requests_valid": True,
+                    "performance_eligible": False,
+                }
             bridge = LiveRamulator2Bridge(project_root, shared_config)
-            runtime_result = run_prefill_cycle_dag(
+            run_cycle = (
+                run_request_cycle_dag
+                if execution_mode == "request_cycle"
+                else run_prefill_cycle_dag
+            )
+            runtime_result = run_cycle(
                 execution_graph,
                 operator_dispatch_specs,
-                prefill_dispatcher,
+                request_dispatcher,
                 bridge,
                 allocations,
                 global_clock_hz=global_clock_hz,
@@ -747,7 +856,9 @@ def execute_run(
                 request_trace_path=run_dir / "request_cycle_trace.jsonl.gz",
             )
             memory_statistics = dict(runtime_result["memory_statistics"])
-            prefill_coverage_payload = dict(runtime_result["artifact_coverage"])
+            request_cycle_coverage_payload = dict(
+                runtime_result["artifact_coverage"]
+            )
             request_cycle_payload = {
                 "schema_version": runtime_result["schema_version"],
                 "backend_dispatch_count": runtime_result["backend_dispatch_count"],
@@ -767,7 +878,9 @@ def execute_run(
                 "version_checks": runtime_result["version_checks"],
                 "one_live_ramulator2": True,
                 "zero_outstanding": memory_statistics["outstanding"] == 0,
-                "all_artifacts_covered": prefill_coverage_payload["all_tasks_covered"],
+                "all_artifacts_covered": request_cycle_coverage_payload[
+                    "all_tasks_covered"
+                ],
             }
         else:
             runtime_result = run_task_dag(runtime_tasks)
@@ -801,8 +914,8 @@ def execute_run(
                 record["timing"]["completion_time_fs"]
             ) - int(record["timing"]["start_time_fs"])
         residency_payload = _materialize_residency(execution_graph, timing_by_id)
-        if execution_mode == "prefill_cycle":
-            metrics["run_status"] = "prefill_cycle_deployment"
+        if execution_mode in _CYCLE_EXECUTION_MODES:
+            metrics["run_status"] = f"{execution_mode}_deployment"
             metrics["implementation_status"] = "implemented_unqualified"
             metrics["fidelity"]["scheduler_fidelity"] = "cycle_event"  # type: ignore[index]
             metrics["fidelity"]["memory_fidelity"] = (  # type: ignore[index]
@@ -812,7 +925,18 @@ def execute_run(
                 "cycle_modeled" if execution_graph["routes"] else "external_gpu_link"
             )
             metrics["memory"] = memory_statistics
-            metrics["prefill_artifact_coverage"] = prefill_coverage_payload
+            coverage_key = (
+                "request_artifact_coverage"
+                if execution_mode == "request_cycle"
+                else "prefill_artifact_coverage"
+            )
+            metrics[coverage_key] = request_cycle_coverage_payload
+            if decode_lifecycle_payload is not None:
+                metrics["decode_kv_lifecycle"] = {
+                    "request_count": decode_lifecycle_payload["request_count"],
+                    "all_requests_valid": True,
+                    "performance_eligible": False,
+                }
             if competition_summary is not None:
                 initiators = memory_statistics.get("initiators", {})
                 if not isinstance(initiators, Mapping):
@@ -837,11 +961,25 @@ def execute_run(
                     )
                 metrics["gpu_logic_die_competition"] = competition_summary
         if execution_mode == "full_runtime":
-            scheduler_result = simulate_token_barrier(request_configs, scheduling)
+            scheduler_result = simulate_token_barrier(
+                scheduler_requests, scheduler_contract
+            )
             batch_plan = build_batch_plan(
                 scheduler_result,
-                placed_graphs[0][0].nodes,  # type: ignore[union-attr]
+                [
+                    node
+                    for graph, _decisions, _request in placed_graphs
+                    for node in graph.nodes
+                ],
                 placement_config,
+                scheduling,
+                model_dtype=model.dtype,
+                batch_artifact_catalog=load_batch_artifact_catalog(
+                    project_root,
+                    str(scheduling["batch_artifact_catalog_ref"])
+                    if "batch_artifact_catalog_ref" in scheduling
+                    else None,
+                ),
             )
             memory_lifecycle = build_dynamic_kv_lifecycle(
                 request_configs,
@@ -849,6 +987,12 @@ def execute_run(
                 model_config,
                 address,
                 memory_space_id,
+            )
+            multi_batch_runtime_payload = build_multi_batch_runtime(
+                scheduler_result,
+                batch_plan,
+                request_configs,
+                memory_lifecycle,
             )
             bindings["allocation_mode"] = "dynamic_first_fit_with_release"
             bindings["dynamic_lifecycle_schema"] = memory_lifecycle["schema_version"]
@@ -864,7 +1008,14 @@ def execute_run(
                 "device_subbatch_count": len(batch_plan["device_subbatches"]),
                 "effective_tokens": batch_plan["effective_tokens"],
                 "padded_tokens": batch_plan["padded_tokens"],
+                "batch_policy": batch_plan["batch_policy"],
+                "cycle_mode": batch_plan["cycle_mode"],
+                "batch_utilization": batch_plan["batch_utilization"],
+                "performance_claim_allowed": batch_plan[
+                    "performance_claim_allowed"
+                ],
             }
+            metrics["multi_batch"] = multi_batch_runtime_payload["metrics"]
             metrics["memory"] = memory_statistics
             metrics["links"] = link_statistics
             if competition_summary is not None:
@@ -885,8 +1036,82 @@ def execute_run(
                     )
                 metrics["gpu_logic_die_competition"] = competition_summary
     else:
-        runtime_result = simulate_token_barrier(request_configs, scheduling)
+        runtime_result = simulate_token_barrier(
+            scheduler_requests, scheduler_contract
+        )
         metrics = _metrics(runtime_result, request_configs)
+        batch_plan = build_batch_plan(
+            runtime_result,
+            [
+                node
+                for graph, _decisions, _request in placed_graphs
+                for node in graph.nodes
+            ],
+            placement_config,
+            scheduling,
+            model_dtype=model.dtype,
+            batch_artifact_catalog=load_batch_artifact_catalog(
+                project_root,
+                str(scheduling["batch_artifact_catalog_ref"])
+                if "batch_artifact_catalog_ref" in scheduling
+                else None,
+            ),
+        )
+        has_request_controls = any(
+            any(
+                field in request
+                for field in (
+                    "eos_after_generated_tokens",
+                    "max_output_tokens",
+                    "cancel_time_fs",
+                )
+            )
+            for request in request_configs
+        )
+        if has_request_controls:
+            request_control_runtime_payload = run_request_control_runtime(
+                request_configs,
+                scheduling,
+                model_config,
+                address,
+                memory_space_id,
+            )
+            if request_control_runtime_payload["scheduler_result"] != runtime_result:
+                raise RuntimeError("P24 request-control scheduler replay diverged")
+            memory_lifecycle = request_control_runtime_payload["memory_lifecycle"]  # type: ignore[assignment]
+            metrics["request_control"] = {
+                "termination": request_control_runtime_payload["termination"],
+                "memory": request_control_runtime_payload["memory"],
+                "performance_claim_allowed": False,
+            }
+        else:
+            memory_lifecycle = build_dynamic_kv_lifecycle(
+                request_configs,
+                runtime_result,
+                model_config,
+                address,
+                memory_space_id,
+            )
+            multi_batch_runtime_payload = build_multi_batch_runtime(
+                runtime_result,
+                batch_plan,
+                request_configs,
+                memory_lifecycle,
+            )
+        metrics["batch"] = {
+            "epoch_count": len(batch_plan["epochs"]),
+            "device_subbatch_count": len(batch_plan["device_subbatches"]),
+            "effective_tokens": batch_plan["effective_tokens"],
+            "padded_tokens": batch_plan["padded_tokens"],
+            "batch_policy": batch_plan["batch_policy"],
+            "cycle_mode": batch_plan["cycle_mode"],
+            "batch_utilization": batch_plan["batch_utilization"],
+            "performance_claim_allowed": batch_plan[
+                "performance_claim_allowed"
+            ],
+        }
+        if multi_batch_runtime_payload is not None:
+            metrics["multi_batch"] = multi_batch_runtime_payload["metrics"]
 
     _write_json(run_dir / "resolved_config.yaml", config)
     dependency_lock = project_root / "dependency_lock.yaml"
@@ -901,6 +1126,8 @@ def execute_run(
             "simulation_input_key": key,
             "runtime_owner": "python.OnlineOperatorRuntime"
             if execution_mode == "operator_event"
+            else "python.RequestCycleRuntime"
+            if execution_mode == "request_cycle"
             else "python.PrefillCycleRuntime"
             if execution_mode == "prefill_cycle"
             else "cpp.GlobalEventRuntime"
@@ -910,7 +1137,7 @@ def execute_run(
                 "cpp.RuntimeMemoryPlanner"
                 if execution_mode == "full_runtime"
                 else "python.GlobalPhysicalAddressAllocator"
-                if execution_mode == "prefill_cycle"
+                if execution_mode in _CYCLE_EXECUTION_MODES
                 or (
                     execution_mode == "operator_event"
                     and dispatcher is not None
@@ -920,7 +1147,7 @@ def execute_run(
             ),
             "memory_timing_owner": (
                 "shared3d.live_ramulator2"
-                if execution_mode == "prefill_cycle"
+                if execution_mode in _CYCLE_EXECUTION_MODES
                 else "shared3d.per_operator_in_process_ramulator2"
                 if execution_mode == "operator_event"
                 and dispatcher is not None
@@ -942,6 +1169,39 @@ def execute_run(
             }
             if execution_mode == "prefill_cycle"
             else None,
+            "request_cycle": {
+                "one_live_ramulator2": True,
+                "request_sampling": "evenly_spaced_bounded",
+                "performance_eligible": False,
+            }
+            if execution_mode == "request_cycle"
+            else None,
+            "multi_batch": {
+                "schema_version": multi_batch_runtime_payload["schema_version"],
+                "cycle_mode": multi_batch_runtime_payload["cycle_mode"],
+                "timing_semantics": multi_batch_runtime_payload[
+                    "timing_semantics"
+                ],
+                "performance_claim_allowed": multi_batch_runtime_payload[
+                    "performance_claim_allowed"
+                ],
+            }
+            if multi_batch_runtime_payload is not None
+            else None,
+            "request_control": {
+                "schema_version": request_control_runtime_payload[
+                    "schema_version"
+                ],
+                "cancellation_granularity": request_control_runtime_payload[
+                    "cancellation_granularity"
+                ],
+                "single_layer_qualification": request_control_runtime_payload[
+                    "single_layer_qualification"
+                ],
+                "performance_claim_allowed": False,
+            }
+            if request_control_runtime_payload is not None
+            else None,
         },
     )
     _write_json(
@@ -954,6 +1214,15 @@ def execute_run(
         _write_json(run_dir / "batch_plan.json", batch_plan)
     if memory_lifecycle is not None:
         _write_json(run_dir / "memory_lifecycle.json", memory_lifecycle)
+    if multi_batch_runtime_payload is not None:
+        _write_json(
+            run_dir / "multi_batch_runtime.json", multi_batch_runtime_payload
+        )
+    if request_control_runtime_payload is not None:
+        _write_json(
+            run_dir / "request_control_runtime.json",
+            request_control_runtime_payload,
+        )
     if link_statistics is not None:
         _write_json(run_dir / "link_statistics.json", link_statistics)
     if memory_statistics is not None:
@@ -966,22 +1235,33 @@ def execute_run(
         _write_json(run_dir / "request_cycle_trace.json", request_cycle_payload)
     if global_memory_map_payload is not None:
         _write_json(run_dir / "global_memory_map.json", global_memory_map_payload)
-    if prefill_coverage_payload is not None:
-        _write_json(
-            run_dir / "prefill_artifact_coverage.json", prefill_coverage_payload
+    if request_cycle_coverage_payload is not None:
+        coverage_name = (
+            "request_artifact_coverage.json"
+            if execution_mode == "request_cycle"
+            else "prefill_artifact_coverage.json"
         )
+        _write_json(
+            run_dir / coverage_name, request_cycle_coverage_payload
+        )
+    if decode_lifecycle_payload is not None:
+        _write_json(run_dir / "decode_kv_lifecycle.json", decode_lifecycle_payload)
     trace_payload = (
         dispatcher.trace_bundle()
         if dispatcher
         else {
-            "schema_version": "hetero-prefill-cycle-trace/v1",
+            "schema_version": (
+                "hetero-request-cycle-trace/v1"
+                if execution_mode == "request_cycle"
+                else "hetero-prefill-cycle-trace/v1"
+            ),
             "trace_semantics": "bounded_value_range_sampling",
             "replay_safe": False,
             "qualification_record": None,
             "capture": {
                 "status": "no_instruction_trace",
                 "execution_mode": execution_mode,
-                "cycle_artifact_coverage": prefill_coverage_payload,
+                "cycle_artifact_coverage": request_cycle_coverage_payload,
             },
             "address_ranges": (
                 global_memory_map_payload["ranges"]
@@ -989,7 +1269,7 @@ def execute_run(
                 else []
             ),
         }
-        if execution_mode == "prefill_cycle"
+        if execution_mode in _CYCLE_EXECUTION_MODES
         else {
             "schema_version": "hetero-trace-manifest/v1",
             "trace_id": f"unavailable.{key}",
@@ -1008,7 +1288,13 @@ def execute_run(
         event_records = (
             runtime_result["tasks"]
             if execution_mode
-            in {"analytical_preview", "operator_event", "full_runtime", "prefill_cycle"}
+            in {
+                "analytical_preview",
+                "operator_event",
+                "full_runtime",
+                "prefill_cycle",
+                "request_cycle",
+            }
             else runtime_result["epochs"]
         )  # type: ignore[index]
         for event in event_records:

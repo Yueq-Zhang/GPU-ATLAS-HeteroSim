@@ -12,6 +12,7 @@ OPERATOR_FILTER="${P17_OPERATOR_FILTER:-}"
 TRACE_MANIFEST_OVERRIDES="${P17_TRACE_MANIFEST_OVERRIDES:-}"
 EXPECTED_OPERATOR_COUNT="${P17_EXPECTED_OPERATOR_COUNT:-14}"
 FINALIZE_CATALOG="${P17_FINALIZE_CATALOG:-1}"
+EXECUTION_IDENTITY_CATALOG="${P17_EXECUTION_IDENTITY_CATALOG:-}"
 
 if [[ ! "$EXPECTED_OPERATOR_COUNT" =~ ^[1-9][0-9]*$ ]]; then
   echo "P17_EXPECTED_OPERATOR_COUNT must be a positive integer" >&2
@@ -74,6 +75,8 @@ for capability in payload["operator_types"]:
         raise SystemExit(f"Trace Manifest is absent for {operator}: {trace_path}")
     trace_manifest = json.loads(trace_path.read_text(encoding="utf-8"))
     kernels_list = Path(trace_manifest["kernels_list"])
+    if not kernels_list.is_absolute():
+        kernels_list = (trace_path.parent / kernels_list).resolve()
     if not kernels_list.is_file():
         raise SystemExit(f"kernels_list is absent for {operator}: {kernels_list}")
     print(f"{operator}\t{trace_path}")
@@ -126,10 +129,15 @@ if [[ "$FINALIZE_CATALOG" == "0" ]]; then
   exit 0
 fi
 
-"$PYTHON" scripts/build_p17_gpu_simulator_catalog.py \
-  --capabilities "$CAPABILITIES" \
-  --qualification-root "$QUALIFICATION_ROOT" \
+CATALOG_ARGS=(
+  --capabilities "$CAPABILITIES"
+  --qualification-root "$QUALIFICATION_ROOT"
   --output "$SIMULATOR_CATALOG"
+)
+if [[ -n "$EXECUTION_IDENTITY_CATALOG" ]]; then
+  CATALOG_ARGS+=(--execution-identity-catalog "$EXECUTION_IDENTITY_CATALOG")
+fi
+"$PYTHON" scripts/build_p17_gpu_simulator_catalog.py "${CATALOG_ARGS[@]}"
 "$PYTHON" scripts/audit_p17_gpu_operator_pairing.py \
   --native "$NATIVE_CATALOG" \
   --simulator "$SIMULATOR_CATALOG" \

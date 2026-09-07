@@ -1,0 +1,40 @@
+{
+  "requests": [
+    {
+      "request_id": "R0",
+      "arrival_time_fs": 0,
+      "prompt_length": 1,
+      "output_length": 4,
+      "priority": 0,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 16
+    },
+    {
+      "request_id": "R1",
+      "arrival_time_fs": 0,
+      "prompt_length": 1,
+      "output_length": 3,
+      "priority": 1,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 18
+    },
+    {
+      "request_id": "R2",
+      "arrival_time_fs": 1500,
+      "prompt_length": 1,
+      "output_length": 2,
+      "priority": 0,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 20
+    },
+    {
+      "request_id": "R3",
+      "arrival_time_fs": 2500,
+      "prompt_length": 1,
+      "output_length": 4,
+      "priority": 0,
+      "execution_scope": "decode_loop",
+      "initial_kv_length": 16
+    }
+  ]
+}

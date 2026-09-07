@@ -27,6 +27,9 @@ int main() {
     assert(e0.selections.at(0).token_begin == 0);
     assert(e0.selections.at(0).token_count == 2);
     assert(e0.selections.at(1).request_id == "R1");
+    assert(e0.admitted_request_ids == std::vector<std::string>({"R0", "R1"}));
+    assert(e0.active_request_ids == std::vector<std::string>({"R0", "R1"}));
+    assert(e0.retired_request_ids == std::vector<std::string>({"R1"}));
 
     const auto& e1 = result.epochs.at(1);
     assert(e1.selections.size() == 1);
@@ -56,5 +59,40 @@ int main() {
     assert(decode_only.epochs.at(0).selections.at(0).phase == RequestPhase::kDecode);
     assert(decode_only.requests.at(0).generated_length == 1);
     assert(decode_only.requests.at(0).committed_kv_length == 1025);
+
+    const auto capacity_limited = simulate_token_barrier(
+        {RequestInput{"K0", 0, 1, 1, 0, false, 0, 64},
+         RequestInput{"K1", 0, 1, 1, 0, false, 0, 64}},
+        SchedulerConfig{2, 2, 1, 8, 1000, 64});
+    assert(capacity_limited.epochs.size() == 2);
+    assert(capacity_limited.epochs.at(0).admitted_request_ids ==
+           std::vector<std::string>({"K0"}));
+    assert(capacity_limited.epochs.at(0).retired_request_ids ==
+           std::vector<std::string>({"K0"}));
+    assert(capacity_limited.epochs.at(1).admitted_request_ids ==
+           std::vector<std::string>({"K1"}));
+
+    const auto controlled = simulate_token_barrier(
+        {RequestInput{"E", 0, 1, 8, 0, true, 16, 64, 2},
+         RequestInput{"M", 0, 1, 8, 0, true, 16, 64, 0, 3},
+         RequestInput{"C", 0, 1, 8, 0, true, 16, 64, 0, 0, 1000}},
+        SchedulerConfig{3, 3, 1, 8, 1000, 192});
+    assert(controlled.requests.at(0).generated_length == 1);
+    assert(controlled.requests.at(0).termination_reason == "cancelled");
+    assert(controlled.requests.at(1).generated_length == 2);
+    assert(controlled.requests.at(1).termination_reason == "eos");
+    assert(controlled.requests.at(2).generated_length == 3);
+    assert(controlled.requests.at(2).termination_reason == "max_length");
+    assert(controlled.epochs.at(1).cancelled_request_ids ==
+           std::vector<std::string>({"C"}));
+
+    const auto cancelled_waiter = simulate_token_barrier(
+        {RequestInput{"A", 0, 1, 2, 0, true, 16, 64},
+         RequestInput{"W", 0, 1, 8, 0, true, 16, 64, 0, 0, 500}},
+        SchedulerConfig{2, 2, 1, 8, 1000, 64});
+    assert(cancelled_waiter.requests.at(1).generated_length == 0);
+    assert(cancelled_waiter.requests.at(1).termination_reason == "cancelled");
+    assert(cancelled_waiter.epochs.at(1).cancelled_request_ids ==
+           std::vector<std::string>({"W"}));
     return 0;
 }

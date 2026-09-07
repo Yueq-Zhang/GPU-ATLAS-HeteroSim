@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "accepted_parent_requests": 190,
+      "gpu_cycles_observed_unqualified": 42057,
+      "layers": 1,
+      "makespan_fs_observed_unqualified": 35047500000,
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p19/one_layer/qualification_record.json",
+      "ramulator2_cycles": 14019,
+      "task_count": 20
+    },
+    {
+      "accepted_parent_requests": 3382,
+      "gpu_cycles_observed_unqualified": 566052,
+      "layers": 22,
+      "makespan_fs_observed_unqualified": 471710000000,
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p19/twenty_two_layer/qualification_record.json",
+      "ramulator2_cycles": 188684,
+      "task_count": 272
+    }
+  ],
+  "claim_boundary": {
+    "accel_sim_instruction_trace_coverage": 0.0,
+    "compute_fidelity": "tiled_cycle_contract_unqualified",
+    "performance_claim_allowed": false,
+    "reason": "P19 qualifies graph, request-cycle scheduling, KV state, Global PA and live Ramulator2 causality. It does not calibrate GPU compute time."
+  },
+  "functional_scope": {
+    "batch_size": 1,
+    "dtype": "fp16",
+    "initial_context_length": 16,
+    "model": "TinyLlama-1.1B",
+    "q_len": 1,
+    "tested_layer_counts": [
+      1,
+      22
+    ]
+  },
+  "next_replacement": "Replace tiled GPU compute contracts with exact-shape Accel-Sim instruction-trace artifacts before P18/P20 performance calibration.",
+  "qualified_invariants": {
+    "all_memory_requests_within_value_allocation": true,
+    "dependency_causality": true,
+    "global_pa_nonoverlap": true,
+    "gpu0_resource_nonoverlap": true,
+    "kv_append_before_attention": true,
+    "kv_version_commit_before_consumption": true,
+    "one_live_ramulator2": true,
+    "parent_child_durable_conservation": true,
+    "zero_atlas_requests": true,
+    "zero_inflight_at_finish": true
+  },
+  "schema_version": "hetero-p19-decode-qualification-summary/v1",
+  "status": "passed"
+}

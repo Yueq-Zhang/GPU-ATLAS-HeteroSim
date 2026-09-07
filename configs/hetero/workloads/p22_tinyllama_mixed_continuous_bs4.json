@@ -1,0 +1,8 @@
+{
+  "requests": [
+    {"request_id": "R0", "arrival_time_fs": 0, "prompt_length": 8, "output_length": 1, "priority": 0},
+    {"request_id": "R1", "arrival_time_fs": 0, "prompt_length": 16, "output_length": 2, "priority": 1},
+    {"request_id": "R2", "arrival_time_fs": 1500, "prompt_length": 31, "output_length": 3, "priority": 0},
+    {"request_id": "R3", "arrival_time_fs": 2500, "prompt_length": 12, "output_length": 2, "priority": 0}
+  ]
+}

@@ -1,0 +1,324 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "capture_allocator_coverage": "target_window_pytorch_allocator_plus_tensor_segments",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.rope.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "driver": "591.86",
+    "gpu": "NVIDIA GeForce RTX 3070",
+    "kind": "accel_sim",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "compute_memory_coupled": false,
+    "global_pa_binding_ready": false,
+    "memory_traffic": "not_extracted",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": false,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/operator_metadata.json",
+      "sha256": "dbb5824bcbc9a8be714fe08aa8a7be535c258305643dda2a1832a89a015d4280",
+      "size_bytes": 4637
+    },
+    {
+      "kind": "kernels_list",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernelslist.g",
+      "sha256": "4f083de07c08842f7c5ab8bab965c02ce9ee41e561cd271f3a62cab99ca3daaf",
+      "size_bytes": 675
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-1-ctx_0x5fd38bf35140.tracez",
+      "sha256": "63cae1c972519bdaf5ce662490c7a4b5654a3e372a5d045b1ea10624a4f02a15",
+      "size_bytes": 3148
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-2-ctx_0x5fd38bf35140.tracez",
+      "sha256": "92f4a685d43429f5448c6648fbf2d718a3043989fb387f28a0e13a057258a93f",
+      "size_bytes": 11681
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-3-ctx_0x5fd38bf35140.tracez",
+      "sha256": "40a301670d358c2395ca63b4fe6938eb25f933622b37183667cdc550f6fd9c65",
+      "size_bytes": 594092
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-4-ctx_0x5fd38bf35140.tracez",
+      "sha256": "2fc33f3c01027981dfd91071f6e74d611a01d674214eefbbec4d2182404ab6e3",
+      "size_bytes": 14636
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-5-ctx_0x5fd38bf35140.tracez",
+      "sha256": "fd15994524b4e902134d5b5ca7a325318a04cf29f51e0c1240f77ea52c26736b",
+      "size_bytes": 4022
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-6-ctx_0x5fd38bf35140.tracez",
+      "sha256": "cc5f63fcc93b064cab2816ba2daa56b8dc9a8e94a64954e6e3cf23aed005ce4b",
+      "size_bytes": 15234
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-7-ctx_0x5fd38bf35140.tracez",
+      "sha256": "1d42f6851bf618bcdd161394ece54cdc6fabb8537b1faf8e2664e1bf3a685b1b",
+      "size_bytes": 4023
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-8-ctx_0x5fd38bf35140.tracez",
+      "sha256": "f5f15070c97438c44def0d88a72771f63759257266095b8da0c8f67157d9ffe2",
+      "size_bytes": 18651
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-9-ctx_0x5fd38bf35140.tracez",
+      "sha256": "1fe146834fe631402e72950a9bbd13279a00ffa74b27b5c860662fa629dd3638",
+      "size_bytes": 18654
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-10-ctx_0x5fd38bf35140.tracez",
+      "sha256": "4429718038c7d24b3576464111c05744f91e9c875015612e4948aaef322d0f3a",
+      "size_bytes": 514605
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-11-ctx_0x5fd38bf35140.tracez",
+      "sha256": "cc5068d7be8b2974e680c758f01c46700c67f3237f6920aeb34b8443df1fb57d",
+      "size_bytes": 180998
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-12-ctx_0x5fd38bf35140.tracez",
+      "sha256": "3d7e1769f24bfbfcdf98884443c960ad52f6d8d01c3334da597992bc5fa861b6",
+      "size_bytes": 2735389
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-13-ctx_0x5fd38bf35140.tracez",
+      "sha256": "1c30389cef2d80e9d1de1d9d8d37072c79d2775287063fc20ab30feaa1b7680f",
+      "size_bytes": 514386
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-14-ctx_0x5fd38bf35140.tracez",
+      "sha256": "4de635f2a8f219f2c2e2d06962695fa4a3b1e958f0047403b3645e025bc204a2",
+      "size_bytes": 161824
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-15-ctx_0x5fd38bf35140.tracez",
+      "sha256": "b4d8a018e0fcd172e232ee6c7c54edada5ffd6f473cb7ec00ba4724a02854cda",
+      "size_bytes": 65948
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-16-ctx_0x5fd38bf35140.tracez",
+      "sha256": "72d2ed7e11e5310b9ad6a722e237e9fee1596ec7f6939ca103d5d4c8075898d6",
+      "size_bytes": 23131
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-17-ctx_0x5fd38bf35140.tracez",
+      "sha256": "3e1c4de64f3c40f9096cb2050ae5dd1b8ccbffb1a969da85b664f9700bb42927",
+      "size_bytes": 789297
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-18-ctx_0x5fd38bf35140.tracez",
+      "sha256": "a542b5ccb20ba2f77663934be00e4f7c3e4ead8b12a4b0bb308b00512fb3e3b4",
+      "size_bytes": 65942
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/rope/traces/kernel-19-ctx_0x5fd38bf35140.tracez",
+      "sha256": "abc7b94b848767052df16e1c5401786e13a15a036416d3302534e7d9b14150d3",
+      "size_bytes": 19682
+    },
+    {
+      "kind": "accel_sim_trace_manifest",
+      "path": "tinyllama_prefill_bs1_ctx16_rope_sm86_trace.json",
+      "sha256": "f2b6b0e7f7b2674b82b722567188679d5782c691275cec957b4a6cfbc74486bb",
+      "size_bytes": 8445
+    }
+  ],
+  "qualification": {
+    "performance_eligible": false,
+    "qualification_record": null,
+    "status": "capture_only_pending_cycle_qualification"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "transformers.LlamaRotaryEmbedding_plus_apply_rotary_pos_emb",
+    "kv_length": 16,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "rope",
+    "phase": "prefill",
+    "q_len": 16
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        32,
+        16,
+        64
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.rope.query",
+      "trace_base": 47380156928
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        4,
+        16,
+        64
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        4096,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.rope.key",
+      "trace_base": 47380222464
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "int64",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        16
+      ],
+      "size_bytes": 128,
+      "strides": [
+        16,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.rope.position_ids",
+      "trace_base": 47380238848
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        16,
+        64
+      ],
+      "size_bytes": 2048,
+      "strides": [
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.rope.cos",
+      "trace_base": 47380091392
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        16,
+        64
+      ],
+      "size_bytes": 2048,
+      "strides": [
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.rope.sin",
+      "trace_base": 47380093440
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        32,
+        16,
+        64
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.rope.query_output",
+      "trace_base": 47380304896
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        4,
+        16,
+        64
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        4096,
+        1024,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.rope.key_output",
+      "trace_base": 47380095488
+    }
+  ]
+}

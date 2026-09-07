@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from ..performance_calibration import (
     PerformanceCalibration,
@@ -204,6 +205,7 @@ def validate_config(config: Mapping[str, Any]) -> None:
         "operator_event",
         "full_runtime",
         "prefill_cycle",
+        "request_cycle",
     }:
         raise ConfigError("invalid simulation.execution_mode")
     if execution_mode in {
@@ -211,6 +213,7 @@ def validate_config(config: Mapping[str, Any]) -> None:
         "operator_event",
         "full_runtime",
         "prefill_cycle",
+        "request_cycle",
     }:
         for backend_name, backend in (("gpu", gpu), ("atlas", atlas)):
             needs_analytical = backend.get("kind") in {"roofline", "analytical"} or (
@@ -295,17 +298,18 @@ def validate_config(config: Mapping[str, Any]) -> None:
                 if atlas.get("fallback_kind", "none") not in {"none", "analytical"}:
                     raise ConfigError("invalid backends.atlas.fallback_kind")
 
-        if execution_mode == "prefill_cycle":
+        if execution_mode in {"prefill_cycle", "request_cycle"}:
             if coupling != "request_cycle":
                 raise ConfigError(
-                    "prefill_cycle execution_mode requires request_cycle coupling"
+                    f"{execution_mode} execution_mode requires request_cycle coupling"
                 )
             for backend_name, backend in (("gpu", gpu), ("atlas", atlas)):
                 if backend.get("kind") == "none":
                     continue
                 if backend.get("kind") != "cycle_replay":
                     raise ConfigError(
-                        f"prefill_cycle requires {backend_name} kind=cycle_replay or none"
+                        f"{execution_mode} requires {backend_name} "
+                        "kind=cycle_replay or none"
                     )
                 if (
                     not isinstance(backend.get("cycle_artifact_ref"), str)
@@ -497,7 +501,7 @@ def validate_config(config: Mapping[str, Any]) -> None:
                     raise ConfigError(
                         f"system.memory_services.{memory_id}.config_ref is required"
                     )
-                if execution_mode == "prefill_cycle":
+                if execution_mode in {"prefill_cycle", "request_cycle"}:
                     if (
                         not isinstance(memory.get("bridge_library"), str)
                         or not memory["bridge_library"]
@@ -546,7 +550,8 @@ def validate_config(config: Mapping[str, Any]) -> None:
                         raise ConfigError("invalid Ramulator2 duplex_mode")
                     if memory.get("sampling_policy") != "evenly_spaced_bounded":
                         raise ConfigError(
-                            "prefill_cycle requires sampling_policy=evenly_spaced_bounded"
+                            f"{execution_mode} requires "
+                            "sampling_policy=evenly_spaced_bounded"
                         )
             for field in ("timing_owner", "parameter_source"):
                 if not isinstance(memory.get(field), str) or not memory[field]:
@@ -572,17 +577,20 @@ def validate_config(config: Mapping[str, Any]) -> None:
                         raise ConfigError(
                             "Model 3 gpu_only shared DRAM requires backends.atlas.kind=none"
                         )
-        if execution_mode == "prefill_cycle":
+        if execution_mode in {"prefill_cycle", "request_cycle"}:
             if profile != "model3_gpu_native_3ddram":
-                raise ConfigError("P10b-B prefill_cycle currently requires Model 3")
+                raise ConfigError(
+                    f"{execution_mode} currently requires Model 3"
+                )
             shared = memory_services.get("shared0.dram3d")
             if not isinstance(shared, Mapping) or shared.get("kind") != "ramulator2":
                 raise ConfigError(
-                    "prefill_cycle requires shared0.dram3d.kind=ramulator2"
+                    f"{execution_mode} requires shared0.dram3d.kind=ramulator2"
                 )
             if shared.get("timing_owner") != "shared3d.live_ramulator2":
                 raise ConfigError(
-                    "prefill_cycle requires exactly one shared3d.live_ramulator2 owner"
+                    f"{execution_mode} requires exactly one "
+                    "shared3d.live_ramulator2 owner"
                 )
 
     model = _mapping(config, "model")
@@ -616,14 +624,14 @@ def validate_config(config: Mapping[str, Any]) -> None:
         not isinstance(checkpoint_revision, str) or not checkpoint_revision
     ):
         raise ConfigError("model.checkpoint_revision must be a non-empty string")
-    if execution_mode == "prefill_cycle":
+    if execution_mode in {"prefill_cycle", "request_cycle"}:
         if model.get("input_embedding_mode") != "token_ids":
             raise ConfigError(
-                "prefill_cycle requires model.input_embedding_mode=token_ids"
+                f"{execution_mode} requires model.input_embedding_mode=token_ids"
             )
         if model.get("materialize_parameters") is not True:
             raise ConfigError(
-                "prefill_cycle requires model.materialize_parameters=true"
+                f"{execution_mode} requires model.materialize_parameters=true"
             )
 
     scheduling = _mapping(config, "scheduling")
@@ -641,9 +649,20 @@ def validate_config(config: Mapping[str, Any]) -> None:
             "max_prefill_wait_epochs",
             "kv_reservation_mode",
             "epoch_duration_fs",
+            "batch_policy",
+            "batch_cycle_mode",
+            "batch_artifact_catalog_ref",
+            "cancellation_granularity",
         },
         "scheduling",
     )
+    if scheduling.get("mode") not in {
+        "static_ragged",
+        "request_batch",
+        "continuous",
+        "continuous_batching",
+    }:
+        raise ConfigError("invalid scheduling.mode")
     max_tokens = _positive_int(
         scheduling.get("max_batched_tokens"), "scheduling.max_batched_tokens"
     )
@@ -657,6 +676,39 @@ def validate_config(config: Mapping[str, Any]) -> None:
             "scheduling.prefill_chunk_tokens must not exceed max_batched_tokens"
         )
     _positive_int(scheduling.get("epoch_duration_fs"), "scheduling.epoch_duration_fs")
+    if scheduling.get("batch_policy", "padding_dense") not in {
+        "homogeneous",
+        "padding_dense",
+        "ragged_split",
+    }:
+        raise ConfigError("invalid scheduling.batch_policy")
+    batch_cycle_mode = scheduling.get(
+        "batch_cycle_mode", "request_cycle_composed"
+    )
+    if batch_cycle_mode not in {
+        "request_cycle_composed",
+        "batched_kernel_cycle",
+    }:
+        raise ConfigError("invalid scheduling.batch_cycle_mode")
+    batch_catalog_ref = scheduling.get("batch_artifact_catalog_ref")
+    if batch_cycle_mode == "batched_kernel_cycle" and (
+        not isinstance(batch_catalog_ref, str) or not batch_catalog_ref
+    ):
+        raise ConfigError(
+            "batched_kernel_cycle requires scheduling.batch_artifact_catalog_ref"
+        )
+    if batch_catalog_ref is not None and (
+        not isinstance(batch_catalog_ref, str) or not batch_catalog_ref
+    ):
+        raise ConfigError(
+            "scheduling.batch_artifact_catalog_ref must be a non-empty path"
+        )
+    if scheduling.get("cancellation_granularity", "token_step_barrier") != (
+        "token_step_barrier"
+    ):
+        raise ConfigError(
+            "scheduling.cancellation_granularity must be token_step_barrier"
+        )
 
     workload = _mapping(config, "workload")
     _reject_unknown(workload, {"requests"}, "workload")
@@ -677,6 +729,9 @@ def validate_config(config: Mapping[str, Any]) -> None:
                 "priority",
                 "execution_scope",
                 "initial_kv_length",
+                "eos_after_generated_tokens",
+                "max_output_tokens",
+                "cancel_time_fs",
             },
             f"workload.requests[{index}]",
         )
@@ -689,13 +744,17 @@ def validate_config(config: Mapping[str, Any]) -> None:
         _positive_int(request.get("prompt_length"), f"requests[{index}].prompt_length")
         _positive_int(request.get("output_length"), f"requests[{index}].output_length")
         scope = request.get("execution_scope", "full_request")
-        if scope not in {"full_request", "decode_step"}:
+        if scope not in {"full_request", "decode_step", "decode_loop"}:
             raise ConfigError(f"requests[{index}].execution_scope is invalid")
         initial_kv = request.get("initial_kv_length", 0)
         _unsigned_int(initial_kv, f"requests[{index}].initial_kv_length")
-        if scope == "decode_step" and int(initial_kv) <= 0:
+        if scope in {"decode_step", "decode_loop"} and int(initial_kv) <= 0:
             raise ConfigError(
-                f"requests[{index}].decode_step requires initial_kv_length"
+                f"requests[{index}].{scope} requires initial_kv_length"
+            )
+        if scope == "decode_step" and int(request.get("output_length", 0)) != 1:
+            raise ConfigError(
+                f"requests[{index}].decode_step requires output_length=1"
             )
         if execution_mode == "prefill_cycle" and (
             scope != "full_request" or int(request.get("output_length", 0)) != 1
@@ -703,9 +762,27 @@ def validate_config(config: Mapping[str, Any]) -> None:
             raise ConfigError(
                 "prefill_cycle requires full_request with output_length=1"
             )
+        if execution_mode == "request_cycle" and scope not in {
+            "decode_step",
+            "decode_loop",
+        }:
+            raise ConfigError(
+                "request_cycle requires decode_step or decode_loop execution_scope"
+            )
         arrival = request.get("arrival_time_fs", 0)
         if not isinstance(arrival, int) or isinstance(arrival, bool) or arrival < 0:
             raise ConfigError(f"requests[{index}].arrival_time_fs must be unsigned")
+        for field in ("eos_after_generated_tokens", "max_output_tokens"):
+            if field in request:
+                _positive_int(request[field], f"requests[{index}].{field}")
+        if "cancel_time_fs" in request:
+            cancel_time = _unsigned_int(
+                request["cancel_time_fs"], f"requests[{index}].cancel_time_fs"
+            )
+            if cancel_time < int(arrival):
+                raise ConfigError(
+                    f"requests[{index}].cancel_time_fs must not precede arrival"
+                )
 
     placement = _mapping(config, "placement")
     _reject_unknown(

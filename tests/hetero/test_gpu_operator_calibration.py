@@ -2,6 +2,11 @@ import copy
 import json
 from pathlib import Path
 
+from frontend.hetero.gpu_execution_identity import (
+    EXECUTION_IDENTITY_SCHEMA,
+    load_execution_identity_catalog,
+    trace_kernel_sequence,
+)
 from frontend.hetero.gpu_operator_calibration import (
     NATIVE_SCHEMA,
     audit_gpu_operator_pairing,
@@ -35,6 +40,21 @@ def _simulator() -> dict[str, object]:
 def _native_from_simulator(simulator: dict[str, object]) -> dict[str, object]:
     operators = []
     for item in simulator["operators"]:
+        simulator_identity = {
+            "schema_version": EXECUTION_IDENTITY_SCHEMA,
+            "executable_sha256": item["operator_artifact_sha256"],
+            "launch_contract_sha256": item["trace_manifest_sha256"],
+            "kernel_sequence_sha256": item["trace_manifest_sha256"],
+            "target_sm": 86,
+            "kernel_launch_count": 1,
+            "native_measurement_observed": False,
+            "trace_capture_observed": True,
+            "provenance": {"source": "unit_test_trace"},
+        }
+        item["execution_identity"] = simulator_identity
+        native_identity = copy.deepcopy(simulator_identity)
+        native_identity["native_measurement_observed"] = True
+        native_identity["provenance"] = {"source": "unit_test_native"}
         operators.append(
             {
                 "operator_type": item["operator_type"],
@@ -43,6 +63,7 @@ def _native_from_simulator(simulator: dict[str, object]) -> dict[str, object]:
                 "operator_artifact": item["operator_artifact"],
                 "operator_artifact_sha256": item["operator_artifact_sha256"],
                 "trace_manifest_sha256": item["trace_manifest_sha256"],
+                "execution_identity": native_identity,
                 "operator_latency_fs": {
                     "min": item["operator_latency_fs"],
                     "p10": item["operator_latency_fs"],
@@ -120,6 +141,33 @@ def test_pairing_rejects_artifact_hash_drift() -> None:
     )
     assert audit["performance_claim_allowed"] is False
     assert any("artifact_sha256_mismatch" in item for item in audit["blockers"])
+
+
+def test_pairing_rejects_same_shape_with_different_executable() -> None:
+    simulator = _simulator()
+    native = _native_from_simulator(simulator)
+    native["operators"][0]["execution_identity"]["executable_sha256"] = "0" * 64
+    audit = audit_gpu_operator_pairing(
+        native, simulator, _capabilities(), _root(), max_relative_error=0.01
+    )
+    assert audit["performance_claim_allowed"] is False
+    assert any("execution_identity_mismatch" in item for item in audit["blockers"])
+
+
+def test_pairing_rejects_unobserved_native_execution_identity() -> None:
+    simulator = _simulator()
+    native = _native_from_simulator(simulator)
+    native["operators"][0]["execution_identity"][
+        "native_measurement_observed"
+    ] = False
+    audit = audit_gpu_operator_pairing(
+        native, simulator, _capabilities(), _root(), max_relative_error=0.01
+    )
+    assert audit["performance_claim_allowed"] is False
+    assert any(
+        "native:measurement_identity_not_observed" in item
+        for item in audit["blockers"]
+    )
 
 
 def test_build_native_vram_catalog_requires_exact_double_runs(tmp_path: Path) -> None:
@@ -235,12 +283,15 @@ def test_p17_sealed_sm86_recapture_record_matches_repository_manifests() -> None
     record_path = _root() / "validation/p17/sm86_sealed_recapture/recapture_record.json"
     record = json.loads(record_path.read_text(encoding="utf-8"))
     assert record["target_binary"]["embedded_cubins"] == ["sm_86", "sm_86"]
-    assert record["claim_boundary"] == {
-        "trace_target_sm": 86,
-        "physical_capture_gpu_is_not_the_simulated_gpu": True,
-        "native_rtx3070_binary_identity_verified": False,
-        "performance_pairing_allowed": False,
-    }
+    assert record["capture_host"]["gpu"] == "NVIDIA GeForce RTX 3070"
+    assert record["claim_boundary"]["trace_target_sm"] == 86
+    assert record["claim_boundary"][
+        "physical_capture_gpu_is_not_the_simulated_gpu"
+    ] is False
+    assert record["claim_boundary"][
+        "native_rtx3070_binary_identity_verified"
+    ] is True
+    assert record["claim_boundary"]["performance_pairing_allowed"] is False
     for operator, evidence in record["operators"].items():
         manifest_path = (
             _root()
@@ -249,8 +300,37 @@ def test_p17_sealed_sm86_recapture_record_matches_repository_manifests() -> None
         )
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         assert manifest["compilation"]["target_sm"] == 86
-        assert manifest["capture"]["source"] == "P17 sealed SM86 cubin capture"
         assert evidence["trace_manifest_sha256"] == file_sha256(manifest_path)
+        native = record["native_measurements"][operator]
+        assert file_sha256(_root() / native["path"]) == native["sha256"]
+
+
+def test_p17_sealed_operator_execution_identity_is_same_program() -> None:
+    catalog_path = (
+        _root()
+        / "validation/p17/sm86_sealed_recapture/execution_identity_catalog.json"
+    )
+    catalog_bytes = catalog_path.read_bytes()
+    assert catalog_bytes.endswith(b"\n")
+    assert b"\r\n" not in catalog_bytes
+    identities = load_execution_identity_catalog(catalog_path)
+    assert set(identities) == set(
+        load_gpu_operator_contracts(_capabilities(), _root())
+    )
+    for operator, identity in identities.items():
+        kernels = (
+            _root()
+            / "configs/hetero/operator_artifacts/p17_sealed/evidence/"
+            "local_rtx3070_same_binary_v1"
+            / operator
+            / "traces/kernelslist.g"
+        )
+        sequence_sha256, descriptors = trace_kernel_sequence(kernels)
+        assert identity["kernel_sequence_sha256"] == sequence_sha256
+        assert identity["kernel_launch_count"] == len(descriptors)
+        assert descriptors
+        assert identity["trace_capture_observed"] is True
+        assert identity["native_measurement_observed"] is True
 
 
 def test_p17_native_vram_import_manifest_seals_all_qualification_records() -> None:
@@ -258,7 +338,7 @@ def test_p17_native_vram_import_manifest_seals_all_qualification_records() -> No
     manifest = json.loads((root / "import_manifest.json").read_text(encoding="utf-8"))
     assert manifest["qualified_operator_count"] == 14
     assert manifest["pairing_audit"]["topology_match"] is True
-    assert manifest["pairing_audit"]["paired_operator_count"] == 0
+    assert manifest["pairing_audit"]["paired_operator_count"] == 4
     for operator, expected_sha256 in manifest["records"].items():
         record = (
             root
@@ -272,6 +352,63 @@ def test_p17_native_vram_import_manifest_seals_all_qualification_records() -> No
         assert len(set(payload["comparison"]["gpu_tot_sim_insn"])) == 1
         assert payload["timing_ownership"]["gpu_local_dram"] == "accel_sim"
         assert payload["timing_ownership"]["external_ramulator2"] is False
-    for artifact in ("simulator_catalog", "pairing_audit"):
+    for artifact in (
+        "simulator_catalog",
+        "execution_identity_catalog",
+        "pairing_audit",
+    ):
         evidence = manifest[artifact]
         assert file_sha256(_root() / evidence["path"]) == evidence["sha256"]
+
+
+def test_p17_measurement_manifest_tracks_current_same_binary_evidence() -> None:
+    root = _root()
+    manifest = json.loads(
+        (
+            root
+            / "validation/p17/gpu_operator_pairing/measurement_manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    expected = {
+        "native_catalog_sha256": (
+            "validation/p17/gpu_operator_pairing/native_rtx3070_local_vram.json"
+        ),
+        "execution_identity_catalog_sha256": (
+            "validation/p17/sm86_sealed_recapture/execution_identity_catalog.json"
+        ),
+        "simulator_catalog_sha256": (
+            "validation/p17/gpu_operator_pairing/simulator_native_vram.json"
+        ),
+        "pairing_audit_sha256": (
+            "validation/p17/gpu_operator_pairing/native_vram_pairing_audit.json"
+        ),
+    }
+    for field, locator in expected.items():
+        assert manifest[field] == file_sha256(root / locator)
+    assert manifest["native_memory_topology"] == "gpu_local_vram"
+    assert manifest["simulator_memory_topology"] == "gpu_local_vram"
+    assert manifest["same_binary_native_operator_count"] == 14
+    assert manifest["performance_eligible"] is False
+
+
+def test_imported_native_vram_catalog_rebases_remote_trace_locators() -> None:
+    catalog = build_native_vram_simulator_catalog(
+        _capabilities(),
+        _root(),
+        _root() / "validation/p17/native_vram_qualification",
+        core_frequency_hz=1_132_000_000,
+        execution_identity_catalog=(
+            _root()
+            / "validation/p17/sm86_sealed_recapture/execution_identity_catalog.json"
+        ),
+    )
+    identities = {
+        item["operator_type"]: item["execution_identity"]
+        for item in catalog["operators"]
+        if "execution_identity" in item
+    }
+    assert set(identities) == set(
+        load_gpu_operator_contracts(_capabilities(), _root())
+    )
+    assert all(item["trace_capture_observed"] for item in identities.values())
+    assert all(item["native_measurement_observed"] for item in identities.values())

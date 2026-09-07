@@ -1,0 +1,17 @@
+{
+  "schema_version": "hetero-p17-sealed-native-operator/v1",
+  "model_spec_name": "TinyLlama-1.1B",
+  "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "operator_type": "token_embedding",
+  "phase": "prefill",
+  "batch_size": 1,
+  "context_length": 16,
+  "dtype": "fp16",
+  "device": {"name": "NVIDIA GeForce RTX 3070", "compute_capability": "8.6", "multiprocessors": 46, "global_memory_bytes": 8589410304},
+  "software": {"cuda_driver_version": 13010, "cuda_runtime_version": 11080, "cudart_compile_version": 11080},
+  "protocol": {"warmup_iterations": 50, "measured_iterations": 500, "timer": "cuda_event_per_iteration", "synchronization": "stop_event_synchronize_each_iteration", "statistic": "median"},
+  "launch": {"kernel_name": "token_embedding_gather", "grid": [128, 1, 1], "block": [256, 1, 1], "dynamic_shared_memory_bytes": 0, "target_sm": 86},
+  "measurement": {"min_fs":4095999990,"p10_fs":10239999741,"median_fs":10463999584,"p90_fs":56448001415,"max_fs":222207993269,"mean_fs":24222271932},
+  "measurement_scope": "native_rtx3070_local_vram",
+  "performance_eligible": false
+}

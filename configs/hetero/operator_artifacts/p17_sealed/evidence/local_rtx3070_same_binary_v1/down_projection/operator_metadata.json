@@ -1,0 +1,113 @@
+{
+  "batch_size": 1,
+  "capture_allocator": {
+    "device": 0,
+    "ranges": [
+      {
+        "address": 47355789312,
+        "size_bytes": 25165824
+      },
+      {
+        "address": 49725571072,
+        "size_bytes": 8519680
+      }
+    ],
+    "source": "pytorch_cuda_caching_allocator_target_window_plus_tensor_segments"
+  },
+  "capture_selector": "process_target_only",
+  "compilation": {
+    "cuda_runtime": "12.1",
+    "framework": "pytorch",
+    "launch_program": {
+      "components": {
+        "cuda_runtime": "12.1",
+        "program_kind": "python_pytorch_launch_program",
+        "python_executable": "/opt/conda/envs/qserve-local/bin/python3.10",
+        "python_executable_sha256": "74bb6acd56f79d9fa9bf668431be20a6e9ecb8ab03f5c0c441053f815385e233",
+        "python_version": "3.10.20",
+        "pytorch": "2.3.0+cu121",
+        "torch_extension": "/opt/conda/envs/qserve-local/lib/python3.10/site-packages/torch/_C.cpython-310-x86_64-linux-gnu.so",
+        "torch_extension_sha256": "1c5e0d6a312a59dc2c8587eac79ffa3eedcc416e79d1b688cbaf2fff02278472",
+        "transformers": "4.57.6",
+        "workload_source": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/workloads/python/tinyllama_prefill_operator.py",
+        "workload_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644"
+      },
+      "kind": "python_pytorch_launch_program",
+      "sha256": "379a5cf9d16e7e7751942e41cb07339e44f5f241df899b6d23d2030a9c7f4890"
+    },
+    "pytorch": "2.3.0+cu121",
+    "target_sm": 86
+  },
+  "context_length": 16,
+  "dtype": "fp16",
+  "implementation": "transformers.LlamaMLP.down_proj",
+  "kv_length": 16,
+  "layer_id": 0,
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "model_spec_name": "TinyLlama-1.1B",
+  "operator": "down_projection",
+  "performance_eligible": false,
+  "phase": "prefill",
+  "q_len": 16,
+  "revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "schema_version": "heterosim-exact-llm-operator/v2",
+  "scope": "one_shape_locked_operator_not_end_to_end",
+  "tensors": [
+    {
+      "address": 47380156928,
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "strides": [
+        90112,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.down_projection.input"
+    },
+    {
+      "address": 47355789312,
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "parameter",
+      "shape": [
+        2048,
+        5632
+      ],
+      "size_bytes": 23068672,
+      "strides": [
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.down_projection.weight"
+    },
+    {
+      "address": 47380091392,
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        16,
+        2048
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        2048,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.down_projection.output"
+    }
+  ],
+  "warmup_iterations": 0
+}

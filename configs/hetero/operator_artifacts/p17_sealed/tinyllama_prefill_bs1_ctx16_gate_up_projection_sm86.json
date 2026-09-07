@@ -1,0 +1,199 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "capture_allocator_coverage": "target_window_pytorch_allocator_plus_tensor_segments",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.gate_up_projection.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "driver": "591.86",
+    "gpu": "NVIDIA GeForce RTX 3070",
+    "kind": "accel_sim",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "compute_memory_coupled": false,
+    "global_pa_binding_ready": false,
+    "memory_traffic": "not_extracted",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": false,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "evidence/local_rtx3070_same_binary_v1/gate_up_projection/operator_metadata.json",
+      "sha256": "a0dc1cf102c1532947ed50d1b0392e1bdedf9eb338651d5fe354cdfe8ad70c8b",
+      "size_bytes": 4381
+    },
+    {
+      "kind": "kernels_list",
+      "path": "evidence/local_rtx3070_same_binary_v1/gate_up_projection/traces/kernelslist.g",
+      "sha256": "8a1c7696fc5471a4599d57714a8eafb2b149a6e34bbdbd98d8b1b600b2a469a1",
+      "size_bytes": 105
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/gate_up_projection/traces/kernel-1-ctx_0x61ae78b24ae0.tracez",
+      "sha256": "05504f15106008d00088e3e1007c6f86722aea07f8a12d62b8ef86f611bf37a7",
+      "size_bytes": 3144461
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/gate_up_projection/traces/kernel-2-ctx_0x61ae78b24ae0.tracez",
+      "sha256": "80de993a67c658a1b6fb117f026063ffbff15238424d23b5e0bc8c1909d0d5c1",
+      "size_bytes": 3097535
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/gate_up_projection/traces/kernel-3-ctx_0x61ae78b24ae0.tracez",
+      "sha256": "1c555d1e820d6af7490172f75b4f2325a0f83b39d1c7579f8c8375789fdb43f5",
+      "size_bytes": 3685129
+    },
+    {
+      "kind": "accel_sim_trace_manifest",
+      "path": "tinyllama_prefill_bs1_ctx16_gate_up_projection_sm86_trace.json",
+      "sha256": "03f83afdde364ef696073bae297661d4a119a9466856a7117aa5604674b6ea81",
+      "size_bytes": 6835
+    }
+  ],
+  "qualification": {
+    "performance_eligible": false,
+    "qualification_record": null,
+    "status": "capture_only_pending_cycle_qualification"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "two_exact_checkpoint_linear_projections_plus_pack",
+    "kv_length": 16,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "gate_up_projection",
+    "phase": "prefill",
+    "q_len": 16
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        16,
+        2048
+      ],
+      "size_bytes": 65536,
+      "strides": [
+        32768,
+        2048,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.input",
+      "trace_base": 47380091392
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "parameter",
+      "shape": [
+        5632,
+        2048
+      ],
+      "size_bytes": 23068672,
+      "strides": [
+        2048,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.gate_weight",
+      "trace_base": 47309651968
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "parameter",
+      "shape": [
+        5632,
+        2048
+      ],
+      "size_bytes": 23068672,
+      "strides": [
+        2048,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.up_weight",
+      "trace_base": 47332720640
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "strides": [
+        90112,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.gate",
+      "trace_base": 47380156928
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "strides": [
+        90112,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.up",
+      "trace_base": 47380337152
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        16,
+        11264
+      ],
+      "size_bytes": 360448,
+      "strides": [
+        180224,
+        11264,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.gate_up_projection.output",
+      "trace_base": 47380517376
+    }
+  ]
+}

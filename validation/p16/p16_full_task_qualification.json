@@ -242,7 +242,7 @@
         "all_tasks_non_overlapping": true,
         "resource_id": "gpu0"
       },
-      "run_dir": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
+      "run_dir": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p18-7303c02/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
       "runtime_memory": {
         "kv_allocate": {
           "children": 3,
@@ -294,7 +294,7 @@
         }
       },
       "simulation_input_key": "d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
-      "simulator_revision": "f8a95b2824698232a41c2b6ad49576fe034feb4a-dirty",
+      "simulator_revision": "7303c02c3727d34a1eb7c96c16c3bdb20865258b-dirty",
       "task_count": 20,
       "version_causality": {
         "all_inputs_validated": true,
@@ -534,7 +534,7 @@
         "all_tasks_non_overlapping": true,
         "resource_id": "gpu0"
       },
-      "run_dir": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
+      "run_dir": "/home/yueqi/gpu-atlas/GPU-ATLAS-HeteroSim-p18-7303c02/validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
       "runtime_memory": {
         "kv_allocate": {
           "children": 3,
@@ -586,7 +586,7 @@
         }
       },
       "simulation_input_key": "d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
-      "simulator_revision": "f8a95b2824698232a41c2b6ad49576fe034feb4a-dirty",
+      "simulator_revision": "7303c02c3727d34a1eb7c96c16c3bdb20865258b-dirty",
       "task_count": 20,
       "version_causality": {
         "all_inputs_validated": true,

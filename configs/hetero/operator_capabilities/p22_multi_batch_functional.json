@@ -1,0 +1,77 @@
+{
+  "schema_version": "hetero-multi-batch-capability-catalog/v1",
+  "milestone": "P22",
+  "model": "TinyLlama-1.1B",
+  "dtype": "fp16",
+  "qualification_record": "validation/p22/qualification_record.json",
+  "timing_contract": {
+    "mode": "request_cycle_composed",
+    "source": "scheduling.epoch_duration_fs",
+    "functional_cycle_ready": true,
+    "exact_batched_kernel_ready": false,
+    "performance_eligible": false
+  },
+  "capabilities": [
+    {
+      "case": "one_layer_static_bs2",
+      "experiment": "configs/hetero/experiments/p22_tinyllama_decode4_1layer_static_bs2.json",
+      "execution_scope": "decode_loop",
+      "layers": 1,
+      "request_count": 2,
+      "max_active_requests": 2,
+      "batch_policy": "homogeneous",
+      "scheduler": "static",
+      "device_coverage": ["gpu0"],
+      "qualification_passed": true
+    },
+    {
+      "case": "one_layer_static_ragged_padding_bs2",
+      "experiment": "configs/hetero/experiments/p22_tinyllama_decode2_1layer_static_ragged_padding_bs2.json",
+      "execution_scope": "decode_loop",
+      "layers": 1,
+      "request_count": 2,
+      "max_active_requests": 2,
+      "batch_policy": "padding_dense",
+      "scheduler": "static",
+      "device_coverage": ["gpu0"],
+      "qualification_passed": true
+    },
+    {
+      "case": "one_layer_static_ragged_split_bs2",
+      "experiment": "configs/hetero/experiments/p22_tinyllama_decode2_1layer_static_ragged_split_bs2.json",
+      "execution_scope": "decode_loop",
+      "layers": 1,
+      "request_count": 2,
+      "max_active_requests": 2,
+      "batch_policy": "ragged_split",
+      "scheduler": "static",
+      "device_coverage": ["gpu0"],
+      "qualification_passed": true
+    },
+    {
+      "case": "twenty_two_layer_continuous_bs4",
+      "experiment": "configs/hetero/experiments/p22_tinyllama_decode4_22layer_continuous_bs4.json",
+      "execution_scope": "decode_loop",
+      "layers": 22,
+      "request_count": 4,
+      "max_active_requests": 2,
+      "batch_policy": "padding_dense",
+      "scheduler": "continuous",
+      "device_coverage": ["gpu0"],
+      "qualification_passed": true
+    },
+    {
+      "case": "two_layer_mixed_continuous_bs4",
+      "experiment": "configs/hetero/experiments/p22_tinyllama_2layer_mixed_continuous_bs4.json",
+      "execution_scope": "request_batch",
+      "layers": 2,
+      "request_count": 4,
+      "max_active_requests": 2,
+      "batch_policy": "padding_dense",
+      "scheduler": "continuous",
+      "device_coverage": ["gpu0", "atlas0.compute"],
+      "qualification_passed": true
+    }
+  ],
+  "claim_boundary": "The catalog qualifies deterministic scheduling, request/KV causality, device sub-batches and dynamic Global PA lifetimes only. It does not contain exact fused/batched GPU or ATLAS cycle artifacts and cannot support performance claims."
+}

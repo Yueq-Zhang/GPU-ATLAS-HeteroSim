@@ -60,6 +60,9 @@ class RequestSpec:
     priority: int = 0
     execution_scope: str = "full_request"
     initial_kv_length: int = 0
+    eos_after_generated_tokens: int = 0
+    max_output_tokens: int = 0
+    cancel_time_fs: int | None = None
 
     def __post_init__(self) -> None:
         if not self.request_id:
@@ -68,12 +71,29 @@ class RequestSpec:
             raise ValueError("prompt_length and output_length must be positive")
         if self.arrival_time_fs < 0:
             raise ValueError("arrival_time_fs must be unsigned")
-        if self.execution_scope not in {"full_request", "decode_step"}:
-            raise ValueError("execution_scope must be full_request or decode_step")
+        if self.execution_scope not in {
+            "full_request",
+            "decode_step",
+            "decode_loop",
+        }:
+            raise ValueError(
+                "execution_scope must be full_request, decode_step or decode_loop"
+            )
         if self.initial_kv_length < 0:
             raise ValueError("initial_kv_length must be unsigned")
-        if self.execution_scope == "decode_step" and self.initial_kv_length <= 0:
-            raise ValueError("decode_step requires positive initial_kv_length")
+        if self.eos_after_generated_tokens < 0 or self.max_output_tokens < 0:
+            raise ValueError("request generation controls must be unsigned")
+        if self.cancel_time_fs is not None and self.cancel_time_fs < self.arrival_time_fs:
+            raise ValueError("cancel_time_fs must not precede arrival_time_fs")
+        if (
+            self.execution_scope in {"decode_step", "decode_loop"}
+            and self.initial_kv_length <= 0
+        ):
+            raise ValueError(
+                f"{self.execution_scope} requires positive initial_kv_length"
+            )
+        if self.execution_scope == "decode_step" and self.output_length != 1:
+            raise ValueError("decode_step requires output_length=1")
 
 
 @dataclass(frozen=True, slots=True)
@@ -113,6 +133,23 @@ def _layer_ops(model: ModelSpec) -> Iterable[tuple[str, str]]:
         )
     )
     return (*attention, *mlp, ("mlp.down", "down_projection"), ("mlp.residual", "residual_add"))
+
+
+def _forward_steps(request: RequestSpec) -> list[tuple[Phase, int, int, int]]:
+    if request.execution_scope == "full_request":
+        return [
+            (Phase.PREFILL, 0, request.prompt_length, 0),
+            *[
+                (Phase.DECODE, step, 1, request.prompt_length + step - 1)
+                for step in range(1, request.output_length)
+            ],
+        ]
+    if request.execution_scope == "decode_step":
+        return [(Phase.DECODE, 0, 1, request.initial_kv_length)]
+    return [
+        (Phase.DECODE, step, 1, request.initial_kv_length + step)
+        for step in range(request.output_length)
+    ]
 
 
 def _build_materialized_request_graph(
@@ -242,17 +279,7 @@ def _build_materialized_request_graph(
         attributes=control_attributes,
     )
 
-    forward_steps = (
-        [
-            (Phase.PREFILL, 0, request.prompt_length, 0),
-            *[
-                (Phase.DECODE, step, 1, request.prompt_length + step - 1)
-                for step in range(1, request.output_length)
-            ],
-        ]
-        if request.execution_scope == "full_request"
-        else [(Phase.DECODE, 0, 1, request.initial_kv_length)]
-    )
+    forward_steps = _forward_steps(request)
 
     prompt_ids = f"{prefix}.prompt_token_ids"
     if request.execution_scope == "full_request":
@@ -267,7 +294,7 @@ def _build_materialized_request_graph(
         phase_key = f"{phase.value}.s{step_id}"
         if phase is Phase.PREFILL:
             embedding_input = prompt_ids
-        elif request.execution_scope == "full_request":
+        elif request.execution_scope == "full_request" or step_id > 0:
             embedding_input = f"{prefix}.token.{step_id - 1}"
         else:
             embedding_input = f"{prefix}.decode_token_id"
@@ -635,25 +662,18 @@ def build_request_graph(model: ModelSpec, request: RequestSpec) -> ModelGraph:
     add_node(f"{prefix}.request_start", NodeKind.CONTROL, "request_start", Phase.CONTROL, 0)
     add_node(f"{prefix}.kv_allocate", NodeKind.STATE, "kv_allocate", Phase.CONTROL, 0)
 
-    forward_steps = (
-        [
-            (Phase.PREFILL, 0, request.prompt_length, 0),
-            *[
-                (Phase.DECODE, step, 1, request.prompt_length + step - 1)
-                for step in range(1, request.output_length)
-            ],
-        ]
-        if request.execution_scope == "full_request"
-        else [(Phase.DECODE, 0, 1, request.initial_kv_length)]
-    )
+    forward_steps = _forward_steps(request)
     for phase, step_id, q_len, past_len in forward_steps:
         phase_key = f"{phase.value}.s{step_id}"
         hidden = (
             prompt_value
-            if phase is Phase.PREFILL or request.execution_scope == "decode_step"
+            if phase is Phase.PREFILL
+            or (request.execution_scope != "full_request" and step_id == 0)
             else f"{prefix}.token.{step_id - 1}"
         )
-        if phase is Phase.DECODE and request.execution_scope == "full_request":
+        if phase is Phase.DECODE and (
+            request.execution_scope == "full_request" or step_id > 0
+        ):
             add_value(hidden, StorageClass.ACTIVATION, (1, model.hidden_size))
         for layer_id in range(model.num_layers):
             for group, op in _layer_ops(model):
@@ -728,6 +748,18 @@ def graph_counters(model: ModelSpec, request: RequestSpec) -> GraphCounters:
             kv_append_pairs=model.num_layers,
             kv_range_writes=model.num_layers * 2,
             final_committed_kv_len=request.initial_kv_length + 1,
+        )
+    if request.execution_scope == "decode_loop":
+        return GraphCounters(
+            prefill_forwards=0,
+            decode_forwards=request.output_length,
+            lm_head=request.output_length,
+            sampling=request.output_length,
+            kv_append_pairs=model.num_layers * request.output_length,
+            kv_range_writes=model.num_layers * 2 * request.output_length,
+            final_committed_kv_len=(
+                request.initial_kv_length + request.output_length
+            ),
         )
     decode = request.output_length - 1
     written_tokens = request.prompt_length + decode

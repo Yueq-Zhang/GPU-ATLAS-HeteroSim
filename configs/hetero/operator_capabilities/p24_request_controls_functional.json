@@ -1,0 +1,28 @@
+{
+  "schema_version": "hetero-p24-request-control-capability-catalog/v1",
+  "validation_scope": "tinyllama_decode_single_layer_only",
+  "features": [
+    {
+      "feature": "replayed_eos",
+      "functional_cycle_ready": true,
+      "performance_eligible": false
+    },
+    {
+      "feature": "maximum_output_length",
+      "functional_cycle_ready": true,
+      "performance_eligible": false
+    },
+    {
+      "feature": "explicit_cancellation_at_token_step_barrier",
+      "functional_cycle_ready": true,
+      "performance_eligible": false
+    },
+    {
+      "feature": "kv_capacity_admission_release_and_first_fit_reuse",
+      "functional_cycle_ready": true,
+      "performance_eligible": false
+    }
+  ],
+  "qualification_record": "validation/p24/qualification_record.json",
+  "performance_claim_allowed": false
+}

@@ -1,0 +1,140 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "capture_allocator_coverage": "target_window_pytorch_allocator_plus_tensor_segments",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.silu_multiply.prefill.bs1_ctx16.fp16.sm86.accel_sim_v2",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "driver": "591.86",
+    "gpu": "NVIDIA GeForce RTX 3070",
+    "kind": "accel_sim",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "compute_memory_coupled": false,
+    "global_pa_binding_ready": false,
+    "memory_traffic": "not_extracted",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": false,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "evidence/local_rtx3070_same_binary_v1/silu_multiply/operator_metadata.json",
+      "sha256": "df951942948d49d567f78b4a10e73825bedb9fb75ef5423c2eeb6b758b1c577d",
+      "size_bytes": 3112
+    },
+    {
+      "kind": "kernels_list",
+      "path": "evidence/local_rtx3070_same_binary_v1/silu_multiply/traces/kernelslist.g",
+      "sha256": "06931421304f95d40f5f6d661aa801ab7c8db20bb5404d16da5065a2379b13a7",
+      "size_bytes": 70
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/silu_multiply/traces/kernel-1-ctx_0x5ce9f7d6c1c0.tracez",
+      "sha256": "3736233cb56c17f8bab7e0b150bc99bbac838554c679811f346683c790d09a7a",
+      "size_bytes": 893864
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "evidence/local_rtx3070_same_binary_v1/silu_multiply/traces/kernel-2-ctx_0x5ce9f7d6c1c0.tracez",
+      "sha256": "f7203090c3a78872fae8b4f1c8d6655cd0b79138e80bc3c4c1c22c145b75163b",
+      "size_bytes": 446062
+    },
+    {
+      "kind": "accel_sim_trace_manifest",
+      "path": "tinyllama_prefill_bs1_ctx16_silu_multiply_sm86_trace.json",
+      "sha256": "21477c608ce5d9e5291c014be3d238044044dfb311abdecece31e41101f3c747",
+      "size_bytes": 5165
+    }
+  ],
+  "qualification": {
+    "performance_eligible": false,
+    "qualification_record": null,
+    "status": "capture_only_pending_cycle_qualification"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "torch.nn.functional.silu_times_up_projection",
+    "kv_length": 16,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "silu_multiply",
+    "phase": "prefill",
+    "q_len": 16
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "strides": [
+        90112,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.silu_multiply.gate",
+      "trace_base": 47380156928
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "strides": [
+        90112,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.silu_multiply.up",
+      "trace_base": 47380337152
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        1,
+        16,
+        5632
+      ],
+      "size_bytes": 180224,
+      "strides": [
+        90112,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.layer0.silu_multiply.output",
+      "trace_base": 47380697600
+    }
+  ]
+}

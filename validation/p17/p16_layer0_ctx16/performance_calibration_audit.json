@@ -178,10 +178,10 @@
         ],
         "source_artifacts": [
           {
-            "actual_sha256": "4a296c2ab6c3336135d20b0a93eefc407e366ea3b1d10d4aa4514d3e533797f4",
+            "actual_sha256": "efc919b618d9c5d6875787628bc0d45e2675700d3de60a76dfaaba1c7d2970e3",
             "artifact_hash_mode": "text_lf_utf8",
             "exists": true,
-            "expected_sha256": "4a296c2ab6c3336135d20b0a93eefc407e366ea3b1d10d4aa4514d3e533797f4",
+            "expected_sha256": "efc919b618d9c5d6875787628bc0d45e2675700d3de60a76dfaaba1c7d2970e3",
             "locator": "validation/p17/gpu_operator_pairing/native_rtx3070_local_vram.json",
             "matched": true,
             "measurement_scope": "native_rtx3070_local_vram_not_external_3ddram",
@@ -306,14 +306,14 @@
     "required_shape_key": "tinyllama.1_1b.prefill.layer0.fp16.bs1.ctx16",
     "schema_version": "hetero-performance-calibration-audit/v1"
   },
-  "calibration_record": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\configs\\hetero\\calibration\\p17_tinyllama_prefill_layer0_ctx16_incomplete.json",
+  "calibration_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/calibration/p17_tinyllama_prefill_layer0_ctx16_incomplete.json",
   "deterministic_runs": true,
   "performance_claim_allowed": false,
   "run_count": 2,
   "runs": [
     {
       "makespan_fs": 35450346739701,
-      "path": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\validation\\p16\\leg1\\p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu\\d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
+      "path": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg1/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
       "performance_claim_allowed": false,
       "requests": [
         {
@@ -332,7 +332,7 @@
     },
     {
       "makespan_fs": 35450346739701,
-      "path": "C:\\Users\\yueqi\\Desktop\\3D_DRAM\\OpenSourceWorks\\GPU-ATLAS-HeteroSim\\validation\\p16\\leg2\\p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu\\d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
+      "path": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
       "performance_claim_allowed": false,
       "requests": [
         {

@@ -1,0 +1,56 @@
+{
+  "schema_version": "heterosim-exact-llm-operator/v2",
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "model_spec_name": "TinyLlama-1.1B",
+  "revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "operator": "residual_add",
+  "phase": "prefill",
+  "layer_id": 0,
+  "batch_size": 1,
+  "context_length": 16,
+  "q_len": 16,
+  "kv_length": 16,
+  "dtype": "fp16",
+  "implementation": "heterosim_cuda_reference_residual_add_v1",
+  "compilation": {"framework": "standalone_cuda", "compiler": "nvcc", "cuda_toolkit": "11.8", "target_sm": 86},
+  "warmup_iterations": 0,
+  "capture_selector": "single_kernel_process",
+  "capture_allocator": null,
+  "scope": "shape_and_implementation_locked_operator_not_framework_overhead",
+  "performance_eligible": false,
+  "tensors": [
+    {
+      "tensor_id": "tinyllama.layer0.residual_add.input",
+      "role": "input",
+      "address": 126654917640192,
+      "size_bytes": 65536,
+      "shape": [1, 16, 2048],
+      "strides": [32768, 2048, 1],
+      "dtype": "float16",
+      "layout": "strided",
+      "alignment_bytes": 256
+    },
+    {
+      "tensor_id": "tinyllama.layer0.residual_add.residual",
+      "role": "input",
+      "address": 126654917705728,
+      "size_bytes": 65536,
+      "shape": [1, 16, 2048],
+      "strides": [32768, 2048, 1],
+      "dtype": "float16",
+      "layout": "strided",
+      "alignment_bytes": 256
+    },
+    {
+      "tensor_id": "tinyllama.layer0.residual_add.output",
+      "role": "output",
+      "address": 126654917771264,
+      "size_bytes": 65536,
+      "shape": [1, 16, 2048],
+      "strides": [32768, 2048, 1],
+      "dtype": "float16",
+      "layout": "strided",
+      "alignment_bytes": 256
+    }
+  ]
+}

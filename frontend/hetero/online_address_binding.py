@@ -156,7 +156,7 @@ def materialize_online_address_bindings(
                 )
 
     output_directory.mkdir(parents=True, exist_ok=True)
-    table_path = output_directory / "online_address_bindings.tsv"
+    table_path = (output_directory / "online_address_bindings.tsv").resolve()
     lines = [
         "HETEROSIM_ADDRESS_BINDINGS_V1",
         f"trace_key\t{manifest.trace_key()}",
@@ -263,7 +263,7 @@ def materialize_explicit_online_address_bindings(
                 )
 
     output_directory.mkdir(parents=True, exist_ok=True)
-    table_path = output_directory / "online_address_bindings.tsv"
+    table_path = (output_directory / "online_address_bindings.tsv").resolve()
     lines = [
         "HETEROSIM_ADDRESS_BINDINGS_V1",
         f"trace_key\t{manifest.trace_key()}",

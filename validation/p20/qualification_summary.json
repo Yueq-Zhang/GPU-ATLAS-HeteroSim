@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "accepted_parent_requests": 760,
+      "gpu_cycles_observed_unqualified": 167658,
+      "itl_fs_observed_unqualified": [
+        34850000000,
+        34915000000,
+        34890000000
+      ],
+      "layers": 1,
+      "makespan_fs_observed_unqualified": 139715000000,
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p20/one_layer/qualification_record.json",
+      "ramulator2_cycles": 55886,
+      "task_count": 68,
+      "ttft_fs_observed_unqualified": 35032500000
+    },
+    {
+      "accepted_parent_requests": 13528,
+      "gpu_cycles_observed_unqualified": 2249544,
+      "itl_fs_observed_unqualified": [
+        466867500000,
+        469622500000,
+        466705000000
+      ],
+      "layers": 22,
+      "makespan_fs_observed_unqualified": 1874620000000,
+      "qualification_record": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p20/twenty_two_layer/qualification_record.json",
+      "ramulator2_cycles": 749848,
+      "task_count": 1076,
+      "ttft_fs_observed_unqualified": 471397500000
+    }
+  ],
+  "claim_boundary": {
+    "accel_sim_instruction_trace_coverage": 0.0,
+    "compute_fidelity": "tiled_cycle_contract_unqualified",
+    "performance_claim_allowed": false,
+    "reason": "P20 qualifies functional multi-token graph, token and KV causality, Global PA and live Ramulator2 request timing. GPU compute cycles remain uncalibrated and cannot support a performance claim."
+  },
+  "functional_scope": {
+    "batch_size": 1,
+    "dtype": "fp16",
+    "final_kv_length": 20,
+    "generated_tokens": 4,
+    "initial_context_length": 16,
+    "model": "TinyLlama-1.1B",
+    "q_len_per_step": 1
+  },
+  "next_replacement": "Replace exact-shape tiled GPU cycle contracts with qualified Accel-Sim instruction traces before performance calibration.",
+  "qualified_invariants": {
+    "all_memory_requests_within_value_allocation": true,
+    "autoregressive_sampling_to_next_embedding": true,
+    "dependency_causality": true,
+    "global_pa_nonoverlap": true,
+    "gpu0_resource_nonoverlap": true,
+    "kv_append_before_attention": true,
+    "kv_release_after_request_finish": true,
+    "kv_versions_0_to_4_monotonic": true,
+    "one_live_ramulator2": true,
+    "parent_child_durable_conservation": true,
+    "request_finish_after_final_sampling": true,
+    "zero_atlas_requests": true,
+    "zero_inflight_at_finish": true
+  },
+  "schema_version": "hetero-p20-decode-loop-qualification-summary/v1",
+  "status": "passed"
+}

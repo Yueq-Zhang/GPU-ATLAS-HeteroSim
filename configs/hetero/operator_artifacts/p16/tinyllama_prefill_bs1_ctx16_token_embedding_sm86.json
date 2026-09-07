@@ -29,27 +29,27 @@
   "files": [
     {
       "kind": "operator_metadata",
-      "path": "/opt/gpu-atlas/qualification/p16-cuda-reference-v3/tinyllama-prefill-bs1-ctx16-token-embedding/operator_metadata.json",
-      "sha256": "2b8ba578e4f2f20b6b32aed431be722e7e43fdecaf4f08bca2001a91784b7554",
-      "size_bytes": 1675
+      "path": "evidence/token_embedding/operator_metadata.json",
+      "sha256": "5a9a7ad887abfc2945b3aa15dc09bd5779c63dcc52578b0840aad7dc6292d0d9",
+      "size_bytes": 1687
     },
     {
       "kind": "kernels_list",
-      "path": "/opt/gpu-atlas/qualification/p16-cuda-reference-v3/tinyllama-prefill-bs1-ctx16-token-embedding/traces/kernelslist.g",
-      "sha256": "b341e005bc48efe5c5c998cd533bf4dad18ad8e3ab56ed7fe317269c3698468f",
+      "path": "evidence/token_embedding/traces/kernelslist.g",
+      "sha256": "29408bd1d80a75ded499c061f1fa63fb088880156af723cfa8c34a03b5317c2d",
       "size_bytes": 35
     },
     {
       "kind": "instruction_trace",
-      "path": "/opt/gpu-atlas/qualification/p16-cuda-reference-v3/tinyllama-prefill-bs1-ctx16-token-embedding/traces/kernel-1-ctx_0x6189e8143890.tracez",
-      "sha256": "ef37978010bb049daa9f28a1a4d329124b476c7a4bb3b0b4ad5c334899619e5f",
-      "size_bytes": 598407
+      "path": "evidence/token_embedding/traces/kernel-1-ctx_0x5d9eae24cf90.tracez",
+      "sha256": "19b76926fb65f615fa047df382fd9d8848a68d3b9c6fe9d1543653fe0e90c6d3",
+      "size_bytes": 601287
     },
     {
       "kind": "accel_sim_trace_manifest",
       "path": "tinyllama_prefill_bs1_ctx16_token_embedding_sm86_trace.json",
-      "sha256": "96e8d7e820e862e03937b166edadd45e25c4af194b0ba3a2aa38cf4e51c88037",
-      "size_bytes": 2616
+      "sha256": "2d1a2c1545bae6d601ba49876f969a0834a86f5337d48b5abf40849ce92a9e25",
+      "size_bytes": 2641
     }
   ],
   "qualification": {
@@ -88,7 +88,7 @@
         1
       ],
       "tensor_id": "tinyllama.layer0.token_embedding.token_ids",
-      "trace_base": 47286583296
+      "trace_base": 128061049667584
     },
     {
       "alignment_bytes": 256,
@@ -105,7 +105,7 @@
         1
       ],
       "tensor_id": "tinyllama.layer0.token_embedding.weight",
-      "trace_base": 47531950080
+      "trace_base": 128061194371072
     },
     {
       "alignment_bytes": 256,
@@ -124,7 +124,7 @@
         1
       ],
       "tensor_id": "tinyllama.layer0.token_embedding.output",
-      "trace_base": 47286583808
+      "trace_base": 128061049668096
     }
   ]
 }

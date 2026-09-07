@@ -1,5 +1,81 @@
 # Implementation status
 
+## 2026-09-07 — v0.34.0 / P23 remote capture plus P24-P25 functional qualification
+
+- P23 now has a remote-only SASS acquisition pipeline for TinyLlama Layer 0, FP16, BS=2, Context=16, `q_len=1`, KV=17. All 14 GPU operator traces were compiled/loaded, executed and captured on the RTX 4090 host; the local RTX 3070 is not an allowed SASS source for this milestone.
+- Capture identity separates the SM89 execution device from each kernel's actual SASS binary version. Accel-Sim 2.0 accepts SM80 and SM86 through its Ampere opcode map, so an explicit SM80/SM86 mixed contract is recorded instead of rewriting those kernels as SM89. Capture completed 14/14; Range-Rebase double qualification is running remotely and the unified Batch timeline remains pending.
+- P24 adds replayed EOS, maximum-output termination and explicit cancellation sampled at token-step barriers. KV-capacity-aware admission, retirement release, deterministic first-fit Global PA reuse and allocation/request conservation are wired through the C++ scheduler and Runner. Two isolated one-layer double-run cases pass.
+- P25 adds deterministic weighted QoS arbitration across GPU and ATLAS resources, priority-class service, bounded-starvation override, fairness auditing and deadlock/livelock watchdog qualification. The BookSim2 activation gate fails closed because no runtime adapter is installed; scheduler micro-cycles are not hardware performance cycles.
+- Verification after integration: 232 Python tests and all 9 CTest targets pass. P24 and P25 qualification records both report `qualification_passed=true` and `performance_claim_allowed=false`.
+- Machine evidence: `validation/p24/qualification_record.json`, `validation/p25/qualification_record.json`, and the remote P23 `validation/p23/capture_catalog.json`. No 22-layer validation was run for this milestone.
+
+## 2026-09-07 — v0.33.0 / P22 functional-cycle multi-Batch qualification
+
+- Added explicit multi-request lifecycle states and epoch records for arrival, KV-capacity-aware admission, active membership, token/KV commit, finish and retirement. KV reservations are released before later requests are admitted.
+- Added deterministic phase/device sub-batch planning with `homogeneous`, `padding_dense` and `ragged_split` policies. Every selected request has a bijective member mapping, exact Q/KV lengths, padding work, permutation metadata and device assignment.
+- Added two fail-closed cycle contracts: `request_cycle_composed` records scheduler-epoch composition for functional causality, while `batched_kernel_cycle` requires an exact sealed catalog entry and rejects missing or mismatched model/shape/device/member lengths.
+- Added dynamic KV/Global PA lifecycle auditing: active allocations may not overlap, allocation epochs are unique, request versions commit in order, retirement releases all bytes and freed ranges may be reused safely.
+- Qualified five isolated double-run cases: one-layer static homogeneous BS=2, one-layer ragged padding, one-layer ragged split, 22-layer continuous four-request Decode and two-layer mixed Prefill/Decode with GPU and ATLAS device sub-batches. All pass admission/retire, request/token fan-out, resource mutual exclusion, address lifetime and zero-inflight gates.
+- Machine evidence is in `validation/p22/qualification_record.json`; the supported functional matrix is in `configs/hetero/operator_capabilities/p22_multi_batch_functional.json`.
+- Verification: 213 Python tests and all 9 CTest targets pass. The five P22 cases pass isolated double-run qualification; changed Python files compile successfully. P22-scoped style/whitespace checks are clean.
+- P22 does not yet provide real fused/batched Accel-Sim or ATLAS artifacts and does not drive their combined memory streams through live Ramulator2. Scheduler epoch times and derived makespan/Token/s/fairness are regression counters only; `performance_claim_allowed=false` remains mandatory.
+
+## 2026-09-04 — inference-framework integration backlog frozen
+
+- Added a fail-closed F0–F8 roadmap for Hugging Face Transformers, vLLM and later TensorRT-LLM integration. Existing PyTorch/Transformers operator workloads remain capture and calibration programs, not framework adapters.
+- The frozen split assigns numerical model execution and token generation to the framework, GPU instruction/memory behavior to compiled NVBit/Accel-Sim artifacts, ATLAS behavior to Tensor-IR lowering, and timing/resource ownership to GPU-ATLAS-HeteroSim shadow simulation.
+- Required work now explicitly covers framework manifests, graph/shape export, stable Tensor/KV identity, Global PA binding, exact-shape Trace Catalog lookup, missing-artifact behavior, ATLAS compilation, runtime callbacks, dynamic batching and end-to-end qualification. See `docs/INFERENCE_FRAMEWORK_INTEGRATION_TODO_zh.md`.
+
+## 2026-09-02 — v0.32.0 / P20 multi-token autoregressive Decode qualification
+
+- Added an explicit `decode_loop` execution scope while preserving P19 `decode_step` as an exactly-one-token contract. The first Decode embedding consumes the external token; every later embedding consumes the preceding sampling output.
+- Added a v2 Decode KV lifecycle that audits every layer and token step: K/V identities remain stable, append offsets advance by one 512-byte token, attention consumes the committed next version, and final state is KV length 20 / version 4 before request finish and release.
+- Qualified TinyLlama-1.1B FP16, BS=1, initial KV=16, four generated tokens in isolated double runs: one layer has 68 tasks / 760 GPU parents / 167,658 uncalibrated GPU cycles; 22 layers have 1,076 tasks / 13,528 GPU parents / 2,249,544 uncalibrated GPU cycles.
+- Both scales pass dependency and `gpu0` resource causality, Sampling-to-next-Embedding chaining, Global PA containment, request completion within task intervals, one live Ramulator2, Parent/Child/durable conservation, zero ATLAS parents and zero inflight work.
+- P20 remains functional only: compute fidelity is `tiled_cycle_contract_unqualified`, Accel-Sim instruction-trace coverage is 0.0, and `performance_claim_allowed=false` is mandatory.
+- Verification: 198 Python tests and all 9 CTest targets pass; both P20 scales also pass isolated double-run qualification, JSON parsing, shell syntax, Python compilation and P20-scoped Ruff checks.
+
+## 2026-09-02 — v0.31.0 / P19 fixed-shape Decode functional qualification
+
+- Generalized the tiled `prefill_cycle` catalog/runtime into a backward-compatible `request_cycle` mode that accepts control, Prefill and Decode phases while retaining one live Ramulator2 and completion-time value commits.
+- Added a fail-closed Decode KV lifecycle audit. Every layer must have one append before attention, consume its own K/V, bind the initial and appended byte ranges to non-overlapping Global PA, commit K/V version 1 and release only after request finish.
+- Added exact TinyLlama‑1.1B FP16, BS=1, initial Context=16, `q_len=1` configurations and capability catalogs for one layer and all 22 layers. The graphs contain 20 and 272 tasks respectively.
+- Both shapes passed independent double runs. The one-layer case completes 190 GPU parents in 42,057 uncalibrated GPU cycles; the 22-layer case completes 3,382 parents in 566,052 uncalibrated GPU cycles. Both have one Ramulator2, zero ATLAS parents, exact Parent/Child/durable conservation and zero outstanding work.
+- Added stream-level qualification that proves every issued request remains within its value's Global PA allocation, every completion remains inside the owning task interval, dependencies and `gpu0` resource intervals are causal, and both legs match on cycles, requests, versions and stream hashes.
+- P19 is a functional milestone only. GPU compute uses `tiled_cycle_contract_unqualified`, not an Accel-Sim instruction trace; `accel_sim_instruction_trace_coverage=0.0` and `performance_claim_allowed=false` are mandatory.
+- Verification: 186 Python tests and all 9 CTest targets pass; the P19 one-command double-run qualification also passes from a clean invocation.
+
+## 2026-09-01 — P18 GPU operator error-triage baseline
+
+- Added a fail-closed P18 triage builder that combines the P17 pairing audit with simulator cycle, instruction and execution-identity counters. It rejects operator-coverage drift and recorded-error inconsistencies instead of silently recomputing a different baseline.
+- Generated a 14-operator machine-readable report. Mean absolute relative error is 45.67%, median is 46.04%; eleven simulated latencies are below Native and three are above. The classification contains four within-tolerance, one near-threshold, three material-error and six severe-error operators.
+- The report deliberately assigns no causal explanation. It establishes the immutable input hashes and calibration order for subsequent stability, launch-gap, clock, cache and memory sensitivity experiments. `performance_claim_allowed=false` remains unchanged.
+- Added three targeted regression tests for the triage calculation, coverage mismatch and checked-in input hashes. The complete WSL regression now passes 174 Python tests; 589 repository JSON records parse successfully and `git diff --check` remains clean.
+
+## 2026-09-01 — v0.30.0 / all fourteen local RTX 3070 execution identities closed
+
+- Completed the remaining twelve TinyLlama Layer-0 BS=1 Context=16 GPU operators on the local RTX 3070. Each operator now has a 50-warmup/500-iteration CUDA Event measurement, real SM86 NVBit 1.8 Trace capture and deterministic native-VRAM Accel-Sim double qualification. Together with Token Embedding and Residual Add, the catalog covers all fourteen operator identities and 63 real kernel launches.
+- Extended the execution-identity contract for dynamic PyTorch launches. It seals the Python executable, `torch._C` extension, workload source and Python/PyTorch/Transformers/CUDA versions before combining them with the exact shape launch contract and observed kernel sequence. Native measurement and Trace capture therefore refer to the same launch program without incorrectly claiming that a PyTorch operator is a single ELF.
+- Found that NVBit profiler-range capture produced kernels with zero instructions in this environment. The formal runner now uses process-target-only capture, rejects empty instruction traces, remains resumable and stops at the first failed operator while preserving evidence.
+- Rebuilt all native, simulator, identity and qualification catalogs. Identity, Artifact and `gpu_local_vram` topology checks pass for 14/14 operators. Down Projection, Output Projection, QKV Projection and LM Head also meet the 15% numerical tolerance; the remaining ten blockers are only relative-error failures. Pairing is therefore 4/14, while six-component performance qualification remains 0/6 and `performance_claim_allowed=false`.
+- Refreshed the reproduction manual, operator-status table and fail-closed performance-calibration documentation. Final verification passed 171 Python tests and 9 C++ tests, rebuilt the WSL C++ runtime/binding, parsed 588 repository JSON records, passed shell syntax checks and produced no `git diff --check` errors. The WSL build emitted only mounted-filesystem clock-skew warnings; no compile, link or test failure occurred.
+
+## 2026-09-01 — v0.29.0 / local RTX 3070 same-Binary closure for two operators
+
+- Kept RTX 3070/SM86 as the only P17 performance-calibration target. The new local runner rejects any other physical GPU and compiles one Linux SM86 executable that exposes a single-launch Trace mode and a 50-warmup/500-iteration CUDA Event mode through different arguments.
+- Recaptured Token Embedding and Residual Add with NVBit 1.8 on the local RTX 3070, measured both on the same physical GPU and executable, and repeated deterministic native-VRAM Accel-Sim qualification. Executable, launch-contract and kernel-sequence identities now match on both sides; current Artifact hashes and memory topology also match.
+- The two operators remain unpaired only because observed relative errors exceed 15%: approximately 38.82% for Token Embedding and 75.97% for Residual Add. The other twelve operators still lack native/Trace same-Binary identity. The audit therefore remains 0/14, 34 blockers, and `performance_claim_allowed=false`.
+- Added a reproducible local runner plus native-catalog updater, and preserved raw native measurement JSON, Metadata, Kernel Lists, compressed Trace files, Trace Manifests, double-run qualification records and the merged audit in repository-visible evidence directories.
+- Re-ran the fail-closed P16 performance audit (`audit_complete_blocked`, 28 component/run blockers), parsed all 211 configuration/P17 JSON records, passed 170 Python tests and 9 C++ tests, and completed shell/Python syntax checks. These checks validate consistency, not hardware performance.
+
+## 2026-09-01 — v0.28.0 / portable P16 evidence and fail-closed same-Binary identity
+
+- Replaced the two P16 simple-operator external `/opt/...` dependencies with repository-contained Metadata, Kernel Lists, non-empty SM86 traces and Range-Rebase qualification records. Source, Trace and coupled Artifacts now use portable repository-relative locators while retaining raw-file SHA-256 validation.
+- Fixed the online address-binding materializer to resolve its TSV before Accel-Sim changes into the per-run output directory. A new remote deployment then completed the P16 twenty-task qualification twice; the synchronized raw run directories independently re-summarize to the same record, including a 35,450,346,739,701 fs causal makespan, 517 runtime-memory parents, one Ramulator2 per runtime task, zero ATLAS requests and zero outstanding work.
+- Added `hetero-gpu-execution-identity/v1` and a catalog format that separately seal executable, launch-contract and normalized kernel-sequence SHA-256 values, target SM, launch count, and native/trace observation flags. GPU pairing now fails closed if either side lacks observed identity or if any immutable identity field differs.
+- Built a deterministic trace-side identity catalog for the sealed Token Embedding and Residual Add binary. It verifies the recapture record and all Metadata/Kernel List/Trace/Manifest hashes, but deliberately records `native_measurement_observed=false`; the remaining twelve Trace operators also still lack this catalog evidence.
+- Regenerated both P17 simulator catalogs and audits. Native-VRAM topology still matches, but pairing remains 0/14: fourteen Native identities and twelve Simulator identities are missing, two current Artifact hashes differ from the old Native catalog, and ten operators exceed the 15% observational tolerance. Performance qualification remains 0/6 and `performance_claim_allowed=false`.
+
 ## 2026-09-01 — v0.27.0 / P17 native-VRAM double qualification and sealed SM86 recapture
 
 - Built the Accel-Sim 2.0 native-memory simulator with CUDA 11.8 on the validation host and completed deterministic double qualification for all fourteen fixed TinyLlama Layer-0 BS=1 Context=16 GPU operators. Every record has identical cycle/instruction pairs, Accel-Sim-owned local DRAM timing, no external Ramulator2 owner and total-duration accounting.
@@ -216,11 +292,12 @@
 1. Extend the qualified one-layer Context=16 P15h path to multi-layer execution while validating cross-layer KV lifetime, Global PA capacity, workspace reuse and deterministic long-run behavior. Do not linearly multiply the one-layer timing.
 2. Replace or qualify the eight remaining analytical/runtime control, KV-management and residual tasks before making an end-to-end cycle-accurate claim.
 3. Calibrate GPU, shared 3D-DRAM and link parameters against measured hardware or another trusted reference before enabling performance claims.
-3. Extend the same strict materialized/request-cycle path to one-layer and 22-layer Decode, including full KV traffic and a real single-token loop.
-4. Connect Continuous/Ragged multi-Batch scheduling to real fused/batched cycle artifacts and validate admission, padding and shared-kernel shapes.
-5. Add longer mixed GPU/ATLAS placement cases, fairness/QoS and deadlock/liveness stress tests; activate and qualify ATLAS BookSim2.
-6. Complete Model 2 PCIe DMA and Model 4 CXL.mem cycle paths, then calibrate RTX 3070 and target link/3D-DRAM parameters. Deferred items remain MMU/TLB and configurable/XOR mapping.
+4. Replace P20's four exact Decode-step tiled contracts with qualified Accel-Sim instruction traces for KV lengths 17–20; do not extrapolate from Prefill or P19.
+5. P22 now validates Continuous/Ragged scheduling, admission, padding, KV isolation and device sub-batches at functional-cycle fidelity; connect its fail-closed `batched_kernel_cycle` mode to real fused/batched GPU and ATLAS artifacts and live shared-memory request streams.
+6. Add longer generation, cancellation, KV release/reuse and capacity-pressure cases, then add mixed GPU/ATLAS placement, fairness/QoS and deadlock/liveness stress tests; activate and qualify ATLAS BookSim2.
+7. Complete Model 2 PCIe DMA and Model 4 CXL.mem cycle paths, then calibrate RTX 3070 and target link/3D-DRAM parameters. Deferred items remain MMU/TLB and configurable/XOR mapping.
+8. Implement the F0–F8 inference-framework roadmap: Hugging Face export first, then stable Tensor/KV-to-Global-PA binding, GPU Trace Catalog and ATLAS Tensor-IR compilation, shadow simulation callbacks, vLLM dynamic batching/Paged KV, and finally TensorRT-LLM plus end-to-end qualification.
 
 ### Claim boundary
 
-The evidence includes a qualified shape-matched Decode Q projection, real Accel-Sim/full-ATLAS-Chip contention, strict single placement/versioned residency, a P10b-B–P14 causal Prefill deployment, P15d 13-operator full Value traffic, twelve independent instruction-to-Ramulator2 stall/resume qualifications, and a P15h one-layer timeline in which all twelve recaptured range-rebase GPU operators execute as real Accel-Sim backends with runtime Global PA and version causality. P15h validates 84 non-overlapping Global PA ranges, 56 private workspaces, 12 request bindings and 18 completion-time version commits. Eight control, KV-management and residual tasks remain analytical/runtime models. P14 still uses tiled compute and sampled traffic at Context=1024; P15d uses tiled compute and mixed full/sampled traffic at Context=16. None of these paths is measured hardware or calibrated end-to-end TinyLlama latency. `performance_claim_allowed=false` remains mandatory.
+The evidence includes a qualified shape-matched Decode Q projection, real Accel-Sim/full-ATLAS-Chip contention, strict single placement/versioned residency, a P10b-B–P14 causal Prefill deployment, P15d 13-operator full Value traffic, twelve independent instruction-to-Ramulator2 stall/resume qualifications, a P15h one-layer real-operator timeline, P19 single-token Decode, P20 four-token autoregressive Decode, and P22 functional-cycle Static/Continuous multi-Batch scheduling. P22 validates request/KV lifecycle, device sub-batches and Global PA isolation, but does not contain real batched-kernel or live shared-memory batch timing. None of these paths is calibrated end-to-end TinyLlama performance. `performance_claim_allowed=false` remains mandatory.

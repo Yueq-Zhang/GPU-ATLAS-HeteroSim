@@ -1110,35 +1110,35 @@
       {
         "duration_fs": 666667,
         "operator": "request_start",
-        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.request_start",
+        "output_directory": "validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.request_start",
         "request_count": 0,
         "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_start"
       },
       {
         "duration_fs": 124558304,
         "operator": "kv_allocate",
-        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.kv_allocate",
+        "output_directory": "validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.kv_allocate",
         "request_count": 3,
         "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_allocate"
       },
       {
         "duration_fs": 3917844523,
         "operator": "kv_append",
-        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
+        "output_directory": "validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append",
         "request_count": 512,
         "task_id": "task.TINYLLAMA11B-PREFILL-R0.prefill.s0.l0.attention.kv_append"
       },
       {
         "duration_fs": 666667,
         "operator": "request_finish",
-        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.request_finish",
+        "output_directory": "validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.request_finish",
         "request_count": 0,
         "task_id": "task.TINYLLAMA11B-PREFILL-R0.request_finish"
       },
       {
         "duration_fs": 99823321,
         "operator": "kv_release",
-        "output_directory": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.kv_release",
+        "output_directory": "validation/p16/leg2/p16_tinyllama_prefill_1layer_ctx16_full_task_models_gpu/d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a/backend_runs/runtime/task.TINYLLAMA11B-PREFILL-R0.kv_release",
         "request_count": 2,
         "task_id": "task.TINYLLAMA11B-PREFILL-R0.kv_release"
       }
@@ -1156,5 +1156,5 @@
   "runtime_owner": "python.OnlineOperatorRuntime",
   "schema_version": "hetero-provenance/v1",
   "simulation_input_key": "d5066ff9081332bd31ae5699f4f572736cc7f188ae9f4272cf89a4af0a1d6e3a",
-  "simulator_revision": "f8a95b2824698232a41c2b6ad49576fe034feb4a-dirty"
+  "simulator_revision": "7303c02c3727d34a1eb7c96c16c3bdb20865258b-dirty"
 }

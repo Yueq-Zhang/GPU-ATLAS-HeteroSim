@@ -1,0 +1,6 @@
+{
+  "allocator": "first_fit",
+  "page_tokens": 16,
+  "kv_capacity_bytes": 32768,
+  "allocation_alignment_bytes": 64
+}

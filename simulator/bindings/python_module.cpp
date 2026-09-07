@@ -41,15 +41,23 @@ py::dict simulate(const py::list& request_objects, const py::dict& scheduler) {
             get_u64(request, "output_length"),
             request.contains("priority") ? py::cast<std::int64_t>(request["priority"]) : 0,
             request.contains("execution_scope") &&
-                py::cast<std::string>(request["execution_scope"]) == "decode_step",
-            get_u64(request, "initial_kv_length")});
+                (py::cast<std::string>(request["execution_scope"]) == "decode_step" ||
+                 py::cast<std::string>(request["execution_scope"]) == "decode_loop"),
+            get_u64(request, "initial_kv_length"),
+            get_u64(request, "kv_reservation_bytes", 1),
+            get_u64(request, "eos_after_generated_tokens"),
+            get_u64(request, "max_output_tokens"),
+            get_u64(
+                request, "cancel_time_fs",
+                std::numeric_limits<heterosim::TimeFs>::max())});
     }
     const heterosim::runtime::SchedulerConfig config{
         get_u64(scheduler, "max_num_sequences"),
         get_u64(scheduler, "max_batched_tokens"),
         get_u64(scheduler, "prefill_chunk_tokens"),
         get_u64(scheduler, "max_prefill_wait_epochs", 8),
-        get_u64(scheduler, "epoch_duration_fs")};
+        get_u64(scheduler, "epoch_duration_fs"),
+        get_u64(scheduler, "kv_capacity_bytes")};
     const auto result = heterosim::runtime::simulate_token_barrier(requests, config);
 
     py::list epochs;
@@ -68,6 +76,10 @@ py::dict simulate(const py::list& request_objects, const py::dict& scheduler) {
             "epoch_id"_a = epoch.epoch_id,
             "boundary_time_fs"_a = epoch.boundary_time_fs,
             "completion_time_fs"_a = epoch.completion_time_fs,
+            "admitted_request_ids"_a = epoch.admitted_request_ids,
+            "active_request_ids"_a = epoch.active_request_ids,
+            "retired_request_ids"_a = epoch.retired_request_ids,
+            "cancelled_request_ids"_a = epoch.cancelled_request_ids,
             "selections"_a = selections));
     }
     py::list request_results;
@@ -77,7 +89,8 @@ py::dict simulate(const py::list& request_objects, const py::dict& scheduler) {
             "generated_length"_a = request.generated_length,
             "committed_kv_length"_a = request.committed_kv_length,
             "token_ready_time_fs"_a = request.token_ready_time_fs,
-            "finish_time_fs"_a = request.finish_time_fs));
+            "finish_time_fs"_a = request.finish_time_fs,
+            "termination_reason"_a = request.termination_reason));
     }
     return py::dict(
         "schema_version"_a = "hetero-runtime-result/v1",

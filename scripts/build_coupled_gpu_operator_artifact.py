@@ -12,10 +12,16 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import sys
 from pathlib import Path
 from typing import Any, Mapping
 
-from frontend.hetero.operator_artifact import OperatorArtifactManifest
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
+from frontend.hetero.operator_artifact import OperatorArtifactManifest  # noqa: E402
 
 
 def _sha256(path: Path) -> str:
@@ -33,15 +39,29 @@ def _resolve(base: Path, value: object) -> Path:
     return path.resolve() if path.is_absolute() else (base / path).resolve()
 
 
+def _render_path(path: Path, base: Path) -> str:
+    """Render repository-local evidence as a cross-platform relative path."""
+
+    path = path.resolve()
+    base = base.resolve()
+    try:
+        path.relative_to(base)
+        return Path(os.path.relpath(path, base)).as_posix()
+    except ValueError:
+        pass
+    try:
+        path.relative_to(_PROJECT_ROOT)
+        base.relative_to(_PROJECT_ROOT)
+        return Path(os.path.relpath(path, base)).as_posix()
+    except ValueError:
+        return str(path)
+
+
 def _file(path: Path, base: Path, kind: str) -> dict[str, object]:
     path = path.resolve()
-    try:
-        rendered = str(path.relative_to(base))
-    except ValueError:
-        rendered = str(path)
     return {
         "kind": kind,
-        "path": rendered,
+        "path": _render_path(path, base),
         "sha256": _sha256(path),
         "size_bytes": path.stat().st_size,
     }
@@ -196,7 +216,7 @@ def main() -> None:
                 else "cycle_coupled_identity_untranslated_pending_global_pa_binding"
             ),
             "performance_eligible": False,
-            "qualification_record": str(qualification_path),
+            "qualification_record": _render_path(qualification_path, base),
             "cycles": int(cycles[0]),
             "instructions": int(instructions[0]),
             "gpu_parents": accepted,
