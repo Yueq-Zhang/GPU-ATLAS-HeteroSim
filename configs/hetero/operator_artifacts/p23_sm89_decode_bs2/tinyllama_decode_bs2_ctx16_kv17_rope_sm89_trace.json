@@ -1,0 +1,311 @@
+{
+  "address_ranges": [
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.decode.kv17.layer0.rope.query.capture0",
+      "capture_allocation_id": "tinyllama.decode.kv17.layer0.rope.query.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        2,
+        32,
+        1,
+        64
+      ],
+      "size_bytes": 8192,
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.query",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360246784,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.decode.kv17.layer0.rope.key.capture0",
+      "capture_allocation_id": "tinyllama.decode.kv17.layer0.rope.key.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        2,
+        4,
+        1,
+        64
+      ],
+      "size_bytes": 1024,
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.key",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360254976,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.decode.kv17.layer0.rope.position_ids.capture0",
+      "capture_allocation_id": "tinyllama.decode.kv17.layer0.rope.position_ids.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        2,
+        1
+      ],
+      "size_bytes": 32,
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.position_ids",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360256000,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.decode.kv17.layer0.rope.inv_freq.capture0",
+      "capture_allocation_id": "tinyllama.decode.kv17.layer0.rope.inv_freq.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        32
+      ],
+      "size_bytes": 128,
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.inv_freq",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360246272,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.decode.kv17.layer0.rope.cos.capture0",
+      "capture_allocation_id": "tinyllama.decode.kv17.layer0.rope.cos.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        2,
+        1,
+        64
+      ],
+      "size_bytes": 256,
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.cos",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360258048,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.decode.kv17.layer0.rope.sin.capture0",
+      "capture_allocation_id": "tinyllama.decode.kv17.layer0.rope.sin.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        2,
+        1,
+        64
+      ],
+      "size_bytes": 256,
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.sin",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360258560,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.decode.kv17.layer0.rope.query_output.capture0",
+      "capture_allocation_id": "tinyllama.decode.kv17.layer0.rope.query_output.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        2,
+        32,
+        1,
+        64
+      ],
+      "size_bytes": 8192,
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.query_output",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360267264,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.decode.kv17.layer0.rope.key_output.capture0",
+      "capture_allocation_id": "tinyllama.decode.kv17.layer0.rope.key_output.capture0",
+      "capture_epoch": 0,
+      "layout": "strided",
+      "shape": [
+        2,
+        4,
+        1,
+        64
+      ],
+      "size_bytes": 1024,
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.key_output",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360260096,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.rope.opaque_workspace_0.capture0",
+      "capture_allocation_id": "tinyllama.layer0.rope.opaque_workspace_0.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_allocator_range",
+      "shape": [
+        1232896
+      ],
+      "size_bytes": 1232896,
+      "tensor_id": "tinyllama.layer0.rope.opaque_workspace_0",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802359013376,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 128,
+      "backing_allocation_id": "tinyllama.layer0.rope.opaque_workspace_1.capture0",
+      "capture_allocation_id": "tinyllama.layer0.rope.opaque_workspace_1.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_allocator_range",
+      "shape": [
+        384
+      ],
+      "size_bytes": 384,
+      "tensor_id": "tinyllama.layer0.rope.opaque_workspace_1",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360246400,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 32,
+      "backing_allocation_id": "tinyllama.layer0.rope.opaque_workspace_2.capture0",
+      "capture_allocation_id": "tinyllama.layer0.rope.opaque_workspace_2.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_allocator_range",
+      "shape": [
+        2016
+      ],
+      "size_bytes": 2016,
+      "tensor_id": "tinyllama.layer0.rope.opaque_workspace_2",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360256032,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.rope.opaque_workspace_3.capture0",
+      "capture_allocation_id": "tinyllama.layer0.rope.opaque_workspace_3.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_allocator_range",
+      "shape": [
+        256
+      ],
+      "size_bytes": 256,
+      "tensor_id": "tinyllama.layer0.rope.opaque_workspace_3",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360258304,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.rope.opaque_workspace_4.capture0",
+      "capture_allocation_id": "tinyllama.layer0.rope.opaque_workspace_4.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_allocator_range",
+      "shape": [
+        1280
+      ],
+      "size_bytes": 1280,
+      "tensor_id": "tinyllama.layer0.rope.opaque_workspace_4",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360258816,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.rope.opaque_workspace_5.capture0",
+      "capture_allocation_id": "tinyllama.layer0.rope.opaque_workspace_5.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_allocator_range",
+      "shape": [
+        6144
+      ],
+      "size_bytes": 6144,
+      "tensor_id": "tinyllama.layer0.rope.opaque_workspace_5",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360261120,
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "tinyllama.layer0.rope.opaque_workspace_6.capture0",
+      "capture_allocation_id": "tinyllama.layer0.rope.opaque_workspace_6.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_allocator_range",
+      "shape": [
+        835072
+      ],
+      "size_bytes": 835072,
+      "tensor_id": "tinyllama.layer0.rope.opaque_workspace_6",
+      "tensor_offset_bytes": 0,
+      "trace_base": 129802360275456,
+      "view_offset_bytes": 0
+    }
+  ],
+  "capture": {
+    "dtype": "fp16",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "operator": "rope",
+    "phase": "decode_step",
+    "scope": "one_exact_decode_shape_locked_operator_not_end_to_end",
+    "shape": {
+      "batch_size": 2,
+      "context_length": 16,
+      "kv_length": 17,
+      "q_len": 1
+    },
+    "source": "shape-locked decode_step operator capture",
+    "tool": "NVBit",
+    "version": "1.8"
+  },
+  "compilation": {
+    "binary_identity": {
+      "binary_versions": [
+        86
+      ],
+      "kernel_launch_count": 20,
+      "kernel_sequence_sha256": "f6b7386de7ee7acf3e5b9d5f8721213e68eb723d6053f5ba84969c2d4b99a938",
+      "mixed_binary_versions": false,
+      "replay_compatibility": "ampere_sm80_sm86_opcode_compatible",
+      "replay_target_sm": 86,
+      "source": "nvbit_trace_headers"
+    },
+    "capture_device_sm": 89,
+    "cuda_runtime": "13.2",
+    "framework": "pytorch",
+    "implementation": "tinyllama.rope_decode_q1_elementwise_outer_product_sm86_replay",
+    "launch_program": {
+      "components": {
+        "adapter_source": "/home/yueqi/gpu-atlas-p22-one-layer-20260907/workloads/python/tinyllama_decode_rope_sm86_operator.py",
+        "adapter_source_sha256": "ac2c070aa7af3709887eed8e730bec77f99e7843fe61985065170594bbb59a9b",
+        "cuda_runtime": "13.2",
+        "entrypoint": "/home/yueqi/gpu-atlas-p22-one-layer-20260907/workloads/python/tinyllama_decode_rope_sm86_operator.py",
+        "program_kind": "python_pytorch_launch_program",
+        "python_executable": "/home/yueqi/anaconda3/envs/dl/bin/python3.12",
+        "python_executable_sha256": "e0fcf110470a6ba9b0a0ad56565fb694d26319c7e356d3c92abf41c5ea9085d1",
+        "python_version": "3.12.14",
+        "pytorch": "2.13.0+cu132",
+        "shared_operator_source": "/home/yueqi/gpu-atlas-p22-one-layer-20260907/workloads/python/tinyllama_prefill_operator.py",
+        "shared_operator_source_sha256": "90de90b8bf2127c62c778f741b899cd87f3dc0fcd4dfad4994b33b5c459b3644",
+        "torch_extension": "/home/yueqi/anaconda3/envs/dl/lib/python3.12/site-packages/torch/_C.cpython-312-x86_64-linux-gnu.so",
+        "torch_extension_sha256": "819a187ea3b1f4d781200fe73fba3264689835d2285f7e6d10b986257a802dce",
+        "transformers": "4.57.6",
+        "workload_source": "/home/yueqi/gpu-atlas-p22-one-layer-20260907/workloads/python/tinyllama_decode_operator.py",
+        "workload_source_sha256": "5df131dd8ebf938aefff1883639133a6c53f19debe3efae67855a172662e4259"
+      },
+      "kind": "python_pytorch_launch_program",
+      "sha256": "9037e8e89afdf02780c5f615dfe9fe8148afab91f8be80f50488b30abd5d91c8"
+    },
+    "pytorch": "2.13.0+cu132",
+    "target_sm": 86,
+    "transformers": "4.57.6"
+  },
+  "kernels_list": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernelslist.g",
+  "qualification_record": null,
+  "replay_safe": false,
+  "schema_version": "hetero-trace-manifest/v1",
+  "trace_id": "tinyllama.1_1b.layer0.rope.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2",
+  "trace_semantics": "functional"
+}

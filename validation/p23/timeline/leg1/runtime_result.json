@@ -1,0 +1,699 @@
+{
+  "backend_dispatch_count": 20,
+  "final_versions": {
+    "P23-BS2-DECODE-R0-R1.attention.context": 1,
+    "P23-BS2-DECODE-R0-R1.attention.projected": 1,
+    "P23-BS2-DECODE-R0-R1.attention.residual": 1,
+    "P23-BS2-DECODE-R0-R1.final_norm": 1,
+    "P23-BS2-DECODE-R0-R1.hidden.attention_norm": 1,
+    "P23-BS2-DECODE-R0-R1.hidden.embedding": 1,
+    "P23-BS2-DECODE-R0-R1.hidden.mlp_norm": 1,
+    "P23-BS2-DECODE-R0-R1.k_new": 1,
+    "P23-BS2-DECODE-R0-R1.k_rot": 1,
+    "P23-BS2-DECODE-R0-R1.kv.l0.k": 2,
+    "P23-BS2-DECODE-R0-R1.kv.l0.v": 2,
+    "P23-BS2-DECODE-R0-R1.layer.output": 1,
+    "P23-BS2-DECODE-R0-R1.logits": 1,
+    "P23-BS2-DECODE-R0-R1.mlp.activated": 1,
+    "P23-BS2-DECODE-R0-R1.mlp.down": 1,
+    "P23-BS2-DECODE-R0-R1.mlp.gate": 1,
+    "P23-BS2-DECODE-R0-R1.mlp.up": 1,
+    "P23-BS2-DECODE-R0-R1.q": 1,
+    "P23-BS2-DECODE-R0-R1.q_rot": 1,
+    "P23-BS2-DECODE-R0-R1.query": 1,
+    "P23-BS2-DECODE-R0-R1.token": 1,
+    "P23-BS2-DECODE-R0-R1.token_ids": 0,
+    "P23-BS2-DECODE-R0-R1.v_new": 1,
+    "model.final_norm.weight": 0,
+    "model.layers.0.attention_norm.weight": 0,
+    "model.layers.0.down.weight": 0,
+    "model.layers.0.gate.weight": 0,
+    "model.layers.0.k.weight": 0,
+    "model.layers.0.mlp_norm.weight": 0,
+    "model.layers.0.output.weight": 0,
+    "model.layers.0.q.weight": 0,
+    "model.layers.0.up.weight": 0,
+    "model.layers.0.v.weight": 0,
+    "model.lm_head.weight": 0,
+    "model.tok_embeddings.weight": 0
+  },
+  "launch_log": [
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.request_start",
+      "time_fs": 0,
+      "validated_input_versions": []
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.kv_allocate",
+      "time_fs": 666667,
+      "validated_input_versions": []
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.token_embedding",
+      "time_fs": 125224971,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.token_ids",
+          "version": 0
+        },
+        {
+          "value_id": "model.tok_embeddings.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_norm",
+      "time_fs": 6411444053,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.hidden.embedding",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.attention_norm.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.qkv_projection",
+      "time_fs": 51092539460,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.hidden.attention_norm",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.q.weight",
+          "version": 0
+        },
+        {
+          "value_id": "model.layers.0.k.weight",
+          "version": 0
+        },
+        {
+          "value_id": "model.layers.0.v.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.rope",
+      "time_fs": 1736295719673,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.q",
+          "version": 1
+        },
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.k_new",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append",
+      "time_fs": 1845249783278,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.q_rot",
+          "version": 1
+        },
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.k_rot",
+          "version": 1
+        },
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.v_new",
+          "version": 1
+        },
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.k",
+          "version": 1
+        },
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.v",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.causal_attention",
+      "time_fs": 1845807203772,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.query",
+          "version": 1
+        },
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.k",
+          "version": 2
+        },
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.v",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.output_projection",
+      "time_fs": 1888356673737,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.attention.context",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.output.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_residual",
+      "time_fs": 3227604906953,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.hidden.embedding",
+          "version": 1
+        },
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.attention.projected",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_norm",
+      "time_fs": 3235132292113,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.attention.residual",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.mlp_norm.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection",
+      "time_fs": 3279842539463,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.hidden.mlp_norm",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.gate.weight",
+          "version": 0
+        },
+        {
+          "value_id": "model.layers.0.up.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.silu_multiply",
+      "time_fs": 10552051903421,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.gate",
+          "version": 1
+        },
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.up",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.down_projection",
+      "time_fs": 10569892009429,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.activated",
+          "version": 1
+        },
+        {
+          "value_id": "model.layers.0.down.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_residual",
+      "time_fs": 14232938829217,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.attention.residual",
+          "version": 1
+        },
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.down",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.final_norm",
+      "time_fs": 14240472398122,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.layer.output",
+          "version": 1
+        },
+        {
+          "value_id": "model.final_norm.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.lm_head",
+      "time_fs": 14285270984695,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.final_norm",
+          "version": 1
+        },
+        {
+          "value_id": "model.lm_head.weight",
+          "version": 0
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.sampling",
+      "time_fs": 34814811620738,
+      "validated_input_versions": [
+        {
+          "value_id": "P23-BS2-DECODE-R0-R1.logits",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.request_finish",
+      "time_fs": 34843648193177,
+      "validated_input_versions": []
+    },
+    {
+      "device_id": "gpu0",
+      "kind": "backend",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.kv_release",
+      "time_fs": 34843648859844,
+      "validated_input_versions": []
+    }
+  ],
+  "makespan_fs": 34843748683165,
+  "performance_boundary": {
+    "causal_makespan_fs": 34843748683165,
+    "device_boundary_end_fs": 34843748683165,
+    "device_boundary_span_fs": 34843748016498,
+    "device_boundary_start_fs": 666667,
+    "excluded_control_duration_fs": 1333334,
+    "excluded_task_count": 2,
+    "included_task_count": 18,
+    "schema_version": "hetero-performance-boundary/v1"
+  },
+  "schema_version": "hetero-online-operator-runtime/v1",
+  "tasks": [
+    {
+      "completion_time_fs": 666667,
+      "ready_time_fs": 0,
+      "resource_id": "gpu0",
+      "start_time_fs": 0,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.request_start"
+    },
+    {
+      "completion_time_fs": 125224971,
+      "ready_time_fs": 666667,
+      "resource_id": "gpu0",
+      "start_time_fs": 666667,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.kv_allocate"
+    },
+    {
+      "completion_time_fs": 6411444053,
+      "ready_time_fs": 125224971,
+      "resource_id": "gpu0",
+      "start_time_fs": 125224971,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.token_embedding"
+    },
+    {
+      "completion_time_fs": 51092539460,
+      "ready_time_fs": 6411444053,
+      "resource_id": "gpu0",
+      "start_time_fs": 6411444053,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_norm"
+    },
+    {
+      "completion_time_fs": 1736295719673,
+      "ready_time_fs": 51092539460,
+      "resource_id": "gpu0",
+      "start_time_fs": 51092539460,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.qkv_projection"
+    },
+    {
+      "completion_time_fs": 1845249783278,
+      "ready_time_fs": 1736295719673,
+      "resource_id": "gpu0",
+      "start_time_fs": 1736295719673,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.rope"
+    },
+    {
+      "completion_time_fs": 1845807203772,
+      "ready_time_fs": 1845249783278,
+      "resource_id": "gpu0",
+      "start_time_fs": 1845249783278,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append"
+    },
+    {
+      "completion_time_fs": 1888356673737,
+      "ready_time_fs": 1845807203772,
+      "resource_id": "gpu0",
+      "start_time_fs": 1845807203772,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.causal_attention"
+    },
+    {
+      "completion_time_fs": 3227604906953,
+      "ready_time_fs": 1888356673737,
+      "resource_id": "gpu0",
+      "start_time_fs": 1888356673737,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.output_projection"
+    },
+    {
+      "completion_time_fs": 3235132292113,
+      "ready_time_fs": 3227604906953,
+      "resource_id": "gpu0",
+      "start_time_fs": 3227604906953,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_residual"
+    },
+    {
+      "completion_time_fs": 3279842539463,
+      "ready_time_fs": 3235132292113,
+      "resource_id": "gpu0",
+      "start_time_fs": 3235132292113,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_norm"
+    },
+    {
+      "completion_time_fs": 10552051903421,
+      "ready_time_fs": 3279842539463,
+      "resource_id": "gpu0",
+      "start_time_fs": 3279842539463,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection"
+    },
+    {
+      "completion_time_fs": 10569892009429,
+      "ready_time_fs": 10552051903421,
+      "resource_id": "gpu0",
+      "start_time_fs": 10552051903421,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.silu_multiply"
+    },
+    {
+      "completion_time_fs": 14232938829217,
+      "ready_time_fs": 10569892009429,
+      "resource_id": "gpu0",
+      "start_time_fs": 10569892009429,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.down_projection"
+    },
+    {
+      "completion_time_fs": 14240472398122,
+      "ready_time_fs": 14232938829217,
+      "resource_id": "gpu0",
+      "start_time_fs": 14232938829217,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_residual"
+    },
+    {
+      "completion_time_fs": 14285270984695,
+      "ready_time_fs": 14240472398122,
+      "resource_id": "gpu0",
+      "start_time_fs": 14240472398122,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.final_norm"
+    },
+    {
+      "completion_time_fs": 34814811620738,
+      "ready_time_fs": 14285270984695,
+      "resource_id": "gpu0",
+      "start_time_fs": 14285270984695,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.lm_head"
+    },
+    {
+      "completion_time_fs": 34843648193177,
+      "ready_time_fs": 34814811620738,
+      "resource_id": "gpu0",
+      "start_time_fs": 34814811620738,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.sampling"
+    },
+    {
+      "completion_time_fs": 34843648859844,
+      "ready_time_fs": 34843648193177,
+      "resource_id": "gpu0",
+      "start_time_fs": 34843648193177,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.request_finish"
+    },
+    {
+      "completion_time_fs": 34843748683165,
+      "ready_time_fs": 34843648859844,
+      "resource_id": "gpu0",
+      "start_time_fs": 34843648859844,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.kv_release"
+    }
+  ],
+  "version_checks": 38,
+  "version_commits": [
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 125224971,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.kv_allocate",
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.k",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 125224971,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.kv_allocate",
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.v",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 6411444053,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.token_embedding",
+      "value_id": "P23-BS2-DECODE-R0-R1.hidden.embedding",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 51092539460,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_norm",
+      "value_id": "P23-BS2-DECODE-R0-R1.hidden.attention_norm",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 1736295719673,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.qkv_projection",
+      "value_id": "P23-BS2-DECODE-R0-R1.q",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 1736295719673,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.qkv_projection",
+      "value_id": "P23-BS2-DECODE-R0-R1.k_new",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 1736295719673,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.qkv_projection",
+      "value_id": "P23-BS2-DECODE-R0-R1.v_new",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 1845249783278,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.rope",
+      "value_id": "P23-BS2-DECODE-R0-R1.q_rot",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 1845249783278,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.rope",
+      "value_id": "P23-BS2-DECODE-R0-R1.k_rot",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 1845807203772,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append",
+      "value_id": "P23-BS2-DECODE-R0-R1.query",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 1845807203772,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append",
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.k",
+      "version": 2
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 1845807203772,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append",
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.v",
+      "version": 2
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 1888356673737,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.causal_attention",
+      "value_id": "P23-BS2-DECODE-R0-R1.attention.context",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 3227604906953,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.output_projection",
+      "value_id": "P23-BS2-DECODE-R0-R1.attention.projected",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 3235132292113,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_residual",
+      "value_id": "P23-BS2-DECODE-R0-R1.attention.residual",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 3279842539463,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_norm",
+      "value_id": "P23-BS2-DECODE-R0-R1.hidden.mlp_norm",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 10552051903421,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.gate",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 10552051903421,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.up",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 10569892009429,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.silu_multiply",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.activated",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 14232938829217,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.down_projection",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.down",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 14240472398122,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_residual",
+      "value_id": "P23-BS2-DECODE-R0-R1.layer.output",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 14285270984695,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.final_norm",
+      "value_id": "P23-BS2-DECODE-R0-R1.final_norm",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 34814811620738,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.lm_head",
+      "value_id": "P23-BS2-DECODE-R0-R1.logits",
+      "version": 1
+    },
+    {
+      "cause": "backend_completion",
+      "commit_time_fs": 34843648193177,
+      "device_id": "gpu0",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.sampling",
+      "value_id": "P23-BS2-DECODE-R0-R1.token",
+      "version": 1
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 GPU-ATLAS-HeteroSim 是面向 GPU、ATLAS Compute Die 与 3D-DRAM 的异构端到端 LLM 联合仿真工程。工程把完整 Prefill/Decode 请求图、算子放置、跨设备数据移动、Paged KV Cache 和全局事件调度连接到同一条可复现运行路径。
 
-> 当前版本为 `0.34.0`。P24已补齐EOS、最大长度、显式取消、KV容量准入/释放和Global PA复用；P25已补齐确定性QoS、公平性、饥饿上界及死锁/活锁Watchdog。P23的远端RTX 4090单层BS=2真实SASS/Trace捕获已完成14/14，Range-Rebase双遍资格正在进行。以上均保持性能声明关闭。
+> 当前版本为 `0.35.0`。P23已完成远端RTX 4090单层BS=2真实SASS/Trace捕获、14类算子Range-Rebase资格、KV Append与统一时间线双遍功能资格；P24/P25分别完成请求控制和控制面QoS/存活性资格。以上均保持性能声明关闭。
 
 长时间资格验证可以部署到`192.168.5.2`并把两个确定性Leg绑定到不同CPU并行执行；密码不进入仓库或日志。远端路径、GPT‑5.6 Luna `xhigh`编排约定、单轮入口和完成后严格合并方法见[远端验证规范](docs/REMOTE_VALIDATION.md)。
 
@@ -24,9 +24,9 @@ Hugging Face、vLLM和后续TensorRT-LLM的接入边界、实施顺序与验收�
 - P22已实现Static/Continuous多请求调度、Homogeneous/Padding/Ragged Split、设备Sub-Batch、KV容量Admission/Retire、Global PA分配释放复用与双遍确定性；
 - P24已实现EOS、最大生成长度、token-step barrier显式取消、KV容量压力、请求退休释放和Global PA first-fit复用，并通过两组单层双遍资格；
 - P25已实现GPU/ATLAS确定性加权公平仲裁、QoS优先级、饥饿上界与死锁/活锁Watchdog；BookSim2适配器缺失时严格失败关闭；
-- P23要求SASS编译、执行和NVBit捕获全部在远端RTX 4090完成；固定BS=2、Context=16、KV=17的14类算子捕获已完成，逐算子Range-Rebase双遍资格尚在运行；
+- P23要求SASS编译、执行和NVBit捕获全部在远端RTX 4090完成；固定BS=2、Context=16、KV=17的14类算子、15个GPU任务实例、KV Append与完整20任务时间线均完成双遍功能资格；
 - 实验产物包含内容哈希、Simulation Key、请求/内存/版本守恒、Fidelity和性能门禁，并提供机器可读能力目录与手工复现入口；
-- 当前P22使用Scheduler Epoch进行功能周期组合；真实Batched/Fused Kernel、长时共享内存争用与整机性能校准尚未完成，`performance_claim_allowed=false`。
+- P22的通用多Batch仍使用Scheduler Epoch组合；P23只为固定BS=2、Context=16、KV=17提供真实Batched Trace时间线，其他KV/Ragged Shape、长时共享内存争用与整机性能校准尚未完成，`performance_claim_allowed=false`。
 
 ## 2. 目录结构
 
@@ -1087,7 +1087,15 @@ bash scripts/run_p23_remote_bs2_capture.sh
 bash scripts/run_p23_bs2_decode_range_rebase_qualification.sh
 ```
 
-当前14/14类GPU算子已完成远端捕获，Range-Rebase Accel-Sim双遍资格正在进行。只有周期、指令、external-memory统计双遍一致，且唯一Ramulator2、地址零漏配、Parent/Child/durable守恒、零ATLAS请求和零在途全部通过的算子才能进入Ready Catalog。KV Append与统一Batch时间线尚未完成，因此P23暂不等于完整单层Batch请求周期闭环。
+14/14类GPU算子已完成远端捕获与独立Range-Rebase Accel-Sim双遍资格，并形成仓库内封存的Ready Catalog。统一时间线包含15个真实GPU Trace实例、KV Append、请求开始/结束和KV分配/释放，共20个任务；两个隔离Leg均为`34,843,748,683,165 fs`，周期、指令、external-memory统计和完整签名一致。
+
+资格进一步确认：97个Global PA范围无重叠，15条Trace绑定、5条运行时绑定和R0/R1四个KV子区间完整；KV Append写入未越过成员边界，19条依赖和`gpu0`资源互斥成立，请求完成、KV长度16→17、版本提交及零在途全部通过。封存记录见`validation/p23/ready_catalog.json`与`validation/p23/timeline/qualification_record.json`，离线核验命令为：
+
+```bash
+python3 scripts/validate_p23_sealed_catalog.py
+```
+
+P23只关闭固定TinyLlama Layer 0、FP16、BS=2、Context=16、`q_len=1`、KV=17的功能里程碑。原始Trace仍由远端证据库保存，仓库封存Manifest与哈希；RTX4090捕获不等于RTX4090性能校准，跨Kernel持久DRAM状态和整机性能资格仍未完成，`performance_claim_allowed=false`。详细证据与声明边界见[P23资格记录](docs/qualification/p23_bs2_decode_timeline.md)。
 
 ### 14.21 P24 请求终止与KV容量控制
 

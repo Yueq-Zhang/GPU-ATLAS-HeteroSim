@@ -1,0 +1,130 @@
+{
+  "completed_task_count": 20,
+  "completed_tasks": [
+    {
+      "cycles": 1,
+      "duration_fs": 666667,
+      "operator": "request_start",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.request_start"
+    },
+    {
+      "cycles": 141,
+      "duration_fs": 124558304,
+      "operator": "kv_allocate",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.kv_allocate"
+    },
+    {
+      "cycles": 7116,
+      "duration_fs": 6286219082,
+      "operator": "token_embedding",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.token_embedding"
+    },
+    {
+      "cycles": 50579,
+      "duration_fs": 44681095407,
+      "operator": "attention_norm",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_norm"
+    },
+    {
+      "cycles": 1907650,
+      "duration_fs": 1685203180213,
+      "operator": "qkv_projection",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.qkv_projection"
+    },
+    {
+      "cycles": 123336,
+      "duration_fs": 108954063605,
+      "operator": "rope",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.rope"
+    },
+    {
+      "cycles": 631,
+      "duration_fs": 557420494,
+      "operator": "kv_append",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append"
+    },
+    {
+      "cycles": 48166,
+      "duration_fs": 42549469965,
+      "operator": "causal_attention",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.causal_attention"
+    },
+    {
+      "cycles": 1516029,
+      "duration_fs": 1339248233216,
+      "operator": "output_projection",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.output_projection"
+    },
+    {
+      "cycles": 8521,
+      "duration_fs": 7527385160,
+      "operator": "residual_add",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_residual"
+    },
+    {
+      "cycles": 50612,
+      "duration_fs": 44710247350,
+      "operator": "mlp_norm",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_norm"
+    },
+    {
+      "cycles": 8232141,
+      "duration_fs": 7272209363958,
+      "operator": "gate_up_projection",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection"
+    },
+    {
+      "cycles": 20195,
+      "duration_fs": 17840106008,
+      "operator": "silu_multiply",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.silu_multiply"
+    },
+    {
+      "cycles": 4146569,
+      "duration_fs": 3663046819788,
+      "operator": "down_projection",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.down_projection"
+    },
+    {
+      "cycles": 8528,
+      "duration_fs": 7533568905,
+      "operator": "residual_add",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_residual"
+    },
+    {
+      "cycles": 50712,
+      "duration_fs": 44798586573,
+      "operator": "final_norm",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.final_norm"
+    },
+    {
+      "cycles": 23239440,
+      "duration_fs": 20529540636043,
+      "operator": "lm_head",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.lm_head"
+    },
+    {
+      "cycles": 32643,
+      "duration_fs": 28836572439,
+      "operator": "sampling",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.sampling"
+    },
+    {
+      "cycles": 1,
+      "duration_fs": 666667,
+      "operator": "request_finish",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.request_finish"
+    },
+    {
+      "cycles": 113,
+      "duration_fs": 99823321,
+      "operator": "kv_release",
+      "task_id": "task.P23-BS2-DECODE-R0-R1.kv_release"
+    }
+  ],
+  "current_operator": null,
+  "current_task_id": null,
+  "schema_version": "hetero-p23-bs2-timeline-progress/v1",
+  "status": "complete",
+  "total_task_count": 20
+}

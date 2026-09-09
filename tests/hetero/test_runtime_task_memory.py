@@ -10,10 +10,8 @@ from frontend.hetero.runtime_task_memory import (
 )
 from frontend.hetero.runtime_task_model import RuntimeTaskModelCatalog
 
-
 CATALOG = Path(
-    "configs/hetero/runtime_tasks/"
-    "tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json"
+    "configs/hetero/runtime_tasks/tinyllama_prefill_layer0_bs1_ctx16_uncalibrated.json"
 )
 
 
@@ -102,6 +100,69 @@ def test_kv_append_lowers_exact_packed_kv_slices_to_global_pa() -> None:
     assert all(item["operation"] == "write" for item in requests[256:])
 
 
+def test_bs2_split_kv_append_targets_each_members_own_kv_slot() -> None:
+    catalog = RuntimeTaskModelCatalog.load(
+        Path(
+            "configs/hetero/runtime_tasks/tinyllama_decode1_bs2_ctx16_uncalibrated.json"
+        )
+    )
+    node = ModelNode(
+        "p23.l0.kv_append",
+        NodeKind.STATE,
+        "kv_append",
+        Phase.DECODE,
+        0,
+        0,
+        attributes={
+            "batch_size": 2,
+            "context_length": 16,
+            "q_len": 1,
+            "past_kv_len": 16,
+            "attention_kv_len": 17,
+        },
+    )
+    contract = catalog.contract_for(node)
+    estimate = catalog.estimate(node, _model())
+    inputs = (
+        {"value_id": "query", "version": 1, "size_bytes": 8192},
+        {"value_id": "k_new", "version": 1, "size_bytes": 1024},
+        {"value_id": "v_new", "version": 1, "size_bytes": 1024},
+        {"value_id": "key", "version": 1, "size_bytes": 17408},
+        {"value_id": "value", "version": 1, "size_bytes": 17408},
+    )
+    outputs = (
+        {"value_id": "query_out", "version": 1, "size_bytes": 8192},
+        {"value_id": "key", "version": 2, "size_bytes": 17408},
+        {"value_id": "value", "version": 2, "size_bytes": 17408},
+    )
+    allocations = {
+        "query": _allocation("query", 0x100000, 8192),
+        "k_new": _allocation("k_new", 0x200000, 1024),
+        "v_new": _allocation("v_new", 0x300000, 1024),
+        "key": _allocation("key", 0x400000, 17408),
+        "value": _allocation("value", 0x500000, 17408),
+        "query_out": _allocation("query_out", 0x600000, 8192),
+    }
+    requests = plan_runtime_task_requests(
+        node,
+        _model(),
+        contract,
+        estimate,
+        RuntimeTaskAddressBinding("task.p23.kv", inputs, outputs),
+        allocations,
+    )
+    assert len(requests) == 64
+    assert sum(item["size_bytes"] for item in requests) == 4096
+    assert [
+        item["global_address"] for item in requests if item["operation"] == "write"
+    ] == [
+        *range(0x400000 + 16 * 512, 0x400000 + 17 * 512, 64),
+        *range(0x500000 + 16 * 512, 0x500000 + 17 * 512, 64),
+        *range(0x400000 + 17 * 512 + 16 * 512, 0x400000 + 34 * 512, 64),
+        *range(0x500000 + 17 * 512 + 16 * 512, 0x500000 + 34 * 512, 64),
+    ]
+
+
 class _FakeBridge:
     GPU_INITIATOR = 0
     SEND_ACCEPTED = 1
@@ -174,9 +235,7 @@ def test_metadata_requests_complete_before_runtime_task_returns() -> None:
     )
     contract = catalog.contract_for(node)
     estimate = catalog.estimate(node, _model())
-    binding = RuntimeTaskAddressBinding(
-        "task.allocate", tuple(), tuple(), 0x500000, 128
-    )
+    binding = RuntimeTaskAddressBinding("task.allocate", (), (), 0x500000, 128)
     requests = plan_runtime_task_requests(
         node, _model(), contract, estimate, binding, {}
     )

@@ -1,0 +1,12 @@
+{
+  "batch_member_request_ids": [
+    "R0",
+    "R1"
+  ],
+  "capture_sm": 89,
+  "local_rtx3070_sass_used": false,
+  "physical_capture_device": "remote RTX4090",
+  "replay_target_sm": 86,
+  "schema_version": "hetero-p23-bs2-decode-timeline-provenance/v1",
+  "simulator_revision": "unavailable"
+}

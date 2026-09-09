@@ -1,0 +1,132 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "capture_allocator_coverage": "target_window_pytorch_allocator_plus_tensor_segments",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.down_projection.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "driver": "595.84",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "kind": "accel_sim",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "compute_memory_coupled": false,
+    "global_pa_binding_ready": false,
+    "memory_traffic": "not_extracted",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": false,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-down-projection/operator_metadata.json",
+      "sha256": "c9b0a4a820b45c584efa8fa50df847f213e4463e1af8719ea4ad22d62fb8668b",
+      "size_bytes": 4005
+    },
+    {
+      "kind": "kernels_list",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-down-projection/traces/kernelslist.g",
+      "sha256": "93f7a594f78cc55af4463e1c360f0f774ffb3688ef48425606c77d1fc9d8bcfc",
+      "size_bytes": 35
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-down-projection/traces/kernel-1-ctx_0x587e0d7538c0.tracez",
+      "sha256": "aa9823535f5d2bf1a562a90bc8bb518db295313b1607cd1951b98534572dfb47",
+      "size_bytes": 2362169
+    },
+    {
+      "kind": "accel_sim_trace_manifest",
+      "path": "tinyllama_decode_bs2_ctx16_kv17_down_projection_sm89_trace.json",
+      "sha256": "59856b063c27a31625f91e61a83000f80281092a2c2e6000a108dc502321d87d",
+      "size_bytes": 6074
+    }
+  ],
+  "qualification": {
+    "performance_eligible": false,
+    "qualification_record": null,
+    "status": "capture_only_pending_cycle_qualification"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 2,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "transformers.LlamaMLP.down_proj",
+    "kv_length": 17,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "down_projection",
+    "phase": "decode_step",
+    "q_len": 1
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        2,
+        1,
+        5632
+      ],
+      "size_bytes": 22528,
+      "strides": [
+        5632,
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.down_projection.input",
+      "trace_base": 132645024625152
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "parameter",
+      "shape": [
+        2048,
+        5632
+      ],
+      "size_bytes": 23068672,
+      "strides": [
+        5632,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.down_projection.weight",
+      "trace_base": 132645365219328
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        2,
+        1,
+        2048
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        2048,
+        2048,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.down_projection.output",
+      "trace_base": 132645024616960
+    }
+  ]
+}

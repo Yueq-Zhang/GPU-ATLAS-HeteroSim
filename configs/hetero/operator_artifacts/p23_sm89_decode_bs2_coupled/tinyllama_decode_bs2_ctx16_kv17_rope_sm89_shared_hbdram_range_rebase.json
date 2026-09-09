@@ -1,0 +1,370 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "capture_allocator_coverage": "target_window_pytorch_allocator_plus_tensor_segments",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "range_rebase"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.rope.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+    "driver": "595.84",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "kind": "accel_sim",
+    "memory_coupling": "ramulator2_in_process",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "compute_memory_coupled": true,
+    "global_pa_binding_ready": true,
+    "memory_traffic": "full_instruction_trace",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": true,
+    "supports_stall_resume": true,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/operator_metadata.json",
+      "sha256": "73fa3cdce1ce932bd27fb6f810d98cd6ceb6e11f71bb21db7b9e0ce4dada86b1",
+      "size_bytes": 6026
+    },
+    {
+      "kind": "kernels_list",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernelslist.g",
+      "sha256": "0ca88da0340bffd2cf4430af1ce14e6a600a6b1aa93d4bdacfa85d399e7b3a07",
+      "size_bytes": 711
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-1-ctx_0x5671e2f21d00.tracez",
+      "sha256": "0f1eb64615b23bf5a4af728438a78d8889d4d944d883187d5f9df2c3750a6274",
+      "size_bytes": 2931
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-2-ctx_0x5671e2f21d00.tracez",
+      "sha256": "e86fd7426903b38a37b56c0a3b0360b58904324ced81f099b460c8d01389d502",
+      "size_bytes": 4239
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-3-ctx_0x5671e2f21d00.tracez",
+      "sha256": "8f2332b96fa8692514e3933fe3f7a9601c191b49207bd06e8b317a83e170c1cb",
+      "size_bytes": 2936
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-4-ctx_0x5671e2f21d00.tracez",
+      "sha256": "efd3e9365ba1704edac7b2e5b4f1d19b4602a8fe4811c17a84530aaeada3639b",
+      "size_bytes": 5018
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-5-ctx_0x5671e2f21d00.tracez",
+      "sha256": "198ef04fe1c05d57df9962d8fa4c2e83b0414ccca305e2f60baf5e1e97596afc",
+      "size_bytes": 8828
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-6-ctx_0x5671e2f21d00.tracez",
+      "sha256": "c7ccfe9dbef7a87ffa6b45346303b5ac8cd09297bdf31cef6440901d4e275d4d",
+      "size_bytes": 5725
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-7-ctx_0x5671e2f21d00.tracez",
+      "sha256": "7c805f397613154e15b89f2381888b88e82c7fa4a756b0e5cfcee7e3125a16da",
+      "size_bytes": 6588
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-8-ctx_0x5671e2f21d00.tracez",
+      "sha256": "a6374eee479e85df25770b5ea561b0db0d64e6fb4c7b64789067ce8158833880",
+      "size_bytes": 8791
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-9-ctx_0x5671e2f21d00.tracez",
+      "sha256": "d38b19fb9bc55e7030194b618c6e85b625ef94fc5e220d43bb44e39f79a549c7",
+      "size_bytes": 5719
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-10-ctx_0x5671e2f21d00.tracez",
+      "sha256": "e3e035c4af95c547f114b533debdf02e77f78e250c7c4a95f9f5f5353f7ed13a",
+      "size_bytes": 6578
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-11-ctx_0x5671e2f21d00.tracez",
+      "sha256": "d6f294c17f020dee08d1cbd10b6c3e168d9471ad60a5e4b59f0179efabd7e9e8",
+      "size_bytes": 61294
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-12-ctx_0x5671e2f21d00.tracez",
+      "sha256": "ff1eb491c48d01c11799c5e193106353e64596dc3ebdbfe6f4e5041daf969d73",
+      "size_bytes": 24974
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-13-ctx_0x5671e2f21d00.tracez",
+      "sha256": "7b906c59a8253ec9ea02c1b1fd1e9afba409c1088d592aa5226519b314614ea6",
+      "size_bytes": 1749265
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-14-ctx_0x5671e2f21d00.tracez",
+      "sha256": "470a2661531fbb76ad4bc780636c9007b71842f57c100e25d629d70ce4fd0692",
+      "size_bytes": 62772
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-15-ctx_0x5671e2f21d00.tracez",
+      "sha256": "ae4504418258a3e2f741a000a8dbfa238ed96d2b88934dc4a37eea858f9e9719",
+      "size_bytes": 12976
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-16-ctx_0x5671e2f21d00.tracez",
+      "sha256": "f7f09e8844ddeb8577aa43948e5f2a4b25144f519c3396e8d3276b85954ba25e",
+      "size_bytes": 9612
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-17-ctx_0x5671e2f21d00.tracez",
+      "sha256": "9d1be09417eadf6cb72794ed39501a66876aecf87f7736da26e7c829c8164068",
+      "size_bytes": 4834
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-18-ctx_0x5671e2f21d00.tracez",
+      "sha256": "51a102a51600b725e9a92027d358f4ca2485f041154f6e3cd3d38cc8791786b6",
+      "size_bytes": 1439926
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-19-ctx_0x5671e2f21d00.tracez",
+      "sha256": "fa77156ea1218971bc9901c22a58dd1ff12b4b36377cce0513624338d7355286",
+      "size_bytes": 9623
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-rope/traces/kernel-20-ctx_0x5671e2f21d00.tracez",
+      "sha256": "2c7d1127a49e97543a9731a37f991c5bc76e38f81374d4e16571b52c3bbbd702",
+      "size_bytes": 9520
+    },
+    {
+      "kind": "accel_sim_trace_manifest",
+      "path": "../p23_sm89_decode_bs2/tinyllama_decode_bs2_ctx16_kv17_rope_sm89_trace.json",
+      "sha256": "f11933c7255f591784d53d7f594abf79b15a3355095f9ff2b2e18917a89d9321",
+      "size_bytes": 10822
+    },
+    {
+      "kind": "standalone_operator_artifact",
+      "path": "../p23_sm89_decode_bs2/tinyllama_decode_bs2_ctx16_kv17_rope_sm89.json",
+      "sha256": "35c0528999c719ac4975d9f91239e2e77ef7de3d3a58524cafad51c8f8cbf82f",
+      "size_bytes": 11555
+    },
+    {
+      "kind": "coupled_accel_sim_backend",
+      "path": "../../backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+      "sha256": "da41dc6c68070d01dc44a1f6d7b6009d8fb1a2167868eb1f7bb34cd88ad9b8df",
+      "size_bytes": 3113
+    },
+    {
+      "kind": "cycle_coupled_qualification_record",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-range-rebase/rope/qualification_record.json",
+      "sha256": "4d9f94cf7aacea836bfa2da57a5d48c61c367fb49b04f6575107e75f94db5c33",
+      "size_bytes": 4007
+    }
+  ],
+  "qualification": {
+    "cycles": 123351,
+    "gpu_parents": 294,
+    "instructions": 6602646,
+    "outstanding": 0,
+    "performance_eligible": false,
+    "qualification_record": "/opt/gpu-atlas/qualification/p23-bs2-decode-range-rebase/rope/qualification_record.json",
+    "ramulator2_instances": 1,
+    "status": "cycle_coupled_range_rebased_pending_global_timeline"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 2,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "tinyllama.rope_decode_q1_elementwise_outer_product_sm86_replay",
+    "kv_length": 17,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "rope",
+    "phase": "decode_step",
+    "q_len": 1
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        2,
+        32,
+        1,
+        64
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        2048,
+        64,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.query",
+      "trace_base": 129802360246784
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        2,
+        4,
+        1,
+        64
+      ],
+      "size_bytes": 1024,
+      "strides": [
+        256,
+        64,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.key",
+      "trace_base": 129802360254976
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "int64",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        2,
+        1
+      ],
+      "size_bytes": 16,
+      "strides": [
+        1,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.position_ids",
+      "trace_base": 129802360256000
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float32",
+      "layout": "strided",
+      "role": "parameter",
+      "shape": [
+        32
+      ],
+      "size_bytes": 128,
+      "strides": [
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.inv_freq",
+      "trace_base": 129802360246272
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        2,
+        1,
+        64
+      ],
+      "size_bytes": 256,
+      "strides": [
+        64,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.cos",
+      "trace_base": 129802360258048
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        2,
+        1,
+        64
+      ],
+      "size_bytes": 256,
+      "strides": [
+        64,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.sin",
+      "trace_base": 129802360258560
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        2,
+        32,
+        1,
+        64
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        2048,
+        64,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.query_output",
+      "trace_base": 129802360267264
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        2,
+        4,
+        1,
+        64
+      ],
+      "size_bytes": 1024,
+      "strides": [
+        256,
+        64,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.rope.key_output",
+      "trace_base": 129802360260096
+    }
+  ]
+}

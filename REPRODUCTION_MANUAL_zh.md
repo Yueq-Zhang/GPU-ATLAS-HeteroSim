@@ -1,6 +1,6 @@
 # GPU-ATLAS-HeteroSim 中文手工复现手册
 
-本文面向希望手动构建、运行和核验 GPU-ATLAS-HeteroSim 的使用者。内容对应工程版本 `0.34.0`，记录日期为 2026-09-07。所有命令默认从工程根目录执行。
+本文面向希望手动构建、运行和核验 GPU-ATLAS-HeteroSim 的使用者。内容对应工程版本 `0.35.0`，记录日期为 2026-09-09。所有命令默认从工程根目录执行。
 
 本手册把“程序成功退出”“请求周期资格通过”和“性能资格通过”视为三个不同结论：
 
@@ -33,7 +33,7 @@
 
 ### 2.1 工程和模型
 
-- 工程版本：`0.34.0`；
+- 工程版本：`0.35.0`；
 - 当前代码基线：运行前使用`git rev-parse HEAD`记录；当前功能基线为`7303c02`加v0.30.0工作区更新，正式复现时应记录实际提交而不是只复制本行；
 - P15h/P16/P17固定模型：TinyLlama-1.1B；
 - Checkpoint revision：`fe8a4ea1ffedaf415f4da2f062534de366a451e6`；
@@ -142,7 +142,7 @@ P16的可移植证据已经纳入仓库，不再需要排除两个Artifact测试
 .venv/bin/python -m pytest tests/hetero -q
 ```
 
-v0.34.0加入P24请求控制、P25 QoS/存活性以及P23远端Batch Trace入口，当前在默认WSL环境复核为`232 passed`。测试数量可能随开发变化，应以`0 failed`为最终判据。任何失败都应视为回归或环境依赖缺失，不得用旧的P16外部目录排除条件掩盖。Windows Python不能加载Linux构建的`_heterosim_runtime`，因此必须在构建该扩展的同一个WSL环境执行完整回归。
+v0.35.0封存P23固定BS=2真实Trace统一时间线，并保留P24请求控制与P25 QoS/存活性功能资格；当前在默认WSL环境复核为`238 passed`。测试数量可能随开发变化，应以`0 failed`为最终判据。任何失败都应视为回归或环境依赖缺失，不得用旧的P16外部目录排除条件掩盖。Windows Python不能加载Linux构建的`_heterosim_runtime`，因此必须在构建该扩展的同一个WSL环境执行完整回归。
 
 ## 5. 配置预检
 
@@ -656,9 +656,21 @@ P23固定TinyLlama Layer 0、FP16、BS=2、Context=16、`q_len=1`、KV=17。下�
 ```bash
 bash scripts/run_p23_remote_bs2_capture.sh
 bash scripts/run_p23_bs2_decode_range_rebase_qualification.sh
+python3 scripts/qualify_p23_bs2_decode_timeline.py \
+  --output-root validation/p23/timeline
 ```
 
-捕获Catalog必须报告14个算子，并分别记录`capture_device_sm=89`、逐Kernel `binary_versions`和`replay_target_sm`。SM80/SM86混合序列只有在显式Ampere兼容合同下才允许继续；不得把实际版本改写为SM89。资格阶段逐算子检查双遍周期、指令和external-memory统计一致、唯一Ramulator2、地址零漏配、Parent/Child/durable守恒、零ATLAS请求与零在途。当前捕获14/14完成，双遍资格仍在远端运行。
+捕获Catalog必须报告14个算子，并分别记录`capture_device_sm=89`、逐Kernel `binary_versions`和`replay_target_sm`。SM80/SM86混合序列只有在显式Ampere兼容合同下才允许继续；不得把实际版本改写为SM89。资格阶段逐算子检查双遍周期、指令和external-memory统计一致、唯一Ramulator2、地址零漏配、Parent/Child/durable守恒、零ATLAS请求与零在途。
+
+最终时间线的两个Leg必须各完成20个任务，并在`validation/p23/timeline/qualification_record.json`中报告`qualification_passed=true`与`double_run_signature_equal=true`。固定记录的makespan为34,843,748,683,165 fs；97个Global PA范围、15条Trace绑定、5条运行时绑定、4个成员KV子区间和19条依赖均须通过。该数值未完成硬件性能校准，不得作为真实延迟。
+
+仓库不包含大型原始Trace和`backend_runs`。同步后的Manifest、逐算子资格记录、轻量时间线证据与Ready Catalog可离线核验：
+
+```bash
+python3 scripts/validate_p23_sealed_catalog.py
+```
+
+输出必须为`status=passed`、`operator_count=14`、`total_task_instances=20`、`timeline_qualified=true`和`performance_claim_allowed=false`。若需要重新进行指令Trace仿真，必须回到保存原始证据的RTX 4090远端环境。
 
 ## 20. R15：P24请求终止与KV容量
 

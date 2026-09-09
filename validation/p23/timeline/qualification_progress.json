@@ -1,0 +1,8 @@
+{
+  "completed_legs": 2,
+  "current_leg": null,
+  "qualification_record": "/home/yueqi/gpu-atlas-p22-one-layer-20260907/validation/p23/timeline/qualification_record.json",
+  "schema_version": "hetero-p23-bs2-timeline-qualification-progress/v1",
+  "status": "complete",
+  "total_legs": 2
+}

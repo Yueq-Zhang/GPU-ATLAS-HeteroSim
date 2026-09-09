@@ -1,0 +1,173 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "capture_allocator_coverage": "target_window_pytorch_allocator_plus_tensor_segments",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.causal_attention.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "driver": "595.84",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "kind": "accel_sim",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "compute_memory_coupled": false,
+    "global_pa_binding_ready": false,
+    "memory_traffic": "not_extracted",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": false,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-causal-attention/operator_metadata.json",
+      "sha256": "fdcb567901d6b16ee456382676c5f28f40274213ed0fc7274b970c4154fda7d9",
+      "size_bytes": 4352
+    },
+    {
+      "kind": "kernels_list",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-causal-attention/traces/kernelslist.g",
+      "sha256": "fff39be34d8112627f50a35b81be25743bde9e6284ce2eecbcd05d685032723a",
+      "size_bytes": 105
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-causal-attention/traces/kernel-1-ctx_0x5f2a8d23ddc0.tracez",
+      "sha256": "3b962cd9f8ff617f05240c5f5842c8ef017d2c6f83c98ad7839374cf900821a4",
+      "size_bytes": 795997
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-causal-attention/traces/kernel-2-ctx_0x5f2a8d23ddc0.tracez",
+      "sha256": "8e9a632b84e1cbf12664b9c5bb62f3badc957e68f790f587145cf84e3804ee83",
+      "size_bytes": 812106
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-causal-attention/traces/kernel-3-ctx_0x5f2a8d23ddc0.tracez",
+      "sha256": "024ff1c1466b831503310b888081a2d45483ef9339b06d2734060e6580afd645",
+      "size_bytes": 6019380
+    },
+    {
+      "kind": "accel_sim_trace_manifest",
+      "path": "tinyllama_decode_bs2_ctx16_kv17_causal_attention_sm89_trace.json",
+      "sha256": "335d311210a53b8f64bfe77cdd3372e7a1efdc9488ee74188694a9702c500d63",
+      "size_bytes": 6705
+    }
+  ],
+  "qualification": {
+    "performance_eligible": false,
+    "qualification_record": null,
+    "status": "capture_only_pending_cycle_qualification"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 2,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "torch.scaled_dot_product_attention_decode_full_kv_visibility",
+    "kv_length": 17,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "causal_attention",
+    "phase": "decode_step",
+    "q_len": 1
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        2,
+        32,
+        1,
+        64
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        2048,
+        64,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.causal_attention.query",
+      "trace_base": 126018158514688
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        2,
+        32,
+        17,
+        64
+      ],
+      "size_bytes": 139264,
+      "strides": [
+        34816,
+        1088,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.causal_attention.key",
+      "trace_base": 126018158557696
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        2,
+        32,
+        17,
+        64
+      ],
+      "size_bytes": 139264,
+      "strides": [
+        34816,
+        1088,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.causal_attention.value",
+      "trace_base": 126018158696960
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        2,
+        32,
+        1,
+        64
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        2048,
+        64,
+        64,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.causal_attention.output",
+      "trace_base": 126018158522880
+    }
+  ]
+}

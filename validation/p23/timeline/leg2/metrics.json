@@ -1,0 +1,16 @@
+{
+  "batch_size": 2,
+  "decode_steps": 1,
+  "gpu_operator_types": 14,
+  "gpu_task_instances": 15,
+  "implementation_status": "implemented_unqualified",
+  "layer_count": 1,
+  "makespan_fs": 34843748683165,
+  "performance_claim_allowed": false,
+  "qualification_boundary": "Exact BS=2 operator instruction/request timing plus live KV/runtime memory is functionally composed. Cross-kernel persistent-memory-state and device performance calibration remain closed.",
+  "request_count": 2,
+  "run_status": "request_cycle_deployment",
+  "runtime_task_instances": 5,
+  "schema_version": "hetero-p23-bs2-decode-timeline-metrics/v1",
+  "trace_coverage": 0.75
+}

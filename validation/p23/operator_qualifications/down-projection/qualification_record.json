@@ -1,0 +1,122 @@
+{
+  "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+  "claim_boundary": null,
+  "comparison": {
+    "external_memory_stats": [
+      {
+        "address_already_global": 0,
+        "address_binding_ranges": 6,
+        "address_translated": 829793,
+        "address_unmapped": 0,
+        "atlas_children": 0,
+        "atlas_completed": 0,
+        "atlas_parents": 0,
+        "child_retries": 0,
+        "children_completed": 721600,
+        "children_sent": 721600,
+        "completed": 721600,
+        "cycles": 1465932,
+        "durable_completed": 721600,
+        "gateway_cycles": 1465932,
+        "global_time_fs": 3664831272084,
+        "gpu_children": 721600,
+        "gpu_completed": 721600,
+        "gpu_cycles": 4148589,
+        "gpu_parents": 721600,
+        "instances": 1,
+        "internal_bytes": 46182400,
+        "link_cycles": 1465932,
+        "logical_bytes": 23091200,
+        "outstanding": 0,
+        "partitions": 16,
+        "reads": 721600,
+        "rejected": 102684637,
+        "request_payload_bytes": 0,
+        "request_wire_bytes": 23091200,
+        "response_payload_bytes": 23091200,
+        "response_wire_bytes": 46182400,
+        "transaction_bytes": 64,
+        "writes": 0
+      },
+      {
+        "address_already_global": 0,
+        "address_binding_ranges": 6,
+        "address_translated": 829793,
+        "address_unmapped": 0,
+        "atlas_children": 0,
+        "atlas_completed": 0,
+        "atlas_parents": 0,
+        "child_retries": 0,
+        "children_completed": 721600,
+        "children_sent": 721600,
+        "completed": 721600,
+        "cycles": 1465932,
+        "durable_completed": 721600,
+        "gateway_cycles": 1465932,
+        "global_time_fs": 3664831272084,
+        "gpu_children": 721600,
+        "gpu_completed": 721600,
+        "gpu_cycles": 4148589,
+        "gpu_parents": 721600,
+        "instances": 1,
+        "internal_bytes": 46182400,
+        "link_cycles": 1465932,
+        "logical_bytes": 23091200,
+        "outstanding": 0,
+        "partitions": 16,
+        "reads": 721600,
+        "rejected": 102684637,
+        "request_payload_bytes": 0,
+        "request_wire_bytes": 23091200,
+        "response_payload_bytes": 23091200,
+        "response_wire_bytes": 46182400,
+        "transaction_bytes": 64,
+        "writes": 0
+      }
+    ],
+    "gpu_tot_sim_cycle": [
+      4148589,
+      4148589
+    ],
+    "gpu_tot_sim_insn": [
+      32764928,
+      32764928
+    ]
+  },
+  "exact_match_required": true,
+  "overlap_evidence": [],
+  "provenance": {
+    "backend_config": "/home/yueqi/gpu-atlas-p22-one-layer-20260907/configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+    "co_resident_atlas": null,
+    "dependency_commits": {
+      "accel_sim_framework": "64653015f85fb5664c84a10f48527e8897d289d0",
+      "gpgpu_sim_distribution": "e10018b67a4b668e7b43f89280cf67624f1df4ff",
+      "ramulator2": "3996362187d7f8314936e5ad7560d93b66b6a215"
+    },
+    "environment_overrides": {},
+    "resume_completed_runs": {
+      "adapter_reused": false,
+      "enabled": true,
+      "native_baseline_reused": false
+    },
+    "trace_manifest": "/home/yueqi/gpu-atlas-p22-one-layer-20260907/configs/hetero/operator_artifacts/p23_sm89_decode_bs2/tinyllama_decode_bs2_ctx16_kv17_down_projection_sm89_trace.json"
+  },
+  "qualified_scopes": [
+    "cycle_coupled_request_response"
+  ],
+  "replay_safety_qualified": false,
+  "schema_version": "hetero-accel-sim-qualification/v1",
+  "simulation_key": "f9f3f43e1f44911a97ca54f14b70e89afc48b694a88966114703897d7864ab85",
+  "status": "passed",
+  "target_gpu": "RTX 3070 SM86 compute complex with range-rebased ATLAS-style 3D-DRAM",
+  "target_sm": 86,
+  "timing_ownership": {
+    "co_resident_atlas_core_sram_noc": false,
+    "duration_mode": "coupled",
+    "external_ramulator2": "shared3d.ramulator2",
+    "gpu_core_cache_noc": "accel_sim",
+    "gpu_local_dram": null
+  },
+  "trace_id": "tinyllama.1_1b.layer0.down_projection.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2",
+  "trace_key": "a2721ef330fb198212044e0e013b5f3b74308ec331a5b764a3c4039e2ff95084"
+}

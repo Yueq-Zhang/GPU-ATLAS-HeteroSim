@@ -1,0 +1,172 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "capture_allocator_coverage": "target_window_pytorch_allocator_plus_tensor_segments",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.layer0.attention_norm.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "driver": "595.84",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "kind": "accel_sim",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "compute_memory_coupled": false,
+    "global_pa_binding_ready": false,
+    "memory_traffic": "not_extracted",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": false,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "operator_metadata",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-attention-norm/operator_metadata.json",
+      "sha256": "8472ebd58634d36765106ebff22d9dbf76508f510cdfa759de8fc01e3e9741ca",
+      "size_bytes": 3659
+    },
+    {
+      "kind": "kernels_list",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-attention-norm/traces/kernelslist.g",
+      "sha256": "e7ccd385583c0045a7067bbf4ed5c713b584ff1d18ab5b731427ae6f318d797d",
+      "size_bytes": 280
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-attention-norm/traces/kernel-1-ctx_0x5e9b5490d760.tracez",
+      "sha256": "e716ac8d9082c6b71a8bad49bbc24c6b3f9cbdaa3074c8b454b6c8f8cfac37de",
+      "size_bytes": 67153
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-attention-norm/traces/kernel-2-ctx_0x5e9b5490d760.tracez",
+      "sha256": "4d600f636bfafce035719550e6da5fabb325b7a1b2f8053acb5f6af541298053",
+      "size_bytes": 9088
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-attention-norm/traces/kernel-3-ctx_0x5e9b5490d760.tracez",
+      "sha256": "89f3adca20e674926a59bba17cd4f89048e964b0ecaa03c2f5244bd111b31c6a",
+      "size_bytes": 33748
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-attention-norm/traces/kernel-4-ctx_0x5e9b5490d760.tracez",
+      "sha256": "4601e756a64de808b91b97eae1aea932550bbce23dd7cb37b35bd1174c7c7133",
+      "size_bytes": 5641
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-attention-norm/traces/kernel-5-ctx_0x5e9b5490d760.tracez",
+      "sha256": "70bfdc06552ba333d7422ec3d8502fd947c263824741429c1945063b06d062af",
+      "size_bytes": 8024
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-attention-norm/traces/kernel-6-ctx_0x5e9b5490d760.tracez",
+      "sha256": "555fedc4fc94ecedcff343f920b18c269d41cbc2bd026de5e2d748b628838946",
+      "size_bytes": 78884
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-attention-norm/traces/kernel-7-ctx_0x5e9b5490d760.tracez",
+      "sha256": "e4df254240fc9df9c1b0ec3d0087c7d35059744f9d7797696a62f8b1562e91aa",
+      "size_bytes": 8388
+    },
+    {
+      "kind": "instruction_trace",
+      "path": "/opt/gpu-atlas/qualification/p23-bs2-decode-capture/tinyllama-decode-bs2-ctx16-kv17-attention-norm/traces/kernel-8-ctx_0x5e9b5490d760.tracez",
+      "sha256": "07c94bc5b309b43a09cef7c47a09c29595cdf8daa99a7992cade4c36d73ca514",
+      "size_bytes": 51920
+    },
+    {
+      "kind": "accel_sim_trace_manifest",
+      "path": "tinyllama_decode_bs2_ctx16_kv17_attention_norm_sm89_trace.json",
+      "sha256": "e2c32a8672fb3303ab3fff1490013fdc04349154eb041fc73d5bb60c4d0941c2",
+      "size_bytes": 5886
+    }
+  ],
+  "qualification": {
+    "performance_eligible": false,
+    "qualification_record": null,
+    "status": "capture_only_pending_cycle_qualification"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 2,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "transformers.LlamaRMSNorm",
+    "kv_length": 17,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "attention_norm",
+    "phase": "decode_step",
+    "q_len": 1
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "input",
+      "shape": [
+        2,
+        1,
+        2048
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        2048,
+        2048,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.attention_norm.input",
+      "trace_base": 139227330433536
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "parameter",
+      "shape": [
+        2048
+      ],
+      "size_bytes": 4096,
+      "strides": [
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.attention_norm.weight",
+      "trace_base": 139227329200128
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "float16",
+      "layout": "strided",
+      "role": "output",
+      "shape": [
+        2,
+        1,
+        2048
+      ],
+      "size_bytes": 8192,
+      "strides": [
+        2048,
+        2048,
+        1
+      ],
+      "tensor_id": "tinyllama.decode.kv17.layer0.attention_norm.output",
+      "trace_base": 139227330449920
+    }
+  ]
+}

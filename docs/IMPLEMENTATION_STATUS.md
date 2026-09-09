@@ -1,5 +1,14 @@
 # Implementation status
 
+## 2026-09-09 — v0.35.0 / P23 sealed fused-BS=2 Decode timeline
+
+- P23 now closes the exact TinyLlama-1.1B Layer-0 FP16, BS=2, Context=16, `q_len=1`, KV=17 functional milestone. All fourteen GPU operator types were compiled/loaded, executed and captured on the remote RTX 4090; fifteen GPU Trace instances plus five runtime/lifecycle tasks form one twenty-task timeline.
+- Both isolated timeline legs pass with the same `34,843,748,683,165 fs` makespan, 39,442,237 aggregate GPU cycles, 371,403,956 instructions, 6,862,620 GPU Parents, 6,863,691 Children and 69 runtime-memory Parents per leg. Every request is durable-complete and the run exits with zero outstanding work.
+- The seal verifies 97 non-overlapping Global PA allocations, fifteen Trace bindings, five runtime bindings, four per-request K/V slices, nineteen dependency edges, one non-overlapping `gpu0` resource timeline, KV length 16→17, version visibility before Attention and final request/KV retirement.
+- Repository evidence includes the remote capture Catalog, fourteen source and fourteen coupled Artifact manifests, fourteen per-operator qualification records, the two lightweight timeline legs, the final timeline qualification and a path/hash-checked Ready Catalog. Raw NVBit/Accel-Sim traces and `backend_runs` remain on the remote evidence host and are intentionally excluded from Git.
+- `scripts/validate_p23_sealed_catalog.py` validates the repository seal without pretending that omitted raw traces are locally replayable. The milestone remains functional-only: capture SM89, actual SM80/SM86 library binaries, replay target SM86, persistent DRAM state across separate kernel replay processes and hardware performance calibration remain distinct claims. `performance_claim_allowed=false`.
+- Verification after sealing: 238 Python tests and all 9 CTest targets pass in WSL; the P23 offline seal validator passes. The legacy Python 3.10 build directory is stale, while the active Python 3.12 WSL build completes successfully.
+
 ## 2026-09-07 — v0.34.0 / P23 remote capture plus P24-P25 functional qualification
 
 - P23 now has a remote-only SASS acquisition pipeline for TinyLlama Layer 0, FP16, BS=2, Context=16, `q_len=1`, KV=17. All 14 GPU operator traces were compiled/loaded, executed and captured on the RTX 4090 host; the local RTX 3070 is not an allowed SASS source for this milestone.

@@ -1,0 +1,118 @@
+{
+  "events": [
+    {
+      "event": "ADMIT",
+      "request_id": "R0",
+      "time_fs": 0
+    },
+    {
+      "event": "ADMIT",
+      "request_id": "R1",
+      "time_fs": 0
+    },
+    {
+      "event": "ALLOCATE_KV",
+      "request_id": "R0",
+      "time_fs": 125224971
+    },
+    {
+      "event": "ALLOCATE_KV",
+      "request_id": "R1",
+      "time_fs": 125224971
+    },
+    {
+      "event": "COMMIT_KV_APPEND",
+      "request_id": "R0",
+      "time_fs": 1845807203772
+    },
+    {
+      "event": "COMMIT_KV_APPEND",
+      "request_id": "R1",
+      "time_fs": 1845807203772
+    },
+    {
+      "event": "TOKEN_READY",
+      "request_id": "R0",
+      "time_fs": 34843648193177
+    },
+    {
+      "event": "TOKEN_READY",
+      "request_id": "R1",
+      "time_fs": 34843648193177
+    },
+    {
+      "event": "FINISH",
+      "request_id": "R0",
+      "time_fs": 34843648859844
+    },
+    {
+      "event": "FINISH",
+      "request_id": "R1",
+      "time_fs": 34843648859844
+    },
+    {
+      "event": "RETIRE_AND_RELEASE",
+      "request_id": "R0",
+      "time_fs": 34843748683165
+    },
+    {
+      "event": "RETIRE_AND_RELEASE",
+      "request_id": "R1",
+      "time_fs": 34843748683165
+    }
+  ],
+  "requests": [
+    {
+      "admission_time_fs": 0,
+      "allocation_complete_time_fs": 125224971,
+      "arrival_time_fs": 0,
+      "final_committed_kv_length": 17,
+      "final_kv_version": 1,
+      "final_state": "FINISHED",
+      "finish_time_fs": 34843648859844,
+      "generated_tokens": 1,
+      "initial_kv_length": 16,
+      "initial_kv_version": 0,
+      "kv_append_complete_time_fs": 1845807203772,
+      "request_id": "R0",
+      "retire_time_fs": 34843748683165,
+      "token_ready_time_fs": 34843648193177
+    },
+    {
+      "admission_time_fs": 0,
+      "allocation_complete_time_fs": 125224971,
+      "arrival_time_fs": 0,
+      "final_committed_kv_length": 17,
+      "final_kv_version": 1,
+      "final_state": "FINISHED",
+      "finish_time_fs": 34843648859844,
+      "generated_tokens": 1,
+      "initial_kv_length": 16,
+      "initial_kv_version": 0,
+      "kv_append_complete_time_fs": 1845807203772,
+      "request_id": "R1",
+      "retire_time_fs": 34843748683165,
+      "token_ready_time_fs": 34843648193177
+    }
+  ],
+  "schema_version": "hetero-p23-bs2-request-lifecycle/v1",
+  "version_commits": [
+    {
+      "cause_task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append",
+      "commit_time_fs": 1845807203772,
+      "committed_kv_length": 17,
+      "from_version": 0,
+      "request_id": "R0",
+      "to_version": 1
+    },
+    {
+      "cause_task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append",
+      "commit_time_fs": 1845807203772,
+      "committed_kv_length": 17,
+      "from_version": 0,
+      "request_id": "R1",
+      "to_version": 1
+    }
+  ],
+  "zero_in_flight": true
+}

@@ -7,9 +7,9 @@ host control events and therefore produce no device-memory traffic.
 
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Mapping, Sequence
 
 from .global_memory_map import GlobalAllocation
 from .ir import ModelNode
@@ -96,7 +96,7 @@ def plan_runtime_task_requests(
     if contract.model_kind == "fixed_control":
         if estimate.memory_transactions:
             raise RuntimeTaskMemoryError("host control task unexpectedly has traffic")
-        return tuple()
+        return ()
 
     if contract.model_kind == "metadata_state":
         if binding.metadata_base_address is None:
@@ -136,92 +136,121 @@ def plan_runtime_task_requests(
                 )
             )
     elif contract.model_kind == "kv_copy_engine":
-        if len(binding.input_values) != 3 or len(binding.output_values) != 3:
+        if len(binding.input_values) not in {3, 5} or len(binding.output_values) != 3:
             raise RuntimeTaskMemoryError(
-                "kv_append requires positioned/K/V inputs and query/K/V outputs"
+                "kv_append requires packed-positioned/K/V or split-Q/K/V/K/V "
+                "inputs and query/K/V outputs"
             )
-        positioned = _allocation(binding.input_values[0], allocations)
         key_output = _allocation(binding.output_values[1], allocations)
         value_output = _allocation(binding.output_values[2], allocations)
         batch = int(node.attributes.get("batch_size", 1))
         q_len = int(node.attributes.get("q_len", 1))
         past_len = int(node.attributes.get("past_kv_len", 0))
-        query_bytes = batch * q_len * model.hidden_size * model.bytes_per_element
-        one_kv_bytes = (
-            batch
-            * q_len
-            * model.num_kv_heads
-            * model.head_dim
-            * model.bytes_per_element
+        kv_token_bytes = model.num_kv_heads * model.head_dim * model.bytes_per_element
+        member_kv_bytes = q_len * kv_token_bytes
+        attention_kv_len = int(
+            node.attributes.get("attention_kv_len", past_len + q_len)
         )
-        destination_offset = (
-            batch
-            * past_len
-            * model.num_kv_heads
-            * model.head_dim
-            * model.bytes_per_element
-        )
-        if query_bytes + 2 * one_kv_bytes > positioned.size_bytes:
-            raise RuntimeTaskMemoryError("packed QKV source range is too small")
-        if destination_offset + one_kv_bytes > min(
+        member_cache_stride = attention_kv_len * kv_token_bytes
+
+        if len(binding.input_values) == 3:
+            positioned = _allocation(binding.input_values[0], allocations)
+            member_query_bytes = q_len * model.hidden_size * model.bytes_per_element
+            member_packed_bytes = member_query_bytes + 2 * member_kv_bytes
+            if batch * member_packed_bytes > positioned.size_bytes:
+                raise RuntimeTaskMemoryError("packed QKV source range is too small")
+            source_records: list[tuple[Mapping[str, object], int, str]] = []
+            for member_index in range(batch):
+                member_base = (
+                    positioned.base_address + member_index * member_packed_bytes
+                )
+                source_records.extend(
+                    (
+                        (
+                            binding.input_values[0],
+                            member_base + member_query_bytes,
+                            "kv_append.key_source",
+                        ),
+                        (
+                            binding.input_values[0],
+                            member_base + member_query_bytes + member_kv_bytes,
+                            "kv_append.value_source",
+                        ),
+                    )
+                )
+        else:
+            key_source = _allocation(binding.input_values[1], allocations)
+            value_source = _allocation(binding.input_values[2], allocations)
+            if batch * member_kv_bytes > min(
+                key_source.size_bytes, value_source.size_bytes
+            ):
+                raise RuntimeTaskMemoryError("split K/V source range is too small")
+            source_records = []
+            for member_index in range(batch):
+                source_records.extend(
+                    (
+                        (
+                            binding.input_values[1],
+                            key_source.base_address + member_index * member_kv_bytes,
+                            "kv_append.key_source",
+                        ),
+                        (
+                            binding.input_values[2],
+                            value_source.base_address + member_index * member_kv_bytes,
+                            "kv_append.value_source",
+                        ),
+                    )
+                )
+
+        if batch * member_cache_stride > min(
             key_output.size_bytes, value_output.size_bytes
         ):
             raise RuntimeTaskMemoryError("KV destination range is too small")
-        source_version = int(binding.input_values[0]["version"])
-        for value_id, address, semantic in (
-            (
-                str(binding.input_values[0]["value_id"]),
-                positioned.base_address + query_bytes,
-                "kv_append.key_source",
-            ),
-            (
-                str(binding.input_values[0]["value_id"]),
-                positioned.base_address + query_bytes + one_kv_bytes,
-                "kv_append.value_source",
-            ),
-        ):
-            requests.extend(
-                _chunks(
-                    task_id=binding.task_id,
-                    value_id=value_id,
-                    value_version=source_version,
-                    operation="read",
-                    base_address=address,
-                    size_bytes=one_kv_bytes,
-                    transaction_bytes=contract.transaction_bytes,
-                    semantic=semantic,
+        for member_index in range(batch):
+            for raw, source_address, semantic in source_records[
+                2 * member_index : 2 * member_index + 2
+            ]:
+                requests.extend(
+                    _chunks(
+                        task_id=binding.task_id,
+                        value_id=str(raw["value_id"]),
+                        value_version=int(raw["version"]),
+                        operation="read",
+                        base_address=source_address,
+                        size_bytes=member_kv_bytes,
+                        transaction_bytes=contract.transaction_bytes,
+                        semantic=f"{semantic}.member{member_index}",
+                    )
                 )
+            destination_offset = (
+                member_index * member_cache_stride + past_len * kv_token_bytes
             )
-        for raw, allocation, semantic in (
-            (binding.output_values[1], key_output, "kv_append.key_destination"),
-            (binding.output_values[2], value_output, "kv_append.value_destination"),
-        ):
-            requests.extend(
-                _chunks(
-                    task_id=binding.task_id,
-                    value_id=str(raw["value_id"]),
-                    value_version=int(raw["version"]),
-                    operation="write",
-                    base_address=allocation.base_address + destination_offset,
-                    size_bytes=one_kv_bytes,
-                    transaction_bytes=contract.transaction_bytes,
-                    semantic=semantic,
+            for raw, allocation, semantic in (
+                (binding.output_values[1], key_output, "kv_append.key_destination"),
+                (binding.output_values[2], value_output, "kv_append.value_destination"),
+            ):
+                requests.extend(
+                    _chunks(
+                        task_id=binding.task_id,
+                        value_id=str(raw["value_id"]),
+                        value_version=int(raw["version"]),
+                        operation="write",
+                        base_address=allocation.base_address + destination_offset,
+                        size_bytes=member_kv_bytes,
+                        transaction_bytes=contract.transaction_bytes,
+                        semantic=f"{semantic}.member{member_index}",
+                    )
                 )
-            )
     else:
         raise RuntimeTaskMemoryError(
             f"unsupported live runtime model {contract.model_kind}"
         )
 
     read_bytes = sum(
-        int(item["size_bytes"])
-        for item in requests
-        if item["operation"] == "read"
+        int(item["size_bytes"]) for item in requests if item["operation"] == "read"
     )
     write_bytes = sum(
-        int(item["size_bytes"])
-        for item in requests
-        if item["operation"] == "write"
+        int(item["size_bytes"]) for item in requests if item["operation"] == "write"
     )
     if (
         read_bytes != estimate.memory_read_bytes
@@ -250,8 +279,8 @@ def run_runtime_task_memory(
     if not requests:
         return RuntimeTaskMemoryResult(
             duration_fs=estimate.duration_fs,
-            requests=tuple(),
-            completions=tuple(),
+            requests=(),
+            completions=(),
             statistics={
                 "instances": 0,
                 "accepted_parent_ids": 0,

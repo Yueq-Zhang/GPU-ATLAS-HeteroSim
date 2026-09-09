@@ -1,0 +1,29 @@
+{
+  "schema_version": "hetero-p23-bs2-decode-timeline/v1",
+  "experiment": {
+    "name": "p23_tinyllama_decode1_1layer_bs2_real_trace",
+    "generation_mode": "trace_locked"
+  },
+  "model_ref": "configs/hetero/models/tinyllama_1_1b_decode_1layer_fp16.json",
+  "placement_ref": "configs/hetero/placements/gpu_only_shared_3ddram.json",
+  "address_ref": "configs/hetero/addresses/tinyllama11b_prefill_global_pa.json",
+  "execution": {
+    "ready_catalog_ref": "validation/p23/ready_catalog.json",
+    "source_root": "configs/hetero/operator_artifacts/p23_sm89_decode_bs2",
+    "coupled_root": "configs/hetero/operator_artifacts/p23_sm89_decode_bs2_coupled",
+    "gpu_backend_ref": "configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+    "runtime_task_model_ref": "configs/hetero/runtime_tasks/tinyllama_decode1_bs2_ctx16_uncalibrated.json"
+  },
+  "batch": {
+    "request_ids": ["R0", "R1"],
+    "batch_size": 2,
+    "context_length": 16,
+    "q_len": 1,
+    "kv_length": 17,
+    "layers": [0]
+  },
+  "claim_boundary": {
+    "performance_claim_allowed": false,
+    "reason": "Functional instruction/request-cycle integration only; performance calibration remains open."
+  }
+}

@@ -1,0 +1,1074 @@
+{
+  "nodes": [
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "runtime",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [],
+      "kind": "control",
+      "layer_id": null,
+      "node_id": "P23-BS2-DECODE-R0-R1.request_start",
+      "op": "request_start",
+      "phase": "control",
+      "read_values": [],
+      "step_id": 0,
+      "write_values": []
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "runtime",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.request_start"
+      ],
+      "kind": "state",
+      "layer_id": null,
+      "node_id": "P23-BS2-DECODE-R0-R1.kv_allocate",
+      "op": "kv_allocate",
+      "phase": "control",
+      "read_values": [],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.kv.l0.k",
+        "P23-BS2-DECODE-R0-R1.kv.l0.v"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "embedding",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.kv_allocate"
+      ],
+      "kind": "compute",
+      "layer_id": null,
+      "node_id": "P23-BS2-DECODE-R0-R1.token_embedding",
+      "op": "token_embedding",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.token_ids",
+        "model.tok_embeddings.weight"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.hidden.embedding"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "norm",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.token_embedding"
+      ],
+      "kind": "compute",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.attention_norm",
+      "op": "attention_norm",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.hidden.embedding",
+        "model.layers.0.attention_norm.weight"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.hidden.attention_norm"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "attention",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.attention_norm"
+      ],
+      "kind": "compute",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.qkv_projection",
+      "op": "qkv_projection",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.hidden.attention_norm",
+        "model.layers.0.q.weight",
+        "model.layers.0.k.weight",
+        "model.layers.0.v.weight"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.q",
+        "P23-BS2-DECODE-R0-R1.k_new",
+        "P23-BS2-DECODE-R0-R1.v_new"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "attention",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.qkv_projection"
+      ],
+      "kind": "compute",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.rope",
+      "op": "rope",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.q",
+        "P23-BS2-DECODE-R0-R1.k_new"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.q_rot",
+        "P23-BS2-DECODE-R0-R1.k_rot"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "attention",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.rope"
+      ],
+      "kind": "state",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.kv_append",
+      "op": "kv_append",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.q_rot",
+        "P23-BS2-DECODE-R0-R1.k_rot",
+        "P23-BS2-DECODE-R0-R1.v_new",
+        "P23-BS2-DECODE-R0-R1.kv.l0.k",
+        "P23-BS2-DECODE-R0-R1.kv.l0.v"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.query",
+        "P23-BS2-DECODE-R0-R1.kv.l0.k",
+        "P23-BS2-DECODE-R0-R1.kv.l0.v"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "attention",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.kv_append"
+      ],
+      "kind": "compute",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.causal_attention",
+      "op": "causal_attention",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.query",
+        "P23-BS2-DECODE-R0-R1.kv.l0.k",
+        "P23-BS2-DECODE-R0-R1.kv.l0.v"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.attention.context"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "attention",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.causal_attention"
+      ],
+      "kind": "compute",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.output_projection",
+      "op": "output_projection",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.attention.context",
+        "model.layers.0.output.weight"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.attention.projected"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "attention",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.output_projection"
+      ],
+      "kind": "compute",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.attention_residual",
+      "op": "residual_add",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.hidden.embedding",
+        "P23-BS2-DECODE-R0-R1.attention.projected"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.attention.residual"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "mlp",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.attention_residual"
+      ],
+      "kind": "compute",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.mlp_norm",
+      "op": "mlp_norm",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.attention.residual",
+        "model.layers.0.mlp_norm.weight"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.hidden.mlp_norm"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "mlp",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.mlp_norm"
+      ],
+      "kind": "compute",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.gate_up_projection",
+      "op": "gate_up_projection",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.hidden.mlp_norm",
+        "model.layers.0.gate.weight",
+        "model.layers.0.up.weight"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.mlp.gate",
+        "P23-BS2-DECODE-R0-R1.mlp.up"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "mlp",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.gate_up_projection"
+      ],
+      "kind": "compute",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.silu_multiply",
+      "op": "silu_multiply",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.mlp.gate",
+        "P23-BS2-DECODE-R0-R1.mlp.up"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.mlp.activated"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "mlp",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.silu_multiply"
+      ],
+      "kind": "compute",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.down_projection",
+      "op": "down_projection",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.mlp.activated",
+        "model.layers.0.down.weight"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.mlp.down"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "mlp",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.down_projection"
+      ],
+      "kind": "compute",
+      "layer_id": 0,
+      "node_id": "P23-BS2-DECODE-R0-R1.l0.mlp_residual",
+      "op": "residual_add",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.attention.residual",
+        "P23-BS2-DECODE-R0-R1.mlp.down"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.layer.output"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "finalize",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.l0.mlp_residual"
+      ],
+      "kind": "compute",
+      "layer_id": null,
+      "node_id": "P23-BS2-DECODE-R0-R1.final_norm",
+      "op": "final_norm",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.layer.output",
+        "model.final_norm.weight"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.final_norm"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "finalize",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.final_norm"
+      ],
+      "kind": "compute",
+      "layer_id": null,
+      "node_id": "P23-BS2-DECODE-R0-R1.lm_head",
+      "op": "lm_head",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.final_norm",
+        "model.lm_head.weight"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.logits"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "finalize",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.lm_head"
+      ],
+      "kind": "compute",
+      "layer_id": null,
+      "node_id": "P23-BS2-DECODE-R0-R1.sampling",
+      "op": "sampling",
+      "phase": "decode",
+      "read_values": [
+        "P23-BS2-DECODE-R0-R1.logits"
+      ],
+      "step_id": 0,
+      "write_values": [
+        "P23-BS2-DECODE-R0-R1.token"
+      ]
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "runtime",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.sampling"
+      ],
+      "kind": "control",
+      "layer_id": null,
+      "node_id": "P23-BS2-DECODE-R0-R1.request_finish",
+      "op": "request_finish",
+      "phase": "control",
+      "read_values": [],
+      "step_id": 0,
+      "write_values": []
+    },
+    {
+      "attributes": {
+        "attention_kv_len": 17,
+        "batch_member_request_ids": [
+          "R0",
+          "R1"
+        ],
+        "batch_size": 2,
+        "context_length": 16,
+        "operator_group": "runtime",
+        "past_kv_len": 16,
+        "q_len": 1
+      },
+      "dependencies": [
+        "P23-BS2-DECODE-R0-R1.request_finish"
+      ],
+      "kind": "state",
+      "layer_id": null,
+      "node_id": "P23-BS2-DECODE-R0-R1.kv_release",
+      "op": "kv_release",
+      "phase": "control",
+      "read_values": [],
+      "step_id": 0,
+      "write_values": []
+    }
+  ],
+  "schema_version": "hetero-model-graph/v2",
+  "values": [
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        32000,
+        2048
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.tok_embeddings.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        2048
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.attention_norm.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        2048,
+        2048
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.q.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        256,
+        2048
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.k.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        256,
+        2048
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.v.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        2048,
+        2048
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.output.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        2048
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.mlp_norm.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        5632,
+        2048
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.gate.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        5632,
+        2048
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.up.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        2048,
+        5632
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.down.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        2048
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.final_norm.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "static",
+      "mutable": false,
+      "shape_expr": [
+        32000,
+        2048
+      ],
+      "storage_class": "parameter",
+      "value_id": "model.lm_head.weight"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "int64",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1
+      ],
+      "storage_class": "metadata",
+      "value_id": "P23-BS2-DECODE-R0-R1.token_ids"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.hidden.embedding"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.hidden.attention_norm"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.q"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        256
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.k_new"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        256
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.v_new"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.q_rot"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        256
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.k_rot"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": true,
+      "shape_expr": [
+        2,
+        "kv_tokens",
+        4,
+        64
+      ],
+      "storage_class": "kv_cache",
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.k"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": true,
+      "shape_expr": [
+        2,
+        "kv_tokens",
+        4,
+        64
+      ],
+      "storage_class": "kv_cache",
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.v"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.query"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.attention.context"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.attention.projected"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.attention.residual"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.hidden.mlp_norm"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        5632
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.gate"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        5632
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.up"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        5632
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.activated"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.down"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.layer.output"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        2048
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.final_norm"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "fp16",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2,
+        1,
+        32000
+      ],
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.logits"
+    },
+    {
+      "alias_or_view": null,
+      "dtype": "int64",
+      "layout": "row_major",
+      "lifetime": "request",
+      "mutable": false,
+      "shape_expr": [
+        2
+      ],
+      "storage_class": "metadata",
+      "value_id": "P23-BS2-DECODE-R0-R1.token"
+    }
+  ]
+}

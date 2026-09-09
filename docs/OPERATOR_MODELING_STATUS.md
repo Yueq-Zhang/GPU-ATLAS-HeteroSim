@@ -1,20 +1,21 @@
 # 算子建模与测试状态
 
-更新日期：2026-09-07
+更新日期：2026-09-09
 Prefill权威机器记录：`configs/hetero/operator_capabilities/tinyllama_prefill_layer0_bs1_ctx16.json`
 Decode单步权威机器记录：`configs/hetero/operator_capabilities/tinyllama_decode_{1,22}layer_bs1_ctx16_p19.json`
 Decode四步权威机器记录：`configs/hetero/operator_capabilities/tinyllama_decode4_{1,22}layer_bs1_ctx16_p20.json`
 多Batch权威机器记录：`configs/hetero/operator_capabilities/p22_multi_batch_functional.json`
+P23真实BS=2 Decode权威机器记录：`validation/p23/ready_catalog.json`、`validation/p23/timeline/qualification_record.json`
 请求控制权威机器记录：`validation/p24/qualification_record.json`
 QoS/存活性权威机器记录：`validation/p25/qualification_record.json`
 
 ## P23–P25增量状态
 
-- P23：TinyLlama Layer 0、FP16、BS=2、Context=16、KV=17的14类GPU算子已全部在远端RTX 4090完成SASS/NVBit捕获；逐Kernel实际Binary为SM80、SM86或显式混合Ampere序列。Range-Rebase双遍资格正在运行，完成前这些新Artifact不得标记为整层Batch Ready。
+- P23：TinyLlama Layer 0、FP16、BS=2、Context=16、KV=17的14类GPU算子已全部在远端RTX 4090完成SASS/NVBit捕获和独立Range-Rebase资格；15个GPU实例、KV Append与四个请求/KV生命周期任务组成的20任务统一时间线也已完成双遍功能资格。封存Catalog标记`timeline_integration_ready=true`，但`performance_eligible=false`。
 - P24：EOS、最大生成长度、等待/活跃取消、KV容量Admission、Retire释放和Global PA first-fit复用已完成两组单层双遍功能资格。
 - P25：GPU/ATLAS确定性加权公平、优先级、饥饿上界和deadlock/livelock Watchdog已完成功能资格；BookSim2未激活，所有时间单位仍是调度微周期。
 
-P23的SASS获取位置是身份合同的一部分：编译/加载、Kernel执行、SASS读取和NVBit捕获必须共置于远端RTX 4090。本地RTX 3070只保存同步回来的证据，不得生成替代Trace。捕获设备SM89不等于所有Library Kernel的SASS Binary Version，二者必须分别报告。
+P23的SASS获取位置是身份合同的一部分：编译/加载、Kernel执行、SASS读取和NVBit捕获必须共置于远端RTX 4090。本地只封存Artifact Manifest、资格记录及哈希，不得生成替代Trace。捕获设备SM89不等于所有Library Kernel的SASS Binary Version，二者必须分别报告。当前封存仅适用于固定BS=2、Context=16、`q_len=1`、KV=17；KV长度、Batch、Ragged成员、模型或dtype变化均需要新的精确捕获和资格。
 
 ## P22 多Batch功能覆盖
 

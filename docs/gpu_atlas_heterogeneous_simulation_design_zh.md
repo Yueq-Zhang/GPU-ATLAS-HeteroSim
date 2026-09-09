@@ -5,7 +5,7 @@
 | 字段 | 内容 |
 | --- | --- |
 | 状态 | 已冻结的实现基线 |
-| 版本 | 1.35 |
+| 版本 | 1.36 |
 | 日期 | 2026-09-07 |
 | 适用工程 | ATLAS-MICRO-2026 |
 | 当前基线提交 | 7303c02（另含v0.30.0工作区更新） |
@@ -2844,6 +2844,10 @@ Accel-Sim 2.0把SM80与SM86映射到同一Ampere Opcode Map，因此P23允许显
 
 14类GPU算子逐个执行Range-Rebase双遍资格，检查周期、指令、external-memory统计、唯一Ramulator2、地址覆盖、Parent/Child/durable守恒、零ATLAS请求和零在途。只有全部通过后才能生成P23 Ready Catalog；之后还必须补齐KV Append并把精确Artifact周期接入一个共享BS=2单层时间线，才可关闭P23功能里程碑。
 
+P23最终封存满足上述门禁。固定时间线含14类、15个GPU Trace实例，Residual Add出现两次；加上KV Append、Request Start/Finish和KV Allocate/Release后共20个任务。两个隔离Leg的总时长均为34,843,748,683,165 fs，GPU周期、指令、external-memory统计及全签名一致；97个Global PA分配、15条Trace绑定、5条运行时绑定、R0/R1四个KV子区间、19条依赖、`gpu0`互斥、KV 16→17和完成时版本提交均通过。封存Catalog必须同时引用捕获Catalog、14份逐算子资格记录和统一时间线资格记录，并对仓库内Manifest与记录执行SHA-256校验。原始Trace和Backend缓存可保留在远端证据库，不得因未提交Git而把封存状态误写为本地可重放。
+
+该完成状态只关闭固定Shape的功能资格。`timeline_integration_ready=true`不得推导为`performance_eligible=true`；跨Kernel持久DRAM状态、RTX4090/目标SM86硬件校准、KV=18–20、Ragged Shape及其他模型仍需分别实现和资格。
+
 ### 25.13 P24请求终止与容量生命周期
 
 请求可携带重放式EOS位置、最大输出Token数和显式取消时刻。EOS/最大长度在Token完成时自然退休；取消只在token-step barrier采样，前一Epoch已发工作必须先提交。等待中与已激活请求均可取消，且每个请求只能产生一个终止原因：`completed/eos/max_length/cancelled`。
@@ -2974,3 +2978,4 @@ GPU算子必须由框架实际选择的执行程序在目标SM上完成编译/�
 | 1.33 | 2026-09-04 | 冻结推理框架接入F0–F8路线：框架负责数值、GPU负责真实Trace、ATLAS负责Tensor IR编译、仿真器负责shadow时序；记录Hugging Face、Tensor/Global PA、Trace Catalog、vLLM、TensorRT-LLM和端到端资格待办 |
 | 1.34 | 2026-09-07 | 完成P22多Batch功能周期闭环：实现Static/Continuous请求状态机、KV容量Admission/Retire、Homogeneous/Padding/Ragged Split、GPU/ATLAS设备Sub-Batch和动态Global PA生命周期双遍资格；冻结真实Batched/Fused Kernel与性能资格仍未完成的边界 |
 | 1.35 | 2026-09-07 | 完成P24 EOS/最大长度/取消/KV容量与Global PA复用功能资格，以及P25确定性QoS、公平性和死锁/活锁Watchdog资格；启动P23远端RTX 4090专属SASS/BS=2 Trace与Range-Rebase双遍流程，并冻结混合Ampere SASS、BookSim2未激活及性能未资格边界 |
+| 1.36 | 2026-09-09 | 完成并封存P23固定TinyLlama Layer-0、BS=2、Context=16、KV=17的14类远端Trace、15个GPU实例、KV Append和20任务统一时间线双遍功能资格；增加仓库相对证据链与离线Seal校验，同时继续冻结原始Trace远端保存、跨Shape不可外推及性能未资格边界 |

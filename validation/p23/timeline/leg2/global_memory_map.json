@@ -1,0 +1,2208 @@
+{
+  "address_semantics": "allocated_global_pa_range_rebased",
+  "alignment_bytes": 64,
+  "allocated_bytes": 451284160,
+  "allocation_count": 97,
+  "batch_member_kv_slices": [
+    {
+      "base_address": 350236672,
+      "committed_kv_length": 17,
+      "end_address_exclusive": 350245376,
+      "initial_kv_length": 16,
+      "kind": "k",
+      "member_index": 0,
+      "request_id": "R0",
+      "size_bytes": 8704,
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.k"
+    },
+    {
+      "base_address": 350245376,
+      "committed_kv_length": 17,
+      "end_address_exclusive": 350254080,
+      "initial_kv_length": 16,
+      "kind": "k",
+      "member_index": 1,
+      "request_id": "R1",
+      "size_bytes": 8704,
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.k"
+    },
+    {
+      "base_address": 350254080,
+      "committed_kv_length": 17,
+      "end_address_exclusive": 350262784,
+      "initial_kv_length": 16,
+      "kind": "v",
+      "member_index": 0,
+      "request_id": "R0",
+      "size_bytes": 8704,
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.v"
+    },
+    {
+      "base_address": 350262784,
+      "committed_kv_length": 17,
+      "end_address_exclusive": 350271488,
+      "initial_kv_length": 16,
+      "kind": "v",
+      "member_index": 1,
+      "request_id": "R1",
+      "size_bytes": 8704,
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.v"
+    }
+  ],
+  "capacity_bytes": 4294967296,
+  "external_input_shadow_count": 3,
+  "high_address_reserved_bytes": 278784,
+  "low_address_watermark_bytes": 451005376,
+  "memory_space_id": "shared0.dram3d",
+  "non_overlapping": true,
+  "operator_workspace_count": 59,
+  "ranges": [
+    {
+      "alignment_bytes": 64,
+      "base_address": 0,
+      "dtype": "fp16",
+      "end_address_exclusive": 4096,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "parameter",
+      "value_id": "model.final_norm.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 4096,
+      "dtype": "fp16",
+      "end_address_exclusive": 8192,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.attention_norm.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 8192,
+      "dtype": "fp16",
+      "end_address_exclusive": 23076864,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 23068672,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.down.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 23076864,
+      "dtype": "fp16",
+      "end_address_exclusive": 46145536,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 23068672,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.gate.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 46145536,
+      "dtype": "fp16",
+      "end_address_exclusive": 47194112,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1048576,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.k.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 47194112,
+      "dtype": "fp16",
+      "end_address_exclusive": 47198208,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.mlp_norm.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 47198208,
+      "dtype": "fp16",
+      "end_address_exclusive": 55586816,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8388608,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.output.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 55586816,
+      "dtype": "fp16",
+      "end_address_exclusive": 63975424,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8388608,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.q.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 63975424,
+      "dtype": "fp16",
+      "end_address_exclusive": 87044096,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 23068672,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.up.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 87044096,
+      "dtype": "fp16",
+      "end_address_exclusive": 88092672,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1048576,
+      "storage_class": "parameter",
+      "value_id": "model.layers.0.v.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 88092672,
+      "dtype": "fp16",
+      "end_address_exclusive": 219164672,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 131072000,
+      "storage_class": "parameter",
+      "value_id": "model.lm_head.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 219164672,
+      "dtype": "fp16",
+      "end_address_exclusive": 350236672,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 131072000,
+      "storage_class": "parameter",
+      "value_id": "model.tok_embeddings.weight"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350236672,
+      "dtype": "fp16",
+      "end_address_exclusive": 350254080,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 17408,
+      "storage_class": "kv_cache",
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.k"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350254080,
+      "dtype": "fp16",
+      "end_address_exclusive": 350271488,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 17408,
+      "storage_class": "kv_cache",
+      "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.v"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350271488,
+      "dtype": "fp16",
+      "end_address_exclusive": 350279680,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.attention.context"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350279680,
+      "dtype": "fp16",
+      "end_address_exclusive": 350287872,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.attention.projected"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350287872,
+      "dtype": "fp16",
+      "end_address_exclusive": 350296064,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.attention.residual"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350296064,
+      "dtype": "fp16",
+      "end_address_exclusive": 350304256,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.final_norm"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350304256,
+      "dtype": "fp16",
+      "end_address_exclusive": 350312448,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.hidden.attention_norm"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350312448,
+      "dtype": "fp16",
+      "end_address_exclusive": 350320640,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.hidden.embedding"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350320640,
+      "dtype": "fp16",
+      "end_address_exclusive": 350328832,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.hidden.mlp_norm"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350328832,
+      "dtype": "fp16",
+      "end_address_exclusive": 350329856,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1024,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.k_new"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350329856,
+      "dtype": "fp16",
+      "end_address_exclusive": 350330880,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1024,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.k_rot"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350330880,
+      "dtype": "fp16",
+      "end_address_exclusive": 350339072,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.layer.output"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350339072,
+      "dtype": "fp16",
+      "end_address_exclusive": 350467072,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 128000,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.logits"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350467072,
+      "dtype": "fp16",
+      "end_address_exclusive": 350489600,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 22528,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.activated"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350489600,
+      "dtype": "fp16",
+      "end_address_exclusive": 350497792,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.down"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350497792,
+      "dtype": "fp16",
+      "end_address_exclusive": 350520320,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 22528,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.gate"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350520320,
+      "dtype": "fp16",
+      "end_address_exclusive": 350542848,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 22528,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.mlp.up"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350542848,
+      "dtype": "fp16",
+      "end_address_exclusive": 350551040,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.q"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350551040,
+      "dtype": "fp16",
+      "end_address_exclusive": 350559232,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.q_rot"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350559232,
+      "dtype": "fp16",
+      "end_address_exclusive": 350567424,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.query"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350567424,
+      "dtype": "fp16",
+      "end_address_exclusive": 350568448,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1024,
+      "storage_class": "activation",
+      "value_id": "P23-BS2-DECODE-R0-R1.v_new"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350568448,
+      "dtype": "int64",
+      "end_address_exclusive": 350568452,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4,
+      "storage_class": "metadata",
+      "value_id": "P23-BS2-DECODE-R0-R1.token"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 350568512,
+      "dtype": "int64",
+      "end_address_exclusive": 350568516,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4,
+      "storage_class": "metadata",
+      "value_id": "P23-BS2-DECODE-R0-R1.token_ids"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 350568704,
+      "dtype": "opaque",
+      "end_address_exclusive": 351797504,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1228800,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.final_norm:tinyllama.layer0.final_norm.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 351797504,
+      "dtype": "opaque",
+      "end_address_exclusive": 351806208,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8704,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.final_norm:tinyllama.layer0.final_norm.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 351806208,
+      "dtype": "opaque",
+      "end_address_exclusive": 351814400,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.final_norm:tinyllama.layer0.final_norm.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 351814400,
+      "dtype": "opaque",
+      "end_address_exclusive": 352645376,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 830976,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.final_norm:tinyllama.layer0.final_norm.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 352645376,
+      "dtype": "opaque",
+      "end_address_exclusive": 353874688,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1229312,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.attention_norm:tinyllama.layer0.attention_norm.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 353874688,
+      "dtype": "opaque",
+      "end_address_exclusive": 353882880,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.attention_norm:tinyllama.layer0.attention_norm.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 353882880,
+      "dtype": "opaque",
+      "end_address_exclusive": 354722048,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 839168,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.attention_norm:tinyllama.layer0.attention_norm.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 354722048,
+      "dtype": "opaque",
+      "end_address_exclusive": 356794624,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 2072576,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.attention_residual:tinyllama.layer0.residual_add.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 356794624,
+      "dtype": "opaque",
+      "end_address_exclusive": 358028032,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.causal_attention:tinyllama.layer0.causal_attention.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 358028032,
+      "dtype": "opaque",
+      "end_address_exclusive": 358054656,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 26624,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.causal_attention:tinyllama.layer0.causal_attention.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 358054656,
+      "dtype": "opaque",
+      "end_address_exclusive": 358596864,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 542208,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.causal_attention:tinyllama.layer0.causal_attention.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 358596864,
+      "dtype": "opaque",
+      "end_address_exclusive": 359830272,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.down_projection:tinyllama.layer0.down_projection.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 359830272,
+      "dtype": "opaque",
+      "end_address_exclusive": 360663296,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 833024,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.down_projection:tinyllama.layer0.down_projection.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 360663296,
+      "dtype": "opaque",
+      "end_address_exclusive": 369182976,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.down_projection:tinyllama.layer0.down_projection.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 369182976,
+      "dtype": "opaque",
+      "end_address_exclusive": 369228032,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 45056,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection:tinyllama.decode.kv17.layer0.gate_up_projection.output"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 369228032,
+      "dtype": "opaque",
+      "end_address_exclusive": 370461440,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection:tinyllama.layer0.gate_up_projection.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 370461440,
+      "dtype": "opaque",
+      "end_address_exclusive": 371226880,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 765440,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection:tinyllama.layer0.gate_up_projection.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 371226880,
+      "dtype": "opaque",
+      "end_address_exclusive": 379746560,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection:tinyllama.layer0.gate_up_projection.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 379746560,
+      "dtype": "opaque",
+      "end_address_exclusive": 379750656,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4096,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.mlp_norm:tinyllama.layer0.mlp_norm.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 379750656,
+      "dtype": "opaque",
+      "end_address_exclusive": 380975872,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1225216,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.mlp_norm:tinyllama.layer0.mlp_norm.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 380975872,
+      "dtype": "opaque",
+      "end_address_exclusive": 380984064,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8192,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.mlp_norm:tinyllama.layer0.mlp_norm.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 380984064,
+      "dtype": "opaque",
+      "end_address_exclusive": 381823232,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 839168,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.mlp_norm:tinyllama.layer0.mlp_norm.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 381823232,
+      "dtype": "opaque",
+      "end_address_exclusive": 383895808,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 2072576,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.mlp_residual:tinyllama.layer0.residual_add.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 383895808,
+      "dtype": "opaque",
+      "end_address_exclusive": 385129216,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.output_projection:tinyllama.layer0.output_projection.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 385129216,
+      "dtype": "opaque",
+      "end_address_exclusive": 385976576,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 847360,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.output_projection:tinyllama.layer0.output_projection.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 385976576,
+      "dtype": "opaque",
+      "end_address_exclusive": 394365184,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8388608,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.output_projection:tinyllama.layer0.output_projection.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 394365184,
+      "dtype": "opaque",
+      "end_address_exclusive": 398559488,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 4194304,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.output_projection:tinyllama.layer0.output_projection.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 398559488,
+      "dtype": "opaque",
+      "end_address_exclusive": 407079168,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.output_projection:tinyllama.layer0.output_projection.opaque_workspace_4"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 407079168,
+      "dtype": "opaque",
+      "end_address_exclusive": 407089408,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 10240,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.qkv_projection:tinyllama.decode.kv17.layer0.qkv_projection.output"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 407089408,
+      "dtype": "opaque",
+      "end_address_exclusive": 408322816,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.qkv_projection:tinyllama.layer0.qkv_projection.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 408322816,
+      "dtype": "opaque",
+      "end_address_exclusive": 409157888,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 835072,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.qkv_projection:tinyllama.layer0.qkv_projection.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 409157888,
+      "dtype": "opaque",
+      "end_address_exclusive": 421740800,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 12582912,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.qkv_projection:tinyllama.layer0.qkv_projection.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 421740800,
+      "dtype": "opaque",
+      "end_address_exclusive": 430260480,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.qkv_projection:tinyllama.layer0.qkv_projection.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 430260480,
+      "dtype": "opaque",
+      "end_address_exclusive": 430260736,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 256,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.rope:tinyllama.decode.kv17.layer0.rope.cos"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 430260736,
+      "dtype": "opaque",
+      "end_address_exclusive": 430260864,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 128,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.rope:tinyllama.decode.kv17.layer0.rope.inv_freq"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 430260992,
+      "dtype": "opaque",
+      "end_address_exclusive": 430261024,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 32,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.rope:tinyllama.decode.kv17.layer0.rope.position_ids"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 430261248,
+      "dtype": "opaque",
+      "end_address_exclusive": 430261504,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 256,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.rope:tinyllama.decode.kv17.layer0.rope.sin"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 430261504,
+      "dtype": "opaque",
+      "end_address_exclusive": 431494400,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1232896,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.rope:tinyllama.layer0.rope.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 128,
+      "base_address": 431494400,
+      "dtype": "opaque",
+      "end_address_exclusive": 431494784,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 384,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.rope:tinyllama.layer0.rope.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 431494784,
+      "dtype": "opaque",
+      "end_address_exclusive": 431496800,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 2016,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.rope:tinyllama.layer0.rope.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 431496960,
+      "dtype": "opaque",
+      "end_address_exclusive": 431497216,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 256,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.rope:tinyllama.layer0.rope.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 431497216,
+      "dtype": "opaque",
+      "end_address_exclusive": 431498496,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1280,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.rope:tinyllama.layer0.rope.opaque_workspace_4"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 431498496,
+      "dtype": "opaque",
+      "end_address_exclusive": 431504640,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 6144,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.rope:tinyllama.layer0.rope.opaque_workspace_5"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 431504640,
+      "dtype": "opaque",
+      "end_address_exclusive": 432339712,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 835072,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.rope:tinyllama.layer0.rope.opaque_workspace_6"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 432339712,
+      "dtype": "opaque",
+      "end_address_exclusive": 433581312,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1241600,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.silu_multiply:tinyllama.layer0.silu_multiply.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 433581312,
+      "dtype": "opaque",
+      "end_address_exclusive": 433603840,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 22528,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.silu_multiply:tinyllama.layer0.silu_multiply.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 433603840,
+      "dtype": "opaque",
+      "end_address_exclusive": 434369280,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 765440,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.l0.silu_multiply:tinyllama.layer0.silu_multiply.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 434369280,
+      "dtype": "opaque",
+      "end_address_exclusive": 435417856,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1048576,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.lm_head:tinyllama.layer0.lm_head.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 435417856,
+      "dtype": "opaque",
+      "end_address_exclusive": 436659456,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1241600,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.lm_head:tinyllama.layer0.lm_head.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 436659456,
+      "dtype": "opaque",
+      "end_address_exclusive": 437378816,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 719360,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.lm_head:tinyllama.layer0.lm_head.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 437378816,
+      "dtype": "opaque",
+      "end_address_exclusive": 445898496,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8519680,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.lm_head:tinyllama.layer0.lm_head.opaque_workspace_3"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 445898496,
+      "dtype": "opaque",
+      "end_address_exclusive": 447131904,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1233408,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.sampling:tinyllama.layer0.sampling.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 447131904,
+      "dtype": "opaque",
+      "end_address_exclusive": 447140064,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 8160,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.sampling:tinyllama.layer0.sampling.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 447140096,
+      "dtype": "opaque",
+      "end_address_exclusive": 447867648,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 727552,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.sampling:tinyllama.layer0.sampling.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 447867648,
+      "dtype": "opaque",
+      "end_address_exclusive": 447868128,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 480,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.token_embedding:tinyllama.layer0.token_embedding.opaque_workspace_0"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 447868160,
+      "dtype": "opaque",
+      "end_address_exclusive": 449956608,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 2088448,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.token_embedding:tinyllama.layer0.token_embedding.opaque_workspace_1"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 449956608,
+      "dtype": "opaque",
+      "end_address_exclusive": 451005184,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 1048576,
+      "storage_class": "operator_workspace",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.token_embedding:tinyllama.layer0.token_embedding.opaque_workspace_2"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 451005184,
+      "dtype": "opaque",
+      "end_address_exclusive": 451005312,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 128,
+      "storage_class": "runtime_metadata",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.kv_allocate:metadata"
+    },
+    {
+      "alignment_bytes": 64,
+      "base_address": 451005312,
+      "dtype": "opaque",
+      "end_address_exclusive": 451005376,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 64,
+      "storage_class": "runtime_metadata",
+      "value_id": "workspace:task.P23-BS2-DECODE-R0-R1.kv_release:metadata"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 4294688512,
+      "dtype": "implementation_specific",
+      "end_address_exclusive": 4294688544,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 32,
+      "source_value_id": "P23-BS2-DECODE-R0-R1.token_ids",
+      "storage_class": "external_input_widened_shadow",
+      "value_id": "shadow:task.P23-BS2-DECODE-R0-R1.token_embedding:tinyllama.decode.kv17.layer0.token_embedding.token_ids"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 4294688768,
+      "dtype": "implementation_specific",
+      "end_address_exclusive": 4294828032,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 139264,
+      "source_value_id": "P23-BS2-DECODE-R0-R1.kv.l0.v",
+      "storage_class": "external_input_widened_shadow",
+      "value_id": "shadow:task.P23-BS2-DECODE-R0-R1.l0.causal_attention:tinyllama.decode.kv17.layer0.causal_attention.value"
+    },
+    {
+      "alignment_bytes": 256,
+      "base_address": 4294828032,
+      "dtype": "implementation_specific",
+      "end_address_exclusive": 4294967296,
+      "memory_space_id": "shared0.dram3d",
+      "size_bytes": 139264,
+      "source_value_id": "P23-BS2-DECODE-R0-R1.kv.l0.k",
+      "storage_class": "external_input_widened_shadow",
+      "value_id": "shadow:task.P23-BS2-DECODE-R0-R1.l0.causal_attention:tinyllama.decode.kv17.layer0.causal_attention.key"
+    }
+  ],
+  "request_cycle_bindings": [
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.final_norm.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 350568704,
+          "size_bytes": 1228800,
+          "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 351797504,
+          "size_bytes": 8704,
+          "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 351806208,
+          "size_bytes": 8192,
+          "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 351814400,
+          "size_bytes": 830976,
+          "tensor_id": "tinyllama.layer0.final_norm.opaque_workspace_3"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350330880,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.final_norm.input",
+          "value_id": "P23-BS2-DECODE-R0-R1.layer.output",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 0,
+          "logical_value_size_bytes": 4096,
+          "size_bytes": 4096,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.final_norm.weight",
+          "value_id": "model.final_norm.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350296064,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.final_norm.output",
+          "value_id": "P23-BS2-DECODE-R0-R1.final_norm",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.final_norm",
+      "trace_id": "tinyllama.1_1b.layer0.final_norm.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.attention_norm.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 352645376,
+          "size_bytes": 1229312,
+          "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 353874688,
+          "size_bytes": 8192,
+          "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 353882880,
+          "size_bytes": 839168,
+          "tensor_id": "tinyllama.layer0.attention_norm.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350312448,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.attention_norm.input",
+          "value_id": "P23-BS2-DECODE-R0-R1.hidden.embedding",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 4096,
+          "logical_value_size_bytes": 4096,
+          "size_bytes": 4096,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.attention_norm.weight",
+          "value_id": "model.layers.0.attention_norm.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350304256,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.attention_norm.output",
+          "value_id": "P23-BS2-DECODE-R0-R1.hidden.attention_norm",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_norm",
+      "trace_id": "tinyllama.1_1b.layer0.attention_norm.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.residual_add.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 354722048,
+          "size_bytes": 2072576,
+          "tensor_id": "tinyllama.layer0.residual_add.opaque_workspace_0"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350312448,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.residual_add.input",
+          "value_id": "P23-BS2-DECODE-R0-R1.hidden.embedding",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350279680,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.residual_add.residual",
+          "value_id": "P23-BS2-DECODE-R0-R1.attention.projected",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350287872,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.residual_add.output",
+          "value_id": "P23-BS2-DECODE-R0-R1.attention.residual",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_residual",
+      "trace_id": "tinyllama.1_1b.layer0.residual_add.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.causal_attention.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 356794624,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 358028032,
+          "size_bytes": 26624,
+          "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 358054656,
+          "size_bytes": 542208,
+          "tensor_id": "tinyllama.layer0.causal_attention.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350559232,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.causal_attention.query",
+          "value_id": "P23-BS2-DECODE-R0-R1.query",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "external_input_widened_shadow",
+          "global_pa_base": 4294828032,
+          "logical_value_size_bytes": 17408,
+          "size_bytes": 139264,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.causal_attention.key",
+          "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.k",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 2
+        },
+        {
+          "binding_mode": "external_input_widened_shadow",
+          "global_pa_base": 4294688768,
+          "logical_value_size_bytes": 17408,
+          "size_bytes": 139264,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.causal_attention.value",
+          "value_id": "P23-BS2-DECODE-R0-R1.kv.l0.v",
+          "value_index": 2,
+          "value_offset_bytes": 0,
+          "value_version": 2
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350271488,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.causal_attention.output",
+          "value_id": "P23-BS2-DECODE-R0-R1.attention.context",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.causal_attention",
+      "trace_id": "tinyllama.1_1b.layer0.causal_attention.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.down_projection.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 358596864,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 359830272,
+          "size_bytes": 833024,
+          "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 360663296,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.down_projection.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350467072,
+          "logical_value_size_bytes": 22528,
+          "size_bytes": 22528,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.down_projection.input",
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.activated",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 8192,
+          "logical_value_size_bytes": 23068672,
+          "size_bytes": 23068672,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.down_projection.weight",
+          "value_id": "model.layers.0.down.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350489600,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.down_projection.output",
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.down",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.down_projection",
+      "trace_id": "tinyllama.1_1b.layer0.down_projection.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.gate_up_projection.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 369182976,
+          "size_bytes": 45056,
+          "tensor_id": "tinyllama.decode.kv17.layer0.gate_up_projection.output"
+        },
+        {
+          "global_pa_base": 369228032,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 370461440,
+          "size_bytes": 765440,
+          "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 371226880,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.gate_up_projection.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350320640,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.gate_up_projection.input",
+          "value_id": "P23-BS2-DECODE-R0-R1.hidden.mlp_norm",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 23076864,
+          "logical_value_size_bytes": 23068672,
+          "size_bytes": 23068672,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.gate_up_projection.gate_weight",
+          "value_id": "model.layers.0.gate.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 63975424,
+          "logical_value_size_bytes": 23068672,
+          "size_bytes": 23068672,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.gate_up_projection.up_weight",
+          "value_id": "model.layers.0.up.weight",
+          "value_index": 2,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350497792,
+          "logical_value_size_bytes": 22528,
+          "size_bytes": 22528,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.gate_up_projection.gate",
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.gate",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350520320,
+          "logical_value_size_bytes": 22528,
+          "size_bytes": 22528,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.gate_up_projection.up",
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.up",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection",
+      "trace_id": "tinyllama.1_1b.layer0.gate_up_projection.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.mlp_norm.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 379746560,
+          "size_bytes": 4096,
+          "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 379750656,
+          "size_bytes": 1225216,
+          "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 380975872,
+          "size_bytes": 8192,
+          "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 380984064,
+          "size_bytes": 839168,
+          "tensor_id": "tinyllama.layer0.mlp_norm.opaque_workspace_3"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350287872,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.mlp_norm.input",
+          "value_id": "P23-BS2-DECODE-R0-R1.attention.residual",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 47194112,
+          "logical_value_size_bytes": 4096,
+          "size_bytes": 4096,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.mlp_norm.weight",
+          "value_id": "model.layers.0.mlp_norm.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350320640,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.mlp_norm.output",
+          "value_id": "P23-BS2-DECODE-R0-R1.hidden.mlp_norm",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_norm",
+      "trace_id": "tinyllama.1_1b.layer0.mlp_norm.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.residual_add.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 381823232,
+          "size_bytes": 2072576,
+          "tensor_id": "tinyllama.layer0.residual_add.opaque_workspace_0"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350287872,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.residual_add.input",
+          "value_id": "P23-BS2-DECODE-R0-R1.attention.residual",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350489600,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.residual_add.residual",
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.down",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350330880,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.residual_add.output",
+          "value_id": "P23-BS2-DECODE-R0-R1.layer.output",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_residual",
+      "trace_id": "tinyllama.1_1b.layer0.residual_add.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.output_projection.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 383895808,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 385129216,
+          "size_bytes": 847360,
+          "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 385976576,
+          "size_bytes": 8388608,
+          "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 394365184,
+          "size_bytes": 4194304,
+          "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_3"
+        },
+        {
+          "global_pa_base": 398559488,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.output_projection.opaque_workspace_4"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350271488,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.output_projection.input",
+          "value_id": "P23-BS2-DECODE-R0-R1.attention.context",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 47198208,
+          "logical_value_size_bytes": 8388608,
+          "size_bytes": 8388608,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.output_projection.weight",
+          "value_id": "model.layers.0.output.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350279680,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.output_projection.output",
+          "value_id": "P23-BS2-DECODE-R0-R1.attention.projected",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.output_projection",
+      "trace_id": "tinyllama.1_1b.layer0.output_projection.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.qkv_projection.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 407079168,
+          "size_bytes": 10240,
+          "tensor_id": "tinyllama.decode.kv17.layer0.qkv_projection.output"
+        },
+        {
+          "global_pa_base": 407089408,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 408322816,
+          "size_bytes": 835072,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 409157888,
+          "size_bytes": 12582912,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 421740800,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.qkv_projection.opaque_workspace_3"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350304256,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.qkv_projection.input",
+          "value_id": "P23-BS2-DECODE-R0-R1.hidden.attention_norm",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 55586816,
+          "logical_value_size_bytes": 8388608,
+          "size_bytes": 8388608,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.qkv_projection.q_weight",
+          "value_id": "model.layers.0.q.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 46145536,
+          "logical_value_size_bytes": 1048576,
+          "size_bytes": 1048576,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.qkv_projection.k_weight",
+          "value_id": "model.layers.0.k.weight",
+          "value_index": 2,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 87044096,
+          "logical_value_size_bytes": 1048576,
+          "size_bytes": 1048576,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.qkv_projection.v_weight",
+          "value_id": "model.layers.0.v.weight",
+          "value_index": 3,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350542848,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.qkv_projection.query",
+          "value_id": "P23-BS2-DECODE-R0-R1.q",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350328832,
+          "logical_value_size_bytes": 1024,
+          "size_bytes": 1024,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.qkv_projection.key",
+          "value_id": "P23-BS2-DECODE-R0-R1.k_new",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350567424,
+          "logical_value_size_bytes": 1024,
+          "size_bytes": 1024,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.qkv_projection.value",
+          "value_id": "P23-BS2-DECODE-R0-R1.v_new",
+          "value_index": 2,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.qkv_projection",
+      "trace_id": "tinyllama.1_1b.layer0.qkv_projection.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.rope.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 430260480,
+          "size_bytes": 256,
+          "tensor_id": "tinyllama.decode.kv17.layer0.rope.cos"
+        },
+        {
+          "global_pa_base": 430260736,
+          "size_bytes": 128,
+          "tensor_id": "tinyllama.decode.kv17.layer0.rope.inv_freq"
+        },
+        {
+          "global_pa_base": 430260992,
+          "size_bytes": 32,
+          "tensor_id": "tinyllama.decode.kv17.layer0.rope.position_ids"
+        },
+        {
+          "global_pa_base": 430261248,
+          "size_bytes": 256,
+          "tensor_id": "tinyllama.decode.kv17.layer0.rope.sin"
+        },
+        {
+          "global_pa_base": 430261504,
+          "size_bytes": 1232896,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 431494400,
+          "size_bytes": 384,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 431494784,
+          "size_bytes": 2016,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 431496960,
+          "size_bytes": 256,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_3"
+        },
+        {
+          "global_pa_base": 431497216,
+          "size_bytes": 1280,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_4"
+        },
+        {
+          "global_pa_base": 431498496,
+          "size_bytes": 6144,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_5"
+        },
+        {
+          "global_pa_base": 431504640,
+          "size_bytes": 835072,
+          "tensor_id": "tinyllama.layer0.rope.opaque_workspace_6"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350542848,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.rope.query",
+          "value_id": "P23-BS2-DECODE-R0-R1.q",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350328832,
+          "logical_value_size_bytes": 1024,
+          "size_bytes": 1024,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.rope.key",
+          "value_id": "P23-BS2-DECODE-R0-R1.k_new",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350551040,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.rope.query_output",
+          "value_id": "P23-BS2-DECODE-R0-R1.q_rot",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350329856,
+          "logical_value_size_bytes": 1024,
+          "size_bytes": 1024,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.rope.key_output",
+          "value_id": "P23-BS2-DECODE-R0-R1.k_rot",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.rope",
+      "trace_id": "tinyllama.1_1b.layer0.rope.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.silu_multiply.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 432339712,
+          "size_bytes": 1241600,
+          "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 433581312,
+          "size_bytes": 22528,
+          "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 433603840,
+          "size_bytes": 765440,
+          "tensor_id": "tinyllama.layer0.silu_multiply.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350497792,
+          "logical_value_size_bytes": 22528,
+          "size_bytes": 22528,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.silu_multiply.gate",
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.gate",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350520320,
+          "logical_value_size_bytes": 22528,
+          "size_bytes": 22528,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.silu_multiply.up",
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.up",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350467072,
+          "logical_value_size_bytes": 22528,
+          "size_bytes": 22528,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.silu_multiply.output",
+          "value_id": "P23-BS2-DECODE-R0-R1.mlp.activated",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.silu_multiply",
+      "trace_id": "tinyllama.1_1b.layer0.silu_multiply.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.lm_head.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 434369280,
+          "size_bytes": 1048576,
+          "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 435417856,
+          "size_bytes": 1241600,
+          "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 436659456,
+          "size_bytes": 719360,
+          "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_2"
+        },
+        {
+          "global_pa_base": 437378816,
+          "size_bytes": 8519680,
+          "tensor_id": "tinyllama.layer0.lm_head.opaque_workspace_3"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350296064,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.lm_head.input",
+          "value_id": "P23-BS2-DECODE-R0-R1.final_norm",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 88092672,
+          "logical_value_size_bytes": 131072000,
+          "size_bytes": 131072000,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.lm_head.weight",
+          "value_id": "model.lm_head.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350339072,
+          "logical_value_size_bytes": 128000,
+          "size_bytes": 128000,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.lm_head.logits",
+          "value_id": "P23-BS2-DECODE-R0-R1.logits",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.lm_head",
+      "trace_id": "tinyllama.1_1b.layer0.lm_head.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.sampling.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 445898496,
+          "size_bytes": 1233408,
+          "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 447131904,
+          "size_bytes": 8160,
+          "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 447140096,
+          "size_bytes": 727552,
+          "tensor_id": "tinyllama.layer0.sampling.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350339072,
+          "logical_value_size_bytes": 128000,
+          "size_bytes": 128000,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.sampling.logits",
+          "value_id": "P23-BS2-DECODE-R0-R1.logits",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350568448,
+          "logical_value_size_bytes": 4,
+          "size_bytes": 32,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.sampling.token",
+          "value_id": "P23-BS2-DECODE-R0-R1.token",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.sampling",
+      "trace_id": "tinyllama.1_1b.layer0.sampling.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    },
+    {
+      "contract_overrides": {
+        "layer_id": 0
+      },
+      "operator_artifact_id": "tinyllama.1_1b.layer0.token_embedding.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2.shared_hbdram_range_rebase_v1",
+      "private_bindings": [
+        {
+          "global_pa_base": 447867648,
+          "size_bytes": 480,
+          "tensor_id": "tinyllama.layer0.token_embedding.opaque_workspace_0"
+        },
+        {
+          "global_pa_base": 447868160,
+          "size_bytes": 2088448,
+          "tensor_id": "tinyllama.layer0.token_embedding.opaque_workspace_1"
+        },
+        {
+          "global_pa_base": 449956608,
+          "size_bytes": 1048576,
+          "tensor_id": "tinyllama.layer0.token_embedding.opaque_workspace_2"
+        }
+      ],
+      "request_cycle_ready": true,
+      "semantic_bindings": [
+        {
+          "binding_mode": "external_input_widened_shadow",
+          "global_pa_base": 4294688512,
+          "logical_value_size_bytes": 4,
+          "size_bytes": 32,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.token_embedding.token_ids",
+          "value_id": "P23-BS2-DECODE-R0-R1.token_ids",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 219164672,
+          "logical_value_size_bytes": 131072000,
+          "size_bytes": 131072000,
+          "source": "input",
+          "tensor_id": "tinyllama.decode.kv17.layer0.token_embedding.weight",
+          "value_id": "model.tok_embeddings.weight",
+          "value_index": 1,
+          "value_offset_bytes": 0,
+          "value_version": 0
+        },
+        {
+          "binding_mode": "semantic_value",
+          "global_pa_base": 350312448,
+          "logical_value_size_bytes": 8192,
+          "size_bytes": 8192,
+          "source": "output",
+          "tensor_id": "tinyllama.decode.kv17.layer0.token_embedding.output",
+          "value_id": "P23-BS2-DECODE-R0-R1.hidden.embedding",
+          "value_index": 0,
+          "value_offset_bytes": 0,
+          "value_version": 1
+        }
+      ],
+      "task_id": "task.P23-BS2-DECODE-R0-R1.token_embedding",
+      "trace_id": "tinyllama.1_1b.layer0.token_embedding.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2"
+    }
+  ],
+  "runtime_task_bindings": [
+    {
+      "host_control_excluded": false,
+      "memory_space_id": "shared0.dram3d",
+      "metadata_global_pa_base": 451005184,
+      "metadata_size_bytes": 128,
+      "model_kind": "metadata_state",
+      "operator": "kv_allocate",
+      "planned_parent_requests": 3,
+      "planned_read_bytes": 64,
+      "planned_write_bytes": 128,
+      "request_cycle_ready": true,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.kv_allocate"
+    },
+    {
+      "host_control_excluded": false,
+      "memory_space_id": "shared0.dram3d",
+      "metadata_global_pa_base": 451005312,
+      "metadata_size_bytes": 64,
+      "model_kind": "metadata_state",
+      "operator": "kv_release",
+      "planned_parent_requests": 2,
+      "planned_read_bytes": 64,
+      "planned_write_bytes": 64,
+      "request_cycle_ready": true,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.kv_release"
+    },
+    {
+      "host_control_excluded": false,
+      "memory_space_id": "shared0.dram3d",
+      "metadata_global_pa_base": null,
+      "metadata_size_bytes": 0,
+      "model_kind": "kv_copy_engine",
+      "operator": "kv_append",
+      "planned_parent_requests": 64,
+      "planned_read_bytes": 2048,
+      "planned_write_bytes": 2048,
+      "request_cycle_ready": true,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append"
+    },
+    {
+      "host_control_excluded": true,
+      "memory_space_id": "shared0.dram3d",
+      "metadata_global_pa_base": null,
+      "metadata_size_bytes": 0,
+      "model_kind": "fixed_control",
+      "operator": "request_finish",
+      "planned_parent_requests": 0,
+      "planned_read_bytes": 0,
+      "planned_write_bytes": 0,
+      "request_cycle_ready": false,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.request_finish"
+    },
+    {
+      "host_control_excluded": true,
+      "memory_space_id": "shared0.dram3d",
+      "metadata_global_pa_base": null,
+      "metadata_size_bytes": 0,
+      "model_kind": "fixed_control",
+      "operator": "request_start",
+      "planned_parent_requests": 0,
+      "planned_read_bytes": 0,
+      "planned_write_bytes": 0,
+      "request_cycle_ready": false,
+      "task_id": "task.P23-BS2-DECODE-R0-R1.request_start"
+    }
+  ],
+  "schema_version": "hetero-global-memory-map/v1"
+}

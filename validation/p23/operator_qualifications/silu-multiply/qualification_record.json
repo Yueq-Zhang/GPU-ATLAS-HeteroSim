@@ -1,0 +1,122 @@
+{
+  "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_hbdram_edge_16ch.range_rebase.v2_0_0",
+  "claim_boundary": null,
+  "comparison": {
+    "external_memory_stats": [
+      {
+        "address_already_global": 0,
+        "address_binding_ranges": 6,
+        "address_translated": 3520,
+        "address_unmapped": 0,
+        "atlas_children": 0,
+        "atlas_completed": 0,
+        "atlas_parents": 0,
+        "child_retries": 0,
+        "children_completed": 1408,
+        "children_sent": 1408,
+        "completed": 1408,
+        "cycles": 7067,
+        "durable_completed": 1408,
+        "gateway_cycles": 7067,
+        "global_time_fs": 17667844522,
+        "gpu_children": 1408,
+        "gpu_completed": 1408,
+        "gpu_cycles": 20000,
+        "gpu_parents": 1408,
+        "instances": 1,
+        "internal_bytes": 90112,
+        "link_cycles": 7067,
+        "logical_bytes": 45056,
+        "outstanding": 0,
+        "partitions": 16,
+        "reads": 1408,
+        "rejected": 199168,
+        "request_payload_bytes": 0,
+        "request_wire_bytes": 45056,
+        "response_payload_bytes": 45056,
+        "response_wire_bytes": 90112,
+        "transaction_bytes": 64,
+        "writes": 0
+      },
+      {
+        "address_already_global": 0,
+        "address_binding_ranges": 6,
+        "address_translated": 3520,
+        "address_unmapped": 0,
+        "atlas_children": 0,
+        "atlas_completed": 0,
+        "atlas_parents": 0,
+        "child_retries": 0,
+        "children_completed": 1408,
+        "children_sent": 1408,
+        "completed": 1408,
+        "cycles": 7067,
+        "durable_completed": 1408,
+        "gateway_cycles": 7067,
+        "global_time_fs": 17667844522,
+        "gpu_children": 1408,
+        "gpu_completed": 1408,
+        "gpu_cycles": 20000,
+        "gpu_parents": 1408,
+        "instances": 1,
+        "internal_bytes": 90112,
+        "link_cycles": 7067,
+        "logical_bytes": 45056,
+        "outstanding": 0,
+        "partitions": 16,
+        "reads": 1408,
+        "rejected": 199168,
+        "request_payload_bytes": 0,
+        "request_wire_bytes": 45056,
+        "response_payload_bytes": 45056,
+        "response_wire_bytes": 90112,
+        "transaction_bytes": 64,
+        "writes": 0
+      }
+    ],
+    "gpu_tot_sim_cycle": [
+      20000,
+      20000
+    ],
+    "gpu_tot_sim_insn": [
+      339328,
+      339328
+    ]
+  },
+  "exact_match_required": true,
+  "overlap_evidence": [],
+  "provenance": {
+    "backend_config": "/home/yueqi/gpu-atlas-p22-one-layer-20260907/configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
+    "co_resident_atlas": null,
+    "dependency_commits": {
+      "accel_sim_framework": "64653015f85fb5664c84a10f48527e8897d289d0",
+      "gpgpu_sim_distribution": "e10018b67a4b668e7b43f89280cf67624f1df4ff",
+      "ramulator2": "3996362187d7f8314936e5ad7560d93b66b6a215"
+    },
+    "environment_overrides": {},
+    "resume_completed_runs": {
+      "adapter_reused": false,
+      "enabled": true,
+      "native_baseline_reused": false
+    },
+    "trace_manifest": "/home/yueqi/gpu-atlas-p22-one-layer-20260907/configs/hetero/operator_artifacts/p23_sm89_decode_bs2/tinyllama_decode_bs2_ctx16_kv17_silu_multiply_sm89_trace.json"
+  },
+  "qualified_scopes": [
+    "cycle_coupled_request_response"
+  ],
+  "replay_safety_qualified": false,
+  "schema_version": "hetero-accel-sim-qualification/v1",
+  "simulation_key": "885028678be8cf5d7b0294c88fa184a1eb4a5ef5f1183dd1f779773a121d9cb7",
+  "status": "passed",
+  "target_gpu": "RTX 3070 SM86 compute complex with range-rebased ATLAS-style 3D-DRAM",
+  "target_sm": 86,
+  "timing_ownership": {
+    "co_resident_atlas_core_sram_noc": false,
+    "duration_mode": "coupled",
+    "external_ramulator2": "shared3d.ramulator2",
+    "gpu_core_cache_noc": "accel_sim",
+    "gpu_local_dram": null
+  },
+  "trace_id": "tinyllama.1_1b.layer0.silu_multiply.decode_step.bs2.ctx16.q1.kv17.fp16.sm86.accel_sim_v2",
+  "trace_key": "c3cb3d5b17019bafa16c286470502f422335d887f5cf94465d0b475b0d6a665d"
+}
