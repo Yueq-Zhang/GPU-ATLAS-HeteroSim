@@ -1,0 +1,68 @@
+{
+  "double_run": {
+    "allocator_workspace_may_vary": true,
+    "runs": [
+      {
+        "alias_group_count": 30,
+        "allocation_observation_sha256": "d2a5dd2daa6480ed9908262abd910757ef6f539a54d38b6757e981586e765c6d",
+        "bundle_sha256": "e5e44618bd73609869251456e21d61b820ef6d2916eb78cf38c6125bffa080f5",
+        "event_count": 67,
+        "identity_sha256": "702cca8ae1aa33445fcff54f9d1505d6a4abd2d51126cea7c1ab687483a59f53",
+        "memory_map_sha256": "ee07d3ce0ce63b0d5ee5b2dff84ecb6ca2368c365b33bec7fc1e3bf541309b38",
+        "module_count": 30,
+        "result": {
+          "decode_logits_sha256": "33e87894f21c6258bdf4418d2847d92dacb480dc43db3ca48112ef623de34aa3",
+          "input_ids_sha256": "5a7bdde0f68f2a46882e98dac3706a8eecc6296721407c0f7e83adf22f17450a",
+          "next_token_id": 10635,
+          "next_token_text": "Face",
+          "prefill_logits_sha256": "e413420572aaa84402ccaa5a493ad316aeced3d94b49972e81815f07f44a8a53"
+        },
+        "simulation_key": "b6ee66f5fe9c47bba219d893aefe78392e2d25740e1205e31a2a401e4ef2c5fa",
+        "storage_count": 50,
+        "tensor_binding_count": 96
+      },
+      {
+        "alias_group_count": 32,
+        "allocation_observation_sha256": "bcd0a19885e8fc2cbaa9d8db8423591cf9cf6028373c235677eb846456b516e9",
+        "bundle_sha256": "ec27c4b76875da02e33d26ea1a311417c0ce6faa9c87586064bded5b1d4a7969",
+        "event_count": 67,
+        "identity_sha256": "702cca8ae1aa33445fcff54f9d1505d6a4abd2d51126cea7c1ab687483a59f53",
+        "memory_map_sha256": "f1d2f66ca18cd98775058c5c6a12bbbf8f666a89e4334372e6273c81fd41743b",
+        "module_count": 30,
+        "result": {
+          "decode_logits_sha256": "33e87894f21c6258bdf4418d2847d92dacb480dc43db3ca48112ef623de34aa3",
+          "input_ids_sha256": "5a7bdde0f68f2a46882e98dac3706a8eecc6296721407c0f7e83adf22f17450a",
+          "next_token_id": 10635,
+          "next_token_text": "Face",
+          "prefill_logits_sha256": "e413420572aaa84402ccaa5a493ad316aeced3d94b49972e81815f07f44a8a53"
+        },
+        "simulation_key": "b6ee66f5fe9c47bba219d893aefe78392e2d25740e1205e31a2a401e4ef2c5fa",
+        "storage_count": 52,
+        "tensor_binding_count": 96
+      }
+    ],
+    "semantic_identity_equal": true,
+    "semantic_result_equal": true,
+    "simulation_key_equal": true
+  },
+  "execution_host": "remote_rtx4090_sm89",
+  "qualification": {
+    "actual_huggingface_request_executed": true,
+    "module_callbacks_connected": true,
+    "p28_simulation_key_connected": true,
+    "performance_claim_allowed": false,
+    "runtime_global_pa_bound": true,
+    "sass_trace_generated": false,
+    "tensor_views_and_aliases_observed": true
+  },
+  "schema_version": "hetero-p30-huggingface-online-qualification/v1",
+  "status": "passed",
+  "workload": {
+    "batch_size": 1,
+    "decode_tokens": 1,
+    "dtype": "fp16",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "prompt_tokens": 16,
+    "revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6"
+  }
+}

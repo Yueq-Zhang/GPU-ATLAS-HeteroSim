@@ -1,0 +1,102 @@
+{
+  "address_ranges": [
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "hf.layer0.allocator.0.capture0",
+      "capture_allocation_id": "hf.layer0.allocator.0.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_pytorch_allocator_range",
+      "shape": [
+        2214592512
+      ],
+      "size_bytes": 2214592512,
+      "tensor_id": "hf.layer0.opaque_allocator_0",
+      "tensor_offset_bytes": 0,
+      "trace_base": "0x706936000000",
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "hf.layer0.allocator.1.capture0",
+      "capture_allocation_id": "hf.layer0.allocator.1.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_pytorch_allocator_range",
+      "shape": [
+        10485760
+      ],
+      "size_bytes": 10485760,
+      "tensor_id": "hf.layer0.opaque_allocator_1",
+      "tensor_offset_bytes": 0,
+      "trace_base": "0x7069cf600000",
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "hf.layer0.allocator.2.capture0",
+      "capture_allocation_id": "hf.layer0.allocator.2.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_pytorch_allocator_range",
+      "shape": [
+        6291456
+      ],
+      "size_bytes": 6291456,
+      "tensor_id": "hf.layer0.opaque_allocator_2",
+      "tensor_offset_bytes": 0,
+      "trace_base": "0x7069d8000000",
+      "view_offset_bytes": 0
+    },
+    {
+      "alignment_bytes": 256,
+      "backing_allocation_id": "hf.layer0.allocator.3.capture0",
+      "capture_allocation_id": "hf.layer0.allocator.3.capture0",
+      "capture_epoch": 0,
+      "layout": "opaque_pytorch_allocator_range",
+      "shape": [
+        18874368
+      ],
+      "size_bytes": 18874368,
+      "tensor_id": "hf.layer0.opaque_allocator_3",
+      "tensor_offset_bytes": 0,
+      "trace_base": "0x7069eae00000",
+      "view_offset_bytes": 0
+    }
+  ],
+  "capture": {
+    "allocator_coverage": "full_runtime_window_segments_and_alloc_events",
+    "control": "nvbit_exported_instrumentation_api",
+    "host": "remote_rtx4090_sm89",
+    "module_path": "model.layers.0",
+    "phase": "decode_step",
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "compilation": {
+    "binary_identity": {
+      "binary_versions": [
+        86
+      ],
+      "kernel_launch_count": 40,
+      "kernel_sequence_sha256": "58acc8464b2fb1cfc023d2a9688d53a6d4af07a05d68b399cf08681de4b1d746",
+      "mixed_binary_versions": false,
+      "replay_compatibility": "single_binary_exact",
+      "replay_target_sm": 86,
+      "source": "nvbit_trace_headers"
+    },
+    "capture_device_sm": 89,
+    "framework": {
+      "attention_implementation": "sdpa",
+      "cuda_runtime": "13.2",
+      "name": "huggingface",
+      "python": "3.10.12",
+      "torch_version": "2.14.0+cu132",
+      "version": "5.16.1"
+    },
+    "framework_simulation_key": "b6ee66f5fe9c47bba219d893aefe78392e2d25740e1205e31a2a401e4ef2c5fa"
+  },
+  "kernels_list": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernelslist.g",
+  "qualification_record": null,
+  "replay_safe": false,
+  "schema_version": "hetero-trace-manifest/v1",
+  "trace_id": "tinyllama.1_1b.huggingface.layer0.decode_step.bs1.ctx16.q1.kv17.fp16.remote_sm89.ampere_replay_sm86.accel_sim_v2",
+  "trace_semantics": "functional"
+}

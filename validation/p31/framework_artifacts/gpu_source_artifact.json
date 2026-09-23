@@ -1,0 +1,392 @@
+{
+  "address_contract": {
+    "capture_address": "trace_address",
+    "capture_allocator_coverage": "target_window_pytorch_allocator",
+    "dram_mapping": "candidate_specific_after_global_pa",
+    "global_pa_binding": "required_at_simulation",
+    "normalized_address": "tensor_id_plus_offset",
+    "virtual_memory_mode": "identity_untranslated"
+  },
+  "artifact_id": "tinyllama.1_1b.huggingface.layer0.decode_step.bs1.ctx16.q1.kv17.fp16.remote_sm89.ampere_replay_sm86.accel_sim_v2",
+  "backend": {
+    "accel_sim_version": "2.0.0",
+    "binary_versions": [
+      86
+    ],
+    "capture_device_sm": 89,
+    "driver": "13.2",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "kind": "accel_sim",
+    "target_sm": 86,
+    "tool": "NVBit",
+    "tool_version": "1.8"
+  },
+  "execution_contract": {
+    "compute_memory_coupled": false,
+    "global_pa_binding_ready": true,
+    "memory_traffic": "full_instruction_trace",
+    "replay_safe_across_memory_candidates": false,
+    "request_cycle_ready": false,
+    "supports_stall_resume": false,
+    "trace_semantics": "functional"
+  },
+  "files": [
+    {
+      "kind": "p30_online_bundle",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/p30_bundle.json",
+      "sha256": "a10cdc2a25a30f5d810174927b5426b9417686153c5c737c1648cc68acb87c79",
+      "size_bytes": 1519189
+    },
+    {
+      "kind": "kernels_list",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernelslist.g",
+      "sha256": "550ce7046e730093053488c681206e66bf1935e28ba6449850486a2ca7dfad01",
+      "size_bytes": 1520
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2825-ctx_0x5d851773f880.tracez",
+      "sha256": "9b24dd0806e5696b19d082ea82f533ac632016e2628d9b7383052e552c18062e",
+      "size_bytes": 33965
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2826-ctx_0x5d851773f880.tracez",
+      "sha256": "2b5a1fc54db86239261dbb41536aad1acca31f878609dc734f278537caf381ca",
+      "size_bytes": 5110
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2827-ctx_0x5d851773f880.tracez",
+      "sha256": "a6897b82473bc34f87ef6f1110f7a6e9a273d2da0daa15993b63d54a37f732fc",
+      "size_bytes": 30328
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2828-ctx_0x5d851773f880.tracez",
+      "sha256": "95e3242164e3f0eb2a44a43072e3efada4feef605801f4ba5b97e01bfd52a32d",
+      "size_bytes": 5662
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2829-ctx_0x5d851773f880.tracez",
+      "sha256": "53aec80d58fcc47ec0685f09eb571b97294c92909e8a82456524bc26bc10de58",
+      "size_bytes": 8064
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2830-ctx_0x5d851773f880.tracez",
+      "sha256": "ca531304f75c66873629bd1e08e225ac2bfcfbba086274c036d8794a4d3fc4ab",
+      "size_bytes": 29685
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2831-ctx_0x5d851773f880.tracez",
+      "sha256": "854f885c3fb384cc167e70d088e79d3beba591645d699359a9501e7ac31f5431",
+      "size_bytes": 4678
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2832-ctx_0x5d851773f880.tracez",
+      "sha256": "79fe1fd2123d4147038a81a825ae764decf30ee43a60e04f61d6c79eca026747",
+      "size_bytes": 7498
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2833-ctx_0x5d851773f880.tracez",
+      "sha256": "9e9e491b738ffb6c4d96f3081d42fcf76af5ad7c7cecce0c7f538bf8f261e894",
+      "size_bytes": 6220375
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2834-ctx_0x5d851773f880.tracez",
+      "sha256": "627a3b023483e1d66f5a68784e27ad63da79e88749c03dc1719dd60bb950c1e1",
+      "size_bytes": 1423455
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2835-ctx_0x5d851773f880.tracez",
+      "sha256": "becf2d5a9997f50444406970ba32b14d78ff16f22039191835caaa3c0a3d20e8",
+      "size_bytes": 1423646
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2836-ctx_0x5d851773f880.tracez",
+      "sha256": "2c6db090c90c23a630b56bba7bfa0bc0801036ffafabb485277bb78f1034c79c",
+      "size_bytes": 27075
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2837-ctx_0x5d851773f880.tracez",
+      "sha256": "a6354f2d4c7de6c34244329e04edc082ef17c12fe31064ae5c856357ccd280bf",
+      "size_bytes": 12851
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2838-ctx_0x5d851773f880.tracez",
+      "sha256": "1c3b4df76e77c979563452a65a9f17417c8833479c0ee750cd1b178647075542",
+      "size_bytes": 1627480
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2839-ctx_0x5d851773f880.tracez",
+      "sha256": "d39a179f41b150937dedc3cb9a3241d31aa4f7242c707d94cdc11092dac22846",
+      "size_bytes": 27082
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2840-ctx_0x5d851773f880.tracez",
+      "sha256": "296392d91d0650a129dca3d420a53cfd71dfd79378663ab6ce5600172040fdf9",
+      "size_bytes": 6873
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2841-ctx_0x5d851773f880.tracez",
+      "sha256": "cb44c2c52d6d224ab347e7bbc44d6a6ee14c455307e2ac8d80143d098dea9531",
+      "size_bytes": 5732
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2842-ctx_0x5d851773f880.tracez",
+      "sha256": "82368ac0f579f266f9a16b3e5461fd0e4933a360cc576597614d550a2653b847",
+      "size_bytes": 3866
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2843-ctx_0x5d851773f880.tracez",
+      "sha256": "df977daf194a7bcec1a75427546de6c87d88509096441fee233f5c1b37a6e025",
+      "size_bytes": 1443960
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2844-ctx_0x5d851773f880.tracez",
+      "sha256": "f1643c2c0b1ad99e889dd28cfb5f92afa01051d12b525482691ac9dc59744254",
+      "size_bytes": 5747
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2845-ctx_0x5d851773f880.tracez",
+      "sha256": "762919254ba3516a2dc370f3c3786fee1497c1f53c6ea6588819c11e6f2ef9ca",
+      "size_bytes": 9110
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2846-ctx_0x5d851773f880.tracez",
+      "sha256": "9091ae0586b74afc067e1a91d2d9fcb483de01789e2b26c69e0b5c855ce65645",
+      "size_bytes": 25932
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2847-ctx_0x5d851773f880.tracez",
+      "sha256": "ec3ff1243abfb21c5b543e0f2d568c86da9ed22bd754ed59bf34376c4de25fd2",
+      "size_bytes": 25957
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2848-ctx_0x5d851773f880.tracez",
+      "sha256": "7849bbc5db20cfa2401dc640f12beaf5308f6f67d66503bce45157cb7e914746",
+      "size_bytes": 405927
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2849-ctx_0x5d851773f880.tracez",
+      "sha256": "f46919634933b069934c809e110dc436126c6fc52662f69fcab9843fc519f2e2",
+      "size_bytes": 6231528
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2850-ctx_0x5d851773f880.tracez",
+      "sha256": "1c35a6eb56daa7bfd82ca24d33a9354cde34ecb4e4c1353682bb61af93a35286",
+      "size_bytes": 7010
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2851-ctx_0x5d851773f880.tracez",
+      "sha256": "cb0fbdf3f2fd205373e1f693e55c65894b0e85e00a41d8fff5e52d96c2fc24e8",
+      "size_bytes": 34011
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2852-ctx_0x5d851773f880.tracez",
+      "sha256": "235d969d2609d705d9e4cd041ddb316823ce1de0394384341745f692613bf023",
+      "size_bytes": 5110
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2853-ctx_0x5d851773f880.tracez",
+      "sha256": "9478f7a085e1911545fa7381d1bd4702a6f4d1befca0de7bc03c8e56f6918d63",
+      "size_bytes": 30328
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2854-ctx_0x5d851773f880.tracez",
+      "sha256": "a0a6b0cb0c484721fea0578ae7c0ff8bddce7a7a4bedb09b0297d31e1170bc28",
+      "size_bytes": 5662
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2855-ctx_0x5d851773f880.tracez",
+      "sha256": "7420c74501ca810c9eb443687cf0492b3d53483f908e5a057070c19434786a15",
+      "size_bytes": 8064
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2856-ctx_0x5d851773f880.tracez",
+      "sha256": "03d359a9651d5439d96a5f9f008a595ac7b894df91938c1c64cbd5f6a3f3cb58",
+      "size_bytes": 29685
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2857-ctx_0x5d851773f880.tracez",
+      "sha256": "b8d5b7c552286d8dca18b5f003472a2cc4b0f638bfbb231fa2e202b9cb05f265",
+      "size_bytes": 4686
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2858-ctx_0x5d851773f880.tracez",
+      "sha256": "3f32ab5276658cd58933bc38c8855460559175acbe93ab29f3b4b68163c73e75",
+      "size_bytes": 7052
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2859-ctx_0x5d851773f880.tracez",
+      "sha256": "2b5838b595673ac108fc32dd7c13a80d48f9957f1e5e9646c6c813c89853341b",
+      "size_bytes": 17111262
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2860-ctx_0x5d851773f880.tracez",
+      "sha256": "7cf8b642625c1d7b590826d12d2f1c5961d3076c302763590f732a67bffee272",
+      "size_bytes": 50041
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2861-ctx_0x5d851773f880.tracez",
+      "sha256": "44de7ce2af4eade50c1161c6fb98c83988d70c7a2e685ff23bd05f8be1c5d8c1",
+      "size_bytes": 17111291
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2862-ctx_0x5d851773f880.tracez",
+      "sha256": "f4f052c17a748c5060e323b9f732197e7f00cfdee47d943f8809a5ef8d5d7ebd",
+      "size_bytes": 23694
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2863-ctx_0x5d851773f880.tracez",
+      "sha256": "f4f692a092a0a6d33c05c629b3846454750b2a9cf8c986d738e65754f1f7c363",
+      "size_bytes": 13701520
+    },
+    {
+      "kind": "sass_instruction_trace",
+      "path": "/home/yueqi/gpu-atlas/framework-runtimes/validation/p31/hf-layer0-decode-run5/traces/kernel-2864-ctx_0x5d851773f880.tracez",
+      "sha256": "79c95214032b37c09219b2ac9ff67dac7e64c9d5525e16c17940ac06f48eae62",
+      "size_bytes": 6996
+    },
+    {
+      "kind": "trace_manifest",
+      "path": "/home/yueqi/gpu-atlas/p30-p31-worktree-20260910/validation/p31/hf_layer0_v2/trace_manifest.json",
+      "sha256": "bcb41df742f851489f6a211e25c92d6240375e4365d006cdc35d3c1feb3fae23",
+      "size_bytes": 3345
+    },
+    {
+      "kind": "online_address_bindings",
+      "path": "/home/yueqi/gpu-atlas/p30-p31-worktree-20260910/validation/p31/hf_layer0_v2/binding/online_address_bindings.tsv",
+      "sha256": "7acce56661ccd1b576788cc692f1db20de8456bcb869a7ad6f67cc5695dde2ad",
+      "size_bytes": 378
+    },
+    {
+      "kind": "online_address_binding_record",
+      "path": "/home/yueqi/gpu-atlas/p30-p31-worktree-20260910/validation/p31/hf_layer0_v2/binding/online_address_binding.json",
+      "sha256": "58344a3514d372902ebb50dffd5661b9ec1e5f6576926e9484a27e7c593b66da",
+      "size_bytes": 1707
+    }
+  ],
+  "qualification": {
+    "limitations": [
+      "Capture device SM89 is distinct from actual SASS binary versions.",
+      "Global PA binding is materialized but request-cycle replay is pending.",
+      "No calibrated performance claim is permitted."
+    ],
+    "performance_eligible": false,
+    "qualification_record": null,
+    "status": "framework_selected_sass_captured_pending_cycle_qualification"
+  },
+  "schema_version": "hetero-operator-artifact/v1",
+  "source_contract": {
+    "batch_size": 1,
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "context_length": 16,
+    "dtype": "fp16",
+    "implementation": "transformers_native_layer0_forward",
+    "kv_length": 17,
+    "layer_id": 0,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "model_spec_name": "TinyLlama-1.1B",
+    "operator": "huggingface_layer0",
+    "phase": "decode_step",
+    "q_len": 1
+  },
+  "tensors": [
+    {
+      "alignment_bytes": 256,
+      "dtype": "byte",
+      "layout": "opaque_pytorch_allocator_range",
+      "role": "opaque_runtime_allocator",
+      "shape": [
+        2214592512
+      ],
+      "size_bytes": 2214592512,
+      "strides": [
+        1
+      ],
+      "tensor_id": "hf.layer0.opaque_allocator_0",
+      "trace_base": 123597179846656
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "byte",
+      "layout": "opaque_pytorch_allocator_range",
+      "role": "opaque_runtime_allocator",
+      "shape": [
+        10485760
+      ],
+      "size_bytes": 10485760,
+      "strides": [
+        1
+      ],
+      "tensor_id": "hf.layer0.opaque_allocator_1",
+      "trace_base": 123599753052160
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "byte",
+      "layout": "opaque_pytorch_allocator_range",
+      "role": "opaque_runtime_allocator",
+      "shape": [
+        6291456
+      ],
+      "size_bytes": 6291456,
+      "strides": [
+        1
+      ],
+      "tensor_id": "hf.layer0.opaque_allocator_2",
+      "trace_base": 123599897755648
+    },
+    {
+      "alignment_bytes": 256,
+      "dtype": "byte",
+      "layout": "opaque_pytorch_allocator_range",
+      "role": "opaque_runtime_allocator",
+      "shape": [
+        18874368
+      ],
+      "size_bytes": 18874368,
+      "strides": [
+        1
+      ],
+      "tensor_id": "hf.layer0.opaque_allocator_3",
+      "trace_base": 123600214425600
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "executable": "/opt/gpu-atlas/framework-runtimes/trtllm-live/bin/python",
+  "framework_object_probe": "tensorrt_llm",
+  "packages": {
+    "tensorrt_llm": "1.2.1"
+  },
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "profile": "tensorrt_llm",
+  "python": "3.10.12",
+  "schema_version": "hetero-framework-runtime-probe/v1",
+  "torch": {
+    "compiled_cuda": "12.8",
+    "compute_capability": [
+      8,
+      6
+    ],
+    "cuda_available": true,
+    "cuda_tensor_sum": 120.0,
+    "device_count": 1,
+    "device_name": "NVIDIA GeForce RTX 3070",
+    "total_memory_bytes": 8589410304,
+    "version": "2.9.1+cu128"
+  }
+}

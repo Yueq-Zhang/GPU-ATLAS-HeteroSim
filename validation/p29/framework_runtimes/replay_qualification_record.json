@@ -1,0 +1,166 @@
+{
+  "automatic_framework_trace_capture_qualified": false,
+  "claim_boundary": "This record qualifies a second real framework request and deterministic same-host functional replay. Timings are observational only. Cross-SM logit hashes are not required to match, and no online adapter, automatic trace capture, simulator coupling, or performance claim is qualified.",
+  "cross_gpu_logits_bitwise_equality_required": false,
+  "cross_host_semantic_output_passed": true,
+  "end_to_end_simulator_integration_qualified": false,
+  "hosts": {
+    "local-sm86": {
+      "profiles": {
+        "huggingface": {
+          "deterministic_replay_passed": true,
+          "evidence_sha256": {
+            "first_run": "64a9832091fb8b29e7fc19b84c3c311662d000f0465f7c2c63e9bf5653037a7e",
+            "replay": "63ba04ec3044a8ddc23f21c521247d57d4f0f3dcd7b608b44e8bbe77943792c0"
+          },
+          "first_run_timings": {
+            "execution.decode_cuda_ms": 177.61273193359375,
+            "execution.model_load_seconds": 36.56017768700258,
+            "execution.prefill_cuda_ms": 2447.71435546875
+          },
+          "replay_timings": {
+            "execution.decode_cuda_ms": 73.47583770751953,
+            "execution.model_load_seconds": 1.1386768100019253,
+            "execution.prefill_cuda_ms": 1479.7535400390625
+          },
+          "semantic_output": {
+            "decode_last_logits_sha256": "8f574cfe72ab02ee5660338e72b759073410b526d2ab2abfc88975ccbb5ad8fb",
+            "next_token_id": 470,
+            "next_token_text": "or",
+            "prefill_last_logits_sha256": "ed6665e1a11f7e2065c0ff2c38db03d4a8a0c5170b0494fee8d01ea4207f4941"
+          },
+          "timing_fields_excluded_from_pass_criterion": true
+        },
+        "tensorrt_llm": {
+          "deterministic_replay_passed": true,
+          "evidence_sha256": {
+            "first_run": "a70949058eacaf96919878a4a85fe717272acdaed842292f5759a6c0faa3fd41",
+            "replay": "68245678fa8b29a4d2a1e4ea4d17481be7bc816aa2ef9623335afa8bfbca8c08"
+          },
+          "first_run_timings": {
+            "execution.engine_load_seconds": 31.357916296998155,
+            "execution.generation_seconds": 0.026705362997745397
+          },
+          "replay_timings": {
+            "execution.engine_load_seconds": 16.192936947998533,
+            "execution.generation_seconds": 0.029684697001357563
+          },
+          "semantic_output": {
+            "text": "\n",
+            "token_ids": [
+              13
+            ],
+            "token_ids_sha256": "525ec3b5ad9afc0f09a5f7e0eb865e97f5b4b614a85cf93f3ae644f8e5f874f0"
+          },
+          "timing_fields_excluded_from_pass_criterion": true
+        },
+        "vllm": {
+          "deterministic_replay_passed": true,
+          "evidence_sha256": {
+            "first_run": "f6500046988669afc23632ab52ec7a2c5b6cc90e2c6fbdb786de4c59d79749e9",
+            "replay": "142c82e9d283c756294addb31c34a4feef5fa91b5e0e92df97e29ed557e7fe33"
+          },
+          "first_run_timings": {
+            "execution.engine_load_seconds": 348.8798863060001,
+            "execution.generation_seconds": 0.05656867899961071
+          },
+          "replay_timings": {
+            "execution.engine_load_seconds": 65.76062171599915,
+            "execution.generation_seconds": 0.06288164899888216
+          },
+          "semantic_output": {
+            "text": "\n",
+            "token_ids": [
+              13
+            ],
+            "token_ids_sha256": "525ec3b5ad9afc0f09a5f7e0eb865e97f5b4b614a85cf93f3ae644f8e5f874f0"
+          },
+          "timing_fields_excluded_from_pass_criterion": true
+        }
+      },
+      "vllm_trtllm_token_parity_passed": true
+    },
+    "remote-sm89": {
+      "profiles": {
+        "huggingface": {
+          "deterministic_replay_passed": true,
+          "evidence_sha256": {
+            "first_run": "3bb8edbd0306a7b56cbb28a885bdc10f8283415d87ab76c1a344ac51f7f57c12",
+            "replay": "a1edd31954a36ee64565fd4d451926b48cb64466a10873c312a5658a86506320"
+          },
+          "first_run_timings": {
+            "execution.decode_cuda_ms": 72.91580963134766,
+            "execution.model_load_seconds": 0.9160303820390254,
+            "execution.prefill_cuda_ms": 1287.99951171875
+          },
+          "replay_timings": {
+            "execution.decode_cuda_ms": 28.700544357299805,
+            "execution.model_load_seconds": 0.6564585641026497,
+            "execution.prefill_cuda_ms": 812.19482421875
+          },
+          "semantic_output": {
+            "decode_last_logits_sha256": "06bb3a2de2e0d93f745aa14edf991c93d05770588edecfb5d9a1c82c4ef25a60",
+            "next_token_id": 470,
+            "next_token_text": "or",
+            "prefill_last_logits_sha256": "596a6553c33852c48a4055b031549a13c247b52aac5f540f8e043d6d6c47d329"
+          },
+          "timing_fields_excluded_from_pass_criterion": true
+        },
+        "tensorrt_llm": {
+          "deterministic_replay_passed": true,
+          "evidence_sha256": {
+            "first_run": "a9730f7ae11939577c436c958ec3b96825483425918c91d9f8781748ce4f4601",
+            "replay": "7922ec22ef605d4b9f4af7540fe44d45c5d912149c2a22c7caf356498548a49a"
+          },
+          "first_run_timings": {
+            "execution.engine_load_seconds": 11.704363721073605,
+            "execution.generation_seconds": 0.017948521999642253
+          },
+          "replay_timings": {
+            "execution.engine_load_seconds": 11.891167150926776,
+            "execution.generation_seconds": 0.014678901992738247
+          },
+          "semantic_output": {
+            "text": "\n",
+            "token_ids": [
+              13
+            ],
+            "token_ids_sha256": "525ec3b5ad9afc0f09a5f7e0eb865e97f5b4b614a85cf93f3ae644f8e5f874f0"
+          },
+          "timing_fields_excluded_from_pass_criterion": true
+        },
+        "vllm": {
+          "deterministic_replay_passed": true,
+          "evidence_sha256": {
+            "first_run": "dbf59a62ac50124473a050e6821535b7be0b454b99b6fa4de7c877fcc5c9b425",
+            "replay": "d9b66ba91d347222a18c7f07694547d0fb48a4be3a2598b783927f668e62740a"
+          },
+          "first_run_timings": {
+            "execution.engine_load_seconds": 70.11882343294565,
+            "execution.generation_seconds": 0.018525941064581275
+          },
+          "replay_timings": {
+            "execution.engine_load_seconds": 5.865713578998111,
+            "execution.generation_seconds": 0.019246335024945438
+          },
+          "semantic_output": {
+            "text": "\n",
+            "token_ids": [
+              13
+            ],
+            "token_ids_sha256": "525ec3b5ad9afc0f09a5f7e0eb865e97f5b4b614a85cf93f3ae644f8e5f874f0"
+          },
+          "timing_fields_excluded_from_pass_criterion": true
+        }
+      },
+      "vllm_trtllm_token_parity_passed": true
+    }
+  },
+  "model_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "performance_claim_allowed": false,
+  "replay_passed": true,
+  "runtime_to_p28_online_adapter_connected": false,
+  "same_host_stable_result_hashes_passed": true,
+  "schema_version": "hetero-framework-live-replay-qualification/v1",
+  "timing_fields_excluded_from_pass_criterion": true
+}

@@ -1,0 +1,26 @@
+{
+  "executable": "/home/yueqi/gpu-atlas/framework-runtimes/hf-live/bin/python",
+  "framework_object_probe": "llama",
+  "packages": {
+    "accelerate": "1.14.0",
+    "huggingface_hub": "1.30.0",
+    "transformers": "5.16.1"
+  },
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+  "profile": "huggingface",
+  "python": "3.10.12",
+  "schema_version": "hetero-framework-runtime-probe/v1",
+  "torch": {
+    "compiled_cuda": "13.2",
+    "compute_capability": [
+      8,
+      9
+    ],
+    "cuda_available": true,
+    "cuda_tensor_sum": 120.0,
+    "device_count": 1,
+    "device_name": "NVIDIA GeForce RTX 4090",
+    "total_memory_bytes": 25250627584,
+    "version": "2.14.0+cu132"
+  }
+}

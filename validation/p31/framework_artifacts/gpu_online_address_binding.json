@@ -1,0 +1,50 @@
+{
+  "allocated_bytes": 2250244096,
+  "bindings": [
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 0,
+      "size_bytes": 2214592512,
+      "tensor_id": "hf.layer0.opaque_allocator_0",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 2214592512,
+      "size_bytes": 10485760,
+      "tensor_id": "hf.layer0.opaque_allocator_1",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 2225078272,
+      "size_bytes": 6291456,
+      "tensor_id": "hf.layer0.opaque_allocator_2",
+      "tensor_offset_bytes": 0
+    },
+    {
+      "memory_space_id": "shared0.dram3d",
+      "physical_offset_bytes": 2231369728,
+      "size_bytes": 18874368,
+      "tensor_id": "hf.layer0.opaque_allocator_3",
+      "tensor_offset_bytes": 0
+    }
+  ],
+  "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+  "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+  "policy": {
+    "alignment_bytes": 256,
+    "capacity_bytes": 4294967296,
+    "memory_space_id": "shared0.dram3d",
+    "mode": "range_rebase_packed_manifest",
+    "physical_base_bytes": 0,
+    "require_nonzero_translations": true
+  },
+  "range_count": 4,
+  "schema_version": "hetero-online-address-binding/v1",
+  "table_path": "/home/yueqi/gpu-atlas/p30-p31-worktree-20260910/validation/p31/hf_layer0_v2/binding/online_address_bindings.tsv",
+  "table_sha256": "7acce56661ccd1b576788cc692f1db20de8456bcb869a7ad6f67cc5695dde2ad",
+  "tensor_count": 4,
+  "trace_key": "88a0cd8d96391814c472bf606a09bcc51fd4ba4659c162f150837ca00bad4ce2",
+  "translation_point": "mem_fetch_before_gpu_cache_lookup"
+}

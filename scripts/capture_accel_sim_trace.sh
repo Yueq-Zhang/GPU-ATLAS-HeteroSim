@@ -31,9 +31,17 @@ export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
 export USER_DEFINED_FOLDERS=1
 export TRACES_FOLDER="$TRACE_OUTPUT"
 export NVBIT_INSTRUMENTATION_ENABLED="${NVBIT_INSTRUMENTATION_ENABLED:-1}"
-export LD_PRELOAD="$TRACER${LD_PRELOAD:+:$LD_PRELOAD}"
-"$APPLICATION" "$@"
-unset LD_PRELOAD
+if [[ "${ACCEL_SIM_INJECTION_MODE:-0}" == "1" ]]; then
+  # NVBit's PyTorch hook path asks the CUDA driver to inject the tracer, then
+  # controls that same instance through its exported enable/disable symbols.
+  export CUDA_INJECTION64_PATH="$TRACER"
+  "$APPLICATION" "$@"
+  unset CUDA_INJECTION64_PATH
+else
+  export LD_PRELOAD="$TRACER${LD_PRELOAD:+:$LD_PRELOAD}"
+  "$APPLICATION" "$@"
+  unset LD_PRELOAD
+fi
 RAW_TRACE_OUTPUT="$TRACE_OUTPUT/traces"
 "$POSTPROCESSOR" "$RAW_TRACE_OUTPUT" -j "${ACCEL_SIM_TRACE_JOBS:-8}"
 [[ -f "$RAW_TRACE_OUTPUT/kernelslist.g" ]] || {

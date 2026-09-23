@@ -1,0 +1,82 @@
+{
+  "schema_version": "hetero-framework-qualification-config/v1",
+  "framework": "vllm",
+  "framework_version": "offline-contract-fixture",
+  "adapter_version": "heterosim-framework-adapter/v1",
+  "tokenizer_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "execution_parameters": {
+    "dtype": "fp16",
+    "temperature": 0.0,
+    "max_new_tokens": 1
+  },
+  "model_name": "TinyLlama-1.1B",
+  "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "huggingface_config": {
+    "model_type": "llama",
+    "hidden_size": 2048,
+    "intermediate_size": 5632,
+    "num_hidden_layers": 22,
+    "num_attention_heads": 32,
+    "num_key_value_heads": 4,
+    "vocab_size": 32000,
+    "torch_dtype": "float16",
+    "tie_word_embeddings": false
+  },
+  "requests": [
+    {
+      "request_id": "shadow-r0",
+      "prompt_length": 16,
+      "output_length": 1,
+      "execution_scope": "decode_step",
+      "initial_kv_length": 16
+    },
+    {
+      "request_id": "shadow-r1",
+      "prompt_length": 16,
+      "output_length": 1,
+      "execution_scope": "decode_step",
+      "initial_kv_length": 16
+    }
+  ],
+  "vllm_events": [
+    {"event": "request_arrived", "request_id": "shadow-r0"},
+    {"event": "request_arrived", "request_id": "shadow-r1"},
+    {"event": "kv_page_alloc", "request_id": "shadow-r0", "page_id": 0},
+    {"event": "kv_page_alloc", "request_id": "shadow-r1", "page_id": 1},
+    {
+      "event": "batch_formed",
+      "batch_id": "decode-bs2",
+      "request_ids": ["shadow-r0", "shadow-r1"],
+      "token_counts": [1, 1]
+    },
+    {
+      "event": "batch_formed",
+      "batch_id": "decode-ragged-bs2",
+      "request_ids": ["shadow-r0", "shadow-r1"],
+      "token_counts": [1, 2]
+    },
+    {"event": "decode_step", "request_id": "shadow-r0"},
+    {"event": "decode_step", "request_id": "shadow-r1"},
+    {"event": "kv_page_free", "request_id": "shadow-r0", "page_id": 0},
+    {"event": "request_finished", "request_id": "shadow-r0"},
+    {"event": "kv_page_free", "request_id": "shadow-r1", "page_id": 1},
+    {"event": "request_finished", "request_id": "shadow-r1"}
+  ],
+  "paged_kv": {
+    "page_size_tokens": 16,
+    "page_size_bytes": 16384,
+    "global_pa_base": 4294967296
+  },
+  "tensorrt_llm_manifest": {
+    "engine_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "builder_version": "offline-contract-fixture",
+    "profile": {
+      "min_batch": 1,
+      "max_batch": 8,
+      "min_seq": 1,
+      "max_seq": 2048
+    },
+    "tactics": [{"layer": "model.layers.0.self_attn.q_proj", "tactic": "fixture"}],
+    "plugins": [{"name": "paged_attention", "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}]
+  }
+}

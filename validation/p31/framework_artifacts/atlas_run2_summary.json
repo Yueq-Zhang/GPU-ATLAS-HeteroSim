@@ -1,0 +1,42 @@
+{
+  "artifact_key": "62cbebf2fbccdefc8a66bff429cf6be2bf2482fca21514b1a733a3badafcced2",
+  "artifact_sha256": "379048e15f8482b44724a928a31765a47ada63edd3c3c3dfca418e1a9d751345",
+  "execution_host": "remote_rtx4090_server",
+  "framework_simulation_key": "b6ee66f5fe9c47bba219d893aefe78392e2d25740e1205e31a2a401e4ef2c5fa",
+  "qualification": {
+    "full_memory_trace_materialized": true,
+    "global_pa_bound_before_dram_mapping": true,
+    "parent_child_conservation_expected": true,
+    "performance_claim_allowed": false,
+    "ramulator2_cycle_replay_qualified": false,
+    "tensor_ir_lowered": true,
+    "tile_and_core_placement_materialized": true
+  },
+  "schema_version": "hetero-p31-atlas-executable-qualification/v1",
+  "source_p30_bundle_sha256": "a10cdc2a25a30f5d810174927b5426b9417686153c5c737c1648cc68acb87c79",
+  "status": "passed",
+  "tensor_extents_bytes": {
+    "activation": 4096,
+    "output": 5120,
+    "weight": 10485760
+  },
+  "tensor_global_pa": {
+    "activation": 8589934592,
+    "output": 8600424448,
+    "weight": 8589938688
+  },
+  "trace": {
+    "parent_child_conservation_expected": true,
+    "read_requests": 337920,
+    "request_bytes": 64,
+    "request_count": 338080,
+    "requests_by_tensor": {
+      "activation": 10240,
+      "output": 160,
+      "weight": 327680
+    },
+    "trace_sha256": "3b89449fbfa3def514e53c58972a0a8e2ed7b1b7c720a388d047008c8d76ccf9",
+    "write_requests": 160
+  },
+  "trace_file_sha256": "050cf123b7f67b766a0bc09253295a764a88cc6316acabf2e764d0e63cae38b9"
+}

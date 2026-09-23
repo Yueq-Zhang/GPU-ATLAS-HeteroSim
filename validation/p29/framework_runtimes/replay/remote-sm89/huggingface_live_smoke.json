@@ -1,0 +1,53 @@
+{
+  "compiled_cuda": "13.2",
+  "device": {
+    "compute_capability": [
+      8,
+      9
+    ],
+    "name": "NVIDIA GeForce RTX 4090",
+    "total_memory_bytes": 25250627584
+  },
+  "dtype": "torch.float16",
+  "execution": {
+    "cuda_peak_allocated_bytes": 2210094592,
+    "decode_cuda_ms": 28.700544357299805,
+    "decode_last_logits_sha256": "06bb3a2de2e0d93f745aa14edf991c93d05770588edecfb5d9a1c82c4ef25a60",
+    "decode_logits_shape": [
+      1,
+      1,
+      32000
+    ],
+    "input_ids_sha256": "d59ca0e4d3ba7faa50a2d0aff9e2ce6e0bda20f842eae651326503e9b00d7037",
+    "model_load_seconds": 0.6564585641026497,
+    "next_token_id": 470,
+    "next_token_text": "or",
+    "prefill_cuda_ms": 812.19482421875,
+    "prefill_last_logits_sha256": "596a6553c33852c48a4055b031549a13c247b52aac5f540f8e043d6d6c47d329",
+    "prefill_logits_shape": [
+      1,
+      16,
+      32000
+    ]
+  },
+  "framework": "huggingface_transformers",
+  "framework_version": "5.16.1",
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "python": "3.10.12",
+  "qualification": {
+    "performance_claim_allowed": false,
+    "real_decode_executed": true,
+    "real_model_loaded": true,
+    "real_prefill_executed": true,
+    "runtime_to_p28_event_adapter_connected": false
+  },
+  "requested_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "resolved_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "schema_version": "hetero-framework-live-smoke/v1",
+  "torch_version": "2.14.0+cu132",
+  "workload": {
+    "batch_size": 1,
+    "decode_tokens": 1,
+    "prefill_tokens": 16
+  }
+}

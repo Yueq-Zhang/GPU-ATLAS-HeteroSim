@@ -1,0 +1,36 @@
+{
+  "schema_version": "hetero-framework-runtime-lock/v1",
+  "captured_at": "2026-09-09",
+  "python": "3.10.*",
+  "profiles": {
+    "huggingface": {
+      "torch": "2.14.0",
+      "transformers": "5.16.1",
+      "accelerate": "1.14.0",
+      "huggingface_hub": "1.30.0",
+      "sentencepiece": "0.2.1",
+      "protobuf": "6.32.1"
+    },
+    "vllm": {
+      "vllm": "0.29.0",
+      "torch_backend": "auto"
+    },
+    "tensorrt_llm": {
+      "tensorrt_llm": "1.2.1",
+      "resolved_transformers": "4.57.3",
+      "known_warning": "ModelOpt 0.37.0 advertises transformers<4.57, but TensorRT-LLM 1.2.1 imports Qwen3-VL code that is absent from 4.56.2; 4.57.3 is the executable resolution.",
+      "mpi_runtime": "system Open MPI or an isolated Ubuntu user-space extraction created by install_p29_user_mpi_runtime.sh",
+      "wheel_python_tag": "cp310",
+      "wheel_platform": "linux_x86_64",
+      "wheel_sha256": "66d7e8405b3021d163cdc761c997aa6dcc3bb9c15aefc2029323748840c3288a"
+    }
+  },
+  "installation_contract": {
+    "environment_isolation_required": true,
+    "accel_sim_cuda_11_8_environment_must_not_be_modified": true,
+    "local_gpu_identity": "NVIDIA GeForce RTX 3070 / SM86",
+    "remote_gpu_identity": "NVIDIA GeForce RTX 4090 / SM89",
+    "cross_sm_artifact_reuse_allowed": false,
+    "performance_claim_allowed": false
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "compiled_cuda": "12.8",
+  "device": {
+    "compute_capability": [
+      8,
+      6
+    ],
+    "name": "NVIDIA GeForce RTX 3070",
+    "total_memory_bytes": 8589410304
+  },
+  "execution": {
+    "engine_load_seconds": 31.357916296998155,
+    "finished": true,
+    "generation_seconds": 0.026705362997745397,
+    "text": "\n",
+    "token_ids": [
+      13
+    ],
+    "token_ids_sha256": "525ec3b5ad9afc0f09a5f7e0eb865e97f5b4b614a85cf93f3ae644f8e5f874f0"
+  },
+  "framework": "tensorrt_llm",
+  "framework_version": "1.2.1",
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "python": "3.10.12",
+  "qualification": {
+    "performance_claim_allowed": false,
+    "real_engine_loaded": true,
+    "real_request_executed": true,
+    "runtime_event_adapter_connected": false
+  },
+  "requested_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "schema_version": "hetero-framework-live-smoke/v1",
+  "torch_version": "2.9.1+cu128",
+  "workload": {
+    "max_seq_len": 64,
+    "output_tokens": 1,
+    "request_count": 1
+  }
+}

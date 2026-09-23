@@ -1,0 +1,53 @@
+{
+  "compiled_cuda": "13.2",
+  "device": {
+    "compute_capability": [
+      8,
+      6
+    ],
+    "name": "NVIDIA GeForce RTX 3070",
+    "total_memory_bytes": 8589410304
+  },
+  "dtype": "torch.float16",
+  "execution": {
+    "cuda_peak_allocated_bytes": 2210094592,
+    "decode_cuda_ms": 177.61273193359375,
+    "decode_last_logits_sha256": "8f574cfe72ab02ee5660338e72b759073410b526d2ab2abfc88975ccbb5ad8fb",
+    "decode_logits_shape": [
+      1,
+      1,
+      32000
+    ],
+    "input_ids_sha256": "d59ca0e4d3ba7faa50a2d0aff9e2ce6e0bda20f842eae651326503e9b00d7037",
+    "model_load_seconds": 36.56017768700258,
+    "next_token_id": 470,
+    "next_token_text": "or",
+    "prefill_cuda_ms": 2447.71435546875,
+    "prefill_last_logits_sha256": "ed6665e1a11f7e2065c0ff2c38db03d4a8a0c5170b0494fee8d01ea4207f4941",
+    "prefill_logits_shape": [
+      1,
+      16,
+      32000
+    ]
+  },
+  "framework": "huggingface_transformers",
+  "framework_version": "5.16.1",
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "python": "3.10.12",
+  "qualification": {
+    "performance_claim_allowed": false,
+    "real_decode_executed": true,
+    "real_model_loaded": true,
+    "real_prefill_executed": true,
+    "runtime_to_p28_event_adapter_connected": false
+  },
+  "requested_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "resolved_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "schema_version": "hetero-framework-live-smoke/v1",
+  "torch_version": "2.14.0+cu132",
+  "workload": {
+    "batch_size": 1,
+    "decode_tokens": 1,
+    "prefill_tokens": 16
+  }
+}

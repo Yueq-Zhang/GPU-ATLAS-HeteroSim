@@ -1,0 +1,64 @@
+{
+  "atlas": {
+    "artifact_key": "62cbebf2fbccdefc8a66bff429cf6be2bf2482fca21514b1a733a3badafcced2",
+    "deterministic_double_run": true,
+    "ramulator2_cycle_replay_qualified": false,
+    "trace": {
+      "parent_child_conservation_expected": true,
+      "read_requests": 337920,
+      "request_bytes": 64,
+      "request_count": 338080,
+      "requests_by_tensor": {
+        "activation": 10240,
+        "output": 160,
+        "weight": 327680
+      },
+      "trace_sha256": "3b89449fbfa3def514e53c58972a0a8e2ed7b1b7c720a388d047008c8d76ccf9",
+      "write_requests": 160
+    }
+  },
+  "evidence_sha256": {
+    "atlas_run_a": "2768b026be085b47d002777779c573ef07dc78182cd61b6523efcccd524620e2",
+    "atlas_run_b": "2768b026be085b47d002777779c573ef07dc78182cd61b6523efcccd524620e2",
+    "gpu_artifact": "4f00c5f96bab9d81c4205a70afb7038616c8fa49e50bbe99dfe7432380e179f1",
+    "gpu_binding": "58344a3514d372902ebb50dffd5661b9ec1e5f6576926e9484a27e7c593b66da",
+    "gpu_replay_stats": "93c8cd26f7c949f37496c38ad433d9699b2fb9b21aa42d5aef8e649d49963005",
+    "gpu_trace_manifest": "bcb41df742f851489f6a211e25c92d6240375e4365d006cdc35d3c1feb3fae23",
+    "p30_qualification": "7d9792c726e77ed7bb18667a9473a3420b91bb6e011d40291fbaf44c8362cf1f"
+  },
+  "execution_host": "remote_rtx4090_sm89",
+  "gpu": {
+    "actual_binary_versions": [
+      86
+    ],
+    "allocated_global_pa_bytes": 2250244096,
+    "allocator_range_count": 4,
+    "artifact_id": "tinyllama.1_1b.huggingface.layer0.decode_step.bs1.ctx16.q1.kv17.fp16.remote_sm89.ampere_replay_sm86.accel_sim_v2",
+    "capture_device_sm": 89,
+    "kernel_launch_count": 40,
+    "replay_target_sm": 86,
+    "request_cycle_ready": false,
+    "single_replay_address_audit": {
+      "all_parents_completed": true,
+      "nonzero_translated": true,
+      "positive_gpu_cycles": true,
+      "positive_gpu_instructions": true,
+      "single_ramulator2": true,
+      "zero_in_flight": true,
+      "zero_unmapped": true
+    }
+  },
+  "p30_simulation_key": "b6ee66f5fe9c47bba219d893aefe78392e2d25740e1205e31a2a401e4ef2c5fa",
+  "qualification": {
+    "atlas_tensor_ir_to_full_memory_trace": true,
+    "automatic_capture_pipeline_available": true,
+    "end_to_end_framework_timeline_qualified": false,
+    "framework_selected_sass_captured": true,
+    "gpu_double_replay_qualified": false,
+    "performance_claim_allowed": false,
+    "sass_binary_identity_sealed": true,
+    "trace_address_to_global_pa_audited": true
+  },
+  "schema_version": "hetero-p31-framework-artifact-qualification/v1",
+  "status": "passed"
+}

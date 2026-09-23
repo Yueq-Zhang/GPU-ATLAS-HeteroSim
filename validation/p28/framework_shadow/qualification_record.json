@@ -1,0 +1,38 @@
+{
+  "artifact_summary": {
+    "atlas_compile_sha256": "9294db8f15feb9a73b89850c2dcc68c5cc67b0bbc1549d5bbc8f2ddaf0643c02",
+    "framework_identity_sha256": "068db16df6709c204cc5720f7d0d48aa0d2324120a3e98c20735e85c078bffec",
+    "full_artifact_sha256": "64c779105907cac2a01a3f823ae55c12282e0edacde7581855764bde3f9f51a6",
+    "global_pa_allocation_count": 761,
+    "gpu_artifacts": {
+      "attention_norm": "configs/hetero/operator_artifacts/p23_sm89_decode_bs2_coupled/tinyllama_decode_bs2_ctx16_kv17_attention_norm_sm89_shared_hbdram_range_rebase.json",
+      "qkv_projection": "configs/hetero/operator_artifacts/p23_sm89_decode_bs2_coupled/tinyllama_decode_bs2_ctx16_kv17_qkv_projection_sm89_shared_hbdram_range_rebase.json"
+    },
+    "graph_count": 2,
+    "paged_kv_global_pa_bound": true,
+    "shadow_record_sha256": "9e139c0edd58944d3426320135777cfd5a43012809c4056acc926b546ccd003d",
+    "task_count": 544,
+    "tensorrt_identity_sha256": "8a8dc4814e64f78b4246fe74737a5ef6910a9cc55939860675a74a34eadc8a91",
+    "vllm_batch_count": 2,
+    "vllm_event_sha256": "1b557ddd66f2853a4df72ae2d42b183338191a1ed42cb0d401af68731fb5305e"
+  },
+  "capabilities": {
+    "atlas_tensor_ir_compile": true,
+    "exact_gpu_catalog_resolution": true,
+    "huggingface_graph_and_tensor_export": true,
+    "shadow_simulation": true,
+    "tensor_to_global_pa": true,
+    "tensorrt_llm_identity_contract": true,
+    "vllm_continuous_ragged_paged_kv_contract": true
+  },
+  "deterministic_double_run": true,
+  "external_runtime_validation": {
+    "huggingface_live_model_executed": false,
+    "tensorrt_llm_engine_executed": false,
+    "vllm_live_scheduler_executed": false
+  },
+  "performance_claim_allowed": false,
+  "qualification_boundary": "The offline, versioned framework adapters and shadow causality are qualified. Live external framework callbacks, a real TensorRT engine, and end-to-end hardware performance remain unqualified.",
+  "schema_version": "hetero-p28-framework-shadow-qualification/v1",
+  "status": "passed"
+}

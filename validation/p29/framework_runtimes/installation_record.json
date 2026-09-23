@@ -1,0 +1,90 @@
+{
+  "automatic_framework_trace_capture_qualified": false,
+  "claim_boundary": "P29 qualifies isolated installation and one real framework request per profile on each GPU. It does not qualify online P28 callbacks, automatic SASS capture, simulator coupling, or performance.",
+  "cuda_execution_passed": true,
+  "end_to_end_simulator_integration_qualified": false,
+  "hosts": {
+    "local-sm86": {
+      "device": {
+        "compute_capability": [
+          8,
+          6
+        ],
+        "name": "NVIDIA GeForce RTX 3070"
+      },
+      "evidence_sha256": {
+        "local-sm86\\huggingface_live_smoke.json": "64a9832091fb8b29e7fc19b84c3c311662d000f0465f7c2c63e9bf5653037a7e",
+        "local-sm86\\huggingface_probe.json": "30476319f432660261cd5f764617d5107f7007ced01bd8f42826ef37f73a4bd0",
+        "local-sm86\\huggingface_requirements.lock": "9dce8f25d7f1d6df414cfca6bcb19f1a6f7689de2f1d8b78a968b28d35a45c41",
+        "local-sm86\\tensorrt_llm_live_smoke.json": "a70949058eacaf96919878a4a85fe717272acdaed842292f5759a6c0faa3fd41",
+        "local-sm86\\tensorrt_llm_probe.json": "9601decdc6fcf553d94af5bd1f87284ba64d7492de1299ad981993570667bddb",
+        "local-sm86\\tensorrt_llm_requirements.lock": "c06c578d04e48d76d3febf415dab9b7de0b5541cba49dd9077a39d7645b303a6",
+        "local-sm86\\vllm_live_smoke.json": "f6500046988669afc23632ab52ec7a2c5b6cc90e2c6fbdb786de4c59d79749e9",
+        "local-sm86\\vllm_probe.json": "5d4231e14ee92ab52b1a33441eb372e074c1f96d5b32192a95c6979253402e6c",
+        "local-sm86\\vllm_requirements.lock": "0191f62124dffdf046105c6060fe734e164b3cc63690258af9b62760c8982942"
+      },
+      "profiles": {
+        "huggingface": {
+          "cuda_probe_passed": true,
+          "real_prefill_decode_passed": true,
+          "version": "5.16.1"
+        },
+        "tensorrt_llm": {
+          "cuda_probe_passed": true,
+          "real_request_passed": true,
+          "version": "1.2.1"
+        },
+        "vllm": {
+          "cuda_probe_passed": true,
+          "model_runner": "v1_wsl_uva_fallback",
+          "real_request_passed": true,
+          "version": "0.29.0"
+        }
+      }
+    },
+    "remote-sm89": {
+      "device": {
+        "compute_capability": [
+          8,
+          9
+        ],
+        "name": "NVIDIA GeForce RTX 4090"
+      },
+      "evidence_sha256": {
+        "remote-sm89\\huggingface_live_smoke.json": "3bb8edbd0306a7b56cbb28a885bdc10f8283415d87ab76c1a344ac51f7f57c12",
+        "remote-sm89\\huggingface_probe.json": "bcf5c725075c6b87d44061e71321f47d8a7d7f66c6d69ba8bcf19a8ddca2ba7c",
+        "remote-sm89\\huggingface_requirements.lock": "9dce8f25d7f1d6df414cfca6bcb19f1a6f7689de2f1d8b78a968b28d35a45c41",
+        "remote-sm89\\tensorrt_llm_live_smoke.json": "a9730f7ae11939577c436c958ec3b96825483425918c91d9f8781748ce4f4601",
+        "remote-sm89\\tensorrt_llm_probe.json": "bf473826f4f9e1b5c8fe9c8e91812c56ede298beca2ceba3e6c4d851218f7ac7",
+        "remote-sm89\\tensorrt_llm_requirements.lock": "c06c578d04e48d76d3febf415dab9b7de0b5541cba49dd9077a39d7645b303a6",
+        "remote-sm89\\vllm_live_smoke.json": "dbf59a62ac50124473a050e6821535b7be0b454b99b6fa4de7c877fcc5c9b425",
+        "remote-sm89\\vllm_probe.json": "7cb91072ade6b124d95e1c8eacc641ec4ec0392386ba5d9936d2ca17000f0785",
+        "remote-sm89\\vllm_requirements.lock": "0191f62124dffdf046105c6060fe734e164b3cc63690258af9b62760c8982942"
+      },
+      "profiles": {
+        "huggingface": {
+          "cuda_probe_passed": true,
+          "real_prefill_decode_passed": true,
+          "version": "5.16.1"
+        },
+        "tensorrt_llm": {
+          "cuda_probe_passed": true,
+          "real_request_passed": true,
+          "version": "1.2.1"
+        },
+        "vllm": {
+          "cuda_probe_passed": true,
+          "model_runner": "framework_default",
+          "real_request_passed": true,
+          "version": "0.29.0"
+        }
+      }
+    }
+  },
+  "installation_passed": true,
+  "live_framework_smoke_passed": true,
+  "model_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "performance_claim_allowed": false,
+  "runtime_to_p28_online_adapter_connected": false,
+  "schema_version": "hetero-framework-runtime-installation/v1"
+}
