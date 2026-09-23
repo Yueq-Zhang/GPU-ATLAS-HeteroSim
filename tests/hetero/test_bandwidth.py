@@ -57,6 +57,49 @@ def test_edge_hbdram_contract_closes_exactly() -> None:
     assert contract.external_link.request_payload_bandwidth_Bps == 12_800_000_000
 
 
+def test_gddr6_contract_accepts_explicit_picosecond_quantization() -> None:
+    payload = _valid_contract()
+    payload["internal_dram"] = {
+        "implementation": "GDDR6",
+        "channel_count": 16,
+        "pseudochannels_per_channel": 1,
+        "dq_bits_per_channel": 16,
+        "channel_width_bits": 16,
+        "transfers_per_clock": 2,
+        "rate_MTps": 13_986,
+        "nBL_cycles": 4,
+        "tCK_ps": 143,
+        "clock_quantization_ppm": 2,
+        "internal_prefetch_size": 8,
+        "transaction_bytes": 16,
+        "peak_payload_bandwidth_Bps": 447_552_000_000,
+    }
+    dram = BandwidthContract.load(payload).internal_dram
+    assert dram.clock_quantization_ppm == 2
+    assert int(dram.phy_peak_bandwidth_Bps) == 447_552_000_000
+
+
+def test_gddr6_contract_rejects_unacknowledged_clock_quantization() -> None:
+    payload = _valid_contract()
+    payload["internal_dram"].update(  # type: ignore[union-attr]
+        {
+            "implementation": "GDDR6",
+            "channel_count": 16,
+            "dq_bits_per_channel": 16,
+            "channel_width_bits": 16,
+            "transfers_per_clock": 2,
+            "rate_MTps": 13_986,
+            "nBL_cycles": 4,
+            "tCK_ps": 143,
+            "internal_prefetch_size": 8,
+            "transaction_bytes": 16,
+            "peak_payload_bandwidth_Bps": 447_552_000_000,
+        }
+    )
+    with pytest.raises(BandwidthContractError, match="tCK_ps"):
+        BandwidthContract.load(payload)
+
+
 @pytest.mark.parametrize(
     ("field", "value", "message"),
     [

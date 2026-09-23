@@ -140,6 +140,7 @@
                 "rate_MTps": {"type": "integer", "minimum": 1},
                 "nBL_cycles": {"type": "integer", "minimum": 1},
                 "tCK_ps": {"type": "integer", "minimum": 1},
+                "clock_quantization_ppm": {"type": "integer", "minimum": 0},
                 "internal_prefetch_size": {"type": "integer", "minimum": 1},
                 "transaction_bytes": {"type": "integer", "minimum": 1},
                 "peak_payload_bandwidth_Bps": {"type": "integer", "minimum": 1}

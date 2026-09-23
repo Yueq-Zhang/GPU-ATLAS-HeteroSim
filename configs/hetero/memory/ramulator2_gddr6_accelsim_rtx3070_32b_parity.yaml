@@ -1,0 +1,74 @@
+# Accel-Sim RTX 3070 internal-DRAM behavioral parity profile.
+#
+# This is an abstract simulator-equivalence profile, not a physical x32 GDDR6
+# device description.  Ramulator2 GDDR6 has a fixed 8n internal prefetch, so a
+# 32-bit logical channel is used to reproduce Accel-Sim's 32-byte DRAM atom.
+# Halving the data rate keeps the aggregate payload bandwidth equal to the
+# 16-bit, 13.986-GT/s physical-bus representation:
+#
+#   16 channels * 32 bits * 6.993 GT/s / 8 = 447.552 GB/s
+#   16 channels * 32 B / (4 * 286 ps)      = 447.552 GB/s (1 ppm)
+#
+# The organization also reproduces the current Accel-Sim address decoder's
+# 13 row bits, 6 decoded column bits, 5 transaction-offset bits, 2 KiB rows,
+# and 4 GiB unique DRAM-tuple space.  OneLevelInterleave cannot reproduce the
+# Accel-Sim IPOLY partition hash; channel_lowest_bit=3 only aligns the raw
+# channel-bit location (byte-address bits 8..11) before hashing.
+Frontend:
+  impl: HBFrontend
+  clock_ratio: 1
+
+MemorySystem:
+  impl: GenericDRAM
+  clock_ratio: 1
+  DRAM:
+    impl: GDDR6
+    org:
+      density: 32768
+      dq: 32
+      channel: 16
+      bankgroup: 4
+      bank: 4
+      row: 8192
+      column: 512
+      channel_width: 32
+    timing:
+      rate: 6993
+      nBL: 4
+      nCL: 24
+      nRCDRD: 24
+      nRCDWD: 15
+      nRP: 24
+      nRAS: 55
+      nRC: 78
+      nWR: 24
+      nRTP: 4
+      nCWL: 8
+      nCCDS: 4
+      nCCDL: 6
+      nRRDS: 12
+      nRRDL: 12
+      # Accel-Sim derives WTR as WL + BL/data_ratio + CDLR, where CDLR=10.
+      nWTRS: 10
+      nWTRL: 10
+      # The internal Accel-Sim DRAM model has no four-activate-window rule.
+      nFAW: 0
+      # Refresh is not issued by the internal Accel-Sim model.  These values
+      # initialize the Ramulator2 state machine, while nREFI keeps refresh out
+      # of the finite qualification window.
+      nRFC: 1259
+      nRFCpb: 630
+      nRREFD: 14
+      nREFI: 2000000000
+  Controller:
+    impl: Generic
+    Scheduler:
+      impl: FRFCFS
+    RefreshManager:
+      impl: AllBank
+    RowPolicy:
+      impl: OpenRowPolicy
+    plugins:
+  AddrMapper:
+    impl: OneLevelInterleave
+    channel_lowest_bit: 3

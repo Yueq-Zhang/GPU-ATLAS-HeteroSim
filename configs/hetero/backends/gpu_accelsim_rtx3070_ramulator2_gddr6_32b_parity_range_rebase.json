@@ -1,0 +1,74 @@
+{
+  "schema_version": "hetero-accel-sim-backend/v1",
+  "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_gddr6_32b_parity.range_rebase.v2_0_0",
+  "executable": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-gddr6-ramulator2/gpu-simulator/build-ramulator2/accel-sim.out",
+  "gpgpu_config": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-gddr6-ramulator2/gpu-simulator/gpgpu-sim/configs/tested-cfgs/SM86_RTX3070/gpgpusim.config",
+  "trace_config": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-gddr6-ramulator2/gpu-simulator/configs/tested-cfgs/SM86_RTX3070/trace.config",
+  "target_gpu": "RTX 3070 SM86 with an abstract 32-byte Accel-Sim-internal-GDDR6 parity profile",
+  "target_sm": 86,
+  "core_frequency_hz": 1132000000,
+  "timeout_seconds": 43200,
+  "dependency_commits": {
+    "accel_sim_framework": "64653015f85fb5664c84a10f48527e8897d289d0",
+    "gpgpu_sim_distribution": "e10018b67a4b668e7b43f89280cf67624f1df4ff",
+    "ramulator2": "3996362187d7f8314936e5ad7560d93b66b6a215"
+  },
+  "environment": {},
+  "external_memory": {
+    "kind": "ramulator2_in_process",
+    "config_file": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/memory/ramulator2_gddr6_accelsim_rtx3070_32b_parity.yaml",
+    "bridge_library": "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-gddr6-ramulator2/ramulator2_bridge/libramulator_gpgpusim_bridge.so",
+    "timing_owner": "gpu_local_gddr6.ramulator2",
+    "expected_instances": 1,
+    "require_nonzero_requests": true,
+    "address_translation": {
+      "mode": "range_rebase_packed_manifest",
+      "memory_space_id": "gpu0.local_gddr6",
+      "physical_base_bytes": 0,
+      "capacity_bytes": 4294967296,
+      "alignment_bytes": 256,
+      "require_nonzero_translations": true
+    },
+    "bandwidth_contract": {
+      "schema_version": "hetero-bandwidth-contract/v1",
+      "external_link": {
+        "protocol": "direct_memory_phy",
+        "request_payload_bandwidth_Bps": 3496503496000000000,
+        "response_payload_bandwidth_Bps": 3496503496000000000,
+        "request_header_bytes": 0,
+        "response_header_bytes": 0,
+        "flit_bytes": 32,
+        "propagation_latency_fs": 0,
+        "queue_depth_transactions": 1024,
+        "credits": 1024,
+        "duplex_mode": "full_duplex",
+        "clock_hz": 3496503496
+      },
+      "logic_die_gateway": {
+        "clock_hz": 3496503496,
+        "ingress_queue_depth": 1024,
+        "parent_table_entries": 2048,
+        "split_width_per_cycle": 16,
+        "issue_width_per_cycle": 16,
+        "completion_width_per_cycle": 16,
+        "ordering_policy": "ordering_domain_fifo",
+        "write_ack_policy": "durable"
+      },
+      "internal_dram": {
+        "implementation": "GDDR6-AccelSim-32B-BehavioralParity",
+        "channel_count": 16,
+        "pseudochannels_per_channel": 1,
+        "dq_bits_per_channel": 32,
+        "channel_width_bits": 32,
+        "transfers_per_clock": 2,
+        "rate_MTps": 6993,
+        "nBL_cycles": 4,
+        "tCK_ps": 286,
+        "clock_quantization_ppm": 2,
+        "internal_prefetch_size": 8,
+        "transaction_bytes": 32,
+        "peak_payload_bandwidth_Bps": 447552000000
+      }
+    }
+  }
+}

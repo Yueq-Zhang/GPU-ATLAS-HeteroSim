@@ -1,0 +1,14 @@
+diff --git a/src/dram/impl/GDDR6.cpp b/src/dram/impl/GDDR6.cpp
+--- a/src/dram/impl/GDDR6.cpp
++++ b/src/dram/impl/GDDR6.cpp
+@@ -310,7 +310,9 @@ class GDDR6 : public IDRAM, public Implementation {
+         }
+       }(m_organization.density);
+
+-      m_timing_vals("nRFC")  = JEDEC_rounding(tRFC_TABLE[0][density_id], tCK_ps);
++      if (density_id != -1) {
++        m_timing_vals("nRFC") = JEDEC_rounding(tRFC_TABLE[0][density_id], tCK_ps);
++      }
+       m_timing_vals("nREFI") = JEDEC_rounding(tREFI_BASE, tCK_ps);
+
+       // Overwrite timing parameters with any user-provided value

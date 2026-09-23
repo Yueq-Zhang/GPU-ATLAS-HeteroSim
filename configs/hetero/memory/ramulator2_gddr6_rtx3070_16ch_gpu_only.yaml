@@ -1,0 +1,57 @@
+Frontend:
+  impl: HBFrontend
+  clock_ratio: 1
+
+MemorySystem:
+  impl: GenericDRAM
+  clock_ratio: 1
+  DRAM:
+    impl: GDDR6
+    org:
+      density: 65536
+      dq: 16
+      channel: 16
+      bankgroup: 4
+      bank: 4
+      row: 16384
+      column: 1024
+      channel_width: 16
+    timing:
+      # 13.986 GT/s and 16 x16-bit channels provide 447.552 GB/s,
+      # within 0.115% of the Accel-Sim RTX 3070 configuration (448.064 GB/s).
+      rate: 13986
+      nBL: 4
+      nCL: 48
+      nRCDRD: 48
+      nRCDWD: 30
+      nRP: 48
+      nRAS: 110
+      nRC: 156
+      nWR: 48
+      nRTP: 8
+      nCWL: 16
+      nCCDS: 8
+      nCCDL: 12
+      nRRDS: 24
+      nRRDL: 24
+      nWTRS: 24
+      nWTRL: 24
+      nFAW: 96
+      nRFC: 2518
+      nRFCpb: 1259
+      nRREFD: 28
+      # Accel-Sim's internal DRAM model does not schedule refresh commands;
+      # keep refresh outside the finite comparison window.
+      nREFI: 2000000000
+  Controller:
+    impl: Generic
+    Scheduler:
+      impl: FRFCFS
+    RefreshManager:
+      impl: AllBank
+    RowPolicy:
+      impl: OpenRowPolicy
+    plugins:
+  AddrMapper:
+    impl: OneLevelInterleave
+    channel_lowest_bit: 0

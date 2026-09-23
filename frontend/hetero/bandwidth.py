@@ -126,6 +126,7 @@ class InternalDramContract:
     rate_MTps: int
     nBL_cycles: int
     tCK_ps: int
+    clock_quantization_ppm: int
     internal_prefetch_size: int
     transaction_bytes: int
     peak_payload_bandwidth_Bps: int
@@ -148,7 +149,9 @@ class InternalDramContract:
             "transaction_bytes",
             "peak_payload_bandwidth_Bps",
         }
-        _require_exact_keys(source, required, path)
+        optional = {"clock_quantization_ppm"}
+        present_optional = optional & source.keys()
+        _require_exact_keys(source, required | present_optional, path)
         implementation = source.get("implementation")
         if not isinstance(implementation, str) or not implementation:
             raise BandwidthContractError(f"{path}.implementation is required")
@@ -168,6 +171,11 @@ class InternalDramContract:
             rate_MTps=_positive_int(source, "rate_MTps", path),
             nBL_cycles=_positive_int(source, "nBL_cycles", path),
             tCK_ps=_positive_int(source, "tCK_ps", path),
+            clock_quantization_ppm=(
+                _unsigned_int(source, "clock_quantization_ppm", path)
+                if "clock_quantization_ppm" in source
+                else 0
+            ),
             internal_prefetch_size=_positive_int(
                 source, "internal_prefetch_size", path
             ),
@@ -208,6 +216,18 @@ class InternalDramContract:
     def clock_hz(self) -> Fraction:
         return Fraction(1_000_000_000_000, self.tCK_ps)
 
+    def _matches_with_clock_quantization(
+        self, actual: Fraction, expected: Fraction
+    ) -> bool:
+        if actual == expected:
+            return True
+        if self.clock_quantization_ppm == 0 or expected == 0:
+            return False
+        return (
+            abs(actual - expected) * 1_000_000
+            <= abs(expected) * self.clock_quantization_ppm
+        )
+
     def validate(self) -> None:
         if self.dq_bits_per_channel % 8 or self.channel_width_bits % 8:
             raise BandwidthContractError(
@@ -220,11 +240,13 @@ class InternalDramContract:
                 "DRAM transaction_bytes disagrees with "
                 "internal_prefetch_size * channel_width_bits / 8"
             )
-        if self.derived_tCK_ps.denominator != 1 or int(self.derived_tCK_ps) != self.tCK_ps:
+        if not self._matches_with_clock_quantization(
+            self.derived_tCK_ps, Fraction(self.tCK_ps, 1)
+        ):
             raise BandwidthContractError(
                 "DRAM tCK_ps disagrees with rate_MTps and transfers_per_clock"
             )
-        if self.clock_hz.denominator != 1:
+        if self.clock_hz.denominator != 1 and self.clock_quantization_ppm == 0:
             raise BandwidthContractError(
                 "DRAM tCK_ps must derive an integer clock frequency"
             )
@@ -233,7 +255,9 @@ class InternalDramContract:
             raise BandwidthContractError(
                 "DRAM declared peak bandwidth disagrees with DQ * rate * channels"
             )
-        if self.command_peak_bandwidth_Bps != declared:
+        if not self._matches_with_clock_quantization(
+            self.command_peak_bandwidth_Bps, declared
+        ):
             raise BandwidthContractError(
                 "DRAM command peak disagrees with transaction_bytes, nBL and tCK"
             )

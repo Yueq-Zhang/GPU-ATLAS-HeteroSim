@@ -14,6 +14,8 @@ BRIDGE_SOURCE="$PROJECT_ROOT/integrations/accel_sim_ramulator2"
 BRIDGE_OUT="$COUPLED_ROOT/ramulator2_bridge"
 PATCH_FILE="$BRIDGE_SOURCE/accel_sim_v2_ramulator2.patch"
 RAMULATOR_PATCH="$BRIDGE_SOURCE/ramulator2_durable_write_callback.patch"
+EXTRA_RAMULATOR_PATCH="${RAMULATOR2_EXTRA_PATCH:-}"
+EXTRA_RAMULATOR_SOURCE="${RAMULATOR2_EXTRA_SOURCE:-}"
 MARKER="$COUPLED_ROOT/.heterosim_ramulator2_patch_applied"
 PATCH_SHA256="$(sha256sum "$PATCH_FILE" | awk '{print $1}')"
 RAMULATOR_PATCH_SHA256="$(sha256sum "$RAMULATOR_PATCH" | awk '{print $1}')"
@@ -36,7 +38,24 @@ for required in \
   }
 done
 
+if [[ -n "$EXTRA_RAMULATOR_PATCH" && ! -f "$EXTRA_RAMULATOR_PATCH" ]]; then
+  echo "missing optional Ramulator2 patch: $EXTRA_RAMULATOR_PATCH" >&2
+  exit 2
+fi
+if [[ -n "$EXTRA_RAMULATOR_SOURCE" && ! -f "$EXTRA_RAMULATOR_SOURCE" ]]; then
+  echo "missing optional Ramulator2 implementation source: $EXTRA_RAMULATOR_SOURCE" >&2
+  exit 2
+fi
+
 EXPECTED_MARKER="$ACCEL_COMMIT $PATCH_SHA256 $RAMULATOR_PATCH_SHA256"
+if [[ -n "$EXTRA_RAMULATOR_PATCH" ]]; then
+  EXTRA_RAMULATOR_PATCH_SHA256="$(sha256sum "$EXTRA_RAMULATOR_PATCH" | awk '{print $1}')"
+  EXPECTED_MARKER="$EXPECTED_MARKER $EXTRA_RAMULATOR_PATCH_SHA256"
+fi
+if [[ -n "$EXTRA_RAMULATOR_SOURCE" ]]; then
+  EXTRA_RAMULATOR_SOURCE_SHA256="$(sha256sum "$EXTRA_RAMULATOR_SOURCE" | awk '{print $1}')"
+  EXPECTED_MARKER="$EXPECTED_MARKER $EXTRA_RAMULATOR_SOURCE_SHA256"
+fi
 if [[ -d "$COUPLED_ROOT" &&
       (! -f "$MARKER" || "$(cat "$MARKER")" != "$EXPECTED_MARKER") ]]; then
   case "$COUPLED_ROOT" in
@@ -68,6 +87,12 @@ if [[ ! -f "$RAMULATOR_LIB/libramulator.so" ]]; then
   git -C "$RAMULATOR_SRC" apply --ignore-space-change --check \
     "$RAMULATOR_PATCH"
   git -C "$RAMULATOR_SRC" apply --ignore-space-change "$RAMULATOR_PATCH"
+  if [[ -n "$EXTRA_RAMULATOR_PATCH" ]]; then
+    git -C "$RAMULATOR_SRC" apply --ignore-space-change --check \
+      "$EXTRA_RAMULATOR_PATCH"
+    git -C "$RAMULATOR_SRC" apply --ignore-space-change \
+      "$EXTRA_RAMULATOR_PATCH"
+  fi
   cmake -S "$DURABLE_RAMULATOR_ROOT" -B "$RAMULATOR_BUILD" \
     -DCMAKE_BUILD_TYPE=Release
   cmake --build "$RAMULATOR_BUILD" --target ramulator \
@@ -78,6 +103,11 @@ mkdir -p "$BRIDGE_OUT"
 cp "$BRIDGE_SOURCE/ramulator_bridge.h" "$BRIDGE_OUT/ramulator_bridge.h"
 cp "$BRIDGE_SOURCE/atlas_hb_port.h" "$BRIDGE_OUT/atlas_hb_port.h"
 
+EXTRA_RAMULATOR_SOURCE_ARGS=()
+if [[ -n "$EXTRA_RAMULATOR_SOURCE" ]]; then
+  EXTRA_RAMULATOR_SOURCE_ARGS+=("$EXTRA_RAMULATOR_SOURCE")
+fi
+
 g++ -std=c++20 -O3 -fPIC -shared \
   -I"$BRIDGE_SOURCE" \
   -I"$RAMULATOR_SRC/src" \
@@ -85,6 +115,7 @@ g++ -std=c++20 -O3 -fPIC -shared \
   -I"$RAMULATOR_SRC/ext/spdlog/include" \
   -I"$YAML_INCLUDE" \
   "$BRIDGE_SOURCE/ramulator_bridge.cpp" \
+  "${EXTRA_RAMULATOR_SOURCE_ARGS[@]}" \
   -L"$RAMULATOR_LIB" -Wl,--no-as-needed -lramulator \
   -Wl,-rpath,"$RAMULATOR_LIB" \
   -o "$BRIDGE_OUT/libramulator_gpgpusim_bridge.so"

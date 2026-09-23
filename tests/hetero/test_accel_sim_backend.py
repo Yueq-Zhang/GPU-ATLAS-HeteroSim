@@ -9,8 +9,8 @@ from frontend.hetero.backends.accel_sim import (
     AccelSimBackend,
     AccelSimBackendConfig,
     AccelSimBackendError,
-    parse_atlas_full_chip_runtime_stats,
     parse_accel_sim_stats,
+    parse_atlas_full_chip_runtime_stats,
     parse_ramulator2_stats,
 )
 from frontend.hetero.trace_manifest import TraceManifest
@@ -67,6 +67,7 @@ def test_checked_in_backend_configs_pin_accel_sim_v2() -> None:
         "gpu_accelsim_qv100.json",
         "gpu_accelsim_rtx3070.json",
         "gpu_accelsim_qv100_ramulator2_hbm3.json",
+        "gpu_accelsim_rtx3070_ramulator2_gddr6_32b_parity_range_rebase.json",
         "gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json",
         "gpu_accelsim_rtx3070_full_atlas_chip_shared_hbdram_edge_16ch.json",
         "gpu_accelsim_rtx3070_full_atlas_chip_shared_hbdram_edge_16ch_range_rebase.json",
@@ -83,6 +84,27 @@ def test_checked_in_backend_configs_pin_accel_sim_v2() -> None:
         assert payload["executable"].endswith(
             f"/gpu-simulator/{expected_build}/accel-sim.out"
         )
+
+
+def test_rtx3070_ramulator2_32b_parity_profile_closes_contract() -> None:
+    repository = Path(__file__).resolve().parents[2]
+    path = (
+        repository
+        / "configs"
+        / "hetero"
+        / "backends"
+        / "gpu_accelsim_rtx3070_ramulator2_gddr6_32b_parity_range_rebase.json"
+    )
+    config = AccelSimBackendConfig.load(path)
+    assert config.external_memory is not None
+    dram = config.external_memory.bandwidth_contract.internal_dram
+    assert dram.transaction_bytes == 32
+    assert dram.nBL_cycles == 4
+    assert dram.tCK_ps == 286
+    assert dram.rate_MTps == 6993
+    assert int(dram.phy_peak_bandwidth_Bps) == 447_552_000_000
+    assert config.external_memory.address_translation is not None
+    assert config.external_memory.address_translation.capacity_bytes == 4_294_967_296
 
 
 def _files(tmp_path):

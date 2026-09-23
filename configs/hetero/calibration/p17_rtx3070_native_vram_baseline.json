@@ -1,0 +1,112 @@
+{
+  "schema_version": "hetero-native-vram-validation/v1",
+  "validation_id": "p17.rtx3070.native_vram.tinyllama_layer0_bs1_ctx16.v1",
+  "purpose": "Validate the RTX 3070 plus local GDDR6 Accel-Sim baseline against same-topology native measurements.",
+  "scope": {
+    "model_spec_name": "TinyLlama-1.1B",
+    "checkpoint_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+    "phase": "prefill",
+    "layer": 0,
+    "dtype": "fp16",
+    "batch_size": 1,
+    "context_length": 16,
+    "kv_length": 16,
+    "required_operator_count": 14,
+    "required_kernel_launch_count": 63,
+    "memory_topology": "gpu_local_vram"
+  },
+  "native_measurement": {
+    "device_name": "NVIDIA GeForce RTX 3070",
+    "compute_capability": "8.6",
+    "multiprocessor_count": 46,
+    "global_memory_bytes": 8589410304,
+    "reported_core_clock_hz": 1815000000,
+    "reported_memory_clock_hz": 7001000000,
+    "memory_bus_width_bits": 256,
+    "warmup_iterations": 50,
+    "measured_iterations": 500,
+    "timer": "cuda_event_per_operator_iteration",
+    "statistic": "median",
+    "synchronization": "stop_event_synchronize_each_iteration",
+    "catalog": {
+      "path": "validation/p17/gpu_operator_pairing/native_rtx3070_local_vram.json",
+      "sha256": "efc919b618d9c5d6875787628bc0d45e2675700d3de60a76dfaaba1c7d2970e3"
+    },
+    "microbenchmark_measurements": {
+      "path": "validation/p17/native_rtx3070/native_measurements.json",
+      "sha256": "e2b3d0eb098801fafc77e924cc60e5634db999e7aab0c81ded1de4344c3d7a0d"
+    },
+    "measurement_manifest": {
+      "path": "validation/p17/native_rtx3070/measurement_manifest.json",
+      "sha256": "61da011009b853c565a8756c951691c1f2291c0a799799d3289eee9aa6309b0a"
+    }
+  },
+  "simulator_measurement": {
+    "backend_id": "gpu.accel_sim.sm86_rtx3070.v2_0_0",
+    "target_sm": 86,
+    "core_frequency_hz": 1132000000,
+    "repetitions": 2,
+    "statistic": "deterministic_double_run_cycle_count",
+    "timing_owner": "accel_sim.sm86.compute_cache_and_native_gpu_memory",
+    "backend_configuration": {
+      "path": "configs/hetero/backends/gpu_accelsim_rtx3070.json",
+      "sha256": "929a307ac4ea35098f36d44b2e9862ee7c8fc428f89047430b3e875fe761eaf9"
+    },
+    "catalog": {
+      "path": "validation/p17/gpu_operator_pairing/simulator_native_vram.json",
+      "sha256": "cb4f7a6196a717590ee8195259c2b0b5578bbe6f1359dd07810e97c73dae729e"
+    }
+  },
+  "pairing_policy": {
+    "capability_catalog": {
+      "path": "configs/hetero/operator_capabilities/tinyllama_prefill_layer0_bs1_ctx16.json",
+      "sha256": "82b99eb7e93ed7cabed98ef0406b0396550e7d21c8bb859c71e7680bf3088a00"
+    },
+    "require_exact_model_revision": true,
+    "require_exact_operator_implementation": true,
+    "require_exact_shape_key": true,
+    "require_execution_identity_match": true,
+    "require_memory_topology_match": true,
+    "max_relative_error": 0.15,
+    "canonical_audit": {
+      "path": "validation/p17/gpu_operator_pairing/native_vram_pairing_audit.json",
+      "sha256": "0db6777f57d94e7c6ef9a74ac2445235b79ce6be74f651831c60518892bfc79d"
+    }
+  },
+  "clock_alignment": {
+    "status": "blocked_unlocked_or_unmatched",
+    "native_reported_core_clock_hz": 1815000000,
+    "native_clock_evidence": "CUDA device property; not sustained per-iteration telemetry and not a locked-clock contract",
+    "simulator_core_frequency_hz": 1132000000,
+    "same_frequency": false,
+    "required_before_final_calibration": [
+      "select and lock a supported RTX 3070 graphics clock",
+      "record actual graphics and memory clocks during every measurement window",
+      "set the Accel-Sim core and memory clock domains to the same calibration point",
+      "recapture or remeasure if the executable, launch sequence, shape, clock contract or topology changes"
+    ]
+  },
+  "current_observation": {
+    "identity_and_topology_matched_operator_count": 14,
+    "within_15_percent_operator_count": 4,
+    "outside_15_percent_operator_count": 10,
+    "mean_absolute_relative_error": 0.456735795766367,
+    "median_absolute_relative_error": 0.460438532933225,
+    "maximum_absolute_relative_error": 0.890257904959824,
+    "maximum_error_operator": "silu_multiply",
+    "simulator_under_native_operator_count": 11,
+    "simulator_over_native_operator_count": 3
+  },
+  "claim_boundary": {
+    "result_class": "diagnostic_same_topology_baseline",
+    "gpu_operator_calibration_complete": false,
+    "performance_claim_allowed": false,
+    "does_not_calibrate": [
+      "external GPU to 3D-DRAM link",
+      "logic-die gateway",
+      "3D-DRAM timing or bandwidth",
+      "ATLAS compute die",
+      "end-to-end GPU plus 3D-DRAM performance"
+    ]
+  }
+}

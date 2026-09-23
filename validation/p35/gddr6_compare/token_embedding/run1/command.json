@@ -1,0 +1,58 @@
+{
+  "argv": [
+    "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-gddr6-ramulator2/gpu-simulator/build-ramulator2/accel-sim.out",
+    "-trace",
+    "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/operator_artifacts/p17_sealed/evidence/local_rtx3070_same_binary_v1/token_embedding/traces/kernelslist.g",
+    "-config",
+    "/opt/gpu-atlas/dependencies/accel-sim-framework-64653015f85fb5664c84a10f48527e8897d289d0-gddr6-ramulator2/gpu-simulator/gpgpu-sim/configs/tested-cfgs/SM86_RTX3070/gpgpusim.config",
+    "-config",
+    "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/backends/rtx3070_ramulator2.trace.config"
+  ],
+  "backend_id": "gpu.accel_sim.sm86_rtx3070.ramulator2_gddr6_16ch.range_rebase.v2_0_0",
+  "environment_overrides": {},
+  "online_address_binding": {
+    "allocated_bytes": 131137792,
+    "bindings": [
+      {
+        "memory_space_id": "gpu0.local_gddr6",
+        "physical_offset_bytes": 0,
+        "size_bytes": 65536,
+        "tensor_id": "tinyllama.layer0.token_embedding.output",
+        "tensor_offset_bytes": 0
+      },
+      {
+        "memory_space_id": "gpu0.local_gddr6",
+        "physical_offset_bytes": 65536,
+        "size_bytes": 128,
+        "tensor_id": "tinyllama.layer0.token_embedding.token_ids",
+        "tensor_offset_bytes": 0
+      },
+      {
+        "memory_space_id": "gpu0.local_gddr6",
+        "physical_offset_bytes": 65792,
+        "size_bytes": 131072000,
+        "tensor_id": "tinyllama.layer0.token_embedding.weight",
+        "tensor_offset_bytes": 0
+      }
+    ],
+    "dram_tuple_mapping": "deferred_to_single_ramulator2_after_llc",
+    "pipeline": "TraceAddr->TensorID+offset->GlobalPA",
+    "policy": {
+      "alignment_bytes": 256,
+      "capacity_bytes": 8589934592,
+      "memory_space_id": "gpu0.local_gddr6",
+      "mode": "range_rebase_packed_manifest",
+      "physical_base_bytes": 0,
+      "require_nonzero_translations": true
+    },
+    "range_count": 3,
+    "schema_version": "hetero-online-address-binding/v1",
+    "table_path": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p35/gddr6_compare/token_embedding/run1/online_address_bindings.tsv",
+    "table_sha256": "eb777bbf87953610fc1154d8021bcd71c13b16e4f053e75083a7f170b28e73ef",
+    "tensor_count": 3,
+    "trace_key": "f16eda8cc2caf58f69d4d90dbdc86cd569b7a384a80c97e4c8fbf2387be42aa0",
+    "translation_point": "mem_fetch_before_gpu_cache_lookup"
+  },
+  "schema_version": "hetero-command/v1",
+  "simulation_key": "5ccfc280162f5466b17a37921a016e1ba1b8430f095d8a3839bc524888a34526"
+}
