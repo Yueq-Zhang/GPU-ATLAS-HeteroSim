@@ -1,0 +1,57 @@
+{
+  "conservation": {
+    "admitted_requests": 6,
+    "cancelled_before_admission": 2,
+    "child_completions": 20591280,
+    "child_requests": 20591280,
+    "durable_parent_completions": 20588067,
+    "exact_p23_epochs": 3,
+    "input_requests": 8,
+    "parent_requests": 20588067,
+    "terminal_requests": 8,
+    "zero_in_flight": true
+  },
+  "double_run_signature_equal": true,
+  "gates": {
+    "cancellation_only_at_token_barrier": true,
+    "deterministic_reuse_observed": true,
+    "long_generation_exact_trace_ready": false,
+    "no_active_overlap": true,
+    "no_leak": true,
+    "release_after_all_requests_durable": true
+  },
+  "long_capacity_pressure_probe": {
+    "allocations": 8192,
+    "batch_size": 2,
+    "capacity_bytes": 34816,
+    "durable_barriers": 8192,
+    "epochs": 4096,
+    "exact_gpu_trace_long_generation": false,
+    "leaked_allocations": 0,
+    "overlap_count": 0,
+    "peak_bytes": 34816,
+    "performance_claim_allowed": false,
+    "releases": 8192,
+    "retired_range_reuses": 8190,
+    "schema_version": "hetero-kv-allocator-pressure-probe/v1",
+    "timing_semantics": "functional_lifecycle_only",
+    "zero_in_flight": true
+  },
+  "memory": {
+    "capacity_bytes": 34816,
+    "peak_bytes": 34816,
+    "retired_range_reuse_count": 4
+  },
+  "performance_claim_allowed": false,
+  "qualification_boundary": "Exact P23 BS=2 KV17 epochs now drive P24 cancellation, durable release and Global-PA reuse. Repeated independent request pairs are exact; a single request advancing to KV18 or later remains fail-closed until those exact GPU traces are qualified.",
+  "schema_version": "hetero-p23-p24-request-control-qualification/v1",
+  "scope": {
+    "admitted_requests": 6,
+    "exact_batch_size": 2,
+    "exact_p23_epochs": 3,
+    "input_requests": 8,
+    "kv_length": 17
+  },
+  "signature_sha256": "ba0884a2a9c8b6ec2d5a658298decc1eca9197792e89f58f5c2aa1e554f9bad2",
+  "status": "passed"
+}

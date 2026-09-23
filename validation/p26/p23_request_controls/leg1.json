@@ -1,0 +1,1191 @@
+{
+  "conservation": {
+    "admitted_requests": 6,
+    "cancelled_before_admission": 2,
+    "child_completions": 20591280,
+    "child_requests": 20591280,
+    "durable_parent_completions": 20588067,
+    "exact_p23_epochs": 3,
+    "input_requests": 8,
+    "parent_requests": 20588067,
+    "terminal_requests": 8,
+    "zero_in_flight": true
+  },
+  "epochs": [
+    {
+      "completion_time_fs": 34843748683165,
+      "conservation": {
+        "child_completions": 6863760,
+        "child_requests": 6863760,
+        "durable_parent_completions": 6862689,
+        "parent_requests": 6862689,
+        "zero_in_flight": true
+      },
+      "epoch_id": 0,
+      "global_pa_bindings": [
+        {
+          "allocation_epoch": 1,
+          "global_pa_base": 2147483648,
+          "global_pa_end_exclusive": 2147501056,
+          "k_base": 2147483648,
+          "member_index": 0,
+          "request_id": "R0-active-cancel",
+          "reused_released_range": false,
+          "size_bytes": 17408,
+          "v_base": 2147492352
+        },
+        {
+          "allocation_epoch": 2,
+          "global_pa_base": 2147501056,
+          "global_pa_end_exclusive": 2147518464,
+          "k_base": 2147501056,
+          "member_index": 1,
+          "request_id": "R1-complete",
+          "reused_released_range": false,
+          "size_bytes": 17408,
+          "v_base": 2147509760
+        }
+      ],
+      "real_p23_source_digest": "596e3aaed973595f722c351faadaf347a3cdd02bf732176392adb75f86325d14",
+      "request_ids": [
+        "R0-active-cancel",
+        "R1-complete"
+      ],
+      "start_time_fs": 0,
+      "tasks": [
+        {
+          "completion_time_fs": 666667,
+          "op": "request_start",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.request_start",
+          "start_time_fs": 0,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.request_start"
+        },
+        {
+          "completion_time_fs": 125224971,
+          "op": "kv_allocate",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.kv_allocate",
+          "start_time_fs": 666667,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.kv_allocate"
+        },
+        {
+          "completion_time_fs": 6411444053,
+          "op": "token_embedding",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.token_embedding",
+          "start_time_fs": 125224971,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.token_embedding"
+        },
+        {
+          "completion_time_fs": 51092539460,
+          "op": "attention_norm",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_norm",
+          "start_time_fs": 6411444053,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.attention_norm"
+        },
+        {
+          "completion_time_fs": 1736295719673,
+          "op": "qkv_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.qkv_projection",
+          "start_time_fs": 51092539460,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.qkv_projection"
+        },
+        {
+          "completion_time_fs": 1845249783278,
+          "op": "rope",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.rope",
+          "start_time_fs": 1736295719673,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.rope"
+        },
+        {
+          "completion_time_fs": 1845807203772,
+          "op": "kv_append",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append",
+          "start_time_fs": 1845249783278,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.kv_append"
+        },
+        {
+          "completion_time_fs": 1888356673737,
+          "op": "causal_attention",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.causal_attention",
+          "start_time_fs": 1845807203772,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.causal_attention"
+        },
+        {
+          "completion_time_fs": 3227604906953,
+          "op": "output_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.output_projection",
+          "start_time_fs": 1888356673737,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.output_projection"
+        },
+        {
+          "completion_time_fs": 3235132292113,
+          "op": "residual_add",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_residual",
+          "start_time_fs": 3227604906953,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.attention_residual"
+        },
+        {
+          "completion_time_fs": 3279842539463,
+          "op": "mlp_norm",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_norm",
+          "start_time_fs": 3235132292113,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.mlp_norm"
+        },
+        {
+          "completion_time_fs": 10552051903421,
+          "op": "gate_up_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection",
+          "start_time_fs": 3279842539463,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection"
+        },
+        {
+          "completion_time_fs": 10569892009429,
+          "op": "silu_multiply",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.silu_multiply",
+          "start_time_fs": 10552051903421,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.silu_multiply"
+        },
+        {
+          "completion_time_fs": 14232938829217,
+          "op": "down_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.down_projection",
+          "start_time_fs": 10569892009429,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.down_projection"
+        },
+        {
+          "completion_time_fs": 14240472398122,
+          "op": "residual_add",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_residual",
+          "start_time_fs": 14232938829217,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.l0.mlp_residual"
+        },
+        {
+          "completion_time_fs": 14285270984695,
+          "op": "final_norm",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.final_norm",
+          "start_time_fs": 14240472398122,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.final_norm"
+        },
+        {
+          "completion_time_fs": 34814811620738,
+          "op": "lm_head",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.lm_head",
+          "start_time_fs": 14285270984695,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.lm_head"
+        },
+        {
+          "completion_time_fs": 34843648193177,
+          "op": "sampling",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.sampling",
+          "start_time_fs": 34814811620738,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.sampling"
+        },
+        {
+          "completion_time_fs": 34843648859844,
+          "op": "request_finish",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.request_finish",
+          "start_time_fs": 34843648193177,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.request_finish"
+        },
+        {
+          "completion_time_fs": 34843748683165,
+          "op": "kv_release",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.kv_release",
+          "start_time_fs": 34843648859844,
+          "task_id": "epoch0.task.P23-BS2-DECODE-R0-R1.kv_release"
+        }
+      ],
+      "token_barrier_time_fs": 34843748683165
+    },
+    {
+      "completion_time_fs": 69687497366330,
+      "conservation": {
+        "child_completions": 6863760,
+        "child_requests": 6863760,
+        "durable_parent_completions": 6862689,
+        "parent_requests": 6862689,
+        "zero_in_flight": true
+      },
+      "epoch_id": 1,
+      "global_pa_bindings": [
+        {
+          "allocation_epoch": 3,
+          "global_pa_base": 2147483648,
+          "global_pa_end_exclusive": 2147501056,
+          "k_base": 2147483648,
+          "member_index": 0,
+          "request_id": "R2-reuse",
+          "reused_released_range": true,
+          "size_bytes": 17408,
+          "v_base": 2147492352
+        },
+        {
+          "allocation_epoch": 4,
+          "global_pa_base": 2147501056,
+          "global_pa_end_exclusive": 2147518464,
+          "k_base": 2147501056,
+          "member_index": 1,
+          "request_id": "R3-reuse",
+          "reused_released_range": true,
+          "size_bytes": 17408,
+          "v_base": 2147509760
+        }
+      ],
+      "real_p23_source_digest": "596e3aaed973595f722c351faadaf347a3cdd02bf732176392adb75f86325d14",
+      "request_ids": [
+        "R2-reuse",
+        "R3-reuse"
+      ],
+      "start_time_fs": 34843748683165,
+      "tasks": [
+        {
+          "completion_time_fs": 34843749349832,
+          "op": "request_start",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.request_start",
+          "start_time_fs": 34843748683165,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.request_start"
+        },
+        {
+          "completion_time_fs": 34843873908136,
+          "op": "kv_allocate",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.kv_allocate",
+          "start_time_fs": 34843749349832,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.kv_allocate"
+        },
+        {
+          "completion_time_fs": 34850160127218,
+          "op": "token_embedding",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.token_embedding",
+          "start_time_fs": 34843873908136,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.token_embedding"
+        },
+        {
+          "completion_time_fs": 34894841222625,
+          "op": "attention_norm",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_norm",
+          "start_time_fs": 34850160127218,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.attention_norm"
+        },
+        {
+          "completion_time_fs": 36580044402838,
+          "op": "qkv_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.qkv_projection",
+          "start_time_fs": 34894841222625,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.qkv_projection"
+        },
+        {
+          "completion_time_fs": 36688998466443,
+          "op": "rope",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.rope",
+          "start_time_fs": 36580044402838,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.rope"
+        },
+        {
+          "completion_time_fs": 36689555886937,
+          "op": "kv_append",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append",
+          "start_time_fs": 36688998466443,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.kv_append"
+        },
+        {
+          "completion_time_fs": 36732105356902,
+          "op": "causal_attention",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.causal_attention",
+          "start_time_fs": 36689555886937,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.causal_attention"
+        },
+        {
+          "completion_time_fs": 38071353590118,
+          "op": "output_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.output_projection",
+          "start_time_fs": 36732105356902,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.output_projection"
+        },
+        {
+          "completion_time_fs": 38078880975278,
+          "op": "residual_add",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_residual",
+          "start_time_fs": 38071353590118,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.attention_residual"
+        },
+        {
+          "completion_time_fs": 38123591222628,
+          "op": "mlp_norm",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_norm",
+          "start_time_fs": 38078880975278,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.mlp_norm"
+        },
+        {
+          "completion_time_fs": 45395800586586,
+          "op": "gate_up_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection",
+          "start_time_fs": 38123591222628,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection"
+        },
+        {
+          "completion_time_fs": 45413640692594,
+          "op": "silu_multiply",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.silu_multiply",
+          "start_time_fs": 45395800586586,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.silu_multiply"
+        },
+        {
+          "completion_time_fs": 49076687512382,
+          "op": "down_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.down_projection",
+          "start_time_fs": 45413640692594,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.down_projection"
+        },
+        {
+          "completion_time_fs": 49084221081287,
+          "op": "residual_add",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_residual",
+          "start_time_fs": 49076687512382,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.l0.mlp_residual"
+        },
+        {
+          "completion_time_fs": 49129019667860,
+          "op": "final_norm",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.final_norm",
+          "start_time_fs": 49084221081287,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.final_norm"
+        },
+        {
+          "completion_time_fs": 69658560303903,
+          "op": "lm_head",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.lm_head",
+          "start_time_fs": 49129019667860,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.lm_head"
+        },
+        {
+          "completion_time_fs": 69687396876342,
+          "op": "sampling",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.sampling",
+          "start_time_fs": 69658560303903,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.sampling"
+        },
+        {
+          "completion_time_fs": 69687397543009,
+          "op": "request_finish",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.request_finish",
+          "start_time_fs": 69687396876342,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.request_finish"
+        },
+        {
+          "completion_time_fs": 69687497366330,
+          "op": "kv_release",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.kv_release",
+          "start_time_fs": 69687397543009,
+          "task_id": "epoch1.task.P23-BS2-DECODE-R0-R1.kv_release"
+        }
+      ],
+      "token_barrier_time_fs": 69687497366330
+    },
+    {
+      "completion_time_fs": 104531246049495,
+      "conservation": {
+        "child_completions": 6863760,
+        "child_requests": 6863760,
+        "durable_parent_completions": 6862689,
+        "parent_requests": 6862689,
+        "zero_in_flight": true
+      },
+      "epoch_id": 2,
+      "global_pa_bindings": [
+        {
+          "allocation_epoch": 5,
+          "global_pa_base": 2147483648,
+          "global_pa_end_exclusive": 2147501056,
+          "k_base": 2147483648,
+          "member_index": 0,
+          "request_id": "R4-pressure",
+          "reused_released_range": true,
+          "size_bytes": 17408,
+          "v_base": 2147492352
+        },
+        {
+          "allocation_epoch": 6,
+          "global_pa_base": 2147501056,
+          "global_pa_end_exclusive": 2147518464,
+          "k_base": 2147501056,
+          "member_index": 1,
+          "request_id": "R5-pressure",
+          "reused_released_range": true,
+          "size_bytes": 17408,
+          "v_base": 2147509760
+        }
+      ],
+      "real_p23_source_digest": "596e3aaed973595f722c351faadaf347a3cdd02bf732176392adb75f86325d14",
+      "request_ids": [
+        "R4-pressure",
+        "R5-pressure"
+      ],
+      "start_time_fs": 69687497366330,
+      "tasks": [
+        {
+          "completion_time_fs": 69687498032997,
+          "op": "request_start",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.request_start",
+          "start_time_fs": 69687497366330,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.request_start"
+        },
+        {
+          "completion_time_fs": 69687622591301,
+          "op": "kv_allocate",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.kv_allocate",
+          "start_time_fs": 69687498032997,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.kv_allocate"
+        },
+        {
+          "completion_time_fs": 69693908810383,
+          "op": "token_embedding",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.token_embedding",
+          "start_time_fs": 69687622591301,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.token_embedding"
+        },
+        {
+          "completion_time_fs": 69738589905790,
+          "op": "attention_norm",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_norm",
+          "start_time_fs": 69693908810383,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.attention_norm"
+        },
+        {
+          "completion_time_fs": 71423793086003,
+          "op": "qkv_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.qkv_projection",
+          "start_time_fs": 69738589905790,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.qkv_projection"
+        },
+        {
+          "completion_time_fs": 71532747149608,
+          "op": "rope",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.rope",
+          "start_time_fs": 71423793086003,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.rope"
+        },
+        {
+          "completion_time_fs": 71533304570102,
+          "op": "kv_append",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.kv_append",
+          "start_time_fs": 71532747149608,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.kv_append"
+        },
+        {
+          "completion_time_fs": 71575854040067,
+          "op": "causal_attention",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.causal_attention",
+          "start_time_fs": 71533304570102,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.causal_attention"
+        },
+        {
+          "completion_time_fs": 72915102273283,
+          "op": "output_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.output_projection",
+          "start_time_fs": 71575854040067,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.output_projection"
+        },
+        {
+          "completion_time_fs": 72922629658443,
+          "op": "residual_add",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.attention_residual",
+          "start_time_fs": 72915102273283,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.attention_residual"
+        },
+        {
+          "completion_time_fs": 72967339905793,
+          "op": "mlp_norm",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_norm",
+          "start_time_fs": 72922629658443,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.mlp_norm"
+        },
+        {
+          "completion_time_fs": 80239549269751,
+          "op": "gate_up_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection",
+          "start_time_fs": 72967339905793,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.gate_up_projection"
+        },
+        {
+          "completion_time_fs": 80257389375759,
+          "op": "silu_multiply",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.silu_multiply",
+          "start_time_fs": 80239549269751,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.silu_multiply"
+        },
+        {
+          "completion_time_fs": 83920436195547,
+          "op": "down_projection",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.down_projection",
+          "start_time_fs": 80257389375759,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.down_projection"
+        },
+        {
+          "completion_time_fs": 83927969764452,
+          "op": "residual_add",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.l0.mlp_residual",
+          "start_time_fs": 83920436195547,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.l0.mlp_residual"
+        },
+        {
+          "completion_time_fs": 83972768351025,
+          "op": "final_norm",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.final_norm",
+          "start_time_fs": 83927969764452,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.final_norm"
+        },
+        {
+          "completion_time_fs": 104502308987068,
+          "op": "lm_head",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.lm_head",
+          "start_time_fs": 83972768351025,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.lm_head"
+        },
+        {
+          "completion_time_fs": 104531145559507,
+          "op": "sampling",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.sampling",
+          "start_time_fs": 104502308987068,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.sampling"
+        },
+        {
+          "completion_time_fs": 104531146226174,
+          "op": "request_finish",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.request_finish",
+          "start_time_fs": 104531145559507,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.request_finish"
+        },
+        {
+          "completion_time_fs": 104531246049495,
+          "op": "kv_release",
+          "source_task_id": "task.P23-BS2-DECODE-R0-R1.kv_release",
+          "start_time_fs": 104531146226174,
+          "task_id": "epoch2.task.P23-BS2-DECODE-R0-R1.kv_release"
+        }
+      ],
+      "token_barrier_time_fs": 104531246049495
+    }
+  ],
+  "events": [
+    {
+      "event": "ARRIVAL",
+      "request_id": "R0-active-cancel",
+      "sequence": 0,
+      "time_fs": 0
+    },
+    {
+      "event": "ARRIVAL",
+      "request_id": "R1-complete",
+      "sequence": 1,
+      "time_fs": 0
+    },
+    {
+      "allocation_epoch": 1,
+      "epoch_id": 0,
+      "event": "ADMIT_AND_ALLOCATE",
+      "global_pa_base": 2147483648,
+      "request_id": "R0-active-cancel",
+      "sequence": 8,
+      "time_fs": 0
+    },
+    {
+      "allocation_epoch": 2,
+      "epoch_id": 0,
+      "event": "ADMIT_AND_ALLOCATE",
+      "global_pa_base": 2147501056,
+      "request_id": "R1-complete",
+      "sequence": 9,
+      "time_fs": 0
+    },
+    {
+      "event": "ARRIVAL",
+      "request_id": "R2-reuse",
+      "sequence": 2,
+      "time_fs": 1
+    },
+    {
+      "event": "ARRIVAL",
+      "request_id": "R3-reuse",
+      "sequence": 3,
+      "time_fs": 1
+    },
+    {
+      "event": "ARRIVAL",
+      "request_id": "R4-pressure",
+      "sequence": 4,
+      "time_fs": 2
+    },
+    {
+      "event": "ARRIVAL",
+      "request_id": "R5-pressure",
+      "sequence": 5,
+      "time_fs": 2
+    },
+    {
+      "event": "ARRIVAL",
+      "request_id": "R6-waiting-cancel",
+      "sequence": 6,
+      "time_fs": 3
+    },
+    {
+      "event": "ARRIVAL",
+      "request_id": "R7-waiting-cancel",
+      "sequence": 7,
+      "time_fs": 3
+    },
+    {
+      "epoch_id": 0,
+      "event": "ALL_REQUESTS_DURABLE",
+      "request_id": "R0-active-cancel",
+      "sequence": 10,
+      "time_fs": 34843748683165
+    },
+    {
+      "committed_kv_length": 17,
+      "epoch_id": 0,
+      "event": "COMMIT_KV_VERSION",
+      "kv_version": 1,
+      "request_id": "R0-active-cancel",
+      "sequence": 11,
+      "time_fs": 34843748683165
+    },
+    {
+      "epoch_id": 0,
+      "event": "CANCEL_AT_TOKEN_BARRIER",
+      "request_id": "R0-active-cancel",
+      "sequence": 12,
+      "time_fs": 34843748683165
+    },
+    {
+      "epoch_id": 0,
+      "event": "RELEASE_GLOBAL_PA",
+      "request_id": "R0-active-cancel",
+      "sequence": 13,
+      "time_fs": 34843748683165
+    },
+    {
+      "epoch_id": 0,
+      "event": "ALL_REQUESTS_DURABLE",
+      "request_id": "R1-complete",
+      "sequence": 14,
+      "time_fs": 34843748683165
+    },
+    {
+      "committed_kv_length": 17,
+      "epoch_id": 0,
+      "event": "COMMIT_KV_VERSION",
+      "kv_version": 1,
+      "request_id": "R1-complete",
+      "sequence": 15,
+      "time_fs": 34843748683165
+    },
+    {
+      "epoch_id": 0,
+      "event": "REQUEST_FINISH",
+      "request_id": "R1-complete",
+      "sequence": 16,
+      "time_fs": 34843748683165
+    },
+    {
+      "epoch_id": 0,
+      "event": "RELEASE_GLOBAL_PA",
+      "request_id": "R1-complete",
+      "sequence": 17,
+      "time_fs": 34843748683165
+    },
+    {
+      "event": "CANCEL_AT_TOKEN_BARRIER",
+      "request_id": "R6-waiting-cancel",
+      "sequence": 18,
+      "time_fs": 34843748683165
+    },
+    {
+      "event": "CANCEL_AT_TOKEN_BARRIER",
+      "request_id": "R7-waiting-cancel",
+      "sequence": 19,
+      "time_fs": 34843748683165
+    },
+    {
+      "allocation_epoch": 3,
+      "epoch_id": 1,
+      "event": "ADMIT_AND_ALLOCATE",
+      "global_pa_base": 2147483648,
+      "request_id": "R2-reuse",
+      "sequence": 20,
+      "time_fs": 34843748683165
+    },
+    {
+      "allocation_epoch": 4,
+      "epoch_id": 1,
+      "event": "ADMIT_AND_ALLOCATE",
+      "global_pa_base": 2147501056,
+      "request_id": "R3-reuse",
+      "sequence": 21,
+      "time_fs": 34843748683165
+    },
+    {
+      "epoch_id": 1,
+      "event": "ALL_REQUESTS_DURABLE",
+      "request_id": "R2-reuse",
+      "sequence": 22,
+      "time_fs": 69687497366330
+    },
+    {
+      "committed_kv_length": 17,
+      "epoch_id": 1,
+      "event": "COMMIT_KV_VERSION",
+      "kv_version": 1,
+      "request_id": "R2-reuse",
+      "sequence": 23,
+      "time_fs": 69687497366330
+    },
+    {
+      "epoch_id": 1,
+      "event": "REQUEST_FINISH",
+      "request_id": "R2-reuse",
+      "sequence": 24,
+      "time_fs": 69687497366330
+    },
+    {
+      "epoch_id": 1,
+      "event": "RELEASE_GLOBAL_PA",
+      "request_id": "R2-reuse",
+      "sequence": 25,
+      "time_fs": 69687497366330
+    },
+    {
+      "epoch_id": 1,
+      "event": "ALL_REQUESTS_DURABLE",
+      "request_id": "R3-reuse",
+      "sequence": 26,
+      "time_fs": 69687497366330
+    },
+    {
+      "committed_kv_length": 17,
+      "epoch_id": 1,
+      "event": "COMMIT_KV_VERSION",
+      "kv_version": 1,
+      "request_id": "R3-reuse",
+      "sequence": 27,
+      "time_fs": 69687497366330
+    },
+    {
+      "epoch_id": 1,
+      "event": "REQUEST_FINISH",
+      "request_id": "R3-reuse",
+      "sequence": 28,
+      "time_fs": 69687497366330
+    },
+    {
+      "epoch_id": 1,
+      "event": "RELEASE_GLOBAL_PA",
+      "request_id": "R3-reuse",
+      "sequence": 29,
+      "time_fs": 69687497366330
+    },
+    {
+      "allocation_epoch": 5,
+      "epoch_id": 2,
+      "event": "ADMIT_AND_ALLOCATE",
+      "global_pa_base": 2147483648,
+      "request_id": "R4-pressure",
+      "sequence": 30,
+      "time_fs": 69687497366330
+    },
+    {
+      "allocation_epoch": 6,
+      "epoch_id": 2,
+      "event": "ADMIT_AND_ALLOCATE",
+      "global_pa_base": 2147501056,
+      "request_id": "R5-pressure",
+      "sequence": 31,
+      "time_fs": 69687497366330
+    },
+    {
+      "epoch_id": 2,
+      "event": "ALL_REQUESTS_DURABLE",
+      "request_id": "R4-pressure",
+      "sequence": 32,
+      "time_fs": 104531246049495
+    },
+    {
+      "committed_kv_length": 17,
+      "epoch_id": 2,
+      "event": "COMMIT_KV_VERSION",
+      "kv_version": 1,
+      "request_id": "R4-pressure",
+      "sequence": 33,
+      "time_fs": 104531246049495
+    },
+    {
+      "epoch_id": 2,
+      "event": "REQUEST_FINISH",
+      "request_id": "R4-pressure",
+      "sequence": 34,
+      "time_fs": 104531246049495
+    },
+    {
+      "epoch_id": 2,
+      "event": "RELEASE_GLOBAL_PA",
+      "request_id": "R4-pressure",
+      "sequence": 35,
+      "time_fs": 104531246049495
+    },
+    {
+      "epoch_id": 2,
+      "event": "ALL_REQUESTS_DURABLE",
+      "request_id": "R5-pressure",
+      "sequence": 36,
+      "time_fs": 104531246049495
+    },
+    {
+      "committed_kv_length": 17,
+      "epoch_id": 2,
+      "event": "COMMIT_KV_VERSION",
+      "kv_version": 1,
+      "request_id": "R5-pressure",
+      "sequence": 37,
+      "time_fs": 104531246049495
+    },
+    {
+      "epoch_id": 2,
+      "event": "REQUEST_FINISH",
+      "request_id": "R5-pressure",
+      "sequence": 38,
+      "time_fs": 104531246049495
+    },
+    {
+      "epoch_id": 2,
+      "event": "RELEASE_GLOBAL_PA",
+      "request_id": "R5-pressure",
+      "sequence": 39,
+      "time_fs": 104531246049495
+    }
+  ],
+  "exact_identity": {
+    "batch_size": 2,
+    "final_kv_length": 17,
+    "initial_kv_length": 16,
+    "layer_count": 1,
+    "qualification_path": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/validation/p23/timeline/qualification_record.json",
+    "source_digest": "596e3aaed973595f722c351faadaf347a3cdd02bf732176392adb75f86325d14"
+  },
+  "gates": {
+    "cancellation_only_at_token_barrier": true,
+    "deterministic_reuse_observed": true,
+    "long_generation_exact_trace_ready": false,
+    "no_active_overlap": true,
+    "no_leak": true,
+    "release_after_all_requests_durable": true
+  },
+  "memory": {
+    "active_range_overlap_count": 0,
+    "allocation_history": [
+      {
+        "allocation_epoch": 1,
+        "global_pa_base": 2147483648,
+        "global_pa_end_exclusive": 2147501056,
+        "k_base": 2147483648,
+        "member_index": 0,
+        "operation": "allocate",
+        "request_id": "R0-active-cancel",
+        "reused_released_range": false,
+        "size_bytes": 17408,
+        "time_fs": 0,
+        "v_base": 2147492352
+      },
+      {
+        "allocation_epoch": 2,
+        "global_pa_base": 2147501056,
+        "global_pa_end_exclusive": 2147518464,
+        "k_base": 2147501056,
+        "member_index": 1,
+        "operation": "allocate",
+        "request_id": "R1-complete",
+        "reused_released_range": false,
+        "size_bytes": 17408,
+        "time_fs": 0,
+        "v_base": 2147509760
+      },
+      {
+        "allocation_epoch": 1,
+        "global_pa_base": 2147483648,
+        "operation": "release",
+        "request_id": "R0-active-cancel",
+        "size_bytes": 17408,
+        "time_fs": 34843748683165
+      },
+      {
+        "allocation_epoch": 2,
+        "global_pa_base": 2147501056,
+        "operation": "release",
+        "request_id": "R1-complete",
+        "size_bytes": 17408,
+        "time_fs": 34843748683165
+      },
+      {
+        "allocation_epoch": 3,
+        "global_pa_base": 2147483648,
+        "global_pa_end_exclusive": 2147501056,
+        "k_base": 2147483648,
+        "member_index": 0,
+        "operation": "allocate",
+        "request_id": "R2-reuse",
+        "reused_released_range": true,
+        "size_bytes": 17408,
+        "time_fs": 34843748683165,
+        "v_base": 2147492352
+      },
+      {
+        "allocation_epoch": 4,
+        "global_pa_base": 2147501056,
+        "global_pa_end_exclusive": 2147518464,
+        "k_base": 2147501056,
+        "member_index": 1,
+        "operation": "allocate",
+        "request_id": "R3-reuse",
+        "reused_released_range": true,
+        "size_bytes": 17408,
+        "time_fs": 34843748683165,
+        "v_base": 2147509760
+      },
+      {
+        "allocation_epoch": 3,
+        "global_pa_base": 2147483648,
+        "operation": "release",
+        "request_id": "R2-reuse",
+        "size_bytes": 17408,
+        "time_fs": 69687497366330
+      },
+      {
+        "allocation_epoch": 4,
+        "global_pa_base": 2147501056,
+        "operation": "release",
+        "request_id": "R3-reuse",
+        "size_bytes": 17408,
+        "time_fs": 69687497366330
+      },
+      {
+        "allocation_epoch": 5,
+        "global_pa_base": 2147483648,
+        "global_pa_end_exclusive": 2147501056,
+        "k_base": 2147483648,
+        "member_index": 0,
+        "operation": "allocate",
+        "request_id": "R4-pressure",
+        "reused_released_range": true,
+        "size_bytes": 17408,
+        "time_fs": 69687497366330,
+        "v_base": 2147492352
+      },
+      {
+        "allocation_epoch": 6,
+        "global_pa_base": 2147501056,
+        "global_pa_end_exclusive": 2147518464,
+        "k_base": 2147501056,
+        "member_index": 1,
+        "operation": "allocate",
+        "request_id": "R5-pressure",
+        "reused_released_range": true,
+        "size_bytes": 17408,
+        "time_fs": 69687497366330,
+        "v_base": 2147509760
+      },
+      {
+        "allocation_epoch": 5,
+        "global_pa_base": 2147483648,
+        "operation": "release",
+        "request_id": "R4-pressure",
+        "size_bytes": 17408,
+        "time_fs": 104531246049495
+      },
+      {
+        "allocation_epoch": 6,
+        "global_pa_base": 2147501056,
+        "operation": "release",
+        "request_id": "R5-pressure",
+        "size_bytes": 17408,
+        "time_fs": 104531246049495
+      }
+    ],
+    "capacity_bytes": 34816,
+    "peak_bytes": 34816,
+    "retired_range_reuse_count": 4,
+    "zero_bytes_after_retirement": true
+  },
+  "performance_claim_allowed": false,
+  "qualification_boundary": "Exact P23 BS=2 KV17 epochs now drive P24 cancellation, durable release and Global-PA reuse. Repeated independent request pairs are exact; a single request advancing to KV18 or later remains fail-closed until those exact GPU traces are qualified.",
+  "requests": [
+    {
+      "admitted": true,
+      "allocation": {
+        "allocation_epoch": 1,
+        "global_pa_base": 2147483648,
+        "global_pa_end_exclusive": 2147501056,
+        "k_base": 2147483648,
+        "member_index": 0,
+        "request_id": "R0-active-cancel",
+        "reused_released_range": false,
+        "size_bytes": 17408,
+        "v_base": 2147492352
+      },
+      "cancel_observed_time_fs": 34843748683165,
+      "durable_complete_time_fs": 34843748683165,
+      "epoch_id": 0,
+      "final_committed_kv_length": 17,
+      "final_state": "CANCELLED",
+      "generated_length": 1,
+      "initial_kv_length": 16,
+      "kv_version": 1,
+      "request_id": "R0-active-cancel",
+      "retire_time_fs": 34843748683165,
+      "termination_reason": "cancelled"
+    },
+    {
+      "admitted": true,
+      "allocation": {
+        "allocation_epoch": 2,
+        "global_pa_base": 2147501056,
+        "global_pa_end_exclusive": 2147518464,
+        "k_base": 2147501056,
+        "member_index": 1,
+        "request_id": "R1-complete",
+        "reused_released_range": false,
+        "size_bytes": 17408,
+        "v_base": 2147509760
+      },
+      "cancel_observed_time_fs": null,
+      "durable_complete_time_fs": 34843748683165,
+      "epoch_id": 0,
+      "final_committed_kv_length": 17,
+      "final_state": "FINISHED",
+      "generated_length": 1,
+      "initial_kv_length": 16,
+      "kv_version": 1,
+      "request_id": "R1-complete",
+      "retire_time_fs": 34843748683165,
+      "termination_reason": "completed"
+    },
+    {
+      "admitted": true,
+      "allocation": {
+        "allocation_epoch": 3,
+        "global_pa_base": 2147483648,
+        "global_pa_end_exclusive": 2147501056,
+        "k_base": 2147483648,
+        "member_index": 0,
+        "request_id": "R2-reuse",
+        "reused_released_range": true,
+        "size_bytes": 17408,
+        "v_base": 2147492352
+      },
+      "cancel_observed_time_fs": null,
+      "durable_complete_time_fs": 69687497366330,
+      "epoch_id": 1,
+      "final_committed_kv_length": 17,
+      "final_state": "FINISHED",
+      "generated_length": 1,
+      "initial_kv_length": 16,
+      "kv_version": 1,
+      "request_id": "R2-reuse",
+      "retire_time_fs": 69687497366330,
+      "termination_reason": "completed"
+    },
+    {
+      "admitted": true,
+      "allocation": {
+        "allocation_epoch": 4,
+        "global_pa_base": 2147501056,
+        "global_pa_end_exclusive": 2147518464,
+        "k_base": 2147501056,
+        "member_index": 1,
+        "request_id": "R3-reuse",
+        "reused_released_range": true,
+        "size_bytes": 17408,
+        "v_base": 2147509760
+      },
+      "cancel_observed_time_fs": null,
+      "durable_complete_time_fs": 69687497366330,
+      "epoch_id": 1,
+      "final_committed_kv_length": 17,
+      "final_state": "FINISHED",
+      "generated_length": 1,
+      "initial_kv_length": 16,
+      "kv_version": 1,
+      "request_id": "R3-reuse",
+      "retire_time_fs": 69687497366330,
+      "termination_reason": "completed"
+    },
+    {
+      "admitted": true,
+      "allocation": {
+        "allocation_epoch": 5,
+        "global_pa_base": 2147483648,
+        "global_pa_end_exclusive": 2147501056,
+        "k_base": 2147483648,
+        "member_index": 0,
+        "request_id": "R4-pressure",
+        "reused_released_range": true,
+        "size_bytes": 17408,
+        "v_base": 2147492352
+      },
+      "cancel_observed_time_fs": null,
+      "durable_complete_time_fs": 104531246049495,
+      "epoch_id": 2,
+      "final_committed_kv_length": 17,
+      "final_state": "FINISHED",
+      "generated_length": 1,
+      "initial_kv_length": 16,
+      "kv_version": 1,
+      "request_id": "R4-pressure",
+      "retire_time_fs": 104531246049495,
+      "termination_reason": "completed"
+    },
+    {
+      "admitted": true,
+      "allocation": {
+        "allocation_epoch": 6,
+        "global_pa_base": 2147501056,
+        "global_pa_end_exclusive": 2147518464,
+        "k_base": 2147501056,
+        "member_index": 1,
+        "request_id": "R5-pressure",
+        "reused_released_range": true,
+        "size_bytes": 17408,
+        "v_base": 2147509760
+      },
+      "cancel_observed_time_fs": null,
+      "durable_complete_time_fs": 104531246049495,
+      "epoch_id": 2,
+      "final_committed_kv_length": 17,
+      "final_state": "FINISHED",
+      "generated_length": 1,
+      "initial_kv_length": 16,
+      "kv_version": 1,
+      "request_id": "R5-pressure",
+      "retire_time_fs": 104531246049495,
+      "termination_reason": "completed"
+    },
+    {
+      "admitted": false,
+      "cancel_observed_time_fs": 34843748683165,
+      "final_committed_kv_length": 16,
+      "final_state": "CANCELLED",
+      "generated_length": 0,
+      "initial_kv_length": 16,
+      "request_id": "R6-waiting-cancel",
+      "retire_time_fs": 34843748683165
+    },
+    {
+      "admitted": false,
+      "cancel_observed_time_fs": 34843748683165,
+      "final_committed_kv_length": 16,
+      "final_state": "CANCELLED",
+      "generated_length": 0,
+      "initial_kv_length": 16,
+      "request_id": "R7-waiting-cancel",
+      "retire_time_fs": 34843748683165
+    }
+  ],
+  "schema_version": "hetero-p23-p24-request-control-timeline/v1",
+  "timing_semantics": "exact_p23_request_cycle_token_barrier"
+}

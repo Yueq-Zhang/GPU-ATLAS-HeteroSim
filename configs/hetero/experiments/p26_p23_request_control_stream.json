@@ -1,0 +1,68 @@
+{
+  "schema_version": "hetero-p23-p24-request-control-experiment/v1",
+  "qualification_ref": "validation/p23/timeline/qualification_record.json",
+  "allocator": {
+    "memory_space_id": "shared0.dram3d.paged_kv",
+    "global_pa_base": 2147483648,
+    "capacity_bytes": 34816,
+    "alignment_bytes": 256,
+    "per_member_kv_bytes": 17408
+  },
+  "requests": [
+    {
+      "request_id": "R0-active-cancel",
+      "arrival_time_fs": 0,
+      "initial_kv_length": 16,
+      "output_length": 1,
+      "cancel_time_fs": 1000000000
+    },
+    {
+      "request_id": "R1-complete",
+      "arrival_time_fs": 0,
+      "initial_kv_length": 16,
+      "output_length": 1
+    },
+    {
+      "request_id": "R2-reuse",
+      "arrival_time_fs": 1,
+      "initial_kv_length": 16,
+      "output_length": 1
+    },
+    {
+      "request_id": "R3-reuse",
+      "arrival_time_fs": 1,
+      "initial_kv_length": 16,
+      "output_length": 1
+    },
+    {
+      "request_id": "R4-pressure",
+      "arrival_time_fs": 2,
+      "initial_kv_length": 16,
+      "output_length": 1
+    },
+    {
+      "request_id": "R5-pressure",
+      "arrival_time_fs": 2,
+      "initial_kv_length": 16,
+      "output_length": 1
+    },
+    {
+      "request_id": "R6-waiting-cancel",
+      "arrival_time_fs": 3,
+      "initial_kv_length": 16,
+      "output_length": 1,
+      "cancel_time_fs": 4
+    },
+    {
+      "request_id": "R7-waiting-cancel",
+      "arrival_time_fs": 3,
+      "initial_kv_length": 16,
+      "output_length": 1,
+      "cancel_time_fs": 4
+    }
+  ],
+  "claim_boundary": {
+    "performance_claim_allowed": false,
+    "reason": "Lifecycle qualification only; KV18+ exact traces and performance calibration remain open."
+  }
+}
