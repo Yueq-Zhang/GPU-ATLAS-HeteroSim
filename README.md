@@ -131,6 +131,28 @@ GPU内部NoC由Accel-Sim/GPGPU-Sim负责，连接SM、Cache和Memory Partition�
 
 Ramulator2-GDDR6列来自32 B事务粒度、4 GiB容量和约448 GB/s峰值带宽的诊断对照。Ramulator2相对Accel-Sim内部GDDR6有7/14落入15%以内，但相对Native为0/14，平均绝对相对误差为119.20%。该实验替换了DRAM Controller、Scheduler、状态机和地址映射器，并使用近零开销GPU到内存适配器，不代表完整外部Link、Logic Die和3D-DRAM端到端性能。详细数据见[GPU算子误差分解](docs/qualification/p18_gpu_operator_error_triage.md)和[GDDR6模型对比](validation/gddr6_model_comparison_32b_parity/README.md)。
 
+#### 1.4.1 对当前仿真偏差的解释
+
+- **执行对象已经对齐**：14类算子的Native测量与Trace捕获使用相同执行程序身份、精确Shape和有序Kernel序列，Accel-Sim侧采用匹配的本地显存拓扑；当前10个失败项不再是身份、Artifact或拓扑不匹配造成的阻断。
+- **实机与仿真的计时边界仍可能不同**：CUDA Event覆盖一次完整算子迭代，可能包含多Kernel之间的设备时间间隔；Accel-Sim主要累计Kernel执行周期。如果框架Launch、Kernel间空隙或同步边界没有被等价建模，小算子和多Kernel算子的误差会被明显放大。
+- **GPU频率和运行状态尚未校准**：当前仿真配置使用1.132 GHz核心频率，但实机测量没有锁定核心/显存时钟，也没有同时记录实际频率、温度、功耗和降频状态，因此周期到时间的换算仍可能存在系统偏差。
+- **微架构参数尚未逐项与硬件计数器对齐**：当前还缺少指令数、IPC、Tensor Core利用率、Occupancy、L1/L2命中率、DRAM事务和访存延迟的实机对照，无法判断误差主要来自Warp调度、指令延迟、Cache、GPU内部NoC还是本地DRAM模型。
+- **误差方向不能直接当作因果结论**：当前11类算子的仿真时间短于Native、3类长于Native，这只能用于划分排查优先级，不能直接证明某一个频率、缓存或运行时参数是原因，也不应使用单一全局缩放系数修正全部算子。
+- **当前结论只适用于固定Shape**：现有对照固定TinyLlama Layer 0、FP16、BS=1和Context=16。Batch、Context、KV Length、融合策略或Kernel实现变化都可能改变Grid/Block、Tensor Core指令、缓存行为和访存事务，必须重新捕获和验证。
+
+#### 1.4.2 下一步校准与验证计划
+
+| 优先级 | 准备工作 | 目标与通过依据 |
+|---:|---|---|
+| 1 | 锁定或记录RTX 3070核心/显存时钟，同时采集温度、功耗和P-State；对14类算子执行多轮50次Warmup加500次测量 | 建立稳定的Native分布，确认4个已通过算子不是偶然落入15%门槛 |
+| 2 | 使用Nsight Compute或CUPTI分离逐Kernel执行时间、Kernel间空隙、Launch和同步边界 | 统一Native与Accel-Sim计时口径，明确框架开销是否应纳入比较 |
+| 3 | 逐算子采集指令数、IPC、Tensor Core利用率、Occupancy、L1/L2命中率和DRAM事务 | 将总延迟误差定位到Core、Cache、NoC或Memory，而不是只比较一个总时间 |
+| 4 | 建立独立Microbenchmark，覆盖指令延迟/吞吐、Warp调度、L1/L2延迟与带宽、GPU NoC、本地显存延迟与持续带宽 | 对RTX 3070配置参数执行组件级校准，并为每项保存硬件参考与允许误差 |
+| 5 | 按组件证据修改Accel-Sim配置，执行参数敏感性实验并重新运行14类算子 | 禁止使用统一比例缩放；要求身份、Shape和拓扑继续匹配，目标为14/14进入±15%门槛 |
+| 6 | 扩展到不同Batch、Context和KV Length，再执行整层及整模型实机对照 | 验证校准结果能否跨Shape复用，并最终比较端到端延迟、TTFT和逐Token时间 |
+
+在完成组件级硬件计数器校准、14类算子复验和整层/整模型对照之前，当前结果只能用于功能、请求周期和误差诊断，必须继续保持`performance_claim_allowed=false`。
+
 ## 2. 目录结构
 
 ```text
