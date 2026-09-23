@@ -1,6 +1,8 @@
 # GPU-ATLAS-HeteroSim 中文手工复现手册
 
-本文面向希望手动构建、运行和核验 GPU-ATLAS-HeteroSim 的使用者。内容对应工程版本 `0.35.0`，记录日期为 2026-09-09。所有命令默认从工程根目录执行。
+本文面向希望手动构建、运行和核验 GPU-ATLAS-HeteroSim 的使用者。内容对应工程版本 `0.42.0`，记录日期为 2026-09-10。所有命令默认从工程根目录执行。
+
+从P30开始，工程测试、CUDA执行、SASS读取和NVBit Trace生成统一在远端RTX 4090服务器执行；本地WSL只用于代码编辑和轻量资格记录归档。下文旧阶段中的“本机”仅描述其历史资格环境，不是P30之后新增实验的执行位置。
 
 本手册把“程序成功退出”“请求周期资格通过”和“性能资格通过”视为三个不同结论：
 
@@ -28,12 +30,24 @@
 | R11 | P19单Token Decode 1层/22层 | 仓库配置与资格工具双遍通过 | 本机WSL + Ramulator2 Bridge | Decode DAG、KV 16→17、Global PA、请求完成和版本提交闭环 |
 | R12 | P20连续4 Token Decode 1层/22层 | 仓库配置与资格工具双遍通过 | 本机WSL + Ramulator2 Bridge | 自回归Token链、KV 16→20/版本0→4、Global PA和请求完成闭环 |
 | R13 | P22 Static/Continuous多Batch | 5组仓库配置双遍通过 | 本机WSL | Homogeneous/Padding/Ragged Split、设备Sub-Batch、KV Admission/Retire和动态Global PA生命周期闭环 |
+| R14 | P23固定BS=2真实Trace单层Decode | 仓库封存证据可离线核验 | 本机WSL；原始Trace在远端RTX 4090 | 14类算子、15个GPU实例、KV Append与20任务统一时间线 |
+| R15 | P24控制面请求终止与容量 | 仓库配置双遍通过 | 本机WSL | EOS、最大长度、Barrier取消、容量与地址复用控制面 |
+| R16 | P25控制面QoS与存活性 | 仓库配置双遍通过 | 本机WSL | 加权公平、饥饿上界及deadlock/livelock检测 |
+| R17 | P26真实P23时间线生命周期 | 仓库证据双遍通过 | 本机WSL | durable Barrier取消、释放和4096轮分配压力无泄漏 |
+| R18 | P27 BookSim2+Ramulator2数据面 | 仓库源码可构建并双遍通过 | 本机WSL + C++依赖 | 真实Packet/Flit/Credit和共享DRAM请求周期守恒 |
+| R19 | P28推理框架离线Shadow合同 | 仓库配置双遍通过 | 本机WSL，不需要安装框架 | Manifest、图/地址/Artifact/ATLAS/vLLM/TensorRT离线合同 |
+| R20 | P29真实框架安装与双主机冒烟 | 双主机安装/CUDA/真实请求通过 | 本地RTX 3070 WSL + 远端RTX 4090 | 三套隔离环境可运行；不证明已在线接入P28或性能合格 |
+| R21 | P30真实Hugging Face在线观测 | 远端双遍语义资格通过 | 远端RTX 4090/SM89 + HF隔离环境 | 实际模块顺序、Tensor/Alias/分配范围、Global PA与稳定Simulation Key接通 |
+| R22 | P31 GPU/ATLAS Artifact生成 | 双侧Artifact生成通过 | 远端RTX 4090 + NVBit + Accel-Sim/Ramulator2 | 框架选中SASS、Range-Rebase和ATLAS全量内存Trace可生成 |
+| R23 | P33 GPU/ATLAS完整双遍周期 | 双侧独立周期资格通过 | 远端RTX 4090工程副本；GPU回放目标SM86 | GPU 40-Kernel和ATLAS 338,080请求各自双遍、唯一Ramulator2、守恒、零在途 |
+| R24 | P32在线统一Shadow时间线 | 固定HF请求因果资格通过 | 远端或本机轻量资格工具 | 非累加双分支、单一时间、Global PA、durable、版本和请求完成因果 |
+| R25 | P34真实vLLM/TRT-LLM在线事件 | 两框架双遍语义资格通过 | 远端RTX 4090 + P29隔离环境 | 真实Scheduler/Block Table/Engine/Profile事件；不含序列化TRT Engine资格 |
 
 ## 2. 冻结软件与实验基线
 
 ### 2.1 工程和模型
 
-- 工程版本：`0.35.0`；
+- 工程版本：`0.42.0`；
 - 当前代码基线：运行前使用`git rev-parse HEAD`记录；当前功能基线为`7303c02`加v0.30.0工作区更新，正式复现时应记录实际提交而不是只复制本行；
 - P15h/P16/P17固定模型：TinyLlama-1.1B；
 - Checkpoint revision：`fe8a4ea1ffedaf415f4da2f062534de366a451e6`；
@@ -57,9 +71,11 @@
 | NVBit | 1.8 |
 | CUDA Toolkit | 11.8，用于构建和SM86 Trace路径 |
 | Ramulator2 | commit `3996362187d7f8314936e5ad7560d93b66b6a215` |
-| BookSim2 | commit `1a8ec21ecc71f26be6907e373034e18c136ee459`，当前不作为已资格路径 |
+| BookSim2 | commit `1a8ec21ecc71f26be6907e373034e18c136ee459`，P27隔离逐周期适配器已资格 |
 
 P17正式性能目标固定为本机RTX 3070/SM86。远端长时间验证主机`yueqi@192.168.5.2`可用于不依赖原生GPU身份的长时模拟，但其RTX 4090结果不得作为P17原生性能基线，也不得与本机3070测量混为同一资格组。认证信息只能交互输入，不写入命令文件、配置、日志或仓库。
+
+P30及后续新实验的执行主机固定为`192.168.5.2`的RTX 4090/SM89。捕获设备SM89、Trace头实际Binary Version和Accel-Sim回放目标必须分别记录；当前P31为SM89捕获、实际SM86 Binary、SM86目标配置，不能据此宣称已建立RTX 4090周期模型。
 
 ## 3. 首次安装与构建
 
@@ -142,7 +158,7 @@ P16的可移植证据已经纳入仓库，不再需要排除两个Artifact测试
 .venv/bin/python -m pytest tests/hetero -q
 ```
 
-v0.35.0封存P23固定BS=2真实Trace统一时间线，并保留P24请求控制与P25 QoS/存活性功能资格；当前在默认WSL环境复核为`238 passed`。测试数量可能随开发变化，应以`0 failed`为最终判据。任何失败都应视为回归或环境依赖缺失，不得用旧的P16外部目录排除条件掩盖。Windows Python不能加载Linux构建的`_heterosim_runtime`，因此必须在构建该扩展的同一个WSL环境执行完整回归。
+v0.42.0在P29运行时之上增加P30真实Hugging Face在线观测、P31双侧Artifact、P32统一Shadow时间线、P33双侧完整周期回放和P34真实在线调度事件。测试数量可能随开发变化，应以`0 failed`为最终判据。任何失败都应视为回归或环境依赖缺失，不得用旧的P16外部目录排除条件掩盖。P30起完整回归也在远端Linux工程副本执行，不用Windows Python加载Linux构建的`_heterosim_runtime`。
 
 ## 5. 配置预检
 
@@ -686,9 +702,206 @@ python3 scripts/qualify_p24_request_controls.py
 python3 scripts/qualify_p25_qos_liveness.py
 ```
 
-检查`validation/p25/qualification_record.json`：正常运行需双遍一致、GPU/ATLAS工作量守恒、最大等待不超过策略上界，同等级前缀Jain公平性通过；deadlock和livelock故障注入均须被Watchdog终止。BookSim2适配器未安装时应看到`failed_closed=true`，不能把调度微周期解释为NoC或设备硬件周期。
+检查`validation/p25/qualification_record.json`：正常运行需双遍一致、GPU/ATLAS工作量守恒、最大等待不超过策略上界，同等级前缀Jain公平性通过；deadlock和livelock故障注入均须被Watchdog终止。该项是控制面微周期资格，真实数据面由R18验证。
 
-## 22. 通用输出检查
+## 22. R17：P26真实Trace时间线请求生命周期
+
+```bash
+python3 scripts/qualify_p26_p23_request_controls.py
+```
+
+检查`validation/p26/p23_request_controls/qualification_record.json`：精确P23 Epoch为3，Parent/Child均守恒；取消只在durable Token Barrier生效，Retire释放晚于全部请求持久完成，地址复用可重复。`long_capacity_pressure_probe`应为4096轮、8192次分配/释放、零泄漏、零重叠、零在途；`long_generation_exact_trace_ready=false`必须保留。
+
+## 23. R18：P27 BookSim2 + Ramulator2真实数据面
+
+```bash
+scripts/build_booksim2_cycle_adapter.sh
+scripts/build_standalone_ramulator2_bridge.sh
+python3 scripts/qualify_p27_booksim2_ramulator2_qos.py
+```
+
+检查`validation/p27/booksim2_ramulator2_qos/qualification_record.json`：`booksim2_active`、双遍一致、唯一Ramulator2、Packet/Flit/Credit/Parent守恒、GPU与ATLAS存在和零在途均须为`true`。构建目录不提交Git，可随时删除后重建。该资格没有打开性能声明。
+
+## 24. R19：P28推理框架离线Shadow合同
+
+```bash
+python3 scripts/qualify_p28_framework_shadow.py
+```
+
+检查`validation/p28/framework_shadow/qualification_record.json`：七项离线能力及双遍确定性应通过；`huggingface_live_model_executed`、`vllm_live_scheduler_executed`和`tensorrt_llm_engine_executed`仍应为`false`，因为该记录只资格P28离线合同。P29真实运行证据单独存放，不能手工回填或改写P28结果。
+
+## 25. R20：P29真实框架安装与双主机冒烟测试
+
+P29把三套框架安装在独立环境中，绝不向主工程`.venv`或Accel-Sim的CUDA 11.8环境混装包。先安装`uv`：
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+本地`Ubuntu-22.04` WSL使用：
+
+```bash
+export HETEROSIM_FRAMEWORK_ROOT=/opt/gpu-atlas/framework-runtimes
+export HETEROSIM_UV_BIN="$HOME/.local/bin/uv"
+bash scripts/install_p29_framework_runtimes.sh all
+```
+
+远端`192.168.5.2`在工程副本中使用：
+
+```bash
+export HETEROSIM_FRAMEWORK_ROOT=/home/yueqi/gpu-atlas/framework-runtimes
+export HETEROSIM_UV_BIN="$HOME/.local/bin/uv"
+bash scripts/install_p29_framework_runtimes.sh all
+```
+
+安装器生成`hf-live`、`vllm-live`与`trtllm-live`三个目录，并分别写入`requirements.lock`。TensorRT-LLM需要MPI；有系统Open MPI时直接使用，没有sudo权限时安装器调用`install_p29_user_mpi_runtime.sh`，把Ubuntu运行库提取到`$HETEROSIM_FRAMEWORK_ROOT/mpi-runtime`。所有TensorRT-LLM命令必须通过`run_p29_profile.sh`启动，以恢复该用户态运行库路径。
+
+先对每个环境做导入与CUDA探测：
+
+```bash
+mkdir -p "$HETEROSIM_FRAMEWORK_ROOT/validation/current-host"
+bash scripts/run_p29_profile.sh huggingface scripts/probe_p29_framework_runtime.py \
+  huggingface --output "$HETEROSIM_FRAMEWORK_ROOT/validation/current-host/huggingface_probe.json"
+bash scripts/run_p29_profile.sh vllm scripts/probe_p29_framework_runtime.py \
+  vllm --output "$HETEROSIM_FRAMEWORK_ROOT/validation/current-host/vllm_probe.json"
+bash scripts/run_p29_profile.sh tensorrt_llm scripts/probe_p29_framework_runtime.py \
+  tensorrt_llm --output "$HETEROSIM_FRAMEWORK_ROOT/validation/current-host/tensorrt_llm_probe.json"
+```
+
+再使用固定Revision执行真实模型请求：
+
+```bash
+export HF_HOME="$HETEROSIM_FRAMEWORK_ROOT/cache/huggingface"
+bash scripts/run_p29_profile.sh huggingface scripts/run_p29_huggingface_live_smoke.py \
+  --output "$HETEROSIM_FRAMEWORK_ROOT/validation/current-host/huggingface_live_smoke.json"
+bash scripts/run_p29_profile.sh vllm scripts/run_p29_vllm_live_smoke.py \
+  --output "$HETEROSIM_FRAMEWORK_ROOT/validation/current-host/vllm_live_smoke.json"
+bash scripts/run_p29_profile.sh tensorrt_llm scripts/run_p29_trtllm_live_smoke.py \
+  --output "$HETEROSIM_FRAMEWORK_ROOT/validation/current-host/tensorrt_llm_live_smoke.json"
+```
+
+远端无法连接Hugging Face时，可以先把固定Revision模型缓存同步过去，再设置`HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1`重跑。模型权重缓存允许复用；SM86与SM89的SASS Trace、Binary身份和资格记录不允许互换。本地WSL下vLLM脚本会自动采用V1 Runner以避开UVA限制，远端原生Linux保持框架默认Runner。
+
+两台机器的小型JSON与依赖Freeze归档到`validation/p29/framework_runtimes/local-sm86`和`remote-sm89`后，执行：
+
+```bash
+python3 scripts/qualify_p29_framework_runtimes.py
+```
+
+通过判据为`installation_passed=true`、`cuda_execution_passed=true`和`live_framework_smoke_passed=true`。同时必须保持`runtime_to_p28_online_adapter_connected=false`、`automatic_framework_trace_capture_qualified=false`、`end_to_end_simulator_integration_qualified=false`和`performance_claim_allowed=false`。冒烟记录中的冷启动时间只用于证明流程执行，不是性能数据。
+
+安装后按相同命令再次执行三套真实请求，将结果分别归档到`validation/p29/framework_runtimes/replay/local-sm86`和`replay/remote-sm89`，再执行：
+
+```bash
+python3 scripts/qualify_p29_framework_live_replay.py
+```
+
+该检查要求同一主机的软件、设备、模型、输入、输出Token及关键结果哈希稳定，并要求两台主机语义输出一致。SM86与SM89的Logits不要求跨架构逐位相等；加载和执行耗时会写入记录，但不参与复测资格，也不得作为性能校准结果。
+
+## 26. R21：P30真实Hugging Face在线观测
+
+登录远端RTX 4090工程副本，确认固定Revision TinyLlama已经位于Hugging Face缓存，然后执行：
+
+```bash
+cd /home/yueqi/gpu-atlas/p30-p31-worktree-20260910
+export HF_HOME=/home/yueqi/gpu-atlas/framework-runtimes/cache/huggingface
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+export P30_P31_OUTPUT_ROOT=/home/yueqi/gpu-atlas/framework-runtimes/validation/p30-p31-remote
+export P30_P31_PHASE=p30
+bash scripts/run_p30_p31_remote.sh
+```
+
+入口会拒绝非RTX 4090/SM89主机。两遍真实Transformers请求必须产生相同的语义身份、Simulation Key和数值结果；事件数为67、模块数为30、Tensor绑定为96。CUDA分配器Storage/Workspace数量允许变化，相关原始Range与内存图哈希只属于各遍观测，不进入稳定Simulation Key。
+
+通过后检查`$P30_P31_OUTPUT_ROOT/p30/qualification_record.json`，并仅将该小型资格记录归档到仓库`validation/p30/huggingface_online`。P30不产生SASS资格，`performance_claim_allowed=false`必须保持。
+
+## 27. R22：P31框架驱动GPU与ATLAS Artifact
+
+P31所有SASS读取与Trace生成仍在同一远端RTX 4090执行。完整入口为：
+
+```bash
+cd /home/yueqi/gpu-atlas/p30-p31-worktree-20260910
+export HF_HOME=/home/yueqi/gpu-atlas/framework-runtimes/cache/huggingface
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+export P30_P31_OUTPUT_ROOT=/home/yueqi/gpu-atlas/framework-runtimes/validation/p30-p31-remote
+export P30_P31_PHASE=all
+bash scripts/run_p30_p31_remote.sh
+```
+
+需要分阶段恢复时，把`P30_P31_PHASE`依次设为`capture`、`artifacts`、`atlas`、`replay`和`qualify`。捕获阶段使用直接NVBit注入，只在实际Layer-0 Decode前向区间开启Instrumentation；任何部分捕获目录都会fail closed，必须先人工检查，禁止覆盖。
+
+GPU通过判据：40个非空Kernel、`capture_device_sm=89`、实际`binary_versions=[86]`、`replay_target_sm=86`、四个Allocator Range全部映射到不重叠Global PA；单遍Accel-Sim回放必须有正周期/指令、唯一Ramulator2、地址零漏配、非零转换、全部Parent完成和零在途。当前合格记录为15,859,267个GPU周期、371,846,682条指令、2,756,823个Parent全部完成且durable、575,486,980次地址转换零漏配、退出时零在途。R22本身只生成Artifact；双遍请求周期资格由R23单独完成。
+
+ATLAS通过判据：两遍Artifact Key、Artifact文件和确定性gzip Trace逐字节一致；均包含338,080条请求，其中337,920读、160写，并绑定Activation/Weight/Output Global PA。周期回放由R23执行。
+
+最终检查`$P30_P31_OUTPUT_ROOT/p31/qualification_record.json`。本地归档资格记录、GPU源Artifact、Trace Manifest、在线地址绑定、单遍回放统计及两个ATLAS摘要，不复制约139 MiB原始压缩GPU Trace。统一在线Shadow时间线和性能资格均不属于R22。
+
+## 28. R23：P33 GPU/ATLAS完整双遍周期资格
+
+在远端工程副本执行。两个GPU Leg应分别使用新输出目录；下面示例复用R22第一遍并执行第二遍。ATLAS使用仓库内独立构建的durable Ramulator2 Bridge：
+
+```bash
+cd /home/yueqi/gpu-atlas/p30-p31-worktree-20260910
+bash scripts/build_standalone_ramulator2_bridge.sh
+PYTHONPATH=. python3 scripts/run_accel_sim_single.py \
+  --backend-config configs/hetero/backends/gpu_accelsim_rtx3070_ramulator2_hbdram_edge_16ch_range_rebase.json \
+  --trace-manifest validation/p31/hf_layer0_v2/trace_manifest.json \
+  --output validation/p33/gpu_double/replay_leg2
+PYTHONPATH=. python3 scripts/run_p33_atlas_cycle_replay.py \
+  --config configs/hetero/frameworks/p33_atlas_cycle_replay.json \
+  --trace validation/p31/atlas_run1/atlas_memory_trace.jsonl.gz \
+  --output validation/p33/atlas/leg1.json
+PYTHONPATH=. python3 scripts/run_p33_atlas_cycle_replay.py \
+  --config configs/hetero/frameworks/p33_atlas_cycle_replay.json \
+  --trace validation/p31/atlas_run2/atlas_memory_trace.jsonl.gz \
+  --output validation/p33/atlas/leg2.json
+PYTHONPATH=. python3 scripts/qualify_p33_cycle_artifacts.py \
+  --gpu-run-a validation/p31/hf_layer0_v2/replay_leg1/stats.json \
+  --gpu-run-b validation/p33/gpu_double/replay_leg2/stats.json \
+  --atlas-run-a validation/p33/atlas/leg1.json \
+  --atlas-run-b validation/p33/atlas/leg2.json \
+  --p31-qualification validation/p31/qualification_record.json \
+  --output validation/p33/qualification_record.json
+```
+
+通过判据见[P33资格说明](docs/qualification/p33_cycle_replay.md)。GPU与ATLAS是两个独立候选的周期资格，不是同一Ramulator2实例中的并发竞争，也不是性能校准。
+
+## 29. R24：P32在线统一Shadow时间线
+
+```bash
+PYTHONPATH=. python3 scripts/build_p32_online_shadow_timeline.py \
+  --p30-qualification validation/p30/qualification_record.json \
+  --p31-qualification validation/p31/qualification_record.json \
+  --p33-qualification validation/p33/qualification_record.json \
+  --gpu-binding validation/p31/hf_layer0_v2/binding/online_address_binding.json \
+  --atlas-artifact validation/p31/atlas_run1/atlas_executable_artifact.json \
+  --output validation/p32/qualification_record.json
+```
+
+GPU整层参考包络已包含QKV，ATLAS只覆盖QKV候选，故输出必须为`timing_aggregation=non_additive_reference_candidate`和`mixed_placement_makespan_qualified=false`。
+
+## 30. R25：P34真实vLLM与TensorRT-LLM在线事件
+
+固定Revision模型应已由P29下载。入口自动启用离线缓存，避免把Hub网络状态混入资格：
+
+```bash
+cd /home/yueqi/gpu-atlas/p30-p31-worktree-20260910
+export HETEROSIM_FRAMEWORK_ROOT=/home/yueqi/gpu-atlas/framework-runtimes
+bash scripts/run_p29_profile.sh vllm scripts/run_p34_vllm_online_events.py --output validation/p34/vllm/run1.json
+bash scripts/run_p29_profile.sh vllm scripts/run_p34_vllm_online_events.py --output validation/p34/vllm/run2.json
+bash scripts/run_p29_profile.sh tensorrt_llm scripts/run_p34_trtllm_online_events.py --output validation/p34/tensorrt_llm/run1.json
+bash scripts/run_p29_profile.sh tensorrt_llm scripts/run_p34_trtllm_online_events.py --output validation/p34/tensorrt_llm/run2.json
+PYTHONPATH=. python3 scripts/qualify_p34_live_framework_events.py \
+  --vllm-run-a validation/p34/vllm/run1.json \
+  --vllm-run-b validation/p34/vllm/run2.json \
+  --trtllm-run-a validation/p34/tensorrt_llm/run1.json \
+  --trtllm-run-b validation/p34/tensorrt_llm/run2.json \
+  --output validation/p34/qualification_record.json
+```
+
+`serialized_tensorrt_engine_qualified`必须保持`false`；详情见[P34资格说明](docs/qualification/p34_live_framework_events.md)。
+
+## 31. 通用输出检查
 
 一次完整运行通常产生以下文件，具体集合取决于执行模式：
 
@@ -707,6 +920,8 @@ python3 scripts/qualify_p25_qos_liveness.py
 | `multi_batch_runtime.json` | 请求状态、Commit/Retire、资源区间、守恒和调度指标 |
 | `request_control_runtime.json` | EOS/长度/取消、KV容量、释放与地址复用 |
 | `qos_runtime.json` | QoS仲裁、公平性、等待与Watchdog证据 |
+| `booksim2`/`packet_ledger`字段 | Packet、Flit、Credit、四段路由与完成周期 |
+| `artifact_summary`字段 | 框架身份、图/任务/地址数量及GPU/ATLAS/vLLM/TensorRT合同哈希 |
 
 正式通过至少检查：
 
@@ -721,7 +936,7 @@ python3 scripts/qualify_p25_qos_liveness.py
 9. 消费者在生产者完成和正确版本可见后启动；
 10. `performance_claim_allowed`按实际校准状态保持关闭或打开，不得手工覆盖。
 
-## 23. 常见故障
+## 32. 常见故障
 
 ### 23.1 `_heterosim_runtime`找不到
 
@@ -748,7 +963,7 @@ Artifact会校验元数据、Kernel List、Trace、资格记录和配置哈希�
 
 Trace捕获脚本会拒绝把新捕获混入非空目录。为每次捕获使用新目录；资格脚本只有在明确支持`--resume-completed-runs`时才能复用已完成Leg。
 
-## 24. 建议的人工复现顺序
+## 33. 建议的人工复现顺序
 
 首次人工复现建议严格按以下顺序推进：
 
@@ -766,6 +981,15 @@ Trace捕获脚本会拒绝把新捕获混入非空目录。为每次捕获使用
 12. 执行R12，复核连续四Token的自回归、KV版本和请求周期资格；不得把未校准P20周期、TTFT或ITL作为性能结果。
 13. 执行R13，复核Static/Continuous、三种Batch策略、设备Sub-Batch和动态KV/Global PA生命周期；不得把Scheduler Epoch指标作为真实Batch性能。
 14. 在远端RTX 4090执行R14；所有SASS获取都必须留在远端，完成双遍前不得发布Batch性能。
-15. 执行R15和R16，分别复核请求终止/KV容量以及QoS/存活性；BookSim2未激活时保持失败关闭。
+15. 执行R15和R16，分别复核请求终止/KV容量以及QoS/存活性控制面。
+16. 执行R17，复核P23真实Trace时间线的durable Barrier、释放、复用和长轮次分配器压力。
+17. 构建并执行R18，确认BookSim2与唯一Ramulator2的真实数据面守恒。
+18. 执行R19，复核推理框架离线合同，并保持其在线运行时字段为`false`。
+19. 执行R20，复核本地SM86与远端SM89三套真实框架的安装、CUDA和单请求证据；不得把该结果解释为P28在线接入或性能资格。
+20. 在远端RTX 4090执行R21，复核真实HF事件、Tensor/Alias和稳定Simulation Key；临时Allocator地址不得成为跨运行身份。
+21. 在同一远端执行R22，生成框架选中GPU Trace和ATLAS内存Trace并完成严格资格；不得把单遍GPU地址审计或ATLAS Trace生成解释为端到端性能。
+22. 执行R23，完成GPU整层和ATLAS QKV各自独立双遍周期资格；两者不得相加。
+23. 执行R24，验证固定HF请求统一Shadow时间线的依赖、资源、地址、durable和版本因果。
+24. 执行R25，验证真实vLLM/TensorRT-LLM在线事件；保持序列化TensorRT Engine与性能资格关闭。
 
 若某一级失败，应保留该次输出目录和命令身份，不继续用其结果生成下一级性能结论。

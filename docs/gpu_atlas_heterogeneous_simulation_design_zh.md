@@ -5,10 +5,10 @@
 | 字段 | 内容 |
 | --- | --- |
 | 状态 | 已冻结的实现基线 |
-| 版本 | 1.36 |
-| 日期 | 2026-09-07 |
+| 版本 | 1.43 |
+| 日期 | 2026-09-10 |
 | 适用工程 | ATLAS-MICRO-2026 |
-| 当前基线提交 | 7303c02（另含v0.30.0工作区更新） |
+| 当前基线提交 | 4fd8f88（P26-P35功能实现；本文档同步在后续提交） |
 | 主要目标 | GPU 与 3D-DRAM Compute Die/ATLAS 的端到端 LLM 联合仿真 |
 
 本文档是后续实现、代码评审、配置设计和实验解释的主规范。后续工作如果与本文档冲突，应先修改本文档并记录原因，再修改代码。不能在实现中静默改变本文档已经冻结的拓扑语义、地址语义、计时所有权或端到端 Token 语义。
@@ -2852,13 +2852,17 @@ P23最终封存满足上述门禁。固定时间线含14类、15个GPU Trace实�
 
 请求可携带重放式EOS位置、最大输出Token数和显式取消时刻。EOS/最大长度在Token完成时自然退休；取消只在token-step barrier采样，前一Epoch已发工作必须先提交。等待中与已激活请求均可取消，且每个请求只能产生一个终止原因：`completed/eos/max_length/cancelled`。
 
-Admission按全请求KV预约检查容量；只有成功Admission的请求才能分配Global PA。Retire按同一Barrier的`release-before-allocate`顺序释放容量与地址，确定性first-fit可复用已释放区间。资格必须验证Admission/Allocation双射、活动范围不重叠、Allocation Epoch唯一、峰值不越界、等待取消不分配，以及最终零字节、零活动分配和零在途。当前P24只资格单层功能周期，不建模mid-kernel抢占或真实性能。
+Admission按全请求KV预约检查容量；只有成功Admission的请求才能分配Global PA。Retire按同一Barrier的`release-before-allocate`顺序释放容量与地址，确定性first-fit可复用已释放区间。资格必须验证Admission/Allocation双射、活动范围不重叠、Allocation Epoch唯一、峰值不越界、等待取消不分配，以及最终零字节、零活动分配和零在途。
+
+P26把该合同嵌入P23固定BS=2、Context=16、KV=17真实Trace时间线。活跃取消必须等待该Epoch全部Parent/Child durable、版本提交和`ALL_REQUESTS_DURABLE` Token Barrier；等待取消不产生分配。三组独立精确Epoch通过双遍，另以4096轮功能压力探针验证8192次分配/释放、零重叠、零泄漏和确定性复用。压力探针不得外推为单请求KV=18+真实Trace；P24/P26仍不建模mid-kernel抢占或真实性能。
 
 ### 25.14 P25 QoS与存活性
 
 控制面以确定性加权公平策略在GPU与ATLAS资源上选择请求，显式记录QoS Class、Weight、Virtual Runtime、最大等待和饥饿覆盖。资格同时检查高优先级前缀服务优势、同等级请求Jain公平性、最大等待上界、总工作守恒和双遍摘要一致。
 
-Watchdog以“存在Ready且未完成工作，但窗口内没有Useful Progress”为触发条件，并按状态是否变化区分Deadlock与Livelock；故障注入只用于证明检测分支。BookSim2只有在Adapter ABI、库、网络配置、逐周期Step/Credit API和确定性Probe同时通过时才算激活，缺任一项必须失败关闭，禁止静默退回分析NoC。当前P25结果是调度微周期，不是GPU、ATLAS、NoC或DRAM硬件周期。
+Watchdog以“存在Ready且未完成工作，但窗口内没有Useful Progress”为触发条件，并按状态是否变化区分Deadlock与Livelock；故障注入只用于证明检测分支。BookSim2只有在Adapter ABI、库、网络配置、逐周期Step/Credit API和确定性Probe同时通过时才算激活，缺任一项必须失败关闭，禁止静默退回分析NoC。
+
+P27以隔离构建的ATLAS补丁版BookSim2实现4节点周期数据面：`gpu0`、`atlas0.compute`、`gateway0`和`dram0`。每个Parent产生发起方→Gateway、Gateway→DRAM、DRAM→Gateway、Gateway→发起方四段Packet；只有前两段完成后才可进入Ramulator2，只有全部Child durable后才可产生响应。新的Gateway直入ABI绕过桥内旧GPU外部Link，避免NoC链路重复计时；Initiator、Packet、Flit、Credit、Parent/Child和零在途必须同时守恒。QoS权重用于同源Ready Packet选择，随后GPU/ATLAS请求竞争同一Ramulator2。该资格证明周期交互，不证明完整ATLAS Chip内部NoC或实体性能已校准。
 
 ### 25.15 推理框架接入边界
 
@@ -2868,7 +2872,23 @@ GPU算子必须由框架实际选择的执行程序在目标SM上完成编译/�
 
 捕获不要求每个请求重新执行，但跨请求复用必须命中合格Catalog。只有证明动态指令、控制流和地址行为不随候选变化时才能设置`replay_safe=true`；缺失精确Artifact时必须失败关闭，或由配置显式选择带Fidelity标签的分析回退。框架捕获地址必须先绑定稳定Tensor/Value Range并映射到Global PA，不得无声明地当作最终物理地址。
 
-正式实现与验收按`docs/INFERENCE_FRAMEWORK_INTEGRATION_TODO_zh.md`的F0–F8执行：Hugging Face导出、Tensor/KV绑定、GPU Trace Catalog、ATLAS Tensor IR编译、shadow运行接口、vLLM Continuous/Ragged Batch与Paged KV、TensorRT-LLM以及端到端资格。在全部执行任务和硬件组件通过门禁前，框架接入存在也不允许打开性能声明。
+P28已实现离线版本的F0–F7合同：Model/Request/Execution Manifest；Hugging Face配置到规范图、任务、稳定Tensor和Global PA；P23精确Ready Catalog选择；投影算子的ATLAS Tensor-IR/Tile/Core分片Lowering；vLLM Continuous/Ragged/Paged-KV事件与页地址绑定；TensorRT-LLM Engine/Profile/Tactic/Plugin身份；以及不可反馈修改Token或Scheduler的Shadow结果连接。两遍离线输出完全一致。
+
+P29把外部执行条件从“未安装”推进到“隔离运行时和单请求已验证”。本地SM86 WSL与远端SM89原生Linux分别安装Transformers、vLLM和TensorRT-LLM环境，并对固定TinyLlama Revision执行CUDA探测及真实请求。模型权重可以共享，但SM86/SM89的SASS、Binary身份和资格证据不得跨架构复用。WSL的vLLM显式选择V1 Runner；远端TensorRT-LLM在无sudo条件下使用隔离Open MPI，且当前冒烟路径为TensorRT-LLM LLM API的PyTorch backend。
+
+P30把固定Hugging Face请求接到在线观测层。模块前后Hook记录实际顺序、层号、Phase、Shape、dtype、Tensor/View/Alias、CUDA Storage范围和生命周期。稳定语义身份不包含原始Storage地址、Workspace范围或分配器内存图；这些字段以独立观测哈希保留。只有模型/请求/框架/适配器和规范化语义事件共同决定Simulation Key，因此合法的CUDA分配器复用或Workspace波动不会伪造新的程序语义，也不会被丢失。
+
+P31从同一个P30身份产生两类可执行Artifact。GPU路径只在实际Layer-0 Decode区间开启NVBit，Trace Manifest必须分别记录捕获设备SM89、每个Trace头实际SM86 Binary Version和SM86回放目标；四个Allocator Range通过`TraceAddr -> Storage+Offset -> Global PA`完成Range-Rebase。固定40-Kernel单遍地址审计共执行15,859,267个GPU周期和371,846,682条指令，2,756,823个Parent全部完成且durable，575,486,980次地址转换零漏配，退出时零在途。ATLAS路径把QKV Tensor IR Lowering为16个Logic Core的Stage/Tile任务，Activation、Weight和Output绑定同一Global PA体系，并生成完整逐请求Trace。Tile、Core、编译器和地址计划进入Artifact Key；Bank/Channel属于后续AddressDecodeKey，不提前固化为Tensor IR身份。
+
+P30起所有新增测试、CUDA执行、SASS读取和NVBit捕获统一在远端RTX 4090完成，本地只负责代码编辑与轻量证据归档。捕获主机身份不能代替仿真目标身份。
+
+P33将P31 GPU整层40-Kernel Trace和ATLAS QKV完整请求Trace分别执行双遍周期回放。每个GPU Leg使用一个进程并在40个Kernel之间保留同一外存状态；每个ATLAS Leg由唯一Ramulator2处理全部338,080个请求。双遍必须分别满足周期、指令、请求/完成摘要、external-memory统计一致，Parent/Child/durable守恒与零在途；两个Leg之间不复用状态，GPU与ATLAS也不被伪装成同一个并发Ramulator2实例。
+
+P32以P30 Simulation Key为根，把P31双侧Artifact接到一个fs时间所有者。GPU Artifact覆盖整个Layer-0 Decode，已经包含QKV；ATLAS Artifact只覆盖QKV候选。因此两者是非累加的参考/候选分支，Observation Barrier取两分支完成时刻的最大值，绝不能相加为混合放置makespan。只有重新捕获“排除QKV的GPU剩余层Trace”后，才能评估真实GPU+ATLAS混合放置总时延。当前P32验证请求到达、依赖、分支资源占用、Global PA不重叠、durable后版本提交以及请求完成。
+
+P34在远端真实框架中接入两种在线事件。vLLM 0.29.0以单进程EngineCore观测`AsyncScheduler`输出、Continuous/Ragged Batch和Paged-KV Block Table，运行期随机Request ID仅在语义比较时规范化，原始记录保留；Block Owner、Global PA和释放后零Live Page必须成立。TensorRT-LLM 1.2.1以TP=1进程内Worker观测实际LLM对象、Optimization Profile和`SimpleScheduler`回调。当前仅资格化LLM API PyTorch backend，`serialized_tensorrt_engine_qualified=false`。
+
+正式在线实现下一步按`docs/INFERENCE_FRAMEWORK_INTEGRATION_TODO_zh.md`推进F8性能校准、真实Batched/Fused Kernel、vLLM抢占/恢复和序列化TensorRT Engine。在全部执行任务和硬件组件通过门禁前不允许打开性能声明。
 
 ---
 
@@ -2979,3 +2999,10 @@ GPU算子必须由框架实际选择的执行程序在目标SM上完成编译/�
 | 1.34 | 2026-09-07 | 完成P22多Batch功能周期闭环：实现Static/Continuous请求状态机、KV容量Admission/Retire、Homogeneous/Padding/Ragged Split、GPU/ATLAS设备Sub-Batch和动态Global PA生命周期双遍资格；冻结真实Batched/Fused Kernel与性能资格仍未完成的边界 |
 | 1.35 | 2026-09-07 | 完成P24 EOS/最大长度/取消/KV容量与Global PA复用功能资格，以及P25确定性QoS、公平性和死锁/活锁Watchdog资格；启动P23远端RTX 4090专属SASS/BS=2 Trace与Range-Rebase双遍流程，并冻结混合Ampere SASS、BookSim2未激活及性能未资格边界 |
 | 1.36 | 2026-09-09 | 完成并封存P23固定TinyLlama Layer-0、BS=2、Context=16、KV=17的14类远端Trace、15个GPU实例、KV Append和20任务统一时间线双遍功能资格；增加仓库相对证据链与离线Seal校验，同时继续冻结原始Trace远端保存、跨Shape不可外推及性能未资格边界 |
+| 1.37 | 2026-09-09 | 完成P26真实P23时间线生命周期与4096轮容量压力、P27 BookSim2四段Packet/Flit/Credit和唯一Ramulator2双遍数据面、P28版本化推理框架离线导出与Shadow合同；继续冻结KV18+、完整Chip NoC校准、真实框架运行时与性能资格边界 |
+| 1.38 | 2026-09-09 | 完成P29双主机隔离框架运行时：本地SM86与远端SM89均通过Transformers Prefill/Decode、vLLM和TensorRT-LLM真实请求；冻结运行时安装不等于P28在线事件接入、自动Trace捕获或性能资格的边界 |
+| 1.39 | 2026-09-10 | 完成P30固定Hugging Face真实请求在线观测：记录67个语义事件、Tensor/View/Alias与分配器范围，并将易变Allocation证据与稳定Simulation Key分离；冻结P30起测试和SASS生成仅在远端RTX 4090执行 |
+| 1.40 | 2026-09-10 | 完成P31框架驱动GPU/ATLAS Artifact：远端捕获40-Kernel NVBit Trace并完成Range-Rebase单遍地址审计，ATLAS QKV双遍生成338,080条完整请求；冻结GPU双遍、ATLAS周期回放、统一Shadow时间线与性能资格仍未完成的边界 |
+| 1.41 | 2026-09-10 | 完成P33双侧周期资格：GPU整层40-Kernel与ATLAS QKV完整338,080请求分别双遍一致；每Leg唯一Ramulator2、Parent/Child/durable守恒且零在途，继续冻结性能声明 |
+| 1.42 | 2026-09-10 | 完成P32固定HF在线Shadow时间线：单一fs时间所有者连接GPU整层参考与ATLAS QKV候选，验证依赖、资源、Global PA、durable、版本和请求完成；冻结两分支不可相加为混合放置makespan |
+| 1.43 | 2026-09-10 | 完成P34真实在线框架事件：vLLM AsyncScheduler/Paged-KV Block Table与TensorRT-LLM Engine/Profile/SimpleScheduler双遍语义资格；TensorRT范围明确限定为PyTorch backend |

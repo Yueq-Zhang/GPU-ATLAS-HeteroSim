@@ -1,9 +1,9 @@
 schema_version: hetero-sim/dependency-lock/v1
-captured_at: 2026-08-27
+captured_at: 2026-09-10
 source_baseline:
   atlas_repository: pku-gsun/ATLAS-MICRO-2026
   atlas_commit: b2787399408e32d327c820daee96d4e6610f551a
-  design_spec_sha256: 197135049B64811E2E1BEB47A37CBC79B60EB250A1290DBA1B037A836F19E4C3
+  design_spec_sha256: F91897E1E474F19B85F2D3E0F60BBE771B3F3F97B52E1EE2667A66CC15298FAE
 environment:
   os: Ubuntu-22.04-WSL2
   wsl_kernel: 6.6.87.2-microsoft-standard-WSL2
@@ -24,17 +24,18 @@ dependencies:
     version: 1.8
     archive_sha256: 72a2b827f9531dcb86b6be13844f267640fb440929d92944177029da6da2b9e1
     capture_status: passed_local_rtx3070_driver_591_86
+    p31_remote_capture_status: passed_rtx4090_sm89_direct_injection_40_kernels
   cuda_toolkit:
     build_and_capture_version: 11.8
     explicit_root: /usr/local/cuda-11.8
   ramulator2:
     commit: 3996362187d7f8314936e5ad7560d93b66b6a215
     source: ATLAS-MICRO-2026/simulator/src/dram/ramulator2
-    integration_status: one_owner_p9b_and_prefill_p10b_b_to_p14_deployment_qualified
+    integration_status: one_owner_p9b_prefill_and_p27_booksim_gateway_path_qualified
   booksim2:
     commit: 1a8ec21ecc71f26be6907e373034e18c136ee459
     source: ATLAS-MICRO-2026/simulator/src/noc/booksim2
-    integration_status: adapter_pending_qualification
+    integration_status: p27_isolated_cycle_step_packet_flit_credit_adapter_qualified
   pybind11:
     simulator_runtime_package: 2.9.1-2_ubuntu_jammy
     accel_sim_bundled_version: 2.9.1
@@ -44,6 +45,35 @@ dependencies:
     version_describe: v0.1.7.post3-80-g3772fd2f
     source: ATLAS-MICRO-2026/frontend/tilelang
     integration_status: compiler_path_pending_qualification
+  framework_runtimes:
+    isolation: separate_uv_virtual_environments
+    python: 3.10.12
+    huggingface:
+      transformers: 5.16.1
+      torch: 2.14.0+cu132
+      integration_status: p30_remote_sm89_online_operator_allocator_observation_passed
+    vllm:
+      version: 0.29.0
+      torch: 2.13.0+cu132
+      integration_status: p34_remote_async_scheduler_paged_kv_double_run_passed
+    tensorrt_llm:
+      version: 1.2.1
+      torch: 2.9.1+cu128
+      integration_status: p34_remote_pytorch_backend_engine_profile_scheduler_double_run_passed
+      mpi: system_or_isolated_ubuntu_user_space_openmpi
+  p30_p34_remote_execution:
+    host_gpu: NVIDIA_GeForce_RTX_4090
+    capture_device_sm: 89
+    observed_trace_binary_versions: [86]
+    accel_sim_replay_target_sm: 86
+    execution_policy: tests_sass_and_trace_generation_remote_only
+    gpu_request_cycle_ready: true
+    atlas_ramulator2_cycle_replay_qualified: true
+    online_shadow_timeline_qualified: true
+    live_vllm_scheduler_block_table_qualified: true
+    live_tensorrt_llm_pytorch_backend_qualified: true
+    serialized_tensorrt_engine_qualified: false
+    performance_claim_allowed: false
 research_candidates:
   rtx4090_sm89_community_config:
     accel_sim_fork_commit: 59679f1afcdbec0de6361f75e3230848c1fa6255
@@ -60,3 +90,10 @@ notes:
   - P10a qualifies strict one-node/one-device-task placement, per-value versioned routes and timed residency events in the reference control plane; real multi-operator cycle coupling remains pending.
   - P10b-B qualifies dependency-, resource-, route-, version- and live request-completion gating for one mixed TinyLlama Prefill layer through one Ramulator2.
   - P11-P14 deploy a complete materialized TinyLlama-1.1B FP16 BS=1 Context=1024 Prefill graph through first-token sampling; compute uses uncalibrated tiled cycle contracts and memory uses bounded representative requests, so performance claims remain disabled.
+  - P27 qualifies the pinned ATLAS-patched BookSim2 through an isolated per-cycle adapter and one memory-side Gateway ingress into the single Ramulator2 owner; full-Chip NoC coverage and performance calibration remain pending.
+  - P29 installs Hugging Face, vLLM and TensorRT-LLM in three isolated environments on local SM86 and remote SM89. P34 connects real remote vLLM Scheduler/Block Table and TensorRT-LLM Engine/Profile/SimpleScheduler events; the TensorRT path remains the PyTorch backend.
+  - P30 connects one fixed remote Hugging Face Prefill plus Decode request to stable operator, Tensor, alias, allocator and Simulation Key records; allocation-specific hashes remain separate because CUDA workspace reuse may vary.
+  - P31 captures the framework-selected Layer-0 Decode SASS on remote SM89, preserves actual SM86 trace headers, and builds a Range-Rebase GPU Artifact plus a deterministic 16-core ATLAS QKV full-memory Trace.
+  - P33 qualifies deterministic double replay of the 40-kernel GPU Artifact and the complete 338,080-request ATLAS stream, with one Ramulator2 per leg, durable conservation and zero in-flight requests.
+  - P32 joins the fixed Hugging Face request and both qualified Artifacts as non-additive reference/candidate branches; because the GPU whole-layer Trace already includes QKV, mixed-placement makespan remains unqualified.
+  - P34 qualifies real vLLM and TensorRT-LLM online event adapters by double run. No P32-P34 evidence enables a performance claim.

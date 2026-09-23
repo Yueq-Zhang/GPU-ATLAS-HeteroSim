@@ -15,6 +15,42 @@ The remote RTX 4090 is not the simulated target of the P15d LM Head replay.
 The pinned SM86 Trace still runs against the RTX 3070 Accel-Sim configuration;
 the host GPU is only relevant to future native capture or functional checks.
 
+## P30 and later execution policy
+
+Starting with P30, all new tests, CUDA execution, SASS inspection and NVBit
+Trace generation run on the remote RTX 4090 host. The local checkout is used
+only for source editing and lightweight evidence archives. This policy changes
+the execution location, not the simulated hardware identity.
+
+Every capture record must keep these fields separate:
+
+- `capture_device_sm`: the physical GPU that executed the framework request;
+- `binary_versions`: the actual SASS versions observed in Trace headers;
+- `replay_target_sm`: the Accel-Sim timing configuration.
+
+P31 currently records SM89, `[86]` and SM86 respectively. A remote RTX 4090
+capture must not be relabeled as a calibrated RTX 4090 simulation. Raw P31
+Trace data remains in the remote evidence directory; only qualification JSON
+and compact summaries are synchronized back to the repository.
+
+P32-P34 follow the same location policy. P33 preserves the 40-kernel GPU state
+inside one process per leg and the full ATLAS stream inside one Ramulator2 per
+leg. P34 loads vLLM and TensorRT-LLM from the isolated P29 environments and
+uses the pinned local Hugging Face cache; a Hub timeout is never part of a
+qualification run. Runtime-random request IDs may be normalized for semantic
+comparison, but raw event records remain archived.
+
+The reproducible P30/P31 entry point is:
+
+```bash
+export P30_P31_PHASE=all
+bash scripts/run_p30_p31_remote.sh
+```
+
+The script refuses non-RTX-4090/SM89 hosts and partial capture directories.
+Credentials and private keys remain outside prompts, repository files and
+logs.
+
 ## Codex orchestration policy
 
 Routine deployment, monitoring, deterministic replay, artifact comparison and
