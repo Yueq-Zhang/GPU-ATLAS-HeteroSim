@@ -103,6 +103,15 @@ int heterosim_ramulator_send_v2(
 int heterosim_ramulator_send_internal_v2(
     heterosim_ramulator_handle handle,
     const heterosim_parent_request_v2 *request);
+/*
+ * Submit a request that has already traversed an independently modelled NoC
+ * and arrived at the Hybrid-Bond gateway.  Both GPU and ATLAS initiators are
+ * accepted, and the durable completion is returned at the gateway without
+ * using this bridge's GPU-facing request/response link a second time.
+ */
+int heterosim_ramulator_send_at_gateway_v2(
+    heterosim_ramulator_handle handle,
+    const heterosim_parent_request_v2 *request, uint32_t initiator);
 void heterosim_ramulator_tick(heterosim_ramulator_handle handle);
 /*
  * Advance up to max_gpu_cycles, stopping immediately after the first cycle

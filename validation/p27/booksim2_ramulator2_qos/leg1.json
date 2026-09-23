@@ -1,0 +1,493 @@
+{
+  "booksim2": {
+    "accepted_flits": 56,
+    "accepted_flow_ids": 16,
+    "accepted_packets": 16,
+    "adapter_abi": "gpu-atlas-booksim2-adapter/v1",
+    "completed_unpolled_packets": 0,
+    "cycles": 95,
+    "delivered_flits": 56,
+    "delivered_packets": 16,
+    "injected_packets": 16,
+    "network_drained": true,
+    "observed_completion_ids": 16,
+    "outstanding_credits": 0,
+    "queued_packets": 0,
+    "schema_version": "hetero-booksim2-cycle-stats/v1",
+    "zero_in_flight": true
+  },
+  "conservation": {
+    "durable_parent_completions": 4,
+    "flit_completions": 56,
+    "flits": 56,
+    "outstanding_credits": 0,
+    "packet_completions": 16,
+    "packets": 16,
+    "parent_requests": 4,
+    "zero_in_flight": true
+  },
+  "nodes": {
+    "atlas0.compute": 1,
+    "dram0": 3,
+    "gateway0": 2,
+    "gpu0": 0
+  },
+  "packet_ledger": [
+    {
+      "destination_node": 2,
+      "flit_count": 1,
+      "flow_id": 1,
+      "injected_cycle": 0,
+      "parent_id": 1,
+      "qos_class": "latency",
+      "ready_cycle": 0,
+      "segment": "initiator_to_gateway",
+      "source_node": 0
+    },
+    {
+      "destination_node": 2,
+      "flit_count": 7,
+      "flow_id": 2,
+      "injected_cycle": 1,
+      "parent_id": 2,
+      "qos_class": "throughput",
+      "ready_cycle": 0,
+      "segment": "initiator_to_gateway",
+      "source_node": 1
+    },
+    {
+      "destination_node": 2,
+      "flit_count": 3,
+      "flow_id": 3,
+      "injected_cycle": 1,
+      "parent_id": 3,
+      "qos_class": "normal",
+      "ready_cycle": 0,
+      "segment": "initiator_to_gateway",
+      "source_node": 0
+    },
+    {
+      "destination_node": 2,
+      "flit_count": 1,
+      "flow_id": 4,
+      "injected_cycle": 0,
+      "parent_id": 4,
+      "qos_class": "latency",
+      "ready_cycle": 0,
+      "segment": "initiator_to_gateway",
+      "source_node": 1
+    },
+    {
+      "destination_node": 3,
+      "flit_count": 1,
+      "flow_id": 5,
+      "injected_cycle": 13,
+      "parent_id": 1,
+      "qos_class": "latency",
+      "ready_cycle": 13,
+      "segment": "gateway_to_dram",
+      "source_node": 2
+    },
+    {
+      "destination_node": 3,
+      "flit_count": 3,
+      "flow_id": 6,
+      "injected_cycle": 16,
+      "parent_id": 3,
+      "qos_class": "normal",
+      "ready_cycle": 16,
+      "segment": "gateway_to_dram",
+      "source_node": 2
+    },
+    {
+      "destination_node": 3,
+      "flit_count": 1,
+      "flow_id": 7,
+      "injected_cycle": 18,
+      "parent_id": 4,
+      "qos_class": "latency",
+      "ready_cycle": 18,
+      "segment": "gateway_to_dram",
+      "source_node": 2
+    },
+    {
+      "destination_node": 3,
+      "flit_count": 7,
+      "flow_id": 8,
+      "injected_cycle": 25,
+      "parent_id": 2,
+      "qos_class": "throughput",
+      "ready_cycle": 25,
+      "segment": "gateway_to_dram",
+      "source_node": 2
+    },
+    {
+      "destination_node": 2,
+      "flit_count": 5,
+      "flow_id": 9,
+      "injected_cycle": 36,
+      "parent_id": 1,
+      "qos_class": "latency",
+      "ready_cycle": 36,
+      "segment": "dram_to_gateway",
+      "source_node": 3
+    },
+    {
+      "destination_node": 2,
+      "flit_count": 9,
+      "flow_id": 10,
+      "injected_cycle": 40,
+      "parent_id": 4,
+      "qos_class": "latency",
+      "ready_cycle": 40,
+      "segment": "dram_to_gateway",
+      "source_node": 3
+    },
+    {
+      "destination_node": 2,
+      "flit_count": 1,
+      "flow_id": 11,
+      "injected_cycle": 42,
+      "parent_id": 3,
+      "qos_class": "normal",
+      "ready_cycle": 42,
+      "segment": "dram_to_gateway",
+      "source_node": 3
+    },
+    {
+      "destination_node": 2,
+      "flit_count": 1,
+      "flow_id": 12,
+      "injected_cycle": 47,
+      "parent_id": 2,
+      "qos_class": "throughput",
+      "ready_cycle": 47,
+      "segment": "dram_to_gateway",
+      "source_node": 3
+    },
+    {
+      "destination_node": 0,
+      "flit_count": 5,
+      "flow_id": 13,
+      "injected_cycle": 53,
+      "parent_id": 1,
+      "qos_class": "latency",
+      "ready_cycle": 53,
+      "segment": "gateway_to_initiator",
+      "source_node": 2
+    },
+    {
+      "destination_node": 0,
+      "flit_count": 1,
+      "flow_id": 14,
+      "injected_cycle": 63,
+      "parent_id": 3,
+      "qos_class": "normal",
+      "ready_cycle": 63,
+      "segment": "gateway_to_initiator",
+      "source_node": 2
+    },
+    {
+      "destination_node": 1,
+      "flit_count": 9,
+      "flow_id": 15,
+      "injected_cycle": 64,
+      "parent_id": 4,
+      "qos_class": "latency",
+      "ready_cycle": 64,
+      "segment": "gateway_to_initiator",
+      "source_node": 2
+    },
+    {
+      "destination_node": 1,
+      "flit_count": 1,
+      "flow_id": 16,
+      "injected_cycle": 65,
+      "parent_id": 2,
+      "qos_class": "throughput",
+      "ready_cycle": 65,
+      "segment": "gateway_to_initiator",
+      "source_node": 2
+    }
+  ],
+  "performance_claim_allowed": false,
+  "qos": {
+    "class_weights": {
+      "latency": 4,
+      "normal": 2,
+      "throughput": 1
+    },
+    "max_observed_packet_wait_cycles": 1,
+    "max_starvation_cycles": 64,
+    "virtual_runtime": {
+      "1": 1.0,
+      "2": 4.0,
+      "3": 2.0,
+      "4": 1.0
+    }
+  },
+  "qualification_boundary": "BookSim2 packet/flit/credit and one live Ramulator2 request path are active. This is a functional cycle-coupling qualification; clock-domain and hardware performance calibration remain closed.",
+  "ramulator2": {
+    "accepted_parent_ids": 4,
+    "children_completed": 10,
+    "children_sent": 10,
+    "clock": 95,
+    "completed": 4,
+    "durable_completed": 4,
+    "gateway_cycles": 95,
+    "global_time_fs": 237500000,
+    "gpu_cycles": 95,
+    "initiators": {
+      "atlas0.compute": {
+        "children": 7,
+        "completed": 2,
+        "parents": 2
+      },
+      "gpu0": {
+        "children": 3,
+        "completed": 2,
+        "parents": 2
+      }
+    },
+    "instances": 1,
+    "internal_bytes": 640,
+    "link_cycles": 95,
+    "logical_bytes": 640,
+    "observed_completion_ids": 4,
+    "outstanding": 0,
+    "reads": 2,
+    "rejected": 0,
+    "request_payload_bytes": 0,
+    "request_wire_bytes": 0,
+    "response_payload_bytes": 0,
+    "response_wire_bytes": 0,
+    "schema_version": "hetero-live-ramulator2-statistics/v1",
+    "writes": 2
+  },
+  "request_events": [
+    {
+      "cycle": 0,
+      "event": "ISSUE_READY",
+      "parent_id": 1
+    },
+    {
+      "cycle": 0,
+      "event": "ISSUE_READY",
+      "parent_id": 2
+    },
+    {
+      "cycle": 0,
+      "event": "ISSUE_READY",
+      "parent_id": 3
+    },
+    {
+      "cycle": 0,
+      "event": "ISSUE_READY",
+      "parent_id": 4
+    },
+    {
+      "cycle": 13,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 1,
+      "parent_id": 1,
+      "segment": "initiator_to_gateway"
+    },
+    {
+      "cycle": 16,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 3,
+      "parent_id": 3,
+      "segment": "initiator_to_gateway"
+    },
+    {
+      "cycle": 18,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 4,
+      "parent_id": 4,
+      "segment": "initiator_to_gateway"
+    },
+    {
+      "cycle": 25,
+      "event": "RAMULATOR_ACCEPT",
+      "parent_id": 1
+    },
+    {
+      "cycle": 25,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 2,
+      "parent_id": 2,
+      "segment": "initiator_to_gateway"
+    },
+    {
+      "cycle": 26,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 5,
+      "parent_id": 1,
+      "segment": "gateway_to_dram"
+    },
+    {
+      "cycle": 30,
+      "event": "RAMULATOR_ACCEPT",
+      "parent_id": 3
+    },
+    {
+      "cycle": 31,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 6,
+      "parent_id": 3,
+      "segment": "gateway_to_dram"
+    },
+    {
+      "cycle": 31,
+      "event": "RAMULATOR_ACCEPT",
+      "parent_id": 4
+    },
+    {
+      "cycle": 32,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 7,
+      "parent_id": 4,
+      "segment": "gateway_to_dram"
+    },
+    {
+      "cycle": 35,
+      "event": "RAMULATOR_DURABLE",
+      "parent_id": 1
+    },
+    {
+      "cycle": 39,
+      "event": "RAMULATOR_DURABLE",
+      "parent_id": 4
+    },
+    {
+      "cycle": 41,
+      "event": "RAMULATOR_DURABLE",
+      "parent_id": 3
+    },
+    {
+      "cycle": 43,
+      "event": "RAMULATOR_ACCEPT",
+      "parent_id": 2
+    },
+    {
+      "cycle": 44,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 8,
+      "parent_id": 2,
+      "segment": "gateway_to_dram"
+    },
+    {
+      "cycle": 46,
+      "event": "RAMULATOR_DURABLE",
+      "parent_id": 2
+    },
+    {
+      "cycle": 53,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 9,
+      "parent_id": 1,
+      "segment": "dram_to_gateway"
+    },
+    {
+      "cycle": 63,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 11,
+      "parent_id": 3,
+      "segment": "dram_to_gateway"
+    },
+    {
+      "cycle": 64,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 10,
+      "parent_id": 4,
+      "segment": "dram_to_gateway"
+    },
+    {
+      "cycle": 65,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 12,
+      "parent_id": 2,
+      "segment": "dram_to_gateway"
+    },
+    {
+      "cycle": 70,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 13,
+      "parent_id": 1,
+      "segment": "gateway_to_initiator"
+    },
+    {
+      "cycle": 76,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 14,
+      "parent_id": 3,
+      "segment": "gateway_to_initiator"
+    },
+    {
+      "cycle": 90,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 15,
+      "parent_id": 4,
+      "segment": "gateway_to_initiator"
+    },
+    {
+      "cycle": 91,
+      "event": "NOC_SEGMENT_COMPLETE",
+      "flow_id": 16,
+      "parent_id": 2,
+      "segment": "gateway_to_initiator"
+    }
+  ],
+  "requests": [
+    {
+      "completion_cycle": 69,
+      "durable_cycle": 35,
+      "global_address": 0,
+      "initiator": "gpu0",
+      "issue_cycle": 0,
+      "operation": "read",
+      "parent_id": 1,
+      "qos_class": "latency",
+      "size_bytes": 128,
+      "state": "COMPLETED"
+    },
+    {
+      "completion_cycle": 90,
+      "durable_cycle": 46,
+      "global_address": 4096,
+      "initiator": "atlas0.compute",
+      "issue_cycle": 0,
+      "operation": "write",
+      "parent_id": 2,
+      "qos_class": "throughput",
+      "size_bytes": 192,
+      "state": "COMPLETED"
+    },
+    {
+      "completion_cycle": 75,
+      "durable_cycle": 41,
+      "global_address": 8192,
+      "initiator": "gpu0",
+      "issue_cycle": 0,
+      "operation": "write",
+      "parent_id": 3,
+      "qos_class": "normal",
+      "size_bytes": 64,
+      "state": "COMPLETED"
+    },
+    {
+      "completion_cycle": 89,
+      "durable_cycle": 39,
+      "global_address": 12288,
+      "initiator": "atlas0.compute",
+      "issue_cycle": 0,
+      "operation": "read",
+      "parent_id": 4,
+      "qos_class": "latency",
+      "size_bytes": 256,
+      "state": "COMPLETED"
+    }
+  ],
+  "schema_version": "hetero-booksim2-ramulator2-qos-runtime/v1",
+  "timing_owner": "global_cycle_booksim2_plus_single_ramulator2"
+}

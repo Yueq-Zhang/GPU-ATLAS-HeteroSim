@@ -1,0 +1,39 @@
+{
+  "activation": {
+    "activation_proven": true,
+    "active_backend": "booksim2",
+    "adapter_library": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/build/booksim2-adapter/libheterosim_booksim2_adapter.so",
+    "booksim2_active": true,
+    "network_config": "/mnt/c/Users/yueqi/Desktop/3D_DRAM/OpenSourceWorks/GPU-ATLAS-HeteroSim/configs/hetero/booksim2/mesh4_cycle.cfg",
+    "performance_claim_allowed": false,
+    "probe": {
+      "adapter_abi": "gpu-atlas-booksim2-adapter/v1",
+      "credit_accounting": true,
+      "cycle_step_api": true,
+      "deterministic_probe_passed": true,
+      "flit_conservation": true,
+      "packet_conservation": true,
+      "probe_cycles": 24
+    },
+    "requested_backend": "booksim2"
+  },
+  "config": "configs/hetero/p25/p27_booksim2_ramulator2_qos.json",
+  "gates": {
+    "booksim2_active": true,
+    "credit_conservation": true,
+    "deterministic_double_run": true,
+    "flit_conservation": true,
+    "gpu_and_atlas_present": true,
+    "packet_conservation": true,
+    "parent_conservation": true,
+    "qos_contention_observed": true,
+    "single_ramulator2_owner": true,
+    "zero_in_flight": true
+  },
+  "leg1_sha256": "e80f1e9c7555ce382fcf7920e3a829c2e47b528d4bc88df35f862110d6c04b4c",
+  "leg2_sha256": "e80f1e9c7555ce382fcf7920e3a829c2e47b528d4bc88df35f862110d6c04b4c",
+  "performance_claim_allowed": false,
+  "qualification_boundary": "BookSim2 packet/flit/credit and one live Ramulator2 request path are active. This is a functional cycle-coupling qualification; clock-domain and hardware performance calibration remain closed.",
+  "schema_version": "hetero-p27-booksim2-ramulator2-qualification/v1",
+  "status": "passed"
+}

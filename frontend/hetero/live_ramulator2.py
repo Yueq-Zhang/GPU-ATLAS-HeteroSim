@@ -138,6 +138,12 @@ class LiveRamulator2Bridge:
             function = getattr(lib, name)
             function.argtypes = [ctypes.c_void_p, ctypes.POINTER(_ParentRequestV2)]
             function.restype = ctypes.c_int
+        lib.heterosim_ramulator_send_at_gateway_v2.argtypes = [
+            ctypes.c_void_p,
+            ctypes.POINTER(_ParentRequestV2),
+            ctypes.c_uint32,
+        ]
+        lib.heterosim_ramulator_send_at_gateway_v2.restype = ctypes.c_int
         lib.heterosim_ramulator_tick.argtypes = [ctypes.c_void_p]
         lib.heterosim_ramulator_tick.restype = None
         self._advance_until = getattr(
@@ -242,6 +248,51 @@ class LiveRamulator2Bridge:
             raise LiveRamulator2Error(f"Ramulator2 rejected invalid parent {parent_id}")
         return result
 
+    def send_from_noc(
+        self,
+        parent_id: int,
+        global_address: int,
+        size_bytes: int,
+        operation: str,
+        initiator: int,
+        ordering_domain: int,
+        sequence_number: int,
+    ) -> int:
+        """Accept a parent already delivered to the memory-side gateway."""
+
+        if self._closed or parent_id <= 0 or parent_id in self._accepted:
+            raise LiveRamulator2Error(f"invalid or duplicate parent {parent_id}")
+        if operation not in {"read", "write"}:
+            raise LiveRamulator2Error(f"invalid memory operation {operation}")
+        if initiator not in {self.GPU_INITIATOR, self.ATLAS_INITIATOR}:
+            raise LiveRamulator2Error(f"invalid initiator {initiator}")
+        request = _ParentRequestV2()
+        request.abi_version = self.ABI_VERSION
+        request.struct_size = ctypes.sizeof(_ParentRequestV2)
+        request.parent_id = parent_id
+        request.global_address = global_address
+        request.size_bytes = size_bytes
+        request.partition_id = 0
+        request.operation = 1 if operation == "write" else 0
+        request.flags = 0
+        request.byte_mask_word_count = 0
+        request.sector_mask = 0
+        request.ordering_domain = ordering_domain
+        request.sequence_number = sequence_number
+        request.qos_class = 0
+        request.reserved = 0
+        request.payload = ctypes.c_void_p(parent_id)
+        result = int(
+            self._library.heterosim_ramulator_send_at_gateway_v2(
+                self._handle, ctypes.byref(request), initiator
+            )
+        )
+        if result == self.SEND_ACCEPTED:
+            self._accepted.add(parent_id)
+        elif result == self.SEND_INVALID:
+            raise LiveRamulator2Error(f"Ramulator2 rejected invalid parent {parent_id}")
+        return result
+
     def advance_until_event(self, max_cycles: int) -> int:
         if self._closed or max_cycles < 0:
             raise LiveRamulator2Error("invalid Ramulator2 advance")
@@ -253,6 +304,13 @@ class LiveRamulator2Bridge:
                 "Ramulator2 made no progress while no completion was visible"
             )
         return advanced
+
+    def tick(self) -> None:
+        """Advance the live Ramulator2 owner by exactly one bridge tick."""
+
+        if self._closed:
+            raise LiveRamulator2Error("Ramulator2 bridge is closed")
+        self._library.heterosim_ramulator_tick(self._handle)
 
     def pop_completions(self) -> list[dict[str, int]]:
         result: list[dict[str, int]] = []

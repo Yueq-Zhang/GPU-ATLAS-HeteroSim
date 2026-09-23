@@ -174,6 +174,7 @@ struct ParentState {
   std::size_t next_child = 0;
   std::size_t completed_children = 0;
   bool gpu_visible = false;
+  bool response_via_bridge_link = false;
   uint32_t initiator = HETEROSIM_INITIATOR_GPU;
 };
 
@@ -395,10 +396,12 @@ struct SharedBridge {
   }
 
   void accept_request_at_gateway(const heterosim_parent_request_v2 &request,
-                                 uint32_t initiator) {
+                                 uint32_t initiator,
+                                 bool response_via_bridge_link) {
     ParentState state;
     state.request = request;
     state.initiator = initiator;
+    state.response_via_bridge_link = response_via_bridge_link;
     state.children = split(request);
     if (state.children.empty()) {
       throw std::runtime_error("accepted parent produced no active child requests");
@@ -413,7 +416,7 @@ struct SharedBridge {
            parents.size() < parent_table_entries &&
            ingress.size() < ingress_queue_depth) {
       accept_request_at_gateway(request_link_arrivals.front().request,
-                                HETEROSIM_INITIATOR_GPU);
+                                HETEROSIM_INITIATOR_GPU, true);
       request_link_arrivals.pop_front();
     }
     while (!response_link_arrivals.empty() &&
@@ -585,7 +588,7 @@ struct SharedBridge {
     ++children_completed;
     if (parent.completed_children != parent.children.size()) return;
     ++durable_completed;
-    if (parent.initiator == HETEROSIM_INITIATOR_ATLAS_LOGIC_DIE) {
+    if (!parent.response_via_bridge_link) {
       heterosim_parent_completion_v2 completion{};
       completion.abi_version = HETEROSIM_RAMULATOR_ABI_VERSION;
       completion.struct_size = sizeof(completion);
@@ -596,14 +599,14 @@ struct SharedBridge {
           static_cast<uint32_t>(parent.children.size());
       completion.completed_children = completion.total_children;
       completion.durable = 1U;
-      completion.initiator = HETEROSIM_INITIATOR_ATLAS_LOGIC_DIE;
+      completion.initiator = parent.initiator;
       completion.payload = parent.request.payload;
       completed_payloads.at(parent.request.partition_id).push_back(completion);
       ++completed;
-      ++completed_by_initiator.at(HETEROSIM_INITIATOR_ATLAS_LOGIC_DIE);
+      ++completed_by_initiator.at(parent.initiator);
       if (!inflight_parent_ids.erase(parent.request.parent_id)) {
         throw std::runtime_error(
-            "ATLAS completion did not own an inflight parent ID");
+            "gateway-direct completion did not own an inflight parent ID");
       }
     } else if (!parent.gpu_visible) {
       enqueue_response(parent.request,
@@ -938,7 +941,26 @@ extern "C" int heterosim_ramulator_send_internal_v2(
   record_parent_acceptance(shared, *parent,
                            HETEROSIM_INITIATOR_ATLAS_LOGIC_DIE);
   shared->accept_request_at_gateway(*parent,
-                                    HETEROSIM_INITIATOR_ATLAS_LOGIC_DIE);
+                                    HETEROSIM_INITIATOR_ATLAS_LOGIC_DIE, false);
+  return HETEROSIM_SEND_ACCEPTED;
+}
+
+extern "C" int heterosim_ramulator_send_at_gateway_v2(
+    heterosim_ramulator_handle opaque,
+    const heterosim_parent_request_v2 *parent, uint32_t initiator) {
+  PartitionHandle *handle = as_handle(opaque);
+  SharedBridge *shared = shared_from(opaque);
+  if (initiator > HETEROSIM_INITIATOR_ATLAS_LOGIC_DIE ||
+      !valid_parent_request(handle, shared, parent)) {
+    return HETEROSIM_SEND_INVALID;
+  }
+  if (shared->parents.size() >= shared->parent_table_entries ||
+      shared->ingress.size() >= shared->ingress_queue_depth) {
+    ++shared->rejected;
+    return HETEROSIM_SEND_RETRY;
+  }
+  record_parent_acceptance(shared, *parent, initiator);
+  shared->accept_request_at_gateway(*parent, initiator, false);
   return HETEROSIM_SEND_ACCEPTED;
 }
 

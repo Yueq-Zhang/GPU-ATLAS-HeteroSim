@@ -1,0 +1,84 @@
+{
+  "schema_version": "hetero-booksim2-ramulator2-qos-config/v1",
+  "adapter_library": "build/booksim2-adapter/libheterosim_booksim2_adapter.so",
+  "network_config": "configs/hetero/booksim2/mesh4_cycle.cfg",
+  "nodes": {
+    "gpu0": 0,
+    "atlas0.compute": 1,
+    "gateway0": 2,
+    "dram0": 3
+  },
+  "flit_bytes": 32,
+  "request_header_bytes": 16,
+  "response_header_bytes": 16,
+  "ramulator_issue_width": 1,
+  "max_cycles": 200000,
+  "qos_policy": {
+    "class_weights": {
+      "latency": 4,
+      "normal": 2,
+      "throughput": 1
+    },
+    "max_starvation_cycles": 64
+  },
+  "ramulator2": {
+    "bridge_library": "build/ramulator2-standalone/bridge/libramulator_gpgpusim_bridge.so",
+    "config_ref": "configs/hetero/memory/ramulator2_hbdram_edge_1ch_shared.yaml",
+    "transaction_bytes": 64,
+    "gateway_ingress_queue_depth": 64,
+    "gateway_parent_table_entries": 64,
+    "gateway_issue_width": 1,
+    "write_ack_policy": "durable",
+    "gpu_clock_hz": 400000000,
+    "link_clock_hz": 400000000,
+    "gateway_clock_hz": 400000000,
+    "dram_clock_hz": 400000000,
+    "request_bandwidth_Bps": 409600000000,
+    "response_bandwidth_Bps": 409600000000,
+    "request_header_bytes": 16,
+    "response_header_bytes": 16,
+    "flit_bytes": 32,
+    "propagation_latency_fs": 0,
+    "external_queue_depth": 64,
+    "external_credits": 64,
+    "duplex_mode": "full_duplex"
+  },
+  "requests": [
+    {
+      "parent_id": 1,
+      "initiator": "gpu0",
+      "qos_class": "latency",
+      "issue_cycle": 0,
+      "global_address": 0,
+      "size_bytes": 128,
+      "operation": "read"
+    },
+    {
+      "parent_id": 2,
+      "initiator": "atlas0.compute",
+      "qos_class": "throughput",
+      "issue_cycle": 0,
+      "global_address": 4096,
+      "size_bytes": 192,
+      "operation": "write"
+    },
+    {
+      "parent_id": 3,
+      "initiator": "gpu0",
+      "qos_class": "normal",
+      "issue_cycle": 0,
+      "global_address": 8192,
+      "size_bytes": 64,
+      "operation": "write"
+    },
+    {
+      "parent_id": 4,
+      "initiator": "atlas0.compute",
+      "qos_class": "latency",
+      "issue_cycle": 0,
+      "global_address": 12288,
+      "size_bytes": 256,
+      "operation": "read"
+    }
+  ]
+}
