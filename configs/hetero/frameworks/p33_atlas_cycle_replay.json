@@ -1,0 +1,32 @@
+{
+  "schema_version": "hetero-p33-atlas-cycle-replay-config/v1",
+  "memory_service": {
+    "bridge_library": "build/ramulator2-standalone/bridge/libramulator_gpgpusim_bridge.so",
+    "config_ref": "configs/hetero/memory/ramulator2_hbdram_edge_16ch_shared.yaml",
+    "transaction_bytes": 64,
+    "gpu_clock_hz": 1200000000,
+    "link_clock_hz": 400000000,
+    "gateway_clock_hz": 400000000,
+    "dram_clock_hz": 400000000,
+    "gateway_ingress_queue_depth": 256,
+    "gateway_parent_table_entries": 256,
+    "gateway_issue_width": 16,
+    "write_ack_policy": "durable",
+    "request_bandwidth_Bps": 12800000000,
+    "response_bandwidth_Bps": 12800000000,
+    "request_header_bytes": 16,
+    "response_header_bytes": 16,
+    "flit_bytes": 32,
+    "propagation_latency_fs": 10000000,
+    "external_queue_depth": 64,
+    "external_credits": 64,
+    "duplex_mode": "full_duplex"
+  },
+  "execution_contract": {
+    "initiator": "atlas0.compute",
+    "request_source": "p31_atlas_tensor_ir_full_memory_trace",
+    "single_ramulator2_owner_per_leg": true,
+    "durable_write_ack": true,
+    "performance_claim_allowed": false
+  }
+}

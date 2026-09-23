@@ -1,0 +1,197 @@
+{
+  "artifact_semantics": {
+    "atlas": "qkv_projection_offload_candidate",
+    "gpu": "whole_layer_reference_envelope",
+    "mixed_placement_makespan_qualified": false,
+    "qkv_double_count_prevented": true,
+    "timing_aggregation": "non_additive_reference_candidate"
+  },
+  "events": [
+    {
+      "depends_on": [],
+      "event": "request_arrive",
+      "request_id": "request-0",
+      "sequence": 0,
+      "time_fs": 0
+    },
+    {
+      "depends_on": [
+        0
+      ],
+      "event": "decode_phase_begin",
+      "kv_length": 17,
+      "q_len": 1,
+      "request_id": "request-0",
+      "sequence": 1,
+      "time_fs": 0
+    },
+    {
+      "artifact_id": "tinyllama.1_1b.huggingface.layer0.decode_step.bs1.ctx16.q1.kv17.fp16.remote_sm89.ampere_replay_sm86.accel_sim_v2",
+      "depends_on": [
+        1
+      ],
+      "event": "gpu_reference_envelope_begin",
+      "resource": "gpu0",
+      "sequence": 2,
+      "time_fs": 0
+    },
+    {
+      "depends_on": [
+        2
+      ],
+      "duration_fs": 14009953180213,
+      "event": "gpu_reference_durable",
+      "parent_count": 2756823,
+      "resource": "shared0.dram3d",
+      "sequence": 3,
+      "time_fs": 14009953180213
+    },
+    {
+      "artifact_key": "62cbebf2fbccdefc8a66bff429cf6be2bf2482fca21514b1a733a3badafcced2",
+      "depends_on": [
+        1
+      ],
+      "event": "atlas_qkv_candidate_begin",
+      "resource": "atlas0.compute",
+      "sequence": 4,
+      "time_fs": 0
+    },
+    {
+      "depends_on": [
+        4
+      ],
+      "duration_fs": 1004810000000,
+      "event": "atlas_qkv_candidate_durable",
+      "parent_count": 338080,
+      "resource": "shared0.dram3d",
+      "sequence": 5,
+      "time_fs": 1004810000000
+    },
+    {
+      "depends_on": [
+        3,
+        5
+      ],
+      "event": "shadow_observation_barrier",
+      "sequence": 6,
+      "time_fs": 14009953180213,
+      "version": "layer0.decode.observation.v1"
+    },
+    {
+      "committed_version": "layer0.decode.observation.v1",
+      "depends_on": [
+        6
+      ],
+      "event": "framework_version_commit",
+      "framework_token_authority": "huggingface",
+      "kv_state": "retained_not_released",
+      "previous_version": "layer0.decode.observation.pending",
+      "sequence": 7,
+      "time_fs": 14009953180213
+    },
+    {
+      "depends_on": [
+        7
+      ],
+      "event": "request_finish",
+      "request_id": "request-0",
+      "sequence": 8,
+      "time_fs": 14009953180213
+    }
+  ],
+  "feedback_to_framework": false,
+  "framework_simulation_key": "b6ee66f5fe9c47bba219d893aefe78392e2d25740e1205e31a2a401e4ef2c5fa",
+  "global_pa": {
+    "atlas_ranges": [
+      [
+        8589934592,
+        8589938688
+      ],
+      [
+        8589938688,
+        8600424448
+      ],
+      [
+        8600424448,
+        8600429568
+      ]
+    ],
+    "gpu_ranges": [
+      [
+        0,
+        2214592512
+      ],
+      [
+        2214592512,
+        2225078272
+      ],
+      [
+        2225078272,
+        2231369728
+      ],
+      [
+        2231369728,
+        2250244096
+      ]
+    ],
+    "memory_space_id": "shared0.dram3d",
+    "non_overlapping": true
+  },
+  "global_time": {
+    "aggregation": "max_of_non_additive_branches",
+    "observation_barrier_fs": 14009953180213,
+    "owner": "shadow0",
+    "unit": "fs"
+  },
+  "qualification": {
+    "dependency_causality": true,
+    "durable_before_version_commit": true,
+    "end_to_end_framework_timeline_qualified": true,
+    "global_pa_non_overlap": true,
+    "kv_release_before_durable": false,
+    "mixed_placement_makespan_qualified": false,
+    "online_huggingface_request_connected": true,
+    "performance_claim_allowed": false,
+    "request_finish_after_version_commit": true,
+    "resource_occupancy_recorded": true,
+    "single_global_time_owner": true
+  },
+  "record_sha256": "cda934e434f48260b502f1642fdb28990f0f6e5bf4d92745f150f8dc7ce4344d",
+  "resource_occupancy": [
+    {
+      "branch": "gpu_whole_layer_reference",
+      "end_fs": 14009953180213,
+      "resource": "gpu0",
+      "start_fs": 0
+    },
+    {
+      "branch": "gpu_whole_layer_reference",
+      "end_fs": 14009953180213,
+      "resource": "shared0.dram3d",
+      "start_fs": 0
+    },
+    {
+      "branch": "atlas_qkv_candidate",
+      "end_fs": 1004810000000,
+      "resource": "atlas0.compute",
+      "start_fs": 0
+    },
+    {
+      "branch": "atlas_qkv_candidate",
+      "end_fs": 1004810000000,
+      "resource": "shared0.dram3d",
+      "start_fs": 0
+    }
+  ],
+  "schema_version": "hetero-p32-online-shadow-timeline/v1",
+  "status": "passed",
+  "tokens_or_scheduler_mutated": false,
+  "workload": {
+    "batch_size": 1,
+    "decode_tokens": 1,
+    "dtype": "fp16",
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "prompt_tokens": 16,
+    "revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6"
+  }
+}

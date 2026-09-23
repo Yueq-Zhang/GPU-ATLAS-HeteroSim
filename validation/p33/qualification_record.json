@@ -1,0 +1,123 @@
+{
+  "atlas": {
+    "completion_stream_sha256": "2ce514cf23e5b1615a53cb8ef8793af83118d2f7ed161c72e19d4c6b8f587e95",
+    "deterministic_double_replay": true,
+    "first_completion": {
+      "completion_cycle": 30,
+      "completion_time_fs": 25000000,
+      "initiator": 1,
+      "operation_code": 0,
+      "parent_id": 1,
+      "total_children": 1
+    },
+    "last_completion": {
+      "completion_cycle": 1205772,
+      "completion_time_fs": 1004810000000,
+      "initiator": 1,
+      "operation_code": 1,
+      "parent_id": 338080,
+      "total_children": 1
+    },
+    "logical_bytes": 21637120,
+    "ramulator2": {
+      "accepted_parent_ids": 338080,
+      "children_completed": 338080,
+      "children_sent": 338080,
+      "clock": 401924,
+      "completed": 338080,
+      "durable_completed": 338080,
+      "gateway_cycles": 401924,
+      "global_time_fs": 1004810000000,
+      "gpu_cycles": 1205772,
+      "initiators": {
+        "atlas0.compute": {
+          "children": 338080,
+          "completed": 338080,
+          "parents": 338080
+        },
+        "gpu0": {
+          "children": 0,
+          "completed": 0,
+          "parents": 0
+        }
+      },
+      "instances": 1,
+      "internal_bytes": 21637120,
+      "link_cycles": 401924,
+      "logical_bytes": 21637120,
+      "observed_completion_ids": 338080,
+      "outstanding": 0,
+      "reads": 337920,
+      "rejected": 626230,
+      "request_payload_bytes": 0,
+      "request_wire_bytes": 0,
+      "response_payload_bytes": 0,
+      "response_wire_bytes": 0,
+      "schema_version": "hetero-live-ramulator2-statistics/v1",
+      "writes": 160
+    },
+    "read_requests": 337920,
+    "request_count": 338080,
+    "request_stream_sha256": "d56415299a33f18acbab46743a06836a5bce398b4853ae24665825b2876b5485",
+    "trace_file_sha256": "050cf123b7f67b766a0bc09253295a764a88cc6316acabf2e764d0e63cae38b9",
+    "write_requests": 160
+  },
+  "framework_simulation_key": "b6ee66f5fe9c47bba219d893aefe78392e2d25740e1205e31a2a401e4ef2c5fa",
+  "gpu": {
+    "cycles": 15859267,
+    "deterministic_double_replay": true,
+    "duration_fs": 14009953180213,
+    "external_memory_stats": {
+      "address_already_global": 0,
+      "address_binding_ranges": 4,
+      "address_translated": 575486980,
+      "address_unmapped": 0,
+      "atlas_children": 0,
+      "atlas_completed": 0,
+      "atlas_parents": 0,
+      "child_retries": 0,
+      "children_completed": 2758278,
+      "children_sent": 2758278,
+      "completed": 2756823,
+      "cycles": 5603981,
+      "durable_completed": 2756823,
+      "gateway_cycles": 5603981,
+      "global_time_fs": 14009953180212,
+      "gpu_children": 2758278,
+      "gpu_completed": 2756823,
+      "gpu_cycles": 15859267,
+      "gpu_parents": 2756823,
+      "instances": 1,
+      "internal_bytes": 176529792,
+      "link_cycles": 5603981,
+      "logical_bytes": 88358016,
+      "outstanding": 0,
+      "partitions": 16,
+      "reads": 2755360,
+      "rejected": 398672755,
+      "request_payload_bytes": 186496,
+      "request_wire_bytes": 88404832,
+      "response_payload_bytes": 88171520,
+      "response_wire_bytes": 176389856,
+      "transaction_bytes": 64,
+      "writes": 1463
+    },
+    "instructions": 371846682
+  },
+  "persistent_state_scope": {
+    "atlas_full_request_stream_one_ramulator2_per_leg": true,
+    "cross_leg_state_reuse": false,
+    "gpu_40_kernel_trace_one_process_per_leg": true,
+    "gpu_and_atlas_same_concurrent_ramulator2_instance": false
+  },
+  "qualification": {
+    "atlas_ramulator2_cycle_replay_qualified": true,
+    "gpu_double_replay_qualified": true,
+    "parent_child_durable_conservation": true,
+    "performance_claim_allowed": false,
+    "zero_in_flight": true
+  },
+  "record_sha256": "24d972201af4b01b8356e4094c4172ed255d47e4888cd72d4073c8f08458280d",
+  "schema_version": "hetero-p33-cycle-qualification/v1",
+  "status": "passed"
+}

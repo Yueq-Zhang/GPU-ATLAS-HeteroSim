@@ -1,0 +1,166 @@
+{
+  "device": {
+    "compute_capability": [
+      8,
+      9
+    ],
+    "name": "NVIDIA GeForce RTX 4090"
+  },
+  "engine": {
+    "block_size_tokens": 16,
+    "bytes_per_block": 360448,
+    "engine_class": "vllm.entrypoints.llm.LLM",
+    "kv_cache_group_count": 1,
+    "kv_cache_tensors": [
+      {
+        "block_stride": 16384,
+        "layer_count": 22,
+        "layer_stride": 695697408,
+        "offset": 0,
+        "size_bytes": 15305342976
+      }
+    ],
+    "max_num_scheduled_tokens": 128,
+    "max_num_seqs": 2,
+    "multiprocess_engine_core": false,
+    "num_gpu_blocks": 42462,
+    "scheduler_class": "vllm.v1.core.sched.async_scheduler.AsyncScheduler"
+  },
+  "finished_request_ids": [
+    "0-9d9eda52",
+    "1-b229c412"
+  ],
+  "framework": "vllm",
+  "framework_version": "0.29.0",
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "python": "3.10.12",
+  "qualification": {
+    "framework_output_used_for_finish": true,
+    "performance_claim_allowed": false,
+    "real_block_table_observed": true,
+    "real_engine_loaded": true,
+    "real_scheduler_callback_connected": true
+  },
+  "requested_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "result": {
+    "texts": [
+      "\n",
+      "\n\n"
+    ],
+    "token_ids": [
+      [
+        13
+      ],
+      [
+        13,
+        13
+      ]
+    ],
+    "token_ids_sha256": "b4c96b7712d49508e4646de31755be53fbd619738b3cb53a3ede7c7ce935d38d"
+  },
+  "scheduler_steps": [
+    {
+      "batch": {
+        "request_ids": [
+          "0-9d9eda52",
+          "1-b229c412"
+        ],
+        "token_counts": [
+          11,
+          19
+        ],
+        "total_num_scheduled_tokens": 30
+      },
+      "cached_requests": {
+        "new_block_ids": [],
+        "num_computed_tokens": [],
+        "num_output_tokens": [],
+        "request_ids": []
+      },
+      "finished_request_ids": [],
+      "new_block_ids_to_zero": [],
+      "new_requests": [
+        {
+          "block_ids": [
+            [
+              1
+            ]
+          ],
+          "num_computed_tokens": 0,
+          "prompt_tokens": 11,
+          "request_id": "0-9d9eda52"
+        },
+        {
+          "block_ids": [
+            [
+              2,
+              3
+            ]
+          ],
+          "num_computed_tokens": 0,
+          "prompt_tokens": 19,
+          "request_id": "1-b229c412"
+        }
+      ],
+      "sequence": 0
+    },
+    {
+      "batch": {
+        "request_ids": [
+          "1-b229c412"
+        ],
+        "token_counts": [
+          1
+        ],
+        "total_num_scheduled_tokens": 1
+      },
+      "cached_requests": {
+        "new_block_ids": [
+          null
+        ],
+        "num_computed_tokens": [
+          19
+        ],
+        "num_output_tokens": [
+          1
+        ],
+        "request_ids": [
+          "1-b229c412"
+        ]
+      },
+      "finished_request_ids": [],
+      "new_block_ids_to_zero": [],
+      "new_requests": [],
+      "sequence": 1
+    },
+    {
+      "batch": {
+        "request_ids": [],
+        "token_counts": [],
+        "total_num_scheduled_tokens": 0
+      },
+      "cached_requests": {
+        "new_block_ids": [],
+        "num_computed_tokens": [],
+        "num_output_tokens": [],
+        "request_ids": []
+      },
+      "finished_request_ids": [
+        "0-9d9eda52"
+      ],
+      "new_block_ids_to_zero": [],
+      "new_requests": [],
+      "sequence": 2
+    }
+  ],
+  "schema_version": "hetero-vllm-live-observation/v1",
+  "torch_version": "2.13.0+cu132",
+  "workload": {
+    "max_output_tokens": [
+      1,
+      2
+    ],
+    "prompt_text_sha256": "79b8c5ab1d7a12947a57cc843ddc28e93c1c53cae09846a4078e9d7d3c2886a3",
+    "request_count": 2
+  }
+}

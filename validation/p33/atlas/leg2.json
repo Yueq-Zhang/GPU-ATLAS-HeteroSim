@@ -1,0 +1,67 @@
+{
+  "completion_stream_sha256": "2ce514cf23e5b1615a53cb8ef8793af83118d2f7ed161c72e19d4c6b8f587e95",
+  "durable_completion_qualified": true,
+  "first_completion": {
+    "completion_cycle": 30,
+    "completion_time_fs": 25000000,
+    "initiator": 1,
+    "operation_code": 0,
+    "parent_id": 1,
+    "total_children": 1
+  },
+  "last_completion": {
+    "completion_cycle": 1205772,
+    "completion_time_fs": 1004810000000,
+    "initiator": 1,
+    "operation_code": 1,
+    "parent_id": 338080,
+    "total_children": 1
+  },
+  "logical_bytes": 21637120,
+  "performance_claim_allowed": false,
+  "ramulator2": {
+    "accepted_parent_ids": 338080,
+    "children_completed": 338080,
+    "children_sent": 338080,
+    "clock": 401924,
+    "completed": 338080,
+    "durable_completed": 338080,
+    "gateway_cycles": 401924,
+    "global_time_fs": 1004810000000,
+    "gpu_cycles": 1205772,
+    "initiators": {
+      "atlas0.compute": {
+        "children": 338080,
+        "completed": 338080,
+        "parents": 338080
+      },
+      "gpu0": {
+        "children": 0,
+        "completed": 0,
+        "parents": 0
+      }
+    },
+    "instances": 1,
+    "internal_bytes": 21637120,
+    "link_cycles": 401924,
+    "logical_bytes": 21637120,
+    "observed_completion_ids": 338080,
+    "outstanding": 0,
+    "reads": 337920,
+    "rejected": 626230,
+    "request_payload_bytes": 0,
+    "request_wire_bytes": 0,
+    "response_payload_bytes": 0,
+    "response_wire_bytes": 0,
+    "schema_version": "hetero-live-ramulator2-statistics/v1",
+    "writes": 160
+  },
+  "read_requests": 337920,
+  "record_sha256": "9f858f06bb6e84d0830c1c925f81df83797b7a1ee852906cfe9bcedb3b38e231",
+  "request_count": 338080,
+  "request_stream_sha256": "d56415299a33f18acbab46743a06836a5bce398b4853ae24665825b2876b5485",
+  "schema_version": "hetero-p33-atlas-cycle-replay/v1",
+  "single_ramulator2": true,
+  "trace_file_sha256": "050cf123b7f67b766a0bc09253295a764a88cc6316acabf2e764d0e63cae38b9",
+  "write_requests": 160
+}

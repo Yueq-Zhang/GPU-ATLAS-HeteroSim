@@ -1,0 +1,394 @@
+{
+  "qualification": {
+    "online_shadow_input_ready": true,
+    "performance_claim_allowed": false,
+    "real_tensorrt_llm_engine_profile_connected": true,
+    "real_vllm_block_table_connected": true,
+    "real_vllm_paged_kv_global_pa_bound": true,
+    "real_vllm_scheduler_connected": true,
+    "serialized_tensorrt_engine_qualified": false
+  },
+  "record_sha256": "9b5c191a291a09eea308f4d20c840bf788524b58bf8a8bd8cb1221607d9f5187",
+  "schema_version": "hetero-p34-live-framework-qualification/v1",
+  "status": "passed",
+  "tensorrt_llm": {
+    "backend_scope": "tensorrt_llm_llm_api_pytorch_backend",
+    "feedback_to_framework": false,
+    "identity": {
+      "device": {
+        "compute_capability": [
+          8,
+          9
+        ],
+        "name": "NVIDIA GeForce RTX 4090"
+      },
+      "engine": {
+        "backend": "pytorch",
+        "engine_class": "tensorrt_llm.llmapi.llm.LLM",
+        "executor_class": "tensorrt_llm.executor.worker.GenerationExecutorWorker",
+        "profile": {
+          "max_batch_size": 2,
+          "max_input_len": 63,
+          "max_num_tokens": 128,
+          "max_seq_len": 64
+        },
+        "scheduler_class": "tensorrt_llm._torch.pyexecutor.scheduler.SimpleScheduler",
+        "serialized_engine_sha256": null
+      },
+      "events": [
+        {
+          "engine_class": "tensorrt_llm.llmapi.llm.LLM",
+          "event": "engine_initialized",
+          "executor_class": "tensorrt_llm.executor.worker.GenerationExecutorWorker",
+          "sequence": 0
+        },
+        {
+          "active_request_states": {
+            "request-0000": "LlmRequestState.CONTEXT_INIT",
+            "request-0001": "LlmRequestState.CONTEXT_INIT"
+          },
+          "context_request_ids": [
+            "request-0000",
+            "request-0001"
+          ],
+          "event": "scheduler_step",
+          "generation_request_ids": [],
+          "paused_request_ids": [],
+          "request_ids": [
+            "request-0000",
+            "request-0001"
+          ],
+          "sequence": 1
+        },
+        {
+          "active_request_states": {
+            "request-0000": "LlmRequestState.GENERATION_TO_COMPLETE",
+            "request-0001": "LlmRequestState.GENERATION_TO_COMPLETE"
+          },
+          "context_request_ids": [],
+          "event": "scheduler_step",
+          "generation_request_ids": [],
+          "paused_request_ids": [],
+          "request_ids": [],
+          "sequence": 2
+        },
+        {
+          "active_request_states": {
+            "request-0002": "LlmRequestState.CONTEXT_INIT"
+          },
+          "context_request_ids": [
+            "request-0002"
+          ],
+          "event": "scheduler_step",
+          "generation_request_ids": [],
+          "paused_request_ids": [],
+          "request_ids": [
+            "request-0002"
+          ],
+          "sequence": 3
+        },
+        {
+          "active_request_states": {
+            "request-0002": "LlmRequestState.GENERATION_TO_COMPLETE"
+          },
+          "context_request_ids": [],
+          "event": "scheduler_step",
+          "generation_request_ids": [],
+          "paused_request_ids": [],
+          "request_ids": [],
+          "sequence": 4
+        },
+        {
+          "active_request_states": {
+            "request-0000": "LlmRequestState.CONTEXT_INIT"
+          },
+          "context_request_ids": [
+            "request-0000"
+          ],
+          "event": "scheduler_step",
+          "generation_request_ids": [],
+          "paused_request_ids": [],
+          "request_ids": [
+            "request-0000"
+          ],
+          "sequence": 5
+        },
+        {
+          "active_request_states": {
+            "request-0000": "LlmRequestState.GENERATION_TO_COMPLETE",
+            "request-0001": "LlmRequestState.CONTEXT_INIT"
+          },
+          "context_request_ids": [
+            "request-0001"
+          ],
+          "event": "scheduler_step",
+          "generation_request_ids": [],
+          "paused_request_ids": [],
+          "request_ids": [
+            "request-0001"
+          ],
+          "sequence": 6
+        },
+        {
+          "active_request_states": {
+            "request-0001": "LlmRequestState.GENERATION_TO_COMPLETE"
+          },
+          "context_request_ids": [],
+          "event": "scheduler_step",
+          "generation_request_ids": [],
+          "paused_request_ids": [],
+          "request_ids": [],
+          "sequence": 7
+        },
+        {
+          "event": "request_complete",
+          "finished": [
+            true,
+            true
+          ],
+          "request_ids": [
+            "request-0000",
+            "request-0001"
+          ],
+          "sequence": 8
+        }
+      ],
+      "framework_version": "1.2.1",
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "requested_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+      "result": {
+        "finished": true,
+        "texts": [
+          "\n",
+          "\n"
+        ],
+        "token_ids": [
+          [
+            13
+          ],
+          [
+            13
+          ]
+        ],
+        "token_ids_sha256": "6be0a279e37bda0add6c372dcaefdfb27182f3cecf0e30a213a013ca2b39def9"
+      }
+    },
+    "identity_sha256": "e9083d22ad31f76aa4931a04e94fa167ae68ac10b0d1babaadea8ccf1782d32b",
+    "nonempty_scheduler_callback_count": 4,
+    "performance_claim_allowed": false,
+    "real_engine_object_observed": true,
+    "real_profile_observed": true,
+    "real_scheduler_callback_connected": true,
+    "scheduler_callback_count": 7,
+    "schema_version": "hetero-tensorrt-llm-live-normalized/v1",
+    "serialized_tensorrt_engine_qualified": false
+  },
+  "vllm": {
+    "allocation_ledger": [
+      {
+        "block_id": 1,
+        "global_address": 274878267392,
+        "group_id": 0,
+        "request_id": "request-0000",
+        "size_bytes": 360448
+      },
+      {
+        "block_id": 2,
+        "global_address": 274878627840,
+        "group_id": 0,
+        "request_id": "request-0001",
+        "size_bytes": 360448
+      },
+      {
+        "block_id": 3,
+        "global_address": 274878988288,
+        "group_id": 0,
+        "request_id": "request-0001",
+        "size_bytes": 360448
+      }
+    ],
+    "continuous_batching_observed": true,
+    "feedback_to_framework": false,
+    "identity": {
+      "device": {
+        "compute_capability": [
+          8,
+          9
+        ],
+        "name": "NVIDIA GeForce RTX 4090"
+      },
+      "engine": {
+        "block_size_tokens": 16,
+        "bytes_per_block": 360448,
+        "engine_class": "vllm.entrypoints.llm.LLM",
+        "kv_cache_group_count": 1,
+        "kv_cache_tensors": [
+          {
+            "block_stride": 16384,
+            "layer_count": 22,
+            "layer_stride": 695697408,
+            "offset": 0,
+            "size_bytes": 15305342976
+          }
+        ],
+        "max_num_scheduled_tokens": 128,
+        "max_num_seqs": 2,
+        "multiprocess_engine_core": false,
+        "num_gpu_blocks": 42462,
+        "scheduler_class": "vllm.v1.core.sched.async_scheduler.AsyncScheduler"
+      },
+      "finished_request_ids": [
+        "request-0000",
+        "request-0001"
+      ],
+      "framework_version": "0.29.0",
+      "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "requested_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+      "result": {
+        "texts": [
+          "\n",
+          "\n\n"
+        ],
+        "token_ids": [
+          [
+            13
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "token_ids_sha256": "b4c96b7712d49508e4646de31755be53fbd619738b3cb53a3ede7c7ce935d38d"
+      },
+      "scheduler_steps": [
+        {
+          "batch": {
+            "request_ids": [
+              "request-0000",
+              "request-0001"
+            ],
+            "token_counts": [
+              11,
+              19
+            ],
+            "total_num_scheduled_tokens": 30
+          },
+          "cached_requests": {
+            "new_block_ids": [],
+            "num_computed_tokens": [],
+            "num_output_tokens": [],
+            "request_ids": []
+          },
+          "finished_request_ids": [],
+          "new_block_ids_to_zero": [],
+          "new_requests": [
+            {
+              "block_ids": [
+                [
+                  1
+                ]
+              ],
+              "num_computed_tokens": 0,
+              "prompt_tokens": 11,
+              "request_id": "request-0000"
+            },
+            {
+              "block_ids": [
+                [
+                  2,
+                  3
+                ]
+              ],
+              "num_computed_tokens": 0,
+              "prompt_tokens": 19,
+              "request_id": "request-0001"
+            }
+          ],
+          "sequence": 0
+        },
+        {
+          "batch": {
+            "request_ids": [
+              "request-0001"
+            ],
+            "token_counts": [
+              1
+            ],
+            "total_num_scheduled_tokens": 1
+          },
+          "cached_requests": {
+            "new_block_ids": [
+              null
+            ],
+            "num_computed_tokens": [
+              19
+            ],
+            "num_output_tokens": [
+              1
+            ],
+            "request_ids": [
+              "request-0001"
+            ]
+          },
+          "finished_request_ids": [],
+          "new_block_ids_to_zero": [],
+          "new_requests": [],
+          "sequence": 1
+        },
+        {
+          "batch": {
+            "request_ids": [],
+            "token_counts": [],
+            "total_num_scheduled_tokens": 0
+          },
+          "cached_requests": {
+            "new_block_ids": [],
+            "num_computed_tokens": [],
+            "num_output_tokens": [],
+            "request_ids": []
+          },
+          "finished_request_ids": [
+            "request-0000"
+          ],
+          "new_block_ids_to_zero": [],
+          "new_requests": [],
+          "sequence": 2
+        }
+      ],
+      "workload": {
+        "max_output_tokens": [
+          1,
+          2
+        ],
+        "prompt_text_sha256": "79b8c5ab1d7a12947a57cc843ddc28e93c1c53cae09846a4078e9d7d3c2886a3",
+        "request_count": 2
+      }
+    },
+    "identity_sha256": "865178cec0160a9e4ee979b5f305f6db3aa406ae8ce6205a571a9ec39c94ec56",
+    "paged_kv_global_pa_bound": true,
+    "performance_claim_allowed": false,
+    "ragged_batching_observed": true,
+    "real_block_table_observed": true,
+    "real_scheduler_callback_connected": true,
+    "release_ledger": [
+      {
+        "block_id": 1,
+        "group_id": 0,
+        "request_id": "request-0000"
+      },
+      {
+        "block_id": 2,
+        "group_id": 0,
+        "request_id": "request-0001"
+      },
+      {
+        "block_id": 3,
+        "group_id": 0,
+        "request_id": "request-0001"
+      }
+    ],
+    "scheduler_step_count": 3,
+    "schema_version": "hetero-vllm-live-normalized/v1",
+    "zero_live_pages": true
+  }
+}

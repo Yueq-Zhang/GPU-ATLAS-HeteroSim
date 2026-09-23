@@ -1,0 +1,170 @@
+{
+  "device": {
+    "compute_capability": [
+      8,
+      9
+    ],
+    "name": "NVIDIA GeForce RTX 4090"
+  },
+  "engine": {
+    "backend": "pytorch",
+    "engine_class": "tensorrt_llm.llmapi.llm.LLM",
+    "executor_class": "tensorrt_llm.executor.worker.GenerationExecutorWorker",
+    "profile": {
+      "max_batch_size": 2,
+      "max_input_len": 63,
+      "max_num_tokens": 128,
+      "max_seq_len": 64
+    },
+    "scheduler_class": "tensorrt_llm._torch.pyexecutor.scheduler.SimpleScheduler",
+    "serialized_engine_sha256": null
+  },
+  "events": [
+    {
+      "engine_class": "tensorrt_llm.llmapi.llm.LLM",
+      "event": "engine_initialized",
+      "executor_class": "tensorrt_llm.executor.worker.GenerationExecutorWorker",
+      "sequence": 0
+    },
+    {
+      "active_request_states": {
+        "2": "LlmRequestState.CONTEXT_INIT",
+        "3": "LlmRequestState.CONTEXT_INIT"
+      },
+      "context_request_ids": [
+        "2",
+        "3"
+      ],
+      "event": "scheduler_step",
+      "generation_request_ids": [],
+      "paused_request_ids": [],
+      "request_ids": [
+        "2",
+        "3"
+      ],
+      "sequence": 1
+    },
+    {
+      "active_request_states": {
+        "2": "LlmRequestState.GENERATION_TO_COMPLETE",
+        "3": "LlmRequestState.GENERATION_TO_COMPLETE"
+      },
+      "context_request_ids": [],
+      "event": "scheduler_step",
+      "generation_request_ids": [],
+      "paused_request_ids": [],
+      "request_ids": [],
+      "sequence": 2
+    },
+    {
+      "active_request_states": {
+        "4": "LlmRequestState.CONTEXT_INIT"
+      },
+      "context_request_ids": [
+        "4"
+      ],
+      "event": "scheduler_step",
+      "generation_request_ids": [],
+      "paused_request_ids": [],
+      "request_ids": [
+        "4"
+      ],
+      "sequence": 3
+    },
+    {
+      "active_request_states": {
+        "4": "LlmRequestState.GENERATION_TO_COMPLETE"
+      },
+      "context_request_ids": [],
+      "event": "scheduler_step",
+      "generation_request_ids": [],
+      "paused_request_ids": [],
+      "request_ids": [],
+      "sequence": 4
+    },
+    {
+      "active_request_states": {
+        "2": "LlmRequestState.CONTEXT_INIT"
+      },
+      "context_request_ids": [
+        "2"
+      ],
+      "event": "scheduler_step",
+      "generation_request_ids": [],
+      "paused_request_ids": [],
+      "request_ids": [
+        "2"
+      ],
+      "sequence": 5
+    },
+    {
+      "active_request_states": {
+        "2": "LlmRequestState.GENERATION_TO_COMPLETE",
+        "3": "LlmRequestState.CONTEXT_INIT"
+      },
+      "context_request_ids": [
+        "3"
+      ],
+      "event": "scheduler_step",
+      "generation_request_ids": [],
+      "paused_request_ids": [],
+      "request_ids": [
+        "3"
+      ],
+      "sequence": 6
+    },
+    {
+      "active_request_states": {
+        "3": "LlmRequestState.GENERATION_TO_COMPLETE"
+      },
+      "context_request_ids": [],
+      "event": "scheduler_step",
+      "generation_request_ids": [],
+      "paused_request_ids": [],
+      "request_ids": [],
+      "sequence": 7
+    },
+    {
+      "event": "request_complete",
+      "finished": [
+        true,
+        true
+      ],
+      "request_ids": [
+        "2",
+        "3"
+      ],
+      "sequence": 8
+    }
+  ],
+  "framework": "tensorrt_llm",
+  "framework_version": "1.2.1",
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "python": "3.10.12",
+  "qualification": {
+    "performance_claim_allowed": false,
+    "real_engine_object_observed": true,
+    "real_profile_observed": true,
+    "real_scheduler_callback_connected": true,
+    "serialized_tensorrt_engine_qualified": false
+  },
+  "requested_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "result": {
+    "finished": true,
+    "texts": [
+      "\n",
+      "\n"
+    ],
+    "token_ids": [
+      [
+        13
+      ],
+      [
+        13
+      ]
+    ],
+    "token_ids_sha256": "6be0a279e37bda0add6c372dcaefdfb27182f3cecf0e30a213a013ca2b39def9"
+  },
+  "schema_version": "hetero-tensorrt-llm-live-observation/v1",
+  "torch_version": "2.9.1+cu128"
+}
